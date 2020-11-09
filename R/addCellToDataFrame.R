@@ -7,24 +7,23 @@
 #' @param colname column containing the cell to be replaced
 #' @param cellValue value to replace
 #'
-#' @return
+#' @return dataframe with the cell replaced
 #' @export
 #'
-#' @examples
-#' addCellToDataFrame (
-#' dataFrame = df,
-#' colSelection = "Name Surname",
-#' cellValueSelection = "Joe Doe",
-#' colname = "Age",
-#' cellValue = 21
-#' )
-addCellToDataFrame <- function(dataFrame, colSelection, cellValueSelection, colname, cellValue) {
+addCellToDataFrame <- function(dataFrame,
+                               colSelection,
+                               cellValueSelection,
+                               colname,
+                               cellValue) {
+  columns_names <- colnames(dataFrame)
 
-  if (!colname %in% colnames(dataFrame))
+  if (!colname %in% columns_names) {
     dataFrame[, colname] <- ""
+  }
 
-  dataFrame[dataFrame[, colSelection] == cellValueSelection, colname] <- cellValue
+  row_selector <- dataFrame[, colSelection] == cellValueSelection
 
-  return(dataFrame)
+  dataFrame[row_selector, colname] <- cellValue
+  result <- dataFrame
+  return(result)
 }
-

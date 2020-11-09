@@ -4,8 +4,7 @@ Title: Calculate Stochastic Epimutations SEM
 Version: 0.1.0
 Author: Luigi Corsaro, Davide gentilini, Lucio Calzari
 Maintainer: Luigi Corsaro <l.corsaro@a-company.it>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Find epimutaion and epilesion inside methylation dataset.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
@@ -14,13 +13,20 @@ Imports:
     checkr,
     dplyr,
     foreach,
+    gdata,
+    ggplot2,
     gtools,
     openxlsx,
     parallel,
     plyr,
     reshape2,
+    stats,
     stringi,
+    utils,
+    withr,
     zoo
 RoxygenNote: 7.1.1
 Suggests: 
     testthat
+Depends: 
+    R (>= 2.10)
