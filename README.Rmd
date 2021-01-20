@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 The goal of semseeker is to ...
 
 ## Installation
-
+  
 You can install the released version of semseeker from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
@@ -34,6 +34,64 @@ This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
 library(semseeker)
+
+library(ChAMP)
+
+idat_folder <- "~/Documents/SEMSEEKER_TEST_BWS/idat/"
+resultFolder = "~/Documents/Progetti/SEMSEEKER_TEST_BWS/result/"
+# 
+# dataToNormalize <- champ.load(directory = idat_folder, method = "minfi")
+# normalizedData <- champ.norm(
+#   beta = dataToNormalize$beta,
+#   rgSet = dataToNormalize$rgSet,
+#   mset = dataToNormalize$mset,
+#   resultsDir = resultFolder,
+#   method = "SWAN",
+#   plotBMIQ = FALSE,
+#   #arraytype = "450K",
+#   cores = min(detectCores(all.tests = FALSE, logical = TRUE) - 1,8)
+#   # set.seed(seed = 200)
+#   #detectCores(all.tests = FALSE, logical = TRUE) -1
+# )
+
+myLoadN <- champ.load(directory = idat_folder,
+                      method = "minfi",
+                      methValue="B",
+                      autoimpute=TRUE,
+                      filterDetP=TRUE,
+                      ProbeCutoff=0,
+                      SampleCutoff=0.1,
+                      detPcut=0.01,
+                      filterBeads=TRUE,
+                      beadCutoff=0.05,
+                      filterNoCG=TRUE,
+                      filterSNPs=TRUE,
+                      population=NULL,
+                      filterMultiHit=TRUE,
+                      filterXY=TRUE,
+                      force=FALSE,
+                      arraytype="450K")
+
+#NORMALIZZAZIONE ChAMP
+myNormN<-champ.norm(beta=myLoadN$beta,
+                    rgSet=myLoadN$rgSet,
+                    mset=myLoadN$mset,
+                    resultsDir= resultFolder,
+                    method="SWAN",
+                    plotBMIQ=FALSE,
+                    arraytype="450K",
+                    cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
+                    )
+
+saveRDS(myNormN,"~/Documents/SEMSEEKER_TEST_BWS/normalizedData.rds")
+
+resultFolder = "~/Documents/Progetti/SEMSEEKER_TEST_BWS/result/"
+normalizedData <- readRDS("~/Documents/SEMSEEKER_TEST_BWS//normalizedData.rds")
+calculate(sampleSheetPath = "~/Documents/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv",
+          methylationData = normalizedData,
+          resultFolder = "~/Documents/SEMSEEKER_TEST_BWS/result/")
+
+
 ## basic example code
 ```
 

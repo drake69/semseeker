@@ -14,6 +14,7 @@ calculate <- function(sampleSheetPath,
                       resultFolder,
                       bonferroniThreshold = 0.05) {
 
+  # # browser()
   # set digits to 22
   withr::local_options(list(digits = 22))
   slidingWindowSize <- 11

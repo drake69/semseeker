@@ -15,6 +15,7 @@
 #'
 analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresholds, comparison, sampleName, subFileExtension, bonferroniThreshold = 0.05, probeFeatures) {
 
+  # browser()
   MUTATIONS <- NULL
   CHR <- NULL
 
@@ -62,35 +63,45 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
   )
 
   ### get lesion #################################################################################################
+  lesionWeighted <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSorted, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
 
-  # browser()
-  chromosomes <- unique(attributes(mutationAnnotatedSorted$CHR)$levels)
-  lesionWeighted <- data.frame()
-  for (chrome in chromosomes)
-  {
-    if (chrome == "" | chrome == "X" | chrome == "Y") {
-      browser()
-    }
-    # browser(condition = chrome == "X")
-    message(sampleName, " Working on Chromosome ", chrome, " ", Sys.time())
-    mutationAnnotatedSortedTemp <- subset(mutationAnnotatedSorted, CHR == chrome)
-
-    if (plyr::empty(mutationAnnotatedSortedTemp)) {
-      browser()
-    }
-    probeFeaturesTemp <- subset(probeFeatures, CHR == chrome)
-    lesionWeightedTemp <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSortedTemp, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeaturesTemp)
-    if (sum(lesionWeightedTemp$LESIONS) > sum(mutationAnnotatedSortedTemp$MUTATIONS)) {
-      browser()
-    }
-    lesionWeighted <- rbind(lesionWeighted, lesionWeightedTemp)
-  }
+  # # # browser()
+  # chromosomes <- unique(attributes(mutationAnnotatedSorted$CHR)$levels)
+  # lesionWeighted <- data.frame()
+  # for (chrome in chromosomes)
+  # {
+  #   if ( chrome == "" | chrome == "X" | chrome == "Y") {
+  #     browser()
+  #   }
+  #   # # browser(condition = chrome == "X")
+  #   message(sampleName, " Working on Chromosome ", chrome, " ", Sys.time())
+  #   mutationAnnotatedSortedTemp <- subset(mutationAnnotatedSorted, CHR == chrome)
+  #
+  #   if (chrome == "11") {
+  #     if( sampleName=="X35")
+  #     {
+  #       browser()
+  #       write.csv2(x = mutationAnnotatedSortedTemp,paste("/home/lcorsaro/Documents/",subFileExtension,".csv", sep=""))
+  #     }
+  #   }
+  #
+  #   if (plyr::empty(mutationAnnotatedSortedTemp)) {
+  #     # browser()
+  #   }
+  #   probeFeaturesTemp <- subset(probeFeatures, CHR == chrome)
+  #   # browser()
+  #   lesionWeightedTemp <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSortedTemp, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeaturesTemp)
+  #   if (sum(lesionWeightedTemp$LESIONS) > sum(mutationAnnotatedSortedTemp$MUTATIONS)) {
+  #     # browser()
+  #   }
+  #   lesionWeighted <- rbind(lesionWeighted, lesionWeightedTemp)
+  # }
 
   result["lesionCount"] <- dim(lesionWeighted)[1]
   result["probesCount"] <- dim(probeFeatures)[1]
   # if (result["lesionCount"] > dim(mutationAnnotatedSortedToSave)[1])
   # {
-  #   #browser()
+  #   ## browser()
   #   lesionWeighted <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSorted, slidingWindowSize = slidingWindowSize , sampleName = sampleName, probeFeatures =  probeFeatures)
   #   result["lesionCount"] <- dim(lesionWeighted)[1]
   # }

@@ -79,50 +79,56 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   message("WarmedUP ...", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  # browser()
+  # # browser()
   summaryFileName <- paste0(resultFolder, "/", "summary.csv", sep = "")
   system(paste0("echo '", paste(colnames(sampleSheet), collapse = ","), "' > ", summaryFileName, sep = ""))
 
+  browser()
   i <- NULL
-  # for (i in 1:dim(beta_values)[2]) {
-  foreach::foreach(i = 1:dim(beta_values)[2]) %dopar% {
+  for (i in 1:dim(beta_values)[2]) {
+  # foreach::foreach(i = 1:dim(beta_values)[2]) %dopar% {
 
-    # browser()
-    message("Starting sample analysis number: ", i, " ", Sys.time())
     sampleDetail <- sampleSheet[i, ]
-    colnames(sampleDetail) <- colnames(sampleSheet)
+    if(sampleDetail$Sample_ID=="X35")
+    {
+      browser()
+      message("Starting sample analysis number: ", i, " ", Sys.time())
+      sampleDetail <- sampleSheet[i, ]
+      colnames(sampleDetail) <- colnames(sampleSheet)
 
-    deltaSingleSample(
-       probeFeatures = probeFeatures,  values = beta_values[i], resultFolder = resultFolder, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleName = sampleDetail$Sample_ID,
-       betaMedians = betaMedians, subFileExtension = "DELTAS"
-    )
+      deltaSingleSample(
+        probeFeatures = probeFeatures,  values = beta_values[i], resultFolder = resultFolder, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleName = sampleDetail$Sample_ID,
+        betaMedians = betaMedians, subFileExtension = "DELTAS"
+      )
 
-    sampleStatusTemp <- analyzeSingleSample(
-      values = beta_values[i], slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaSuperiorThresholds, comparison = `>`, sampleName = sampleDetail$Sample_ID,
-      subFileExtension = "HYPER", bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures
-    )
+      sampleStatusTemp <- analyzeSingleSample(
+        values = beta_values[i], slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaSuperiorThresholds, comparison = `>`, sampleName = sampleDetail$Sample_ID,
+        subFileExtension = "HYPER", bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures
+      )
 
-    # browser()
-    sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Probes_Count", cellValue = sampleStatusTemp["probesCount"])
-    sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Mutations", cellValue = sampleStatusTemp["mutationCount"])
-    sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Lesions", cellValue = sampleStatusTemp["lesionCount"])
+      # # browser()
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Probes_Count", cellValue = sampleStatusTemp["probesCount"])
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Mutations", cellValue = sampleStatusTemp["mutationCount"])
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Lesions", cellValue = sampleStatusTemp["lesionCount"])
 
-    sampleStatusTemp <- analyzeSingleSample(
-      values = beta_values[i], slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaInferiorThresholds, comparison = `<`, sampleName = sampleDetail$Sample_ID,
-       subFileExtension = "HYPO", probeFeatures = probeFeatures
-    )
+      sampleStatusTemp <- analyzeSingleSample(
+        values = beta_values[i], slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaInferiorThresholds, comparison = `<`, sampleName = sampleDetail$Sample_ID,
+        subFileExtension = "HYPO", probeFeatures = probeFeatures
+      )
 
-    # browser()
-    sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Mutations", cellValue = sampleStatusTemp["mutationCount"])
-    sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Lesions", cellValue = sampleStatusTemp["lesionCount"])
+      # # browser()
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Mutations", cellValue = sampleStatusTemp["mutationCount"])
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Lesions", cellValue = sampleStatusTemp["lesionCount"])
 
-    tempExtension <- stringi::stri_rand_strings(1, 10)
-    filePath <- paste0(summaryFileName, tempExtension, sep = "")
-    utils::write.table(sampleDetail, file = filePath, quote = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
-    system(paste0("cat ", filePath, " >> ", summaryFileName, sep = ""))
-    system(paste0("rm ", filePath, sep = ""))
+      tempExtension <- stringi::stri_rand_strings(1, 10)
+      filePath <- paste0(summaryFileName, tempExtension, sep = "")
+      utils::write.table(sampleDetail, file = filePath, quote = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
+      system(paste0("cat ", filePath, " >> ", summaryFileName, sep = ""))
+      system(paste0("rm ", filePath, sep = ""))
 
-    # forEachSampleSheet[i,] <- sampleDetail system(paste0('echo '', paste(sampleDetail,collapse = ',') , '' >> ', summaryFileName, sep = ''))
+      # forEachSampleSheet[i,] <- sampleDetail system(paste0('echo '', paste(sampleDetail,collapse = ',') , '' >> ', summaryFileName, sep = ''))
+
+      }
   }
 
 
