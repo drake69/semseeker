@@ -120,8 +120,8 @@ Hash: 931f9972deae0f205e1c78a51f33149b
 
 Package: brio
 Source: CRAN
-Version: 1.1.0
-Hash: 6935ba0d343d8901caf6b0a524749b4a
+Version: 1.1.1
+Hash: 14f5792a274142d1d69d32d454377844
 
 Package: callr
 Source: CRAN
