@@ -55,7 +55,7 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   doParallel::registerDoParallel(computation_cluster)
 
   # options(digits = 22)
-  parallel::clusterExport(computation_cluster, list("analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample", "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame"))
+  parallel::clusterExport(computation_cluster, list("PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body","getLesionsNew", "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample", "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame"))
 
 
   ### get beta_values ########################################################
@@ -83,15 +83,17 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   summaryFileName <- paste0(resultFolder, "/", "summary.csv", sep = "")
   system(paste0("echo '", paste(colnames(sampleSheet), collapse = ","), "' > ", summaryFileName, sep = ""))
 
-  browser()
+
+  # data("PROBES_Gene_5UTR")
+  # browser()
   i <- NULL
-  for (i in 1:dim(beta_values)[2]) {
-  # foreach::foreach(i = 1:dim(beta_values)[2]) %dopar% {
+  # for (i in 1:dim(beta_values)[2]) {
+  foreach::foreach(i = 1:dim(beta_values)[2], .packages=c("dplyr")) %dopar% {
 
     sampleDetail <- sampleSheet[i, ]
-    if(sampleDetail$Sample_ID=="X35")
+    # if(sampleDetail$Sample_ID=="X35")
     {
-      browser()
+      # browser()
       message("Starting sample analysis number: ", i, " ", Sys.time())
       sampleDetail <- sampleSheet[i, ]
       colnames(sampleDetail) <- colnames(sampleSheet)
@@ -130,7 +132,6 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
 
       }
   }
-
 
 
   sampleSheet <- utils::read.csv(file = summaryFileName)

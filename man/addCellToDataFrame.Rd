@@ -25,18 +25,9 @@ addCellToDataFrame(
 \item{cellValue}{value to replace}
 }
 \value{
-
+dataframe with the cell replaced
 }
 \description{
 Find a cell using the row selected with value cellValueSelection in the
 column colSelection and the column colname
-}
-\examples{
-addCellToDataFrame (
-dataFrame = df,
-colSelection = "Name Surname",
-cellValueSelection = "Joe Doe",
-colname = "Age",
-cellValue = 21
-)
 }

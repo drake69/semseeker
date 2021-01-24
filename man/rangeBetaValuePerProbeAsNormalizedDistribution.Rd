@@ -18,9 +18,3 @@ methylation matrix as normalized distribution
 \description{
 Nrmalize the methyation level distributing as a normalized distribution
 }
-\examples{
-rangeBetaValuePerProbeAsNormalizedDistribution(
-populationMatrix = controlPopulationMatrix,
-iqrTimes = 3
-)
-}

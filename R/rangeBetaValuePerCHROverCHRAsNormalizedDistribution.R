@@ -23,7 +23,7 @@ rangeBetaValuePerCHROverCHRAsNormalizedDistribution <- function(populationMatrix
   ## by CHR median #
   betaValuesMergedCHR <- subset(betaValuesMergedComplete, (!is.na(betaValuesMergedComplete$CHR) & !is.null(betaValuesMergedComplete$CHR) & betaValuesMergedComplete$CHR != ""))
 
-  # # browser()
+  # #  
   betaValuesNoCHRMatrix <- betaValuesMergedNoCHR[, -(1:4)]
 
   betaMedianValuesNoCHR <- parApply(computationCluster, betaValuesNoCHRMatrix, 1, median)
@@ -34,7 +34,7 @@ rangeBetaValuePerCHROverCHRAsNormalizedDistribution <- function(populationMatrix
   betaIQRValuesNoCHR <- data.frame(betaIQRValuesNoCHR)
   colnames(betaIQRValuesNoCHR) <- "iqr"
 
-  ## browser()
+  ##  
 
   chromosomes <- as.character(unique(attributes(betaValuesMergedCHR$CHR)$levels))
   chromosomes <- subset(chromosomes, chromosomes != "")
@@ -51,7 +51,7 @@ rangeBetaValuePerCHROverCHRAsNormalizedDistribution <- function(populationMatrix
     data.frame(row.names = probes, median = medianValues, iqr = iqrValues)
   }
 
-  ## browser()
+  ##  
 
   betaMedianValues <- data.frame(row.names = rownames(betaMedianIQRValues), betaMedianIQRValues[, "median"])
   colnames(betaMedianValues) <- "median"
@@ -69,7 +69,7 @@ rangeBetaValuePerCHROverCHRAsNormalizedDistribution <- function(populationMatrix
   if (!test_match_order(row.names(betaValues), row.names(betaIQRValues)))
     stop("Wrong order matching Probes and Mutation!", Sys.time())
 
-  # # browser()
+  # #  
 
   betaInferiorThresholds <- (betaMedianValues - (iqrTimes * betaIQRValues))
   row.names(betaInferiorThresholds) <- row.names(betaMedianValues)

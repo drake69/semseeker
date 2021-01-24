@@ -2,7 +2,7 @@
 % Please edit documentation in R/dumpSampleAsBedFile.R
 \name{dumpSampleAsBedFile}
 \alias{dumpSampleAsBedFile}
-\title{Title}
+\title{given data and colnames dump as bed file}
 \usage{
 dumpSampleAsBedFile(
   dataToDump,
@@ -14,11 +14,21 @@ dumpSampleAsBedFile(
 )
 }
 \arguments{
-\item{multipleFileColNames}{}
+\item{dataToDump}{data frame to dump into bed file with CHR, START, END}
+
+\item{fileExtension}{extension to give to written file}
+
+\item{resultFolder}{root folder to save dumped files}
+
+\item{resultSubFolder}{folder under the root result folder to group files}
+
+\item{sampleName}{name of the sample to create the file for}
+
+\item{multipleFileColNames}{names to use as header for the files dumped}
 }
 \value{
-
+nothing
 }
 \description{
-Title
+given data and colnames dump as bed file
 }

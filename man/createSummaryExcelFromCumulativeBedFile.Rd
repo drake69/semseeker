@@ -2,20 +2,28 @@
 % Please edit documentation in R/createSummaryExcelFromCumulativeBedFile.R
 \name{createSummaryExcelFromCumulativeBedFile}
 \alias{createSummaryExcelFromCumulativeBedFile}
-\title{createSummaryExcelFromCumulativeBedFile}
+\title{createSummaryExcelFromCumulativeBedFile build an excel summary of figures and
+anomaly staring from the cumulative bed files into the result folder}
 \usage{
 createSummaryExcelFromCumulativeBedFile(
   resultFolder,
-  probeFeaturesOriginal,
+  probeFeatures,
   sampleSheet
 )
 }
 \arguments{
-\item{sampleSheet}{}
+\item{resultFolder}{where the bed files are located and organized with
+anomaly and figure built tree}
+
+\item{probeFeatures}{probes information CHR, START, END and rowname
+as probenames}
+
+\item{sampleSheet}{sheet of samples with at least Sample_ID column}
 }
 \value{
-
+a saved excel file
 }
 \description{
-createSummaryExcelFromCumulativeBedFile
+createSummaryExcelFromCumulativeBedFile build an excel summary of figures and
+anomaly staring from the cumulative bed files into the result folder
 }

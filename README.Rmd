@@ -87,9 +87,7 @@ saveRDS(myNormN,"~/Documents/SEMSEEKER_TEST_BWS/normalizedData.rds")
 
 resultFolder = "~/Documents/Progetti/SEMSEEKER_TEST_BWS/result/"
 normalizedData <- readRDS("~/Documents/SEMSEEKER_TEST_BWS//normalizedData.rds")
-calculate(sampleSheetPath = "~/Documents/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv",
-          methylationData = normalizedData,
-          resultFolder = "~/Documents/SEMSEEKER_TEST_BWS/result/")
+calculate(sampleSheetPath = "~/Documents/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv", methylationData = normalizedData,resultFolder = "~/Documents/SEMSEEKER_TEST_BWS/result/")
 
 
 ## basic example code

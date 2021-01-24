@@ -2,22 +2,30 @@
 % Please edit documentation in R/getLesions.R
 \name{getLesions}
 \alias{getLesions}
-\title{Title}
+\title{for each sample given the mutations return the lesions}
 \usage{
 getLesions(
   mutationAnnotatedSorted,
   slidingWindowSize,
   sampleName,
-  probePositions,
-  bonferroniThreshold = 0.05
+  bonferroniThreshold = 0.05,
+  probeFeatures
 )
 }
 \arguments{
-\item{bonferroniThreshold}{}
+\item{mutationAnnotatedSorted}{dataframe of mutations annotated and sorted
+per the input sample}
+
+\item{slidingWindowSize}{window size to calculate the hypergeometric
+distribution}
+
+\item{sampleName}{name of the sample which working with}
+
+\item{bonferroniThreshold}{accepted value to consider pValue valid}
 }
 \value{
-
+data frame with lesioned/not lesioned probes identified by 1/0
 }
 \description{
-Title
+for each sample given the mutations return the lesions
 }

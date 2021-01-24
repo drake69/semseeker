@@ -6,32 +6,19 @@
 report of pivot}
 \usage{
 calculate(
-  sampleSheet,
+  sampleSheetPath,
   methylationData,
-  probeFeatures,
   resultFolder,
-  logFolder,
-  slidingWindowSize = 11,
-  popControlSelector,
-  popStudyDefinition,
   bonferroniThreshold = 0.05
 )
 }
 \arguments{
+\item{sampleSheetPath}{dataframe with at least a column Sample_ID to identify
+samples}
+
+\item{methylationData}{matrix of methylation data}
+
 \item{resultFolder}{folder to save computed epimutations and bedgraphs files.}
-
-\item{logFolder}{folder to output log}
-
-\item{slidingWindowSize}{size of the sliding widows to compute epilesions
-default 11 probes.}
-
-\item{popControlSelector}{name of samplesheet's column to use as control
-population selector followed by selection value,}
-
-\item{popStudyDefinition}{data frame to select, from the sample sheet,
-samples to use as control as study population and as refereces two vectors
-within the first vector the names of the selection colum and tha second
-vector the study population selector,}
 
 \item{bonferroniThreshold}{= 0.05 #threshold to define which pValue
 accept for lesions definition}
@@ -42,14 +29,4 @@ files into the result folder with pivot table and bedgraph.
 \description{
 Calculate stochastic epi mutations from a methylation dataset as outcome
 report of pivot
-}
-\examples{
-calculate(
-slidingWindowSize = 11,
-resultFolder = resultFolderValue,
-logFolder = logFolderValue,
-popStudyDefinition  = ,
-popControlSelector = "Case_Ctrl == 0",
-bonferroniThreshold = 0.05
-)
 }

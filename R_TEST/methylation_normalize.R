@@ -28,7 +28,7 @@ epimut_normalize_champ <- function(sampleFolder, resultFolder, methodNormalizati
         dir.create(normalizationDataFolder)
     }
 
-    # browser()
+    #  
 
     available.cores <- min(detectCores(all.tests = FALSE, logical = TRUE) - 1, 8)
 
@@ -66,11 +66,11 @@ epimut_normalize_champ <- function(sampleFolder, resultFolder, methodNormalizati
     if (useMvalue) {
         normalizedData <- log2(normalizedData/(1 - normalizedData))
     }
-    # browser()
+    #  
     normalizedData <- data.frame(row.names = row.names(probeFeaturesValue), normalizedData)
     write.table(normalizedData, paste(normalizationDataFolder, "/CHAMP_Normalization_by_", methodNormalization, "/", "Normalized_Data.txt", sep = ""), sep = "\t", row.names = TRUE)
 
-    # browser()
+    #  
     sampleSheet <- if (methodNormalization == "SWAN") {
         data.frame(dataToNormalize$pd@listData)
     } else {
@@ -115,7 +115,7 @@ epimut_normalize_rnbeads <- function(sampleFolder, resultFolder, methodNormaliza
         dir.create(normalizationDataFolder)
     }
 
-    # browser()
+    #  
 
     # NORMALIZZAZIONE
     message("Starting normalization ", Sys.time())
@@ -148,12 +148,12 @@ epimut_normalize_rnbeads <- function(sampleFolder, resultFolder, methodNormaliza
     if (!test_match_order(row.names(normalizedData), probeFeaturesValue$Probe))
         stop("Wrong order matching Probes and Mutation!", Sys.time())
 
-    # browser()
+    #  
     normalizedData <- data.frame(row.names = row.names(probeFeaturesValue), normalizedData)
     write.table(normalizedData, paste(normalizationDataFolder, "/CHAMP_Normalization_by_", methodNormalization, "/", "Normalized_Data.txt", sep = ""), sep = "\t", row.names = TRUE)
 
 
-    # browser() NORMALIZZAZIONE
+    #   NORMALIZZAZIONE
     message("Starting normalization ", Sys.time())
     normalizedData2 <- champ.norm(beta = dataToNormalize$beta, rgSet = dataToNormalize$rgSet, mset = dataToNormalize$mset, resultsDir = paste(normalizationDataFolder, "/CHAMP_Normalization_by_", methodNormalization, "/", sep = ""),
         method = methodNormalization, plotBMIQ = FALSE)
@@ -184,14 +184,14 @@ epimut_normalize_rnbeads <- function(sampleFolder, resultFolder, methodNormaliza
     if (!test_match_order(row.names(normalizedData2), probeFeaturesValue$Probe))
         stop("Wrong order matching Probes and Mutation!", Sys.time())
 
-    # browser()
+    #  
     normalizedData2 <- data.frame(row.names = row.names(probeFeaturesValue), normalizedData2)
     write.table(normalizedData2, paste(normalizationDataFolder, "/CHAMP_Normalization_by_", methodNormalization, "/", "Normalized_Data_2.txt", sep = ""), sep = "\t", row.names = TRUE)
 
     check <- normalizedData != normalizedData2
     print(table(check))
 
-    browser()
+    #  
     sampleSheet <- if (methodNormalization == "SWAN") {
         data.frame(dataToNormalize$pd@listData)
     } else {

@@ -15,7 +15,7 @@
 #'
 analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresholds, comparison, sampleName, subFileExtension, bonferroniThreshold = 0.05, probeFeatures) {
 
-  # browser()
+  #
   MUTATIONS <- NULL
   CHR <- NULL
 
@@ -62,10 +62,153 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
     multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
   )
 
+
+  PROBES_Gene_5UTR <- get("PROBES_Gene_5UTR")
+  gene_probes <- PROBES_Gene_5UTR
+  gene_probes$CHR <- as.factor(gene_probes$CHR)
+  gene_probes$END <- gene_probes$START
+  gene_probes <- gene_probes[, c("PROBE","CHR","START","END","GENE")]
+  gene_probes <- unique(gene_probes)
+
+  mutationAnnotatedSortedGENE <- dplyr::inner_join(mutationAnnotatedSorted,gene_probes, by = c("CHR", "START","END","PROBE"))
+  lesionWeighted <- getLesionsNew(bonferroniThreshold = bonferroniThreshold, slidingWindowSize = slidingWindowSize, grouping_column = "GENE", mutationAnnotatedSorted = mutationAnnotatedSortedGENE)
+
+  # browser()
+  # summed <- aggregate(mutationAnnotatedSortedGENE$MUTATIONS, by = list(mutationAnnotatedSortedGENE$GENE), FUN = sum)
+  # colnames(summed) <- c("GENE","MUTATIONS_COUNT")
+  # counted <- aggregate(mutationAnnotatedSortedGENE$MUTATIONS, by = list(mutationAnnotatedSortedGENE$GENE), FUN = length)
+  # colnames(counted) <- c("GENE","PROBES_COUNT")
+  # mutationAnnotatedSortedGENE <- merge(mutationAnnotatedSortedGENE,summed, by = "GENE")
+  # mutationAnnotatedSortedGENE <- merge(mutationAnnotatedSortedGENE,counted, by = "GENE")
+  # enriched <- aggregate(mutationAnnotatedSortedGENE, by = list(mutationAnnotatedSortedGENE$GENE), FUN = sum, nfrequency=11)
+  #
+  # lesionWeightedTemp <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSortedGENE, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = gene_probes)
+  #
+  # genes <- unique((mutationAnnotatedSortedGENE$GENE))
+  # lesionWeighted <- data.frame()
+  # for (gene in genes)
+  # {
+  #
+  #   message(sampleName, " Working on gene ", gene, " ", Sys.time())
+  #   mutationAnnotatedSortedTemp <- subset(mutationAnnotatedSortedGENE, GENE == gene)
+  #   rownames(mutationAnnotatedSortedTemp) <- mutationAnnotatedSortedTemp$PROBE
+  #
+  #
+  #   if (plyr::empty(mutationAnnotatedSortedTemp)) {
+  #     browser()
+  #   }
+  #   probeFeaturesTemp <- mutationAnnotatedSortedTemp[, c("CHR", "START","END","PROBE")]
+  #   #
+  #   lesionWeightedTemp <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSortedTemp, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeaturesTemp)
+  #
+  #   if (sum(lesionWeightedTemp$LESIONS) > sum(mutationAnnotatedSortedTemp$MUTATIONS)) {
+  #     browser()
+  #   }
+  #   lesionWeighted <- rbind(lesionWeighted, lesionWeightedTemp)
+  # }
+
+  dumpSampleAsBedFile(
+    dataToDump = lesionWeighted,
+    fileExtension = paste0(".", subFileExtension, ".GENE_5UTR.LESIONS.bed"),
+    resultFolder = resultFolder,
+    resultSubFolder = paste("LESIONS", subFileExtension, sep = "_"),
+    sampleName = sampleName,
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
+  )
+
+
+  gene_probes <- get("PROBES_Gene_Body")
+  gene_probes$CHR <- as.factor(gene_probes$CHR)
+  gene_probes$END <- gene_probes$START
+  gene_probes <- gene_probes[, c("PROBE","CHR","START","END","GENE")]
+  gene_probes <- unique(gene_probes)
+
+  mutationAnnotatedSortedGENE <- dplyr::inner_join(mutationAnnotatedSorted,gene_probes, by = c("CHR", "START","END","PROBE"))
+  lesionWeighted <- getLesionsNew(bonferroniThreshold = bonferroniThreshold, slidingWindowSize = slidingWindowSize, grouping_column = "GENE", mutationAnnotatedSorted = mutationAnnotatedSortedGENE)
+
+  # genes <- unique((mutationAnnotatedSortedGENE$GENE))
+  # lesionWeighted <- data.frame()
+  # for (gene in genes)
+  # {
+  #
+  #   message(sampleName, " Working on gene ", gene, " ", Sys.time())
+  #   mutationAnnotatedSortedTemp <- subset(mutationAnnotatedSortedGENE, GENE == gene)
+  #   rownames(mutationAnnotatedSortedTemp) <- mutationAnnotatedSortedTemp$PROBE
+  #
+  #
+  #   if (plyr::empty(mutationAnnotatedSortedTemp)) {
+  #     browser()
+  #   }
+  #   probeFeaturesTemp <- mutationAnnotatedSortedTemp[, c("CHR", "START","END","PROBE")]
+  #   #
+  #   lesionWeightedTemp <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSortedTemp, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeaturesTemp)
+  #
+  #   if (sum(lesionWeightedTemp$LESIONS) > sum(mutationAnnotatedSortedTemp$MUTATIONS)) {
+  #     browser()
+  #   }
+  #   lesionWeighted <- rbind(lesionWeighted, lesionWeightedTemp)
+  # }
+
+  dumpSampleAsBedFile(
+    dataToDump = lesionWeighted,
+    fileExtension = paste0(".", subFileExtension, ".GENE_BODY.LESIONS.bed"),
+    resultFolder = resultFolder,
+    resultSubFolder = paste("LESIONS", subFileExtension, sep = "_"),
+    sampleName = sampleName,
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
+  )
+
+
+  dmr_probes <- get("PROBES_DMR_DMR")
+  dmr_probes$CHR <- as.factor(dmr_probes$CHR)
+  dmr_probes <- unique(dmr_probes)
+  mutationAnnotatedSortedDMR <- dplyr::inner_join(mutationAnnotatedSorted,dmr_probes, by = c("CHR", "START","END","PROBE"))
+  lesionWeighted <- getLesionsNew(bonferroniThreshold = bonferroniThreshold, slidingWindowSize = slidingWindowSize, grouping_column = "DMR", mutationAnnotatedSorted = mutationAnnotatedSortedDMR)
+
+  # dmrs <- unique((mutationAnnotatedSortedDMR$DMR))
+  # lesionWeighted <- data.frame()
+  # for (dmr in dmrs)
+  # {
+  #
+  #   message(sampleName, " Working on dmr ", dmr, " ", Sys.time())
+  #   mutationAnnotatedSortedTemp <- subset(mutationAnnotatedSortedDMR, DMR == dmr)
+  #   rownames(mutationAnnotatedSortedTemp) <- mutationAnnotatedSortedTemp$PROBE
+  #
+  #   if (plyr::empty(mutationAnnotatedSortedTemp)) {
+  #     browser()
+  #   }
+  #   probeFeaturesTemp <- mutationAnnotatedSortedTemp[, c("CHR", "START","END","PROBE")]
+  #   #
+  #   lesionWeightedTemp <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSortedTemp, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeaturesTemp)
+  #
+  #   if (sum(lesionWeightedTemp$LESIONS) > sum(mutationAnnotatedSortedTemp$MUTATIONS)) {
+  #     browser()
+  #   }
+  #   lesionWeighted <- rbind(lesionWeighted, lesionWeightedTemp)
+  # }
+
+  dumpSampleAsBedFile(
+    dataToDump = lesionWeighted,
+    fileExtension = paste0(".", subFileExtension, ".DMR.LESIONS.bed"),
+    resultFolder = resultFolder,
+    resultSubFolder = paste("LESIONS", subFileExtension, sep = "_"),
+    sampleName = sampleName,
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
+  )
+
   ### get lesion #################################################################################################
   lesionWeighted <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSorted, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
 
-  # # # browser()
+  dumpSampleAsBedFile(
+    dataToDump = lesionWeighted,
+    fileExtension = paste0(".", subFileExtension, ".LESIONS.bed"),
+    resultFolder = resultFolder,
+    resultSubFolder = paste("LESIONS", subFileExtension, sep = "_"),
+    sampleName = sampleName,
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
+  )
+
+
   # chromosomes <- unique(attributes(mutationAnnotatedSorted$CHR)$levels)
   # lesionWeighted <- data.frame()
   # for (chrome in chromosomes)
@@ -77,44 +220,40 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
   #   message(sampleName, " Working on Chromosome ", chrome, " ", Sys.time())
   #   mutationAnnotatedSortedTemp <- subset(mutationAnnotatedSorted, CHR == chrome)
   #
-  #   if (chrome == "11") {
-  #     if( sampleName=="X35")
-  #     {
-  #       browser()
-  #       write.csv2(x = mutationAnnotatedSortedTemp,paste("/home/lcorsaro/Documents/",subFileExtension,".csv", sep=""))
-  #     }
-  #   }
   #
   #   if (plyr::empty(mutationAnnotatedSortedTemp)) {
-  #     # browser()
+  #     browser()
   #   }
   #   probeFeaturesTemp <- subset(probeFeatures, CHR == chrome)
-  #   # browser()
+  #   #
   #   lesionWeightedTemp <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSortedTemp, slidingWindowSize = slidingWindowSize, sampleName = sampleName, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeaturesTemp)
   #   if (sum(lesionWeightedTemp$LESIONS) > sum(mutationAnnotatedSortedTemp$MUTATIONS)) {
-  #     # browser()
+  #     browser()
   #   }
   #   lesionWeighted <- rbind(lesionWeighted, lesionWeightedTemp)
   # }
 
-  result["lesionCount"] <- dim(lesionWeighted)[1]
-  result["probesCount"] <- dim(probeFeatures)[1]
-  # if (result["lesionCount"] > dim(mutationAnnotatedSortedToSave)[1])
-  # {
-  #   ## browser()
-  #   lesionWeighted <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSorted, slidingWindowSize = slidingWindowSize , sampleName = sampleName, probeFeatures =  probeFeatures)
-  #   result["lesionCount"] <- dim(lesionWeighted)[1]
-  # }
-
-
+  lesionWeighted <- getLesionsNew(bonferroniThreshold = bonferroniThreshold, slidingWindowSize = slidingWindowSize, grouping_column = "CHR", mutationAnnotatedSorted = mutationAnnotatedSorted)
   dumpSampleAsBedFile(
     dataToDump = lesionWeighted,
-    fileExtension = paste0(".", subFileExtension, ".LESIONS.bed"),
+    fileExtension = paste0(".", subFileExtension, ".CHR.LESIONS.bed"),
     resultFolder = resultFolder,
     resultSubFolder = paste("LESIONS", subFileExtension, sep = "_"),
     sampleName = sampleName,
     multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
   )
+
+
+  result["lesionCount"] <- dim(lesionWeighted)[1]
+  result["probesCount"] <- dim(probeFeatures)[1]
+  # if (result["lesionCount"] > dim(mutationAnnotatedSortedToSave)[1])
+  # {
+  #   ##
+  #   lesionWeighted <- getLesions(mutationAnnotatedSorted = mutationAnnotatedSorted, slidingWindowSize = slidingWindowSize , sampleName = sampleName, probeFeatures =  probeFeatures)
+  #   result["lesionCount"] <- dim(lesionWeighted)[1]
+  # }
+
+
 
   end_time_single_sample <- Sys.time()
   time_taken <- end_time_single_sample - start_time_single_sample

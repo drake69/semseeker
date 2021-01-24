@@ -2,16 +2,18 @@
 % Please edit documentation in R/sortByCHRandStart.R
 \name{sortByCHRandSTART}
 \alias{sortByCHRandSTART}
-\title{Title}
+\title{sort the dataframe using CHR and START sorting column first for CHR and after
+for START}
 \usage{
 sortByCHRandSTART(dataframe)
 }
 \arguments{
-\item{dataframe}{}
+\item{dataframe}{dataframe to be sorted}
 }
 \value{
-
+sorted dataframe
 }
 \description{
-Title
+sort the dataframe using CHR and START sorting column first for CHR and after
+for START
 }

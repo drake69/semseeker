@@ -13,10 +13,10 @@ analizePopulation(
   betaSuperiorThresholds,
   betaInferiorThresholds,
   sampleSheet,
-  probeFeatures,
-  betaMeans,
+  betaMedians,
   populationName,
-  bonferroniThreshold = 0.05
+  bonferroniThreshold = 0.05,
+  probeFeatures
 )
 }
 \arguments{
@@ -41,16 +41,15 @@ population selector followed by selection value,}
 \item{sampleSheet}{name of samplesheet's column to use as control population
 selector followed by selection value,}
 
-\item{probeFeatures}{name of samplesheet's column to use as control
-population selector followed by selection value,}
-
-\item{betaMeans}{name of samplesheet's column to use as control population
+\item{betaMedians}{name of samplesheet's column to use as control population
 selector followed by selection value,}
 
 \item{populationName}{name of samplesheet's column to use as control
 population selector followed by selection value,}
 
-\item{bonferroniThreshold}{threshold to define which pValue accept for
+\item{bonferroniThreshold}{threshold to define which pValue accept for}
+
+\item{probeFeatures}{probes detail from 27 to EPIC illumina dataset
 lesions definition}
 }
 \value{
@@ -59,19 +58,4 @@ files into the result folder with pivot table and bedgraph.
 \description{
 Calculate stochastic epi mutations from a methylation dataset as outcome
 report of pivot
-}
-\examples{
-calculate(
-populationMatrix
-slidingWindowSize = 11,
-resultFolder = resultFolderValue,
-logFolder = logFolderValue,
-betaSuperiorThresholds  = ,
-betaInferiorThresholds =,
-sampleSheet,
-probeFeatures,
-betaMeans,
-populationName,
-bonferroniThreshold = 0.05
-)
 }

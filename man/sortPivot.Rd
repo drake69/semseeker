@@ -2,16 +2,16 @@
 % Please edit documentation in R/sortPivot.R
 \name{sortPivot}
 \alias{sortPivot}
-\title{Title}
+\title{sort the pivot table per SAMPLENAME}
 \usage{
 sortPivot(pivotTable)
 }
 \arguments{
-\item{pivotTable}{}
+\item{pivotTable}{data to be sorted}
 }
 \value{
-
+pivt table sorted
 }
 \description{
-Title
+sort the pivot table per SAMPLENAME
 }
