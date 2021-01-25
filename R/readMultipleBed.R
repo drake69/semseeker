@@ -15,7 +15,7 @@
 readMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
 {
   POSITION  <- NULL
-  souceFolder <- paste(resultFolder, "/", anomalyLabel, "_", figureLable, "/", sep = "")
+  souceFolder <- paste(resultFolder, "/", anomalyLabel, "_", figureLable, "/",columnLabel, "_", groupingColumnLabel,"/",  sep = "")
   fileName <- paste(souceFolder, "/", "MULTIPLE", ".", figureLable, ".", anomalyLabel, ".bed", sep = "")
   if(!file.exists(fileName))
     return(NULL)
@@ -33,7 +33,7 @@ readMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatur
   droplevels(probeFeatures$CHR)
   droplevels(sourceData$CHR)
 
-  sourceData <- dplyr::left_join(sourceData, probeFeatures, by = c("CHR", "START"))
+  sourceData <- dplyr::inner_join(sourceData, probeFeatures, by = c("CHR", "START"))
   sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
   sourceData[is.na(sourceData)] <- ""
   sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLENAME", groupingColumnLabel))

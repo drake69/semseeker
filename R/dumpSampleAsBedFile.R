@@ -25,11 +25,13 @@ dumpSampleAsBedFile <- function(dataToDump, fileExtension, resultFolder, resultS
 
   if (!plyr::empty(dataToDump)) {
 
+  # save file bed per sample
     filePath <- paste0(resultFolder, "/", resultSubFolder, "/", sampleName, fileExtension, sep = "")
     utils::write.table(dataToDump, file = filePath, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
 
     message(sampleName, " ", "saved file ", filePath, " ", Sys.time())
 
+  # save file bed per sample temporary to reuse for aggregated bed file
     filePath <- paste0(resultFolder, "/", resultSubFolder, "/", sampleName , fileExtension,".temp", sep = "")
     sampleNames <- rep(sampleName, dim(dataToDump)[1])
     dataToDump <- data.frame(dataToDump, sampleNames)

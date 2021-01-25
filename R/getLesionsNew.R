@@ -20,12 +20,24 @@ getLesionsNew <- function(slidingWindowSize, bonferroniThreshold, grouping_colum
 
   #function to calculate rolled sum, returns a column vector
   roll<-function(x,lags){
-    if (length(x)<lags) {
-      tmp=c(rep(0,length(x)))
-    }
-    else {
-      tmp=zoo::rollsum(x, lags, align = "center", fill = 0)
-    }
+    # if (length(x)<lags) {
+    #   # tmp=c(rep(0,length(x)))
+    #   for (i in 1:length(x))
+    #   {
+    #     i_inf <- max(0, i -  ((lags - 1) / 2) )
+    #     i_sup<- min(length(x), (i+  ((lags - 1) / 2)))
+    #     burden <- sum(x[ i_inf:i_sup ])
+    #     x[i]  <- burden
+    #   }
+    # }
+    # else {
+    #
+    missedWindowLength <- ((lags - 1) / 2)
+    y <- c(rep(0,missedWindowLength))
+    tmp <- c(y,x,y)
+    tmp=zoo::rollsum( tmp, lags, align = "center", fill = 0)
+    tmp <- tmp[(missedWindowLength+1):(missedWindowLength+ length(x))]
+    # }
     tmp=as.numeric(tmp)
     return(tmp)
   }
