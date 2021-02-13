@@ -8,6 +8,7 @@
 getLesionsNew <- function(slidingWindowSize, bonferroniThreshold, grouping_column, mutationAnnotatedSorted)
 {
 
+  # browser()
   mutationAnnotatedSortedLocal <- mutationAnnotatedSorted
   summed <- aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = sum)
   colnames(summed) <- c(grouping_column,"MUTATIONS_COUNT")
@@ -18,33 +19,30 @@ getLesionsNew <- function(slidingWindowSize, bonferroniThreshold, grouping_colum
   rm(counted)
   rm(summed)
 
-  #function to calculate rolled sum, returns a column vector
-  roll<-function(x,lags){
-    # if (length(x)<lags) {
-    #   # tmp=c(rep(0,length(x)))
-    #   for (i in 1:length(x))
-    #   {
-    #     i_inf <- max(0, i -  ((lags - 1) / 2) )
-    #     i_sup<- min(length(x), (i+  ((lags - 1) / 2)))
-    #     burden <- sum(x[ i_inf:i_sup ])
-    #     x[i]  <- burden
-    #   }
-    # }
-    # else {
-    #
+  #function to calculate rolled sum, returns a vector
+  enrichement_calculator<-function(x,lags){
     missedWindowLength <- ((lags - 1) / 2)
     y <- c(rep(0,missedWindowLength))
     tmp <- c(y,x,y)
     tmp=zoo::rollsum( tmp, lags, align = "center", fill = 0)
     tmp <- tmp[(missedWindowLength+1):(missedWindowLength+ length(x))]
-    # }
     tmp=as.numeric(tmp)
     return(tmp)
   }
 
-  #eval(parse(text = grouping_colum))
+  # browser()
+  # calculate enrichment for each window
+  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(ENRICHMENT = ave(MUTATIONS, eval(parse(text = grouping_column)), FUN = function(x) enrichement_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
-  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(ENRICHMENT = ave(MUTATIONS, eval(parse(text = grouping_column)), FUN = function(x) roll(x, slidingWindowSize))) %>% dplyr::ungroup ()
+  basepair_calculator<-function(x,lags){
+    tmp_min=-zoo::rollmax( -x, lags, align = "center", fill = 0)
+    tmp_max=zoo::rollmax( x, lags, align = "center", fill = 0)
+    tmp= tmp_max - tmp_min
+    tmp=as.numeric(tmp)
+    return(tmp)
+  }
+  #calculate the base pair count for each window
+  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(BASEPAIR_COUNT = ave(START, eval(parse(text = grouping_column)), FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 
@@ -56,7 +54,7 @@ getLesionsNew <- function(slidingWindowSize, bonferroniThreshold, grouping_colum
   tt <- data.frame(mutationAnnotatedSortedLocal,lesionpValue)
 
   ## correction by Bonferroni
-  lesionWeighted <- ((tt$lesionpValue ) < (bonferroniThreshold/length(tt$PROBES_COUNT)))
+  lesionWeighted <- (tt$lesionpValue ) < ( bonferroniThreshold/( length(tt$PROBES_COUNT) * log10(tt$BASEPAIR_COUNT) ))
   table(lesionWeighted)
   rm(tt)
 

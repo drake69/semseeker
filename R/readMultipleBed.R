@@ -15,7 +15,7 @@
 readMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
 {
   POSITION  <- NULL
-  souceFolder <- paste(resultFolder, "/", anomalyLabel, "_", figureLable, "/",columnLabel, "_", groupingColumnLabel,"/",  sep = "")
+  souceFolder <- paste(resultFolder, "/", anomalyLabel, "_", figureLable, "/","/",  sep = "")
   fileName <- paste(souceFolder, "/", "MULTIPLE", ".", figureLable, ".", anomalyLabel, ".bed", sep = "")
   if(!file.exists(fileName))
     return(NULL)

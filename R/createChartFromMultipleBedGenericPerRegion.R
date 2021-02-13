@@ -80,16 +80,16 @@ createChartFromMultipleBedGenericPerRegion <-
       #   default = FALSE,
       #   clip = "on"
       # )
-      # leg <- "Each point represent the number of locus having X hypometilated probes and Y hypermethylated probes\n" +
-      #   " the size of the point represent the count of locus having these figures \n"
+      # leg <- "Each symbol represent the number of locus having X hypometilated probes and Y hypermethylated probes\n" +
+      #   " the size of the circle represents the count of locus having these figures \n"
       # " the transparency is the case/control ratio black means only case white means only control"
 
-      myplot <- myplot  + ggplot2::ggtitle (paste("Count Hyper methylated probes \n Vs. Hypo Methylated Probes per", mainGroupLabel, "  in the region:", " BODY ","(", dim(temp)[1],")" ,  sep=""))
+      myplot <- myplot  + ggplot2::ggtitle (paste("Count Hyper methylated probes \n Vs. Hypo Methylated Probes per ", mainGroupLabel, "  in the region: ", grp ," (", dim(temp)[1],")" ,  sep=""))
       # myplot
 
       try(
         ggplot2::ggsave(
-          filename = paste( chartFolder,"/",paste( unique(temp$POPULATION), collapse ="_Vs_"),"_", mainGroupLabel, "_", grp, ".jpg",sep=""),
+          filename = paste( chartFolder,"/",paste( unique(tempPopData), collapse ="_Vs_"),"_", mainGroupLabel, "_", grp, ".jpg",sep=""),
           plot = myplot,
           device = NULL,
           path = NULL,

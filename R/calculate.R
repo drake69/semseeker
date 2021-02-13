@@ -14,7 +14,7 @@ calculate <- function(sampleSheetPath,
                       resultFolder,
                       bonferroniThreshold = 0.05) {
 
-  # #  
+  # #
   # set digits to 22
   withr::local_options(list(digits = 22))
   slidingWindowSize <- 11
@@ -132,8 +132,7 @@ calculate <- function(sampleSheetPath,
     multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
   )
 
-  # createSummaryExcelFromCumulativeBedFile(resultFolder = resultFolder, probeFeatures = probeFeatures,
-                                          # sampleSheet = sampleSheet)
+  # createSummaryExcelFromCumulativeBedFile(resultFolder = resultFolder, probeFeatures = probeFeatures,sampleSheet = sampleSheet)
 
   populations <- c("Reference","Control","Case")
   figures <- c("HYPO", "HYPER")
