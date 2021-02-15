@@ -65,6 +65,13 @@ calculate <- function(sampleSheetPath,
 
   # reference population
   populations <-  c("Reference","Control","Case")
+  sampleSheet$Sample_Group <- R.utils:toCamelCase(sampleSheet$Sample_Group)
+  sampleSheet$Sample_Group <- as.factor(sampleSheet$Sample_Group)
+  missed_populations <- levels(sampleSheet$Sample_Group) %in% populations
+  if (length(missed_populations) > 0) {
+    stop("File:",sampleSheet, " Sample_Group should contain only: Reference, Control, case")
+  }
+
 
   # reference population
   referencePopulationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == "Reference", ]

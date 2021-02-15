@@ -83,9 +83,9 @@ myNormN<-champ.norm(beta=myLoadN$beta,
                     cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
                     )
 
-saveRDS(myNormN,"~/Documents/Progetti/experiments/SEMSEEKER_TEST_BWS/normalizedData.rds")
+saveRDS(myNormN,"~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
 
-resultFolder = "~/Documents/Progetti/experiments/SEMSEEKER_TEST_BWS/result/"
+resultFolder = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/"
 normalizedData <- readRDS("~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
 calculate(sampleSheetPath = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv", 
           methylationData = normalizedData,resultFolder = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/")
