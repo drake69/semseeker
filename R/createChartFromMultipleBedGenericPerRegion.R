@@ -12,7 +12,7 @@
 #' @param resultFolder folder as root for bedfiles organized per anomaly
 #'
 #' @return list of pivot by column identified with mainGroupLabel and by Sample
-#' @export
+
 #'
 createChartFromMultipleBedGenericPerRegion <-
   function(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel ) {

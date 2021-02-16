@@ -8,7 +8,7 @@
 #' #' @param bonferroniThreshold accepted value to consider pValue valid
 #' #'
 #' #' @return data frame with lesioned/not lesioned probes identified by 1/0
-#' #' @export
+#' 
 #' #'
 #' getLesions <- function(mutationAnnotatedSorted, slidingWindowSize, sampleName, bonferroniThreshold = 0.05, probeFeatures) {
 #'   LESIONS <- NULL

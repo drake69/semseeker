@@ -3,7 +3,7 @@
 #' @param pivotTable data to be sorted
 #'
 #' @return pivt table sorted
-#' @export
+
 #'
 sortPivot <- function(pivotTable) {
 

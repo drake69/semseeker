@@ -9,7 +9,7 @@
 #' @param subFileExtension extension to pre pend to file name
 #'
 #' @return none
-#' @export
+
 #'
 deltaSingleSample <- function(values, resultFolder, highThresholds, lowThresholds, sampleName, betaMedians, subFileExtension, probeFeatures) {
 

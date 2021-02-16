@@ -9,7 +9,8 @@
 #' accept for lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
-calculate <- function(sampleSheetPath,
+#'
+semseeker <- function(sampleSheetPath,
                       methylationData,
                       resultFolder,
                       bonferroniThreshold = 0.05) {

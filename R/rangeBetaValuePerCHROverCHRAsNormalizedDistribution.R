@@ -7,7 +7,7 @@
 #' #' @param probeFeatures
 #' #'
 #' #' @return
-#' #' @export
+#' 
 #' #'
 #' #' @examples
 #' rangeBetaValuePerCHROverCHRAsNormalizedDistribution <- function(populationMatrix, iqrTimes = 1, probeFeatures) {

@@ -9,7 +9,7 @@
 #' @param groupingColumnLabel name of the genomic sub area
 #'
 #' @return list of pivot by column identified with column Label and by Sample
-#' @export
+
 #'
 readMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
 {

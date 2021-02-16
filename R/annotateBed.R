@@ -10,7 +10,7 @@
 #' @param resultFolder folder to which build the folder tree and save the annotated bed
 #'
 #' @return original bed with genomic area infos
-#' @export
+
 #'
 #' @examples
 #' probesPrefix <- "PROBES_Island_"

@@ -8,7 +8,7 @@
 #' @param sampleSheet sheet of samples with at least Sample_ID column
 #'
 #' @return a saved excel file
-#' @export
+
 #'
 createSummaryExcelFromCumulativeBedFile <-
   function(resultFolder,

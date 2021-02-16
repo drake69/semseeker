@@ -8,7 +8,7 @@
 #' @param probeFeatures features of probe CHR and START and NAME
 #'
 #' @return list of pivot by CHR and by Gene
-#' @export
+
 #'
 createPivotResultFromMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatures) {
 

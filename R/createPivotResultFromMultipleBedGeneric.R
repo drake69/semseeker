@@ -9,7 +9,7 @@
 #' @param columnLabel
 #'
 #' @return list of pivot by column identified with columnLabel and by Sample
-#' @export
+
 #'
 createPivotResultFromMultipleBedGeneric <- function(resultFolder, anomalyLabel, figureLable, probeFeatures, columnLabel) {
 

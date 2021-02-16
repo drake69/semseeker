@@ -8,7 +8,7 @@
 #' @param multipleFileColNames
 #'
 #' @return bed file
-#' @export
+
 #'
 #' @examples  populations <- c("Reference","Control","Case")
 #' mergeMultipleBed(

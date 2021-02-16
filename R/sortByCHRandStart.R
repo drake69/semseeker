@@ -4,7 +4,7 @@
 #' @param dataframe dataframe to be sorted
 #'
 #' @return sorted dataframe
-#' @export
+
 #'
 sortByCHRandSTART <- function(dataframe) {
 

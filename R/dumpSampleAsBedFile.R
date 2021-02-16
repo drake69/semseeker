@@ -8,7 +8,7 @@
 #' @param multipleFileColNames names to use as header for the files dumped
 #'
 #' @return nothing
-#' @export
+
 #'
 
 dumpSampleAsBedFile <- function(dataToDump, fileExtension, resultFolder, resultSubFolder, sampleName, multipleFileColNames) {

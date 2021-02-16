@@ -23,7 +23,7 @@
 #' @param probeFeatures probes detail from 27 to EPIC illumina dataset
 #' lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
-#' @export
+
 #' @importFrom foreach %dopar%
 analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder, logFolder, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, populationName, bonferroniThreshold = 0.05, probeFeatures) {
   analyzeSingleSample <- NULL

@@ -8,7 +8,7 @@
 #' @param cellValue value to replace
 #'
 #' @return dataframe with the cell replaced
-#' @export
+
 #'
 addCellToDataFrame <- function(dataFrame,
                                colSelection,

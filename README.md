@@ -4,49 +4,82 @@
 # semseeker
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
-The goal of semseeker is to …
+The goal of semseeker is to find all methylation localized and enriched
+variants
 
 ## Installation
 
-You can install the released version of semseeker from
-[CRAN](https://CRAN.R-project.org) with:
+You can install semseeker using devtools, future relese will be
+available through CRAN.
+
+Install the latest release:
 
 ``` r
-install.packages("semseeker")
+install.packages("devtools")
+library("devtools")
+install_github("drake69/semseeker")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows how you can create the beta’s
+methylation matrix to use for calculation using ChAMP:
+
+``` r
+library(ChAMP)
+idat_folder <- "~/Documents/SEMSEEKER_TEST_BWS/idat/"
+resultFolder = "~/Documents/Progetti/SEMSEEKER_TEST_BWS/result/"
+myLoadN <- champ.load(directory = idat_folder,
+                      method = "minfi",
+                      methValue="B",
+                      autoimpute=TRUE,
+                      filterDetP=TRUE,
+                      ProbeCutoff=0,
+                      SampleCutoff=0.1,
+                      detPcut=0.01,
+                      filterBeads=TRUE,
+                      beadCutoff=0.05,
+                      filterNoCG=TRUE,
+                      filterSNPs=TRUE,
+                      population=NULL,
+                      filterMultiHit=TRUE,
+                      filterXY=TRUE,
+                      force=FALSE,
+                      arraytype="450K")
+
+# normalize with ChAMP
+myNormN<-champ.norm(beta=myLoadN$beta,
+                    rgSet=myLoadN$rgSet,
+                    mset=myLoadN$mset,
+                    resultsDir= resultFolder,
+                    method="SWAN",
+                    plotBMIQ=FALSE,
+                    arraytype="450K",
+                    cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
+                    )
+
+saveRDS(myNormN,"~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
+```
+
+This how to obtain the analyzed data:
 
 ``` r
 library(semseeker)
-## basic example code
+
+resultFolder <- "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/"
+normalizedData <- readRDS("~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
+semseeker (sampleSheetPath = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv", methylationData = normalizedData,resultFolder = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
-
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub\!
+<!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
+<!-- ```{r cars} -->
+<!-- summary(cars) -->
+<!-- ``` -->
+<!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. -->
+<!-- You can also embed plots, for example: -->
+<!-- ```{r pressure, echo = FALSE} -->
+<!-- plot(pressure) -->
+<!-- ``` -->
+<!-- In that case, don't forget to commit and push the resulting figure files, so they display on GitHub! -->

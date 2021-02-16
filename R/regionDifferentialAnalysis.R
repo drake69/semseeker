@@ -10,7 +10,7 @@
 #' #' @param subGroupLabel
 #' #'
 #' #' @return
-#' #' @export
+#' 
 #' #'
 #' #' @examples
 #' #' @importFrom dplyr %>%

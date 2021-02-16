@@ -4,7 +4,7 @@
 #' @param y vector to compare
 #'
 #' @return true if the order matches otherwise is false
-#' @export
+
 #'
 test_match_order <- function(x, y) {
   if (all(x == y)) {

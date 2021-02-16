@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyzeSingleSample.R
 \name{analyzeSingleSample}
 \alias{analyzeSingleSample}
-\title{Title}
+\title{Analyze a single sample}
 \usage{
 analyzeSingleSample(
   values,
@@ -39,5 +39,5 @@ analyzeSingleSample(
 list of lesion count  and probes count
 }
 \description{
-Title
+Analyze a single sample
 }

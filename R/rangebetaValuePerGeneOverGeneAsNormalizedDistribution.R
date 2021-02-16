@@ -5,7 +5,7 @@
 #' #' @param probeFeatures probes data name and location
 #' #'
 #' #' @return data frame of inferior, superior thresholds and median of the beta value
-#' #' @export
+#' 
 #' #'
 #' #' @examples
 #' rangeBetaValuePerGeneOverGeneAsNormalizedDistribution <- function(populationMatrix, iqrTimes = 1, probeFeatures) {

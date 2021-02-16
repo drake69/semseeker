@@ -12,7 +12,7 @@
 #' @param resultFolder folder as root for bedfiles organized per anomaly
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
-#' @export
+
 #'
 createHeatmap <-
   function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
