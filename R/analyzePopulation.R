@@ -55,7 +55,7 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   doParallel::registerDoParallel(computation_cluster)
 
   # options(digits = 22)
-  parallel::clusterExport(computation_cluster, list("PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body","getLesionsNew", "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample", "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame"))
+  parallel::clusterExport(computation_cluster, list("PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body", "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample", "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame"))
 
 
   ### get beta_values ########################################################

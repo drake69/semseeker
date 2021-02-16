@@ -2,7 +2,7 @@
 % Please edit documentation in R/mergeMultipleBed.R
 \name{mergeMultipleBed}
 \alias{mergeMultipleBed}
-\title{Title}
+\title{Merge multiple temporary bed into one bed file. Using the input parameters t build the location}
 \usage{
 mergeMultipleBed(
   populations,
@@ -14,11 +14,32 @@ mergeMultipleBed(
 )
 }
 \arguments{
+\item{populations}{vector of population to cycle with to build the folder path}
+
+\item{figures}{vector of hyper /hypo to use to build the folder path}
+
+\item{anomalies}{vector of lesions/mutations to use to build the folder path}
+
+\item{fileExtension}{extension given to filter the files to merge}
+
+\item{resultFolder}{folder to which build the folder tree and save the annotated bed}
+
 \item{multipleFileColNames}{}
 }
 \value{
-
+bed file
 }
 \description{
-Title
+Merge multiple temporary bed into one bed file. Using the input parameters t build the location
+}
+\examples{
+ populations <- c("Reference","Control","Case")
+mergeMultipleBed(
+  populations,
+  figures = c("METHYLATION"),
+  anomalies = c("DELTAS"),
+  fileExtension = ".bedgraph",
+  resultFolder = resultFolder,
+  multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME", "VALUE")
+)
 }

@@ -5,7 +5,7 @@
 # mutationAnnotatedSortedLocal <- read.csv2("/home/lcorsaro/Documents/SEMSEEKER_TEST_BWS/mutations_annotated_sorted_gene.csv")
 
 #' @importFrom dplyr %>%
-getLesionsNew <- function(slidingWindowSize, bonferroniThreshold, grouping_column, mutationAnnotatedSorted)
+getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, mutationAnnotatedSorted)
 {
 
   # browser()

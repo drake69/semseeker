@@ -1,15 +1,14 @@
-#' readMultipleBed
+#' read multiple bed with annotated data as per input parameter
 #'
-#' @param resultFolder folder as root for bedfiles organized per anomaly
-#' @param anomalyLabel anomaly definition used to lable folder and files eg
-#' MUTATIONS, LESIONS
+#' @param resultFolder folder as root for bed files organized per anomaly
+#' @param anomalyLabel anomaly definition used to label folder and files eg MUTATIONS, LESIONS
 #' @param probeFeatures features of probe CHR and START and NAME
-#' @param figureLable
-#' @param columnLabel
-#' @param populationName
-#' @param groupingColumnLabel
+#' @param figureLable figures like hypo/hyper to built the data path
+#' @param columnLabel name of column in the annotation dataset to select genomic area (gene, island etc..)
+#' @param populationName name of the population used to build the data path
+#' @param groupingColumnLabel name of the genomic sub area
 #'
-#' @return list of pivot by column identified with columnLabel and by Sample
+#' @return list of pivot by column identified with column Label and by Sample
 #' @export
 #'
 readMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)

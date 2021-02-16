@@ -20,6 +20,7 @@ Imports:
     parallel,
     plyr,
     reshape2,
+    R.utils,
     slider,
     stats,
     stringi,

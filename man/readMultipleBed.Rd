@@ -2,7 +2,7 @@
 % Please edit documentation in R/readMultipleBed.R
 \name{readMultipleBed}
 \alias{readMultipleBed}
-\title{readMultipleBed}
+\title{read multiple bed with annotated data as per input parameter}
 \usage{
 readMultipleBed(
   resultFolder,
@@ -15,18 +15,23 @@ readMultipleBed(
 )
 }
 \arguments{
-\item{resultFolder}{folder as root for bedfiles organized per anomaly}
+\item{resultFolder}{folder as root for bed files organized per anomaly}
 
-\item{anomalyLabel}{anomaly definition used to lable folder and files eg
-MUTATIONS, LESIONS}
+\item{anomalyLabel}{anomaly definition used to label folder and files eg MUTATIONS, LESIONS}
+
+\item{figureLable}{figures like hypo/hyper to built the data path}
 
 \item{probeFeatures}{features of probe CHR and START and NAME}
 
-\item{groupingColumnLabel}{}
+\item{columnLabel}{name of column in the annotation dataset to select genomic area (gene, island etc..)}
+
+\item{populationName}{name of the population used to build the data path}
+
+\item{groupingColumnLabel}{name of the genomic sub area}
 }
 \value{
-list of pivot by column identified with columnLabel and by Sample
+list of pivot by column identified with column Label and by Sample
 }
 \description{
-readMultipleBed
+read multiple bed with annotated data as per input parameter
 }

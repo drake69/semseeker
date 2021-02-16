@@ -18,42 +18,29 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of semseeker is to ...
+The goal of semseeker is to find all methylation localized and enriched variants
 
 ## Installation
   
-You can install the released version of semseeker from [CRAN](https://CRAN.R-project.org) with:
+You can install semseeker using devtools, future relese will be available through CRAN.
+
+Install the latest release:
 
 ``` r
-install.packages("semseeker")
+install.packages("devtools")
+library("devtools")
+install_github("drake69/semseeker")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows how you can create the beta's methylation matrix to use for calculation using ChAMP:
 
-```{r example}
-library(semseeker)
+```r
 
 library(ChAMP)
-
 idat_folder <- "~/Documents/SEMSEEKER_TEST_BWS/idat/"
 resultFolder = "~/Documents/Progetti/SEMSEEKER_TEST_BWS/result/"
-# 
-# dataToNormalize <- champ.load(directory = idat_folder, method = "minfi")
-# normalizedData <- champ.norm(
-#   beta = dataToNormalize$beta,
-#   rgSet = dataToNormalize$rgSet,
-#   mset = dataToNormalize$mset,
-#   resultsDir = resultFolder,
-#   method = "SWAN",
-#   plotBMIQ = FALSE,
-#   #arraytype = "450K",
-#   cores = min(detectCores(all.tests = FALSE, logical = TRUE) - 1,8)
-#   # set.seed(seed = 200)
-#   #detectCores(all.tests = FALSE, logical = TRUE) -1
-# )
-
 myLoadN <- champ.load(directory = idat_folder,
                       method = "minfi",
                       methValue="B",
@@ -72,7 +59,7 @@ myLoadN <- champ.load(directory = idat_folder,
                       force=FALSE,
                       arraytype="450K")
 
-#NORMALIZZAZIONE ChAMP
+# normalize with ChAMP
 myNormN<-champ.norm(beta=myLoadN$beta,
                     rgSet=myLoadN$rgSet,
                     mset=myLoadN$mset,
@@ -84,8 +71,15 @@ myNormN<-champ.norm(beta=myLoadN$beta,
                     )
 
 saveRDS(myNormN,"~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
+```
 
-resultFolder = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/"
+This how to obtain the analyzed data:
+
+```{r semseeker_usage}
+
+library(semseeker)
+
+resultFolder <- "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/"
 normalizedData <- readRDS("~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
 calculate(sampleSheetPath = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv", 
           methylationData = normalizedData,resultFolder = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/")

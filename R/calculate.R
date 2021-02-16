@@ -53,7 +53,7 @@ calculate <- function(sampleSheetPath,
   missedColumns <- needColumns[!(needColumns %in% colnames(sampleSheet))]
 
   if (length(missedColumns) > 0) {
-    stop("File:",sampleSheet, " Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values 0 as reference, 1 as Control 2 as Case")
+    stop("File:",sampleSheetPath, " Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values 0 as reference, 1 as Control 2 as Case")
   }
 
   if (logFolder != "" && !dir.exists(logFolder)) {
@@ -65,11 +65,11 @@ calculate <- function(sampleSheetPath,
 
   # reference population
   populations <-  c("Reference","Control","Case")
-  sampleSheet$Sample_Group <- R.utils:toCamelCase(sampleSheet$Sample_Group)
+  sampleSheet$Sample_Group <- R.utils::toCamelCase(sampleSheet$Sample_Group, capitalize=TRUE)
   sampleSheet$Sample_Group <- as.factor(sampleSheet$Sample_Group)
-  missed_populations <- levels(sampleSheet$Sample_Group) %in% populations
-  if (length(missed_populations) > 0) {
-    stop("File:",sampleSheet, " Sample_Group should contain only: Reference, Control, case")
+  matchedPopulation <- levels(sampleSheet$Sample_Group) %in% populations
+  if (is.element(FALSE, matchedPopulation)) {
+    stop("File:",sampleSheetPath, " Sample_Group should contain only: Reference, Control, Case")
   }
 
 

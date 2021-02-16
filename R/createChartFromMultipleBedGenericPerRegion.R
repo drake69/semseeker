@@ -89,7 +89,7 @@ createChartFromMultipleBedGenericPerRegion <-
 
       try(
         ggplot2::ggsave(
-          filename = paste( chartFolder,"/",paste( unique(tempPopData), collapse ="_Vs_"),"_", mainGroupLabel, "_", grp, ".jpg",sep=""),
+          filename = paste( chartFolder,"/",paste( unique(tempPopData$POPULATION), collapse ="_Vs_"),"_", mainGroupLabel, "_", grp, ".jpg",sep=""),
           plot = myplot,
           device = NULL,
           path = NULL,

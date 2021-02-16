@@ -2,7 +2,8 @@
 % Please edit documentation in R/annotateBed.R
 \name{annotateBed}
 \alias{annotateBed}
-\title{Title}
+\title{takes a bed and its location (build with the details of popuationa nd genomic area)
+and annoate with detail about genomic area}
 \usage{
 annotateBed(
   populations,
@@ -16,11 +17,33 @@ annotateBed(
 )
 }
 \arguments{
-\item{resultFolder}{}
+\item{populations}{vector of population to cycle with to build the folder path}
+
+\item{figures}{vector of hyper /hypo to use to build the folder path}
+
+\item{anomalies}{vector of lesions/mutations to use to build the folder path}
+
+\item{groups}{vector of genomic are to cycle and group the annotated data}
+
+\item{probesPrefix}{prefix to use to get the annotated probes dataset}
+
+\item{columnLabel}{label of the column of the genomic area gene, island ,dmr etc..}
+
+\item{groupingColumnLabel}{label of the column of the genomic sub area body, tss1500}
+
+\item{resultFolder}{folder to which build the folder tree and save the annotated bed}
 }
 \value{
-
+original bed with genomic area infos
 }
 \description{
-Title
+takes a bed and its location (build with the details of popuationa nd genomic area)
+and annoate with detail about genomic area
+}
+\examples{
+probesPrefix <- "PROBES_Island_"
+subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island")
+mainGroupLabel <- "ISLAND"
+subGroupLabel <- "RELATION_TO_CPGISLAND"
+islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
 }
