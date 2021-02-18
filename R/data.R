@@ -9,7 +9,7 @@
 #'   \code{applicants}
 "PROBES_DMR_DMR"
 
-#' PROBES_Gene_1sExon
+#' PROBES_Gene_1stExon
 #'
 #' Full data set probes as defined by Illumina
 #'
@@ -17,7 +17,7 @@
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
 #'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
-"PROBES_Gene_1sExon"
+"PROBES_Gene_1stExon"
 
 #' PROBES_Gene_3UTR
 #'
@@ -87,7 +87,7 @@
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
 #'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
-"PROBES_Gene_Island_Island"
+"PROBES_Island_Island"
 
 #' PROBES_Island_N_Shelf
 #'
