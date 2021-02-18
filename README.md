@@ -29,8 +29,8 @@ methylation matrix to use for calculation using ChAMP:
 
 ``` r
 library(ChAMP)
-idat_folder <- "~/Documents/SEMSEEKER_TEST_BWS/idat/"
-resultFolder = "~/Documents/Progetti/SEMSEEKER_TEST_BWS/result/"
+idat_folder <- "~/source_idat/"
+resultFolder = "~/result/"
 myLoadN <- champ.load(directory = idat_folder,
                       method = "minfi",
                       methValue="B",
@@ -60,7 +60,7 @@ myNormN<-champ.norm(beta=myLoadN$beta,
                     cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
                     )
 
-saveRDS(myNormN,"~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
+saveRDS(myNormN,"~/normalizedData.rds")
 ```
 
 This how to obtain the analyzed data:
@@ -68,9 +68,11 @@ This how to obtain the analyzed data:
 ``` r
 library(semseeker)
 
-resultFolder <- "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/"
-normalizedData <- readRDS("~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/normalizedData.rds")
-semseeker (sampleSheetPath = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv", methylationData = normalizedData,resultFolder = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/")
+normalizedData <- readRDS("~/normalizedData.rds")
+
+semseeker (sampleSheetPath = "~/source_idat/sample_sheet.csv", 
+        methylationData = normalizedData,
+        resultFolder = "~/semseeker_result/")
 ```
 
 The outcomes are: - per each population - bed graph file with the delta
