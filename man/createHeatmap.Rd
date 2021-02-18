@@ -5,12 +5,20 @@
 \title{createChartFromMultipleBedGenericPerRegion load the multiple bed resulting from
 analysis organized into files and folders per anomaly and produce a pivot}
 \usage{
-createHeatmap(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs)
+createHeatmap(
+  inputBedDataFrame,
+  anomalies,
+  groupLabel,
+  groupColumnIDs,
+  resultFolder
+)
 }
 \arguments{
 \item{anomalies}{vector of anomalies MUTATIONS or LESIONS}
 
 \item{groupLabel}{name of column to group the data set}
+
+\item{resultFolder}{folder as root for bedfiles organized per anomaly}
 
 \item{populations}{vectors of populations name used to group populations
 for differential analysis}
@@ -22,8 +30,6 @@ for differential analysis}
 \item{probesPrefix}{definition of prefix to use probes to load}
 
 \item{subGroupLabel}{name of column to sub group the data set}
-
-\item{resultFolder}{folder as root for bedfiles organized per anomaly}
 }
 \value{
 list of pivot by column identified with groupLabel and by Sample

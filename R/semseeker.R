@@ -154,10 +154,10 @@ semseeker <- function(sampleSheetPath,
   createChartFromMultipleBedGenericPerRegion(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel )
   # regionDifferentialAnalysis(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) )
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) )
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder)
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) ,resultFolder)
   try(
-    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) )
+    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) ,resultFolder)
   )
 
   probesPrefix <- "PROBES_Island_"
@@ -168,10 +168,10 @@ semseeker <- function(sampleSheetPath,
   # regionDifferentialAnalysisPerGenomicArea(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   createChartFromMultipleBedGenericPerRegion(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel )
   # regionDifferentialAnalysis(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 )
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 )
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder)
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 ,resultFolder)
   try(
-    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3) )
+    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3) ,resultFolder)
   )
 
   subGroups <- c("DMR")
@@ -182,13 +182,13 @@ semseeker <- function(sampleSheetPath,
   # regionDifferentialAnalysisPerGenomicArea(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   createChartFromMultipleBedGenericPerRegion(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel )
   # regionDifferentialAnalysis(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 )
+  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder)
 
   colnames(geneBed) <- c("MAINGROUP","SAMPLENAME","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   colnames(dmrBed) <- c("MAINGROUP","SAMPLENAME","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   colnames(islandBed) <- c("MAINGROUP","SAMPLENAME","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   totalBed <- rbind(geneBed, dmrBed, islandBed, stringsAsFactors = TRUE)
-  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 )
+  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 ,resultFolder)
 
   rm(populationControlRangeBetaValues)
 }

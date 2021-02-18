@@ -15,7 +15,7 @@
 
 #'
 createHeatmap <-
-  function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
+  function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ,resultFolder) {
 
     chartFolder <- paste(resultFolder, "/Charts/", sep="")
     if (chartFolder != "" && !dir.exists(chartFolder)) {
