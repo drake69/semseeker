@@ -73,6 +73,16 @@ normalizedData <- readRDS("~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_
 semseeker (sampleSheetPath = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/idat/sample_sheet.csv", methylationData = normalizedData,resultFolder = "~/Documents/Progetti/experiments_data/SEMSEEKER_TEST_BWS/result/")
 ```
 
+The outcomes are: - per each population - bed graph file with the delta
+methylation value above and under the outline threshold - bed file of
+found MUTATIONS due to hyper methylation and hypomethylation - bed file
+of found LESIONS due to hyper methylation and hypomethylation - a
+cumulative bed file for lesions with a column identifying the sample
+without annotations - a cumulative bed file for lesions with a column
+identifying the sample annotated with genomic area, gene part, island
+and DMR - chart: heatmaps to compare the burden difference cases
+vs. control per genomic area
+
 <!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
 <!-- ```{r cars} -->
 <!-- summary(cars) -->
