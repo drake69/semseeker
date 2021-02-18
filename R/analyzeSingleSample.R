@@ -11,8 +11,6 @@
 #' @param bonferroniThreshold bonferroni threshol to validate pVale
 #'
 #' @return list of lesion count  and probes count
-
-#'
 analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresholds, comparison, sampleName, subFileExtension, bonferroniThreshold = 0.05, probeFeatures) {
 
   #
