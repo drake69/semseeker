@@ -54,7 +54,7 @@ semseeker <- function(sampleSheetPath,
   missedColumns <- needColumns[!(needColumns %in% colnames(sampleSheet))]
 
   if (length(missedColumns) > 0) {
-    stop("File:",sampleSheetPath, " Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values 0 as reference, 1 as Control 2 as Case")
+    stop("File:",sampleSheetPath, " Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values Reference,  Control and Case")
   }
 
   if (logFolder != "" && !dir.exists(logFolder)) {
@@ -140,7 +140,7 @@ semseeker <- function(sampleSheetPath,
     multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
   )
 
-  # createSummaryExcelFromCumulativeBedFile(resultFolder = resultFolder, probeFeatures = probeFeatures,sampleSheet = sampleSheet)
+  createSummaryExcelFromCumulativeBedFile(resultFolder = resultFolder, probeFeatures = probeFeatures,sampleSheet = sampleSheet)
 
   populations <- c("Reference","Control","Case")
   figures <- c("HYPO", "HYPER")

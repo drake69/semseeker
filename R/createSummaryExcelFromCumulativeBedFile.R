@@ -14,6 +14,7 @@ createSummaryExcelFromCumulativeBedFile <-
   function(resultFolder,
            probeFeatures,
            sampleSheet) {
+
     lesionsComparison <- NULL
     lesionsComparisonByGene <- NULL
 

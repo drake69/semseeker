@@ -8,6 +8,8 @@ Description: Find epimutaion and epilesion inside methylation dataset.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
+URL: http://github.com/drake69/semseeker
+BugReports: https://github.com/drake69/semseeker/issues
 Imports:
     doParallel,
     checkr,

@@ -103,7 +103,6 @@ createChartFromMultipleBedGenericPerRegion <-
       )
     }
   }
-  # return(tempResult)
   }
 
 
