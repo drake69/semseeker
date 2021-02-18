@@ -31,7 +31,7 @@ analyzeSingleSample(
 
 \item{subFileExtension}{extension to pre pend to file name}
 
-\item{bonferroniThreshold}{bonferroni threshol to validate pVale}
+\item{bonferroniThreshold}{bonferroni threshold to validate pValue}
 
 \item{probeFeatures}{probes features probe, chr, start,end}
 }

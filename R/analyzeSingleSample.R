@@ -8,9 +8,10 @@
 #' @param sampleName name of sample to analyze
 #' @param probeFeatures probes features probe, chr, start,end
 #' @param subFileExtension extension to pre pend to file name
-#' @param bonferroniThreshold bonferroni threshol to validate pVale
+#' @param bonferroniThreshold bonferroni threshold to validate pValue
 #'
 #' @return list of lesion count  and probes count
+#'
 analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresholds, comparison, sampleName, subFileExtension, bonferroniThreshold = 0.05, probeFeatures) {
 
   #
@@ -29,6 +30,7 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
 
   mutation <- as.numeric(comparison(values, thresholds))
   message(sampleName, " ", "Got probesOverThreshold ", Sys.time())
+
   ### get mutationAnnotatedSorted ################################################################################################
   if (!test_match_order(row.names(mutation), probeFeatures$PROBE)) {
     stop("Wrong order matching Probes and Mutation!", Sys.time())

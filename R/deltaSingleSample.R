@@ -1,4 +1,4 @@
-#' Title
+#' deltaSingleSample
 #'
 #' @param values values of methylation
 #' @param resultFolder folder to store result files

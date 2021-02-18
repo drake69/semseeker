@@ -55,8 +55,7 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   doParallel::registerDoParallel(computation_cluster)
 
   # options(digits = 22)
-  parallel::clusterExport(computation_cluster, list("PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body", "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample", "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame"))
-
+  parallel::clusterExport(envir=environment(), cl = computation_cluster, varlist = c("PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body", "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample", "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame"))
 
   ### get beta_values ########################################################
   sampleSheet <- sampleSheet[order(sampleSheet[, "Sample_ID"], decreasing = FALSE), ]
@@ -79,19 +78,14 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   message("WarmedUP ...", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  # # browser()
   summaryFileName <- paste0(resultFolder, "/", "summary.csv", sep = "")
   system(paste0("echo '", paste(colnames(sampleSheet), collapse = ","), "' > ", summaryFileName, sep = ""))
 
-
-  # data("PROBES_Gene_5UTR")
-  # browser()
   i <- NULL
   # for (i in 1:dim(beta_values)[2]) {
-  foreach::foreach(i = 1:dim(beta_values)[2], .packages=c("dplyr"), .export = ls(globalenv())) %dopar% {
+  foreach::foreach(i = 1:dim(beta_values)[2], .packages=c("dplyr")) %dopar% {
 
     sampleDetail <- sampleSheet[i, ]
-    # if(sampleDetail$Sample_ID=="X35")
     {
       # browser()
       message("Starting sample analysis number: ", i, " ", Sys.time())
@@ -108,7 +102,7 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
         subFileExtension = "HYPER", bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures
       )
 
-      # # browser()
+      # browser()
       sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Probes_Count", cellValue = sampleStatusTemp["probesCount"])
       sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Mutations", cellValue = sampleStatusTemp["mutationCount"])
       sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Lesions", cellValue = sampleStatusTemp["lesionCount"])
@@ -129,7 +123,6 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
       system(paste0("rm ", filePath, sep = ""))
 
       # forEachSampleSheet[i,] <- sampleDetail system(paste0('echo '', paste(sampleDetail,collapse = ',') , '' >> ', summaryFileName, sep = ''))
-
       }
   }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/deltaSingleSample.R
 \name{deltaSingleSample}
 \alias{deltaSingleSample}
-\title{Title}
+\title{deltaSingleSample}
 \usage{
 deltaSingleSample(
   values,
@@ -34,5 +34,5 @@ deltaSingleSample(
 none
 }
 \description{
-Title
+deltaSingleSample
 }
