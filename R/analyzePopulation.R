@@ -88,7 +88,7 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   # browser()
   i <- NULL
   # for (i in 1:dim(beta_values)[2]) {
-  foreach::foreach(i = 1:dim(beta_values)[2], .packages=c("dplyr")) %dopar% {
+  foreach::foreach(i = 1:dim(beta_values)[2], .packages=c("dplyr"), .export = ls(globalenv())) %dopar% {
 
     sampleDetail <- sampleSheet[i, ]
     # if(sampleDetail$Sample_ID=="X35")
