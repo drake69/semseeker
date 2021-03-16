@@ -11,35 +11,56 @@
 #' @return list of pivot by column identified with columnLabel and by Sample
 
 #'
-createPivotResultFromMultipleBedGeneric <- function(resultFolder, anomalyLabel, figureLable, probeFeatures, columnLabel) {
+createPivotResultFromMultipleBedGeneric <- function(resultFolder, genomicAreaMain, genomicAreaSub, sampleSheet) {
 
   POSITION <- NULL
-  # TODO: check sample name is a column of the bedfile
 
-  souceFolder <- paste(resultFolder, "/", anomalyLabel, "_", figureLable, "/", sep = "")
-  fileName <- paste(souceFolder, "/", "MULTIPLE", ".", figureLable, ".", anomalyLabel, ".bed", sep = "")
-  sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = TRUE)
-  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLENAME")
+  fileName <- paste(resultFolder, "/", genomicAreaMain , "._annotatedBed.bed", sep = "")
+  annotatedBed <- read_csv(fileName)
+  annotatedBed <- subset(annotatedBed, POPULATION !="Reference")
+  annotatedBed$GROUP <- as.factor(annotatedBed$GROUP)
+  levels(annotatedBed$GROUP)
 
-  sourceData$CHR <- as.factor(sourceData$CHR)
+  pheno <- read_csv(sampleSheet)
 
-  probeFeatures <- subset(probeFeatures, POSITION == 1)
-  probeFeatures$CHR <- as.factor(paste0("chr", probeFeatures$CHR))
+  annotatedBed$ANOMALY <- as.factor(annotatedBed$ANOMALY)
+  annotatedBed$FIGURE <- as.factor(annotatedBed$FIGURE)
+  hypo <- subset(annotatedBed, FIGURE=="HYPER" & ANOMALY == "LESIONS" & GROUP ==genomicAreaSub )[, c(genomicAreaMain,"SAMPLENAME","POPULATION","freq")]
+  hyper <- subset(annotatedBed,FIGURE=="HYPO"  & ANOMALY == "LESIONS"& GROUP ==genomicAreaSub)[, c(genomicAreaMain,"SAMPLENAME","POPULATION","freq")]
 
-  probeFeatures <- probeFeatures[(probeFeatures$CHR %in% unique((sourceData$CHR))), ]
-  droplevels(probeFeatures$CHR)
-  droplevels(sourceData$CHR)
+  colnames(hypo) <- c(genomicAreaMain,"SAMPLENAME","POPULATION","HYPO")
+  colnames(hyper) <- c(genomicAreaMain,"SAMPLENAME","POPULATION","HYPER")
 
-  sourceData <- dplyr::left_join(sourceData, probeFeatures, by = c("CHR", "START"))
-  sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
-  sourceData[is.na(sourceData)] <- ""
+  hypo$freq <- -1 * hypo$HYPO
+  merged <- merge(hypo,hyper,all=TRUE)[, c(genomicAreaMain,"SAMPLENAME","POPULATION","HYPO","HYPER")]
+  merged$HYPO[is.na(merged$HYPO)] <-0
+  merged$HYPER[is.na(merged$HYPER)] <-0
+  merged$BALANCE <- merged$HYPO - merged$HYPER
 
-  sourceData[,columnLabel] <- as.factor(sourceData[,columnLabel])
-  sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLENAME"))
-  finalResult <- reshape2::dcast(data = sourceData, eval(parse(text=columnLabel)) ~ SAMPLENAME, value.var = "freq", sum)
-  finalResult[is.na(finalResult)] <- 0
-  finalResult[finalResult == ""] <- 0
+  merged_downregulated <- subset(merged, BALANCE < 0)
+  #pivot
+  finalResult_down <- reshape2::dcast(data = merged_downregulated,POPULATION+SAMPLENAME ~ GENE, value.var = "BALANCE", sum)
 
-  return(finalResult)
+  merged_upregulated <- subset(merged, BALANCE > 0)
+  #pivot
+  finalResult_up <- reshape2::dcast(data = merged_upregulated,POPULATION+SAMPLENAME ~ GENE, value.var = "BALANCE", sum)
+
+  finalResultdim_up<-dim(finalResult_up)[2]
+  pheno_final_up <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_up[,2:finalResultdim_up], by.x = "Sample_ID", by.y = "SAMPLENAME")
+
+  finalResultdim_down<-dim(finalResult_down)[2]
+  pheno_final_down <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_down[,2:finalResultdim_down], by.x = "Sample_ID", by.y = "SAMPLENAME")
+
+  sheets <- list(
+    SUMMARY = sampleSheet,
+    HYPER_LESIONS = hyperLesions,
+    HYPO_LESIONS = hypoLesions
+  )
+  openxlsx::write.xlsx(
+    x = sheets,
+    file = fileName,
+    asTable = TRUE
+  )
+
 }
 
