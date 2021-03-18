@@ -76,7 +76,7 @@ semseeker (sampleSheetPath = "~/source_idat/sample_sheet.csv",
 ```
 Requirements:
 - the sample sheet should contain:
-  - Sample_Name for the column of the sample name
+  - Sample_ID for the column of the sample name
   - Sample_Group for the dolumn of population
 The outcomes are: 
 - per each population 
