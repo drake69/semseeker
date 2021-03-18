@@ -1,7 +1,7 @@
 #' Calculate stochastic epi mutations from a methylation dataset as outcome
 #' report of pivot
 #'
-#' @param sampleSheetPath dataframe with at least a column Sample_ID to identify
+#' @param sampleSheet dataframe with at least a column Sample_ID to identify
 #' samples
 #' @param methylationData matrix of methylation data
 #' @param resultFolder folder to save computed epimutations and bedgraphs files.
@@ -10,7 +10,7 @@
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
 #'
-semseeker <- function(sampleSheetPath,
+semseeker <- function(sampleSheet,
                       methylationData,
                       resultFolder,
                       bonferroniThreshold = 0.05) {
@@ -44,8 +44,6 @@ semseeker <- function(sampleSheetPath,
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
 
-
-  sampleSheet <- utils::read.csv(sampleSheetPath)
   logFolder <- paste0(tempdir(),"/log")
 
   populationControlRangeBetaValues <- NULL
