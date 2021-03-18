@@ -80,6 +80,7 @@ This how to obtain the analyzed data:
 library(semseeker)
 
 normalizedData <- readRDS("~/normalizedData.rds")
+sampleSheet <- readRDS("~/normalizedData.rds")
 
 semseeker (sampleSheetPath = "~/source_idat/sample_sheet.csv", 
         methylationData = normalizedData,

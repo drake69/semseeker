@@ -7,10 +7,9 @@ analysis organized into files and folders per anomaly and produce a pivot}
 \usage{
 createPivotResultFromMultipleBedGeneric(
   resultFolder,
-  anomalyLabel,
-  figureLable,
-  probeFeatures,
-  columnLabel
+  genomicAreaMain,
+  genomicAreaSub,
+  sampleSheet
 )
 }
 \arguments{
