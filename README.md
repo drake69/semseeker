@@ -78,6 +78,8 @@ Requirements:
 - the sample sheet should contain:
   - Sample_ID for the column of the sample name
   - Sample_Group for the dolumn of population
+  - The popularion should be identifed into the Sample_Group column as "Reference","Control","Case"
+
 The outcomes are: 
 - per each population 
 - bed graph file with the delta methylation value above and under the outline threshold 
