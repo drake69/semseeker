@@ -74,16 +74,17 @@ semseeker (sampleSheetPath = "~/source_idat/sample_sheet.csv",
         methylationData = normalizedData,
         resultFolder = "~/semseeker_result/")
 ```
-
-The outcomes are: - per each population - bed graph file with the delta
-methylation value above and under the outline threshold - bed file of
-found MUTATIONS due to hyper methylation and hypomethylation - bed file
-of found LESIONS due to hyper methylation and hypomethylation - a
-cumulative bed file for lesions with a column identifying the sample
-without annotations - a cumulative bed file for lesions with a column
-identifying the sample annotated with genomic area, gene part, island
-and DMR - chart: heatmaps to compare the burden difference cases
-vs. control per genomic area
+Requirements:
+- the sample sheet should contain:
+  - Sample_Name for the column of the sample name
+  - Sample_Group for the dolumn of population
+The outcomes are: 
+- per each population 
+- bed graph file with the delta methylation value above and under the outline threshold 
+- bed file of found MUTATIONS due to hyper methylation and hypomethylation 
+- bed file of found LESIONS due to hyper methylation and hypomethylation 
+- a cumulative bed file for lesions with a column identifying the sample without annotations
+- a cumulative bed file for lesions with a column identifying the sample annotated with genomic area, gene part, island and DMR - chart: heatmaps to compare the burden difference cases vs. control per genomic area
 
 <!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
 <!-- ```{r cars} -->
