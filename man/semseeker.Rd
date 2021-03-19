@@ -6,14 +6,14 @@
 report of pivot}
 \usage{
 semseeker(
-  sampleSheetPath,
+  sampleSheet,
   methylationData,
   resultFolder,
   bonferroniThreshold = 0.05
 )
 }
 \arguments{
-\item{sampleSheetPath}{dataframe with at least a column Sample_ID to identify
+\item{sampleSheet}{dataframe with at least a column Sample_ID to identify
 samples}
 
 \item{methylationData}{matrix of methylation data}
