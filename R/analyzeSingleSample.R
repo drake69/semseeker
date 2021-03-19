@@ -1,4 +1,4 @@
-#' Analyze a single sample
+#' analyzeSingleSample
 #'
 #' @param values values of methylation
 #' @param slidingWindowSize size of window sliding to calculate hypergeometric
@@ -11,6 +11,7 @@
 #' @param bonferroniThreshold bonferroni threshold to validate pValue
 #'
 #' @return list of lesion count  and probes count
+#'
 #'
 analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresholds, comparison, sampleName, subFileExtension, bonferroniThreshold = 0.05, probeFeatures) {
 
