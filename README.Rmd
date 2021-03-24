@@ -75,28 +75,29 @@ saveRDS(myNormN,"~/normalizedData.rds")
 
 This how to obtain the analyzed data:
 
-```r
 
+``` r
 library(semseeker)
 
 normalizedData <- readRDS("~/normalizedData.rds")
 
-sampleSheet <- readRDS("~/normalizedData.rds")
+sampleSheet <- read.csv2("~/sample_sheet.csv")
 
-semseeker (sampleSheetPath = "~/source_idat/sample_sheet.csv", 
+semseeker (sampleSheet = sampleSheet, 
         methylationData = normalizedData,
         resultFolder = "~/semseeker_result/")
-
 ```
 
-The outcomes are:
-- per each population
-  - bed graph file with the delta methylation value above and under the outline threshold
-  - bed file of found MUTATIONS due to hyper methylation and hypomethylation
-  - bed file of found LESIONS due to hyper methylation and hypomethylation
-  - a cumulative bed file for lesions with a column identifying the sample without annotations
-  - a cumulative bed file for lesions with a column identifying the sample annotated with genomic area, gene part, island and DMR
-  - chart: heatmaps to compare the burden difference cases vs. control per genomic area 
+The outcomes are: 
+<ul>
+<li>per each population </li>
+<li>bed graph file with the delta methylation value above and under the outline threshold </li>
+<li>bed file of found MUTATIONS due to hyper methylation and hypomethylation </li>
+<li>bed file of found LESIONS due to hyper methylation and hypomethylation </li>
+<li>a cumulative bed file for lesions with a column identifying the sample without annotations - a cumulative bed file for lesions with a column identifying the sample annotated with genomic area, gene part, island and DMR</li>
+<li>chart: heatmaps to compare the burden difference cases vs. control per genomic area</li>
+<li>pivots: pivot table to compare the burden difference cases vs. control per genomic area</li>
+</ul>
 
 <!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
 
