@@ -26,7 +26,7 @@
 
 #' @importFrom foreach %dopar%
 analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder, logFolder, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, populationName, bonferroniThreshold = 0.05, probeFeatures) {
-  analyzeSingleSample <- NULL
+
 
   if (.Platform$OS.type == "windows") {
     withAutoprint({
