@@ -5,61 +5,63 @@ createExcelPivot <-
     HYPER <- NULL
     POPULATION <- NULL
 
-    chartFolder <- paste(resultFolder, "/Charts/", sep="")
-    if (chartFolder != "" && !dir.exists(chartFolder)) {
-      dir.create(chartFolder)
-    }
-
-    chartFolder <- paste(resultFolder, "/Charts/", mainGroupLabel,"/", sep="")
-    if (chartFolder != "" && !dir.exists(chartFolder)) {
-      dir.create(chartFolder)
-    }
-
-    chartFolder <- paste(resultFolder, "/Charts/", mainGroupLabel,"/Grouped", sep="")
-    if (chartFolder != "" && !dir.exists(chartFolder)) {
-      dir.create(chartFolder)
-    }
 
     finalBed <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel, resultFolder)
 
     if (is.null(finalBed))
       return()
 
-    finalBed <- data.frame(finalBed, "KEY" = paste(finalBed$POPULATION,"_", finalBed[,mainGroupLabel], sep=""))
+    reportFolder <- paste(resultFolder, "/Pivots/", sep="")
+    if (reportFolder != "" && !dir.exists(reportFolder)) {
+      dir.create(reportFolder)
+    }
+
+    finalBed <- data.frame(finalBed, "KEY" = finalBed[,mainGroupLabel])
     finalBed[,mainGroupLabel] <- as.factor(finalBed[,mainGroupLabel])
     finalBed[,"KEY"] <- as.factor(finalBed[,"KEY"])
     finalBed[,"FIGURE"] <- as.factor(finalBed[,"FIGURE"])
     finalBed[,"POPULATION"] <- as.factor(finalBed[,"POPULATION"])
+
 
     numberOfCase <- length(unique(subset(finalBed, POPULATION == "Case" )$SAMPLENAME))
     numberOfControl <- length(unique(subset(finalBed, POPULATION == "Control" )$SAMPLENAME))
 
     pop <- "Reference"
     tempPopData <- subset(finalBed, finalBed[,"POPULATION"] != pop)
-    sheetList <- vectore(mode="list")
+    tempPopData <- subset(tempPopData, freq >0 )
+    sheetList <- vector(mode="list")
+    sheetListNames <- vector(mode="list")
     i <- 1
     for (grp in unique(tempPopData[,subGroupLabel]))
     {
       temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
-      temp <- reshape2::dcast(data = temp, KEY + POPULATION  ~ FIGURE, value.var = "freq", sum)
-      temp <- reshape2::dcast(data = temp, HYPO + HYPER  ~ POPULATION, value.var="HYPER", length)
-
-
+      if(dim(temp)[1]==0)
+        next
       for (anomaly in anomalies)
       {
-
-        tempDataFrame <- subset(inputBedDataFrame, ANOMALY == anomaly)
-        if(dim(tempDataFrame)[1]==0)
+        tempAnomaly <- subset(temp, ANOMALY == anomaly )
+        if(dim(tempAnomaly)[1]==0)
           next
-        tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLENAME + POPULATION ~ KEY, value.var = "FREQ", sum)
-        row.names(tempDataFrame) <- tempDataFrame$SAMPLENAME
-        sheetList[[i]] <- tempDataFrame
-        i <- i +1
+        for (figure in figures)
+        {
+          tempDataFrame <- subset(tempAnomaly, FIGURE == figure)
+          if(dim(tempDataFrame)[1]==0)
+            next
+          tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLENAME + POPULATION ~ KEY, value.var = "freq", sum)
+          row.names(tempDataFrame) <- tempDataFrame$SAMPLENAME
+          fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
+          write.csv2(tempDataFrame, fileName)
+          sheetList[[i]] <- tempDataFrame
+          sheetListNames[i] <- paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp)
+          i <- i +1
+        }
       }
     }
-  openxlsx::write.xlsx(
-    x = sheetList,
-    file = fileName,
-    asTable = TRUE
-  )
+    fileName <- paste(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
+    names(sheetList) <- as.vector(sheetListNames)
+    openxlsx::write.xlsx(
+      x = sheetList,
+      file = fileName,
+      asTable = TRUE
+    )
 }

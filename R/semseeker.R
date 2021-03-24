@@ -138,7 +138,6 @@ semseeker <- function(sampleSheet,
     multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
   )
 
-  createSummaryExcelFromCumulativeBedFile(resultFolder = resultFolder, probeFeatures = probeFeatures,sampleSheet = sampleSheet)
 
   populations <- c("Reference","Control","Case")
   figures <- c("HYPO", "HYPER")
@@ -148,9 +147,8 @@ semseeker <- function(sampleSheet,
   probesPrefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  # regionDifferentialAnalysisPerGenomicArea(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  createChartFromMultipleBedGenericPerRegion(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel )
-  # regionDifferentialAnalysis(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+
   geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
   createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder)
   createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) ,resultFolder)
@@ -162,10 +160,9 @@ semseeker <- function(sampleSheet,
   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island")
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
+  createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+
   islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  # regionDifferentialAnalysisPerGenomicArea(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  createChartFromMultipleBedGenericPerRegion(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel )
-  # regionDifferentialAnalysis(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder)
   createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 ,resultFolder)
   try(
@@ -176,10 +173,9 @@ semseeker <- function(sampleSheet,
   probesPrefix = "PROBES_DMR_"
   mainGroupLabel =  "DMR"
   subGroupLabel="GROUP"
+  createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+
   dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  # regionDifferentialAnalysisPerGenomicArea(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  createChartFromMultipleBedGenericPerRegion(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel )
-  # regionDifferentialAnalysis(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder)
 
   colnames(geneBed) <- c("MAINGROUP","SAMPLENAME","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
