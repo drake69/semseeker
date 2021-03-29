@@ -81,7 +81,7 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   message("WarmedUP ...", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  summaryFileName <- paste0(resultFolder, "/", "summary.csv", sep = "")
+  summaryFileName <- file.path(resultFolder, "summary.csv")
   system(paste0("echo '", paste(colnames(sampleSheet), collapse = ","), "' > ", summaryFileName, sep = ""))
 
   i <- NULL
@@ -122,8 +122,26 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
       tempExtension <- stringi::stri_rand_strings(1, 10)
       filePath <- paste0(summaryFileName, tempExtension, sep = "")
       utils::write.table(sampleDetail, file = filePath, quote = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
-      system(paste0("cat ", filePath, " >> ", summaryFileName, sep = ""))
-      system(paste0("rm ", filePath, sep = ""))
+
+      if (.Platform$OS.type == "windows") {
+
+        command <- paste0("type ", (filePath), " > ",(summaryFileName), sep = "")
+        command <- gsub ("/","\\\\",command)
+        shell(command, intern = TRUE)
+
+        command <- paste0("del ", (filePath), sep = "")
+        command <- gsub ("/","\\\\",command)
+        #print(command)
+        shell(command, intern = TRUE)
+        # system2(paste0("type ", shQuote(filePath), " > ",shQuote(summaryFileName), sep = ""))
+        # system2(paste0("rm ", filePath, sep = ""))
+      } else
+      {
+        system(paste0("cat ", filePath, " >> ", summaryFileName, sep = ""))
+        system(paste0("rm ", filePath, sep = ""))
+      }
+
+
 
       # forEachSampleSheet[i,] <- sampleDetail system(paste0('echo '', paste(sampleDetail,collapse = ',') , '' >> ', summaryFileName, sep = ''))
       }
@@ -131,7 +149,7 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
 
 
   sampleSheet <- utils::read.csv(file = summaryFileName)
-  # file.remove(summaryFileName)
+  #file.remove(summaryFileName)
 
   ### get countProbesEpiMutatedPerSample ######################################################### probes_above_high_thresholds <- beta_values > betaSuperiorThresholds probes_below_low_thresholds <- beta_values <
   ### betaInferiorThresholds count_probes_above_high_threshold_per_sample <- colSums(probes_above_high_thresholds) count_probes_below_low_threshold_per_sample <- colSums(probes_below_low_thresholds)

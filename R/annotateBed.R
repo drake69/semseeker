@@ -33,7 +33,7 @@ annotateBed <- function (
 
 
   finalBed <- NULL
-  bedFileName <- paste0(resultFolder,"/", columnLabel, "_annotatedBed.bed" ,sep="")
+  bedFileName <- file.path( resultFolder, paste0("/", columnLabel, "_annotatedBed.bed" ,sep=""))
 
   if(file.exists(bedFileName))
   {
