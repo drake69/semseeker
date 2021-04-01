@@ -64,7 +64,7 @@ semseeker <- function(sampleSheet,
 
   # reference population
   populations <-  c("Reference","Control","Case")
-  sampleSheet$Sample_Group <- R.utils::toCamelCase(sampleSheet$Sample_Group, capitalize=TRUE)
+  sampleSheet$Sample_Group <- R.utils::toCamelCase(tolower(sampleSheet$Sample_Group), capitalize=TRUE)
   sampleSheet$Sample_Group <- as.factor(sampleSheet$Sample_Group)
   matchedPopulation <- levels(sampleSheet$Sample_Group) %in% populations
   if (is.element(FALSE, matchedPopulation)) {
