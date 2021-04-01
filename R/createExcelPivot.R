@@ -50,7 +50,7 @@ createExcelPivot <-
           tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLENAME + POPULATION ~ KEY, value.var = "freq", sum)
           row.names(tempDataFrame) <- tempDataFrame$SAMPLENAME
           fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
-          write.csv2(tempDataFrame, fileName)
+          write.csv2(t(tempDataFrame), fileName)
           sheetList[[i]] <- tempDataFrame
           sheetListNames[i] <- paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp)
           i <- i +1
