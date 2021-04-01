@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # semseeker
@@ -16,77 +15,92 @@ available through CRAN.
 
 Install the latest release:
 
-``` r
-install.packages("devtools")
-library("devtools")
-install_github("drake69/semseeker")
-```
+    install.packages("devtools")
+    library("devtools")
+    install_github("drake69/semseeker")
 
 ## Example
 
 This is a basic example which shows how you can create the beta’s
 methylation matrix to use for calculation using ChAMP:
 
-``` r
-library(ChAMP)
-idat_folder <- "~/source_idat/"
-resultFolder = "~/result/"
-myLoadN <- champ.load(directory = idat_folder,
-                      method = "minfi",
-                      methValue="B",
-                      autoimpute=TRUE,
-                      filterDetP=TRUE,
-                      ProbeCutoff=0,
-                      SampleCutoff=0.1,
-                      detPcut=0.01,
-                      filterBeads=TRUE,
-                      beadCutoff=0.05,
-                      filterNoCG=TRUE,
-                      filterSNPs=TRUE,
-                      population=NULL,
-                      filterMultiHit=TRUE,
-                      filterXY=TRUE,
-                      force=FALSE,
-                      arraytype="450K")
 
-# normalize with ChAMP
-myNormN<-champ.norm(beta=myLoadN$beta,
-                    rgSet=myLoadN$rgSet,
-                    mset=myLoadN$mset,
-                    resultsDir= resultFolder,
-                    method="SWAN",
-                    plotBMIQ=FALSE,
-                    arraytype="450K",
-                    cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
-                    )
+    library(ChAMP)
+    idat_folder <- "~/source_idat/"
+    resultFolder = "~/result/"
+    myLoadN <- champ.load(directory = idat_folder,
+                          method = "minfi",
+                          methValue="B",
+                          autoimpute=TRUE,
+                          filterDetP=TRUE,
+                          ProbeCutoff=0,
+                          SampleCutoff=0.1,
+                          detPcut=0.01,
+                          filterBeads=TRUE,
+                          beadCutoff=0.05,
+                          filterNoCG=TRUE,
+                          filterSNPs=TRUE,
+                          population=NULL,
+                          filterMultiHit=TRUE,
+                          filterXY=TRUE,
+                          force=FALSE,
+                          arraytype="450K")
 
-saveRDS(myNormN,"~/normalizedData.rds")
-```
+    # normalize with ChAMP
+    myNormN<-champ.norm(beta=myLoadN$beta,
+                        rgSet=myLoadN$rgSet,
+                        mset=myLoadN$mset,
+                        resultsDir= resultFolder,
+                        method="SWAN",
+                        plotBMIQ=FALSE,
+                        arraytype="450K",
+                        cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
+                        )
+
+    saveRDS(myNormN,"~/normalizedData.rds")
 
 This how to obtain the analyzed data:
 
-``` r
-library(semseeker)
+    library(semseeker)
 
-normalizedData <- readRDS("~/normalizedData.rds")
+    normalizedData <- readRDS("~/normalizedData.rds")
 
-sampleSheet <- readRDS("~/normalizedData.rds")
+    sampleSheet <- read.csv2("~/sample_sheet.csv")
 
-semseeker (sampleSheetPath = "~/source_idat/sample_sheet.csv", 
-        methylationData = normalizedData,
-        resultFolder = "~/semseeker_result/")
-```
+    semseeker (sampleSheet = sampleSheet, 
+            methylationData = normalizedData,
+            resultFolder = "~/semseeker_result/")
 
-The outcomes are: - per each population - bed graph file with the delta
-methylation value above and under the outline threshold - bed file of
-found MUTATIONS due to hyper methylation and hypomethylation - bed file
-of found LESIONS due to hyper methylation and hypomethylation - a
-cumulative bed file for lesions with a column identifying the sample
+The outcomes are:
+<ul>
+<li>
+per each population
+</li>
+<li>
+bed graph file with the delta methylation value above and under the
+outline threshold
+</li>
+<li>
+bed file of found MUTATIONS due to hyper methylation and hypomethylation
+</li>
+<li>
+bed file of found LESIONS due to hyper methylation and hypomethylation
+</li>
+<li>
+a cumulative bed file for lesions with a column identifying the sample
 without annotations - a cumulative bed file for lesions with a column
 identifying the sample annotated with genomic area, gene part, island
-and DMR - chart: heatmaps to compare the burden difference cases
-vs. control per genomic area
-
+and DMR
+</li>
+<li>
+chart: heatmaps to compare the burden difference cases vs. control per
+genomic area
+</li>
+<li>
+pivots: pivot table to compare the burden difference cases vs. control
+per genomic area
+</li>
+</ul>
 <!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
 <!-- ```{r cars} -->
 <!-- summary(cars) -->

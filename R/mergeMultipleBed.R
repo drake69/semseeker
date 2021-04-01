@@ -32,8 +32,24 @@ mergeMultipleBed <- function(populations,figures,anomalies, fileExtension, resul
         destinationFile <- paste0(souceFolder, "/","MULTIPLE", ".", fig, ".", anomal,".bed", sep = "")
 
         system(paste0("echo '" ,paste(multipleFileColNames, collapse = "\t") ,  "'  > ", destinationFile, sep = ""))
-        system(paste0("cat ", sourceFiles, " >> ", destinationFile, sep = ""))
-        system(paste0("rm ", sourceFiles, sep = ""))
+
+        if (.Platform$OS.type == "windows") {
+
+          command <- paste0("type ", (sourceFiles), " > ",(destinationFile), sep = "")
+          command <- gsub ("/","\\\\",command)
+          shell(command, intern = TRUE)
+
+          command <- paste0("del ", (sourceFiles), sep = "")
+          command <- gsub ("/","\\\\",command)
+          #print(command)
+          shell(command, intern = TRUE)
+          # system2(paste0("type ", shQuote(filePath), " > ",shQuote(summaryFileName), sep = ""))
+          # system2(paste0("rm ", filePath, sep = ""))
+        } else
+        {
+          system(paste0("cat ", sourceFiles, " >> ", destinationFile, sep = ""))
+          system(paste0("rm ", sourceFiles, sep = ""))
+        }
       }
     }
   }
