@@ -98,6 +98,9 @@ semseeker <- function(sampleSheet,
       next
     }
 
+    extractEpiMutations(values = beta_values,resultFolder = resultFolder, thresholds = thresholds,
+                        populationName = populationSampleSheet$Sample_Group, probeFeatures= probeFeatures)
+
     analizePopulation(
       populationMatrix = populationMatrixToAnalyze,
       slidingWindowSize = slidingWindowSize,
