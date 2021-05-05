@@ -177,34 +177,3 @@ analizePopulation <- function(populationMatrix, slidingWindowSize, resultFolder,
   message("Completed population with Excel summary", Sys.time(), " Time taken: ", time_taken)
 }
 
-extractEpiMutations <- function(values, resultFolder, thresholds, probeFeatures, population) {
-
-
-  for ( comp in 1:2 )
-  {
-    comparison <- `<`
-    label <- "HYPO"
-    if (comp==1){
-      comparison <-`>`
-      label <- "HYPER"
-    }
-
-    mutation <- as.numeric(comparison(values, thresholds))
-    if (!test_match_order(row.names(mutation), probeFeatures$PROBE)) {
-      stop("Wrong order matching Probes and Mutation!", Sys.time())
-    }
-
-    mutationAnnotated <- data.frame(as.data.frame(probeFeatures), "MUTATIONS" = mutation, row.names = probeFeatures$PROBE)
-
-    if (!test_match_order(row.names(mutationAnnotated), probeFeatures$PROBE)) {
-      stop("Wrong order matching Probes and Mutation!", Sys.time())
-    }
-
-    mutationAnnotatedSorted <- sortByCHRandSTART(mutationAnnotated)
-    if (!test_match_order(mutationAnnotatedSorted$PROBE, row.names(mutationAnnotatedSorted))) {
-      stop("Mutation annotation sorted is not coherent with probe informations order!")
-    }
-
-    write.csv2(mutationAnnotatedSorted, file.path(paste(resultFolder,"/", population, "_mutations.csv", sep=""  )), row.names = FALSE )
-  }
-}

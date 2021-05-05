@@ -83,7 +83,7 @@ semseeker <- function(sampleSheet,
   }
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes = 3)
-
+  write.csv2(resul, file.path(populationControlRangeBetaValues, "beta_thresholds.csv"), sep=";")
 
   for (i in 1:3) {
 
@@ -98,8 +98,8 @@ semseeker <- function(sampleSheet,
       next
     }
 
-    extractEpiMutations(values = beta_values,resultFolder = resultFolder, thresholds = thresholds,
-                        populationName = populationSampleSheet$Sample_Group, probeFeatures= probeFeatures)
+    # extractEpiMutations(values = populationMatrixToAnalyze,resultFolder = resultFolder, thresholds = populationControlRangeBetaValues,
+                        # populationName = populationSampleSheet$Sample_Group, probeFeatures= PROBES)
 
     analizePopulation(
       populationMatrix = populationMatrixToAnalyze,
