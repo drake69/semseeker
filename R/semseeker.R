@@ -15,7 +15,6 @@ semseeker <- function(sampleSheet,
                       resultFolder,
                       bonferroniThreshold = 0.05) {
 
-  # #
   # set digits to 22
   withr::local_options(list(digits = 22))
   slidingWindowSize <- 11
