@@ -48,7 +48,7 @@ createExcelPivot <-
           if(dim(tempDataFrame)[1]==0)
             next
           tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLENAME + POPULATION ~ KEY, value.var = "freq", sum)
-          browser()
+          # browser()
           row.names(tempDataFrame) <- tempDataFrame$SAMPLENAME
           fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
           write.csv2(t(tempDataFrame), fileName)
