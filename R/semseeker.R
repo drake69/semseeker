@@ -87,7 +87,7 @@ semseeker <- function(sampleSheet,
   }
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes = 3)
-  write.csv2(populationControlRangeBetaValues, file.path(resultFolder, "beta_thresholds.csv"), sep=";")
+  write.table(x = populationControlRangeBetaValues, file = file.path(resultFolder, "beta_thresholds.csv"), sep=";")
 
   for (i in 1:3) {
 
