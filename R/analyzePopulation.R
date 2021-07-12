@@ -98,9 +98,11 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
 
   for (x in 1:length(splittedColumnIndexes))
   {
-
     # browser()
     betaValues <- methylationData[,as.vector(unlist(splittedColumnIndexes[x]))]
+
+    # betaValuesHyper <- betaValues[betaValues > betaSuperiorThresholds]  - betaSuperiorThresholds
+    # betaValuesHypo <- betaInferiorThresholds - betaValues[betaValues < betaInferiorThresholds]
 
     foreach::foreach(i = 1:dim(betaValues)[2] , .packages=c("dplyr")) %dopar% {
     # for(i in 1:dim(betaValues)[2] ) {
