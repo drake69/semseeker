@@ -52,17 +52,19 @@ createExcelPivot <-
           fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
           write.csv2(t(tempDataFrame), fileName)
           sheetList[[i]] <- tempDataFrame
-          sheetListNames[i] <- gsub(" ","", paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
+          sheetListNames[i] <- gsub(" ","", paste( anomaly," ",figure," ", mainGroupLabel," ", grp, sep=""), fixed=TRUE)
           i <- i +1
         }
       }
     }
     fileName <- paste(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
     names(sheetList) <- as.vector(sheetListNames)
-    openxlsx::write.xlsx(
-      x = sheetList,
-      file = fileName,
-      asTable = TRUE,
-      overwrite = TRUE
+    try(
+      openxlsx::write.xlsx(
+        x = sheetList,
+        file = fileName,
+        asTable = TRUE,
+        overwrite = TRUE
+      )
     )
 }
