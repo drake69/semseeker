@@ -68,4 +68,6 @@ createExcelPivot <-
         overwrite = TRUE
       )
     )
+    message("Saved spreadsheet file:")
+    message(fileName)
 }
