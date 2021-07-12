@@ -6,7 +6,7 @@
 report of pivot}
 \usage{
 analizePopulation(
-  populationMatrix,
+  methylationData,
   slidingWindowSize,
   resultFolder,
   logFolder,
@@ -20,8 +20,7 @@ analizePopulation(
 )
 }
 \arguments{
-\item{populationMatrix}{size of the sliding widows to compute epilesions
-default 11 probes.}
+\item{methylationData}{whole matrix of data to analyze.}
 
 \item{slidingWindowSize}{size of the sliding widows to compute epilesions
 default 11 probes.}

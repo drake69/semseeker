@@ -28,6 +28,7 @@ semseeker <- function(sampleSheet,
 
   methylationData <- methDataTemp[, -c(1)]
 
+  rm(methDataTemp)
   # if(dim(methylationData)[1] < 485512)
   #   PROBES <- PROBES[!is.na(PROBES$METH_450K),]
   #
@@ -75,6 +76,10 @@ semseeker <- function(sampleSheet,
   referencePopulationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == "Reference", ]
   referencePopulationMatrix <- data.frame(PROBE = row.names(methylationData), methylationData[, referencePopulationSampleSheet$Sample_ID])
 
+  # browser()
+  # methylationData <- data.frame(PROBE = row.names(methylationData), methylationData[ , which(!(colnames(methylationData)%in%referencePopulationSampleSheet$Sample_ID))]  )
+
+
   if (plyr::empty(referencePopulationMatrix) |
     dim(referencePopulationMatrix)[2] < 2) {
     message("Empty methylationData ", Sys.time())
@@ -86,13 +91,15 @@ semseeker <- function(sampleSheet,
 
   for (i in 1:3) {
 
+    # browser()
+    # i <- 2
     populationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == populations[i], ]
     populationName <- populations[[i]]
 
-    populationMatrixToAnalyze <- data.frame(PROBE = row.names(methylationData), methylationData[, populationSampleSheet$Sample_ID])
+    populationMatrixColumns <- colnames(methylationData[, populationSampleSheet$Sample_ID])
+    # populationMatrixToAnalyze <- data.frame(PROBE = row.names(methylationData), methylationData[, populationSampleSheet$Sample_ID])
 
-    if (plyr::empty(populationMatrixToAnalyze) |
-      dim(populationMatrixToAnalyze)[2] < 2) {
+    if (length(populationMatrixColumns)==0) {
       message("WARNING: Population ",populationName, " is empty ", Sys.time())
       next
     }
@@ -101,7 +108,7 @@ semseeker <- function(sampleSheet,
                         # populationName = populationSampleSheet$Sample_Group, probeFeatures= PROBES)
 
     analizePopulation(
-      populationMatrix = populationMatrixToAnalyze,
+      methylationData = methylationData,
       slidingWindowSize = slidingWindowSize,
       resultFolder = resultFolder,
       logFolder = logFolder,
@@ -115,9 +122,10 @@ semseeker <- function(sampleSheet,
     )
 
     rm(populationSampleSheet)
-    rm(populationMatrixToAnalyze)
+    # rm(populationMatrixToAnalyze)
   }
 
+  browser()
 
   populations <- c("Reference","Control","Case")
   mergeMultipleBed(

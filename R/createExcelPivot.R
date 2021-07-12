@@ -26,9 +26,9 @@ createExcelPivot <-
     numberOfCase <- length(unique(subset(finalBed, POPULATION == "Case" )$SAMPLENAME))
     numberOfControl <- length(unique(subset(finalBed, POPULATION == "Control" )$SAMPLENAME))
 
-    pop <- "Reference"
-    tempPopData <- subset(finalBed, finalBed[,"POPULATION"] != pop)
-    tempPopData <- subset(tempPopData, freq >0 )
+    # pop <- "Reference"
+    # tempPopData <- subset(finalBed, finalBed[,"POPULATION"] != pop)
+    tempPopData <- subset(finalBed, freq >0 )
     sheetList <- vector(mode="list")
     sheetListNames <- vector(mode="list")
     i <- 1
@@ -48,6 +48,7 @@ createExcelPivot <-
           if(dim(tempDataFrame)[1]==0)
             next
           tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLENAME + POPULATION ~ KEY, value.var = "freq", sum)
+          # browser()
           row.names(tempDataFrame) <- tempDataFrame$SAMPLENAME
           fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
           write.csv2(t(tempDataFrame), fileName)
