@@ -53,7 +53,7 @@ createExcelPivot <-
           fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
           write.csv2(t(tempDataFrame), fileName)
           sheetList[[i]] <- tempDataFrame
-          sheetListNames[i] <- paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp)
+          sheetListNames[i] <- paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep="")
           i <- i +1
         }
       }
