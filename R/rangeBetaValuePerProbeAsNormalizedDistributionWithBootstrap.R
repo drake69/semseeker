@@ -6,7 +6,8 @@
 #'
 #' @return methylation matrix as normalized distribution
 
-rangeBetaValuePerProbeAsNormalizedDistribution <- function(populationMatrix, iqrTimes = 3) {
+rangeBetaValuePerProbeAsNormalizedDistributionWithBootstrap <- function(populationMatrix, iqrTimes = 3) {
+
   computationCluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1)
   doParallel::registerDoParallel(computationCluster)
 
