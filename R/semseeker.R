@@ -201,5 +201,6 @@ semseeker <- function(sampleSheet,
   createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 ,resultFolder)
 
   rm(populationControlRangeBetaValues)
+  message("Job Completed !")
 }
 
