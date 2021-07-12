@@ -157,7 +157,9 @@ semseeker <- function(sampleSheet,
   probesPrefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  try(
+    createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  )
 
   geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
   createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder)
@@ -170,7 +172,9 @@ semseeker <- function(sampleSheet,
   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island")
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
-  createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  try(
+    createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  )
 
   islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
   createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder)
@@ -183,7 +187,9 @@ semseeker <- function(sampleSheet,
   probesPrefix = "PROBES_DMR_"
   mainGroupLabel =  "DMR"
   subGroupLabel="GROUP"
-  createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  try(
+    createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  )
 
   dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
   createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder)
