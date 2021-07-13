@@ -33,6 +33,7 @@ mergeMultipleBed <- function(populations,figures,anomalies, fileExtension, resul
 
         system(paste0("echo '" ,paste(multipleFileColNames, collapse = "\t") ,  "'  > ", destinationFile, sep = ""))
 
+        message ("Merging bed into a multiple bed file.")
         if (.Platform$OS.type == "windows") {
 
           command <- paste0("type ", (sourceFiles), " > ",(destinationFile), sep = "")
@@ -48,7 +49,7 @@ mergeMultipleBed <- function(populations,figures,anomalies, fileExtension, resul
         } else
         {
           system(paste0("cat ", sourceFiles, " >> ", destinationFile, sep = ""))
-          system(paste0("rm ", sourceFiles, sep = ""))
+          # system(paste0("rm ", sourceFiles, sep = ""))
         }
       }
     }
