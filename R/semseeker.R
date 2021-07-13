@@ -125,7 +125,6 @@ semseeker <- function(sampleSheet,
     # rm(populationMatrixToAnalyze)
   }
 
-  browser()
 
   populations <- c("Reference","Control","Case")
   mergeMultipleBed(
@@ -158,7 +157,7 @@ semseeker <- function(sampleSheet,
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
   try(
-    createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+    createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   )
 
   geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
@@ -173,7 +172,7 @@ semseeker <- function(sampleSheet,
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
   try(
-    createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+    createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   )
 
   islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
@@ -188,7 +187,7 @@ semseeker <- function(sampleSheet,
   mainGroupLabel =  "DMR"
   subGroupLabel="GROUP"
   try(
-    createExcelPivot (resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+    createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
   )
 
   dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
@@ -201,6 +200,10 @@ semseeker <- function(sampleSheet,
   createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 ,resultFolder)
 
   rm(populationControlRangeBetaValues)
+
+  message("Starting inference Analysis.")
+  inferenceAnalysisWithoutCorrection(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder)
+
   message("Job Completed !")
 }
 

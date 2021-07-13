@@ -19,7 +19,7 @@ createPivotResultFromMultipleBedGeneric <- function(resultFolder, genomicAreaMai
   annotatedBed <- read_csv(fileName)
   annotatedBed <- subset(annotatedBed, POPULATION !="Reference")
   annotatedBed$GROUP <- as.factor(annotatedBed$GROUP)
-  levels(annotatedBed$GROUP)
+  # levels(annotatedBed$GROUP)
 
   pheno <- read_csv(sampleSheet)
 
