@@ -2,7 +2,7 @@
 % Please edit documentation in R/sortPivot.R
 \name{sortPivot}
 \alias{sortPivot}
-\title{sort the pivot table per SAMPLENAME}
+\title{sort the pivot table per SAMPLEID}
 \usage{
 sortPivot(pivotTable)
 }
@@ -13,5 +13,5 @@ sortPivot(pivotTable)
 pivt table sorted
 }
 \description{
-sort the pivot table per SAMPLENAME
+sort the pivot table per SAMPLEID
 }

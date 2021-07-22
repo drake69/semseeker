@@ -20,7 +20,7 @@ createPivotResultFromMultipleBedAnnotated <- function(resultFolder) {
 
   fileName <- paste(souceFolder, "/", "MULTIPLE", ".", figureLable, ".", anomalyLabel, ".bed", sep = "")
   sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = TRUE)
-  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLENAME")
+  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLEID")
 
   sourceData$CHR <- as.factor(sourceData$CHR)
 
@@ -36,8 +36,8 @@ createPivotResultFromMultipleBedAnnotated <- function(resultFolder) {
   sourceData[is.na(sourceData)] <- ""
 
   sourceData[,columnLabel] <- as.factor(sourceData[,columnLabel])
-  sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLENAME"))
-  finalResult <- reshape2::dcast(data = sourceData, eval(parse(text=columnLabel)) ~ SAMPLENAME, value.var = "freq", sum)
+  sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLEID"))
+  finalResult <- reshape2::dcast(data = sourceData, eval(parse(text=columnLabel)) ~ SAMPLEID, value.var = "freq", sum)
   finalResult[is.na(finalResult)] <- 0
   finalResult[finalResult == ""] <- 0
 

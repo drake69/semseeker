@@ -30,9 +30,9 @@ createHeatmap <-
     if (is.null(inputBedDataFrame))
       return()
 
-    colnames(inputBedDataFrame) <- c("MAINGROUP","SAMPLENAME", "SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+    colnames(inputBedDataFrame) <- c("MAINGROUP","SAMPLEID", "SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
     inputBedDataFrame$MAINGROUP <- as.factor(inputBedDataFrame$MAINGROUP)
-    inputBedDataFrame$SAMPLENAME <- as.factor(inputBedDataFrame$SAMPLENAME)
+    inputBedDataFrame$SAMPLEID <- as.factor(inputBedDataFrame$SAMPLEID)
     inputBedDataFrame$SUBGROUP <- as.factor(inputBedDataFrame$SUBGROUP)
     inputBedDataFrame$FIGURE <- as.factor(inputBedDataFrame$FIGURE)
     inputBedDataFrame$ANOMALY <- as.factor(inputBedDataFrame$ANOMALY)
@@ -59,14 +59,14 @@ createHeatmap <-
       # tempDataFrame <- subset(inputBedDataFrame, ANOMALY == anomaly)
       # if(dim(tempDataFrame)[1]==0)
       #   next
-      # tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLENAME ~ KEY, value.var = "FREQ", sum)
+      # tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID ~ KEY, value.var = "FREQ", sum)
       # mine.long <- tidyr::pivot_longer(data = tempDataFrame,
       #                           cols = -c(1),
       #                           names_to = "KEY",
       #                           values_to = "FREQ")
       # # head(mine.long)
       # fillLable <- paste0("Number of ", anomaly, sep="" )
-      # mine.heatmap <- ggplot2::ggplot(data = mine.long,mapping = ggplot2::aes(x = KEY,y = SAMPLENAME, fill = FREQ))
+      # mine.heatmap <- ggplot2::ggplot(data = mine.long,mapping = ggplot2::aes(x = KEY,y = SAMPLEID, fill = FREQ))
       # mine.heatmap <- mine.heatmap +  ggplot2::geom_tile()
       # mine.heatmap <- mine.heatmap + ggplot2::xlab(label = groupLabel)
       # mine.heatmap <- mine.heatmap + ggplot2::ylab(label = "SAMPLE NAME")
@@ -97,8 +97,8 @@ createHeatmap <-
       tempDataFrame <- subset(inputBedDataFrame, ANOMALY == anomaly)
       if(dim(tempDataFrame)[1]==0)
         next
-      tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLENAME + POPULATION ~ KEY, value.var = "FREQ", sum)
-      row.names(tempDataFrame) <- tempDataFrame$SAMPLENAME
+      tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "FREQ", sum)
+      row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
 
       # col<- colorRampPalette(c("violet","white","blue"))(1024)
 

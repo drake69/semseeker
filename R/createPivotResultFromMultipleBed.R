@@ -17,7 +17,7 @@ createPivotResultFromMultipleBed <- function(resultFolder, anomalyLabel, figureL
   souceFolder <- paste(resultFolder, "/", anomalyLabel, "_", figureLable, "/", sep = "")
   fileName <- paste(souceFolder, "/", "MULTIPLE", ".", figureLable, ".", anomalyLabel, ".bed", sep = "")
   sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = TRUE)
-  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLENAME")
+  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLEID")
 
   sourceData$CHR <- as.factor(sourceData$CHR)
   probeFeatures$CHR <- as.factor(paste0("chr", probeFeatures$CHR))
@@ -25,8 +25,8 @@ createPivotResultFromMultipleBed <- function(resultFolder, anomalyLabel, figureL
   droplevels(probeFeatures$CHR)
   droplevels(sourceData$CHR)
 
-  sourceDatabyCHR <- plyr::count(df = sourceData, vars = c("SAMPLENAME", "CHR"))
-  finalResult <- reshape2::dcast(data = sourceDatabyCHR, SAMPLENAME ~ CHR, value.var = "freq")
+  sourceDatabyCHR <- plyr::count(df = sourceData, vars = c("SAMPLEID", "CHR"))
+  finalResult <- reshape2::dcast(data = sourceDatabyCHR, SAMPLEID ~ CHR, value.var = "freq")
   finalResult[is.na(finalResult)] <- 0
   finalResult[finalResult == ""] <- 0
 
@@ -41,8 +41,8 @@ createPivotResultFromMultipleBed <- function(resultFolder, anomalyLabel, figureL
   sourceData$CHR <- paste0(sourceData$CHR, ifelse(test = is.na(sourceData$GENE) | is.null(sourceData$GENE) | sourceData$GENE == "", yes = paste0(":", sourceData$START), no = "_"), sourceData$GENE, sep = "")
 
   sourceData$CHR <- as.factor(sourceData$CHR)
-  sourceData <- plyr::count(df = sourceData, vars = c("CHR", "SAMPLENAME"))
-  finalResult <- reshape2::dcast(data = sourceData, CHR ~ SAMPLENAME, value.var = "freq", sum)
+  sourceData <- plyr::count(df = sourceData, vars = c("CHR", "SAMPLEID"))
+  finalResult <- reshape2::dcast(data = sourceData, CHR ~ SAMPLEID, value.var = "freq", sum)
   finalResult[is.na(finalResult)] <- 0
   finalResult[finalResult == ""] <- 0
 

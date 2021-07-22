@@ -4,20 +4,20 @@
 #
 # bodyGene <- subset(finalBed, finalBed$GROUP=="Island")
 #
-# test1<-reshape2::dcast(data = bodyGene, POPULATION + GENE + SAMPLENAME ~ FIGURE , value.var = "freq", sum)
+# test1<-reshape2::dcast(data = bodyGene, POPULATION + GENE + SAMPLEID ~ FIGURE , value.var = "freq", sum)
 # View(test1)
 # plot(test1)
 #
 # utils::write.table(test1, file = "~/Desktop/test_sni.csv" , quote = FALSE, row.names = FALSE, col.names = TRUE, sep = "\t")
 #
-# test2 <- reshape2::dcast(data = test1, POPULATION + SAMPLENAME + HYPO + HYPER ~ GENE  , value.var = c("GENE"), fun.aggregate = length)
+# test2 <- reshape2::dcast(data = test1, POPULATION + SAMPLEID + HYPO + HYPER ~ GENE  , value.var = c("GENE"), fun.aggregate = length)
 # View(test2)
 #
 # test4 <- data.frame(test2[,1:4], "REGIONS_COUNT" =rowSums(test2[,-c(1:4)]))
 # View(test4)
 #
 #
-# test3 <- reshape2::dcast(data = test4, REGIONS_COUNT + POPULATION + HYPO + HYPER ~ SAMPLENAME  , value.var = c("SAMPLENAME"), fun.aggregate = length)
+# test3 <- reshape2::dcast(data = test4, REGIONS_COUNT + POPULATION + HYPO + HYPER ~ SAMPLEID  , value.var = c("SAMPLEID"), fun.aggregate = length)
 # View(test3)
 #
 # test5 <- data.frame(test3[,1:4], "SAMPLES_COUNT" =rowSums(test3[,-c(1:4)]))
@@ -66,7 +66,7 @@
 # inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
 #
 # tempDataFrame <- subset(inputBedDataFrame, ANOMALY == "LESIONS")
-# tempDataFrame <- reshape2::dcast(data = tempDataFrame, KEY ~ SAMPLENAME, value.var = "freq", sum)
+# tempDataFrame <- reshape2::dcast(data = tempDataFrame, KEY ~ SAMPLEID, value.var = "freq", sum)
 # rownames(tempDataFrame) <- tempDataFrame$KEY
 # stats::heatmap(as.matrix(tempDataFrame[,2:dim(tempDataFrame)[2]]),scale = "column", margins = c(5, 5))
 

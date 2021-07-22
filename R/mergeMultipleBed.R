@@ -17,7 +17,7 @@
 #'   anomalies = c("DELTAS"),
 #'   fileExtension = ".bedgraph",
 #'   resultFolder = resultFolder,
-#'   multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME", "VALUE")
+#'   multipleFileColNames = c("CHR", "START", "END", "SAMPLEID", "VALUE")
 #' )
 
 mergeMultipleBed <- function(populations,figures,anomalies, fileExtension, resultFolder,  multipleFileColNames) {

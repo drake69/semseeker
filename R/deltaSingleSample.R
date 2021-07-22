@@ -56,6 +56,6 @@ deltaSingleSample <- function(values, resultFolder, highThresholds, lowThreshold
     resultFolder = resultFolder,
     resultSubFolder = "DELTAS_METHYLATION",
     sampleName = sampleName,
-    multipleFileColNames = c("CHR", "START", "END", "DELTA", "SAMPLENAME")
+    multipleFileColNames = c("CHR", "START", "END", "DELTA", "SAMPLEID")
   )
 }

@@ -47,8 +47,8 @@ createChartFromMultipleBedGenericPerRegion <-
   finalBed[,"FIGURE"] <- as.factor(finalBed[,"FIGURE"])
   finalBed[,"POPULATION"] <- as.factor(finalBed[,"POPULATION"])
 
-  numberOfCase <- length(unique(subset(finalBed, POPULATION == "Case" )$SAMPLENAME))
-  numberOfControl <- length(unique(subset(finalBed, POPULATION == "Control" )$SAMPLENAME))
+  numberOfCase <- length(unique(subset(finalBed, POPULATION == "Case" )$SAMPLEID))
+  numberOfControl <- length(unique(subset(finalBed, POPULATION == "Control" )$SAMPLEID))
 
   # for (pop in populations)
   {

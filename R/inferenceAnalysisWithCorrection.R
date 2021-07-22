@@ -1,7 +1,7 @@
 inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFolder)
 {
 
-  browser()
+  # browser()
 
   nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
   outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
@@ -23,7 +23,7 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
   if(!dir.exists(resultFolder))
     dir.create(resultFolder)
 
-  sampleSheet$Sample_Group <- as.numeric(sampleSheet[,"Sample_Group"] == "Case")
+  # sampleSheet$Sample_Group <- as.numeric(sampleSheet[,"Sample_Group"] == "Case")
   sample_names <- data.frame(sampleSheet[, c("Sample_ID", "Sample_Group", "Sample_Group")])
   result = data.frame (
     "ANOMALY" = "",
@@ -38,12 +38,12 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
   )
 
   result <- result[-1,]
-  sample_names[, c("Sample_Group")]  <-  toupper(sample_names[, c("Sample_Group")])
-  sample_names <- sample_names[complete.cases(sample_names),]
-  sample_names <- subset(sample_names, sample_names[, "Sample_Group"]  != "REFERENCE")
+  # sample_names[, c("Sample_Group")]  <-  toupper(sample_names[, c("Sample_Group")])
+  # sample_names <- sample_names[complete.cases(sample_names),]
+  sample_names <- subset(sample_names, sample_names[, "Sample_Group"]  != "Reference")
 
   sample_names <-   sample_names[, c("Sample_ID", "Sample_Group")]
-  colnames(sample_names) <- c("Sample_Name", "Sample_Group")
+  colnames(sample_names) <- c("Sample_ID", "Sample_Group")
   ######################################################################################################
   # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
   # binomiale che si vuole usare per la regressione logistica
@@ -104,6 +104,7 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
       keys
     )
 
+  # browser()
   # areas <- rbind(genes, islands, dmrs)
   nkeys <- dim(keys)[1]
   for (i in 1:nkeys)
@@ -126,11 +127,14 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
     if(dim(df)[1]<=1)
       next
     # df <- df[,-2]
-    df <-  merge(sample_names,  df,  by.y = "SAMPLENAME",  by.x = "Sample_Name" , all.x = TRUE)
-    df$Sample_Group <- df$POPULATION
+    df <- as.data.frame(df)
+    df <- subset(df, POPULATION != "Reference")
+    df <- subset(df, POPULATION != 0)
+
+    df <-  merge( x =  sample_names, y =  df,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
+    df$POPULATION <- sample_names$Sample_Group
     df[is.na(df)] <- 0
-    df <- df[, -1]
-    df <- df[, -1]
+    df <- df[, !(names(df) %in% c("POPULATION","Sample_ID"))]
 
     cols <- (gsub(" ", "_", colnames(df[])))
     cols <- (gsub("-", "_", cols))
@@ -138,14 +142,11 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
     cols <- (gsub("/", "_", cols))
     cols <- (gsub("'", "_", cols))
 
-    cols[1] <- "Sample_Group"
     colnames(df) <- cols
 
     df <- as.data.frame(df)
-    df <- subset(df, Sample_Group != "Reference")
-    df <- subset(df, Sample_Group != 0)
     df$Sample_Group <- as.factor(df$Sample_Group)
-    df$Sample_Group  <- relevel(df$SampleGroup, "Control")
+    df$Sample_Group  <- relevel(df$Sample_Group, "Control")
 
     df[,2:ncol(df)] = as.data.frame(sapply(df[, 2:ncol(df)] , as.numeric))
 
