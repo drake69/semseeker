@@ -20,8 +20,8 @@ readMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatur
     return(NULL)
 
   # sourceData <- readr::read_delim(fileName, "\t", escape_double = FALSE, trim_ws = TRUE, col_names = FALSE)
-  sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = c("CHR", "START", "END", "SAMPLENAME"), header = TRUE)
-  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLENAME")
+  sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = c("CHR", "START", "END", "SAMPLEID"), header = TRUE)
+  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLEID")
 
   sourceData$CHR <- as.factor(sourceData$CHR)
 
@@ -35,7 +35,7 @@ readMultipleBed <- function(resultFolder, anomalyLabel, figureLable, probeFeatur
   sourceData <- dplyr::inner_join(sourceData, probeFeatures, by = c("CHR", "START"))
   sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
   sourceData[is.na(sourceData)] <- ""
-  sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLENAME", groupingColumnLabel))
+  sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLEID", groupingColumnLabel))
   # output with column freq
 
   # names(sourceData)[names(sourceData) == "freq"] <- figureLable

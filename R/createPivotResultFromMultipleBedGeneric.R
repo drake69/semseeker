@@ -25,30 +25,30 @@ createPivotResultFromMultipleBedGeneric <- function(resultFolder, genomicAreaMai
 
   annotatedBed$ANOMALY <- as.factor(annotatedBed$ANOMALY)
   annotatedBed$FIGURE <- as.factor(annotatedBed$FIGURE)
-  hypo <- subset(annotatedBed, FIGURE=="HYPER" & ANOMALY == "LESIONS" & GROUP ==genomicAreaSub )[, c(genomicAreaMain,"SAMPLENAME","POPULATION","freq")]
-  hyper <- subset(annotatedBed,FIGURE=="HYPO"  & ANOMALY == "LESIONS"& GROUP ==genomicAreaSub)[, c(genomicAreaMain,"SAMPLENAME","POPULATION","freq")]
+  hypo <- subset(annotatedBed, FIGURE=="HYPER" & ANOMALY == "LESIONS" & GROUP ==genomicAreaSub )[, c(genomicAreaMain,"SAMPLEID","POPULATION","freq")]
+  hyper <- subset(annotatedBed,FIGURE=="HYPO"  & ANOMALY == "LESIONS"& GROUP ==genomicAreaSub)[, c(genomicAreaMain,"SAMPLEID","POPULATION","freq")]
 
-  colnames(hypo) <- c("GENE","SAMPLENAME","POPULATION","HYPO")
-  colnames(hyper) <- c("GENE","SAMPLENAME","POPULATION","HYPER")
+  colnames(hypo) <- c("GENE","SAMPLEID","POPULATION","HYPO")
+  colnames(hyper) <- c("GENE","SAMPLEID","POPULATION","HYPER")
 
   hypo$freq <- -1 * hypo$HYPO
-  merged <- merge(hypo,hyper,all=TRUE)[, c("GENE","SAMPLENAME","POPULATION","HYPO","HYPER")]
+  merged <- merge(hypo,hyper,all=TRUE)[, c("GENE","SAMPLEID","POPULATION","HYPO","HYPER")]
   merged$HYPO[is.na(merged$HYPO)] <-0
   merged$HYPER[is.na(merged$HYPER)] <-0
   merged$BALANCE <- merged$HYPO - merged$HYPER
   merged_downregulated <- subset(merged, BALANCE < 0)
   #pivot
-  finalResult_down <- reshape2::dcast(data = merged_downregulated,POPULATION+SAMPLENAME ~ GENE, value.var = "BALANCE", sum)
+  finalResult_down <- reshape2::dcast(data = merged_downregulated,POPULATION+SAMPLEID ~ GENE, value.var = "BALANCE", sum)
 
   merged_upregulated <- subset(merged, BALANCE > 0)
   #pivot
-  finalResult_up <- reshape2::dcast(data = merged_upregulated,POPULATION+SAMPLENAME ~ GENE, value.var = "BALANCE", sum)
+  finalResult_up <- reshape2::dcast(data = merged_upregulated,POPULATION+SAMPLEID ~ GENE, value.var = "BALANCE", sum)
 
   finalResultdim_up<-dim(finalResult_up)[2]
-  pheno_final_up <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_up[,2:finalResultdim_up], by.x = "Sample_ID", by.y = "SAMPLENAME")
+  pheno_final_up <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_up[,2:finalResultdim_up], by.x = "Sample_ID", by.y = "SAMPLEID")
 
   finalResultdim_down<-dim(finalResult_down)[2]
-  pheno_final_down <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_down[,2:finalResultdim_down], by.x = "Sample_ID", by.y = "SAMPLENAME")
+  pheno_final_down <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_down[,2:finalResultdim_down], by.x = "Sample_ID", by.y = "SAMPLEID")
 
   sheets <- list(
     SUMMARY = sampleSheet,

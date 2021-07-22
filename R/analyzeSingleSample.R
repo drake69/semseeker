@@ -60,7 +60,7 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
     resultFolder = resultFolder,
     resultSubFolder = paste("MUTATIONS", subFileExtension, sep = "_"),
     sampleName = sampleName,
-    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLEID")
   )
 
   lesionWeighted <- getLesions(bonferroniThreshold = bonferroniThreshold, slidingWindowSize = slidingWindowSize, grouping_column = "CHR", mutationAnnotatedSorted = mutationAnnotatedSorted)
@@ -70,7 +70,7 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
     resultFolder = resultFolder,
     resultSubFolder = paste0("LESIONS","_", subFileExtension, sep = ""),
     sampleName = sampleName,
-    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLEID")
   )
 
   result["lesionCount"] <- dim(lesionWeighted)[1]

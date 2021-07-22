@@ -250,7 +250,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
 
   message("Completed population analysis ", Sys.time())
 
-  # xPlot <- colnames(dataToGraph)[-c('SAMPLENAME')] plot( xPlot, dataToGraph[2,2:dim(dataToGraph)[2]] ,type = 'l',col = 'red') for (z in 3:dim(dataToGraph)[1]) { lines(xPlot, dataToGraph[z,2:dim(dataToGraph)[2]], col = 'green') }
+  # xPlot <- colnames(dataToGraph)[-c('SAMPLEID')] plot( xPlot, dataToGraph[2,2:dim(dataToGraph)[2]] ,type = 'l',col = 'red') for (z in 3:dim(dataToGraph)[1]) { lines(xPlot, dataToGraph[z,2:dim(dataToGraph)[2]], col = 'green') }
   end_time <- Sys.time()
   time_taken <- (end_time - start_time)
   message("Completed population with Excel summary", Sys.time(), " Time taken: ", time_taken)

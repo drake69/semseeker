@@ -40,6 +40,6 @@ mergeMultipleBed(
   anomalies = c("DELTAS"),
   fileExtension = ".bedgraph",
   resultFolder = resultFolder,
-  multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME", "VALUE")
+  multipleFileColNames = c("CHR", "START", "END", "SAMPLEID", "VALUE")
 )
 }

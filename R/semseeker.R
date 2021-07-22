@@ -133,7 +133,7 @@ semseeker <- function(sampleSheet,
     anomalies = c("DELTAS"),
     fileExtension = ".bedgraph",
     resultFolder = resultFolder,
-    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME", "VALUE")
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLEID", "VALUE")
   )
 
   figures <- c("HYPO", "HYPER")
@@ -144,7 +144,7 @@ semseeker <- function(sampleSheet,
     anomalies,
     fileExtension = ".bed",
     resultFolder = resultFolder,
-    multipleFileColNames = c("CHR", "START", "END", "SAMPLENAME")
+    multipleFileColNames = c("CHR", "START", "END", "SAMPLEID")
   )
 
 
@@ -193,9 +193,9 @@ semseeker <- function(sampleSheet,
   dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
   createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder)
 
-  colnames(geneBed) <- c("MAINGROUP","SAMPLENAME","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  colnames(dmrBed) <- c("MAINGROUP","SAMPLENAME","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  colnames(islandBed) <- c("MAINGROUP","SAMPLENAME","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   totalBed <- rbind(geneBed, dmrBed, islandBed, stringsAsFactors = TRUE)
   createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 ,resultFolder)
 
