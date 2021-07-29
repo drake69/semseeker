@@ -152,7 +152,7 @@ semseeker <- function(sampleSheet,
   figures <- c("HYPO", "HYPER")
   anomalies <- c("MUTATIONS","LESIONS")
 
-  subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd")
+  subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probesPrefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
@@ -166,6 +166,7 @@ semseeker <- function(sampleSheet,
   try(
     createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) ,resultFolder)
   )
+
 
   probesPrefix <- "PROBES_Island_"
   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island")

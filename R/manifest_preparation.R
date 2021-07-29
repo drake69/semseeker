@@ -68,6 +68,15 @@
 #    PROBES_Gene_1stExon <- rbind(PROBES_Gene_1stExon,temp_keys_Gene_1stExon )
 #
 #  }
+
+
+# PROBES_Gene_Whole <- rbind(PROBES_Gene_1stExon, PROBES_Gene_3UTR, PROBES_Gene_Body, PROBES_Gene_5UTR, PROBES_Gene_ExonBnd, PROBES_Gene_TSS1500, PROBES_Gene_TSS200)
+# PROBES_Gene_Whole <- PROBES_Gene_Whole[,c("PROBE","GENE","CHR","START")]
+# PROBES_Gene_Whole <- unique(PROBES_Gene_Whole)
+# PROBES_Gene_Whole$POSITION <- 1
+# PROBES_Gene_Whole$GROUP <- "Whole"
+# PROBES_Gene_Whole$ACCESSION <- ""
+
 #
 #  RefGene_Group <- unique(as.vector(UCSC_RefGene_Group))
 #
@@ -82,6 +91,7 @@
 #  usethis::use_data(PROBES_Gene_ExonBnd, overwrite = TRUE)
 #  usethis::use_data(PROBES_Gene_TSS1500, overwrite = TRUE)
 #  usethis::use_data(PROBES_Gene_TSS200, overwrite = TRUE)
+#  usethis::use_data(PROBES_Gene_Whole, overwrite = TRUE)
 #
 #
 #  keys <- data.frame( PROBE="",ISLAND="", RELATION_TO_CPGISLAND="", CHR="", START="", POSITION ="")
