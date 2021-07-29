@@ -59,7 +59,8 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
       "TSS200",
       "1stExon",
       "3'UTR",
-      "ExonBnd")
+      "ExonBnd",
+      "Whole")
 
   # genes <- data.frame("group" = group, "area" = subGroups)
 
