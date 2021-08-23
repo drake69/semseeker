@@ -6,6 +6,7 @@
 #' @param methylationData matrix of methylation data
 #' @param resultFolder folder to save computed epimutations and bedgraphs files.
 #' @param bonferroniThreshold = 0.05 #threshold to define which pValue
+#' @param covariates vector of column name from sample sheet to use as covariates
 #' accept for lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
@@ -13,7 +14,8 @@
 semseeker <- function(sampleSheet,
                       methylationData,
                       resultFolder,
-                      bonferroniThreshold = 0.05) {
+                      bonferroniThreshold = 0.05,
+                      covariates = NULL) {
 
   # set digits to 22
   withr::local_options(list(digits = 22))
@@ -169,7 +171,7 @@ semseeker <- function(sampleSheet,
 
 
   probesPrefix <- "PROBES_Island_"
-  subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island")
+  subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
   try(
@@ -203,7 +205,14 @@ semseeker <- function(sampleSheet,
   rm(populationControlRangeBetaValues)
 
   message("Starting inference Analysis.")
-  inferenceAnalysisWithoutCorrection(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder)
+  if(is.null(covariates) || length(covariates)==0)
+  {
+    inferenceAnalysisWithoutCorrection(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder)
+  }
+  else
+  {
+    inferenceAnalysisWithCorrection(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, covariates = covariates)
+  }
 
   message("Job Completed !")
 }

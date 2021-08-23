@@ -1,4 +1,4 @@
-inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFolder)
+inferenceAnalysisWithCorrection <- function(sampleSheet, resultFolder, logFolder, covariates)
 {
 
   # browser()
@@ -24,7 +24,8 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
     dir.create(resultFolder)
 
   # sampleSheet$Sample_Group <- as.numeric(sampleSheet[,"Sample_Group"] == "Case")
-  sample_names <- data.frame(sampleSheet[, c("Sample_ID", "Sample_Group", "Sample_Group")])
+  sample_names <- data.frame(sampleSheet[, c("Sample_ID", "Sample_Group", covariates)])
+  # sample_names <- data.frame(sampleSheet)
   result = data.frame (
     "ANOMALY" = "",
     "FIGURE" = "",
@@ -42,8 +43,8 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
   # sample_names <- sample_names[complete.cases(sample_names),]
   sample_names <- subset(sample_names, sample_names[, "Sample_Group"]  != "Reference")
 
-  sample_names <-   sample_names[, c("Sample_ID", "Sample_Group")]
-  colnames(sample_names) <- c("Sample_ID", "Sample_Group")
+  sample_names <-   sample_names[, c("Sample_ID", "Sample_Group", covariates)]
+  colnames(sample_names) <- c("Sample_ID", "Sample_Group", covariates)
   ######################################################################################################
   # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
   # binomiale che si vuole usare per la regressione logistica
@@ -73,7 +74,7 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
     )
 
   group <- "ISLAND"
-  subGroups <- c("N_Shore", "S_Shore", "N_Shelf", "S_Shelf", "Island")
+  subGroups <- c("N_Shore", "S_Shore", "N_Shelf", "S_Shelf", "Island", "Whole")
 
   # islands <- data.frame("group" = group, "area" = subGroups)
 
@@ -146,28 +147,34 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
     colnames(df) <- cols
 
     df <- as.data.frame(df)
-    df$Sample_Group <- as.factor(df$Sample_Group)
-    df$Sample_Group  <- relevel(df$Sample_Group, "Control")
+    # df$Sample_Group <- as.factor(df$Sample_Group)
+    # df$Sample_Group  <- relevel(df$Sample_Group, "Control")
+    df$Sample_Group[df$Sample_Group=="Control"] <- 0
+    df$Sample_Group[df$Sample_Group=="Case"] <- 1
+    df$Sample_Group <- as.numeric(df$Sample_Group)
 
-    df[,2:ncol(df)] = as.data.frame(sapply(df[, 2:ncol(df)] , as.numeric))
+    g_start <- dim(sample_names)[2] + 1
+    df[,g_start:ncol(df)] = as.data.frame(sapply(df[, g_start:ncol(df)] , as.numeric))
 
     iters <- length(cols)
-    result_temp <- foreach::foreach(g = 2:iters, .combine = rbind) %dopar%
-      # for (g in 2:iters)
+
+    result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind) %dopar%
+      # for (g in g_start:iters)
       {
         #g <- 2
-        sig.formula <- as.formula(paste( paste0(cols[g],"~", sep=""),"Sample_Group", sep=""))
-        result.glm  <- glm( sig.formula, family = "poisson", data = df)
-        pvalue <- summary( result.glm )$coeff[-1, 4]
+        covariates_model <- paste(paste0(c(cols[g], covariates),collapse="+", sep=""))
+        sig.formula <- as.formula(paste0("Sample_Group","~", covariates_model, sep=""))
+        result.glm  <- glm( sig.formula, family = "binomial", data = df)
+        pvalue <- summary( result.glm )$coeff[-1, 4][1]
         pvalueadjusted <- pvalue
-        beta <- exp(summary( result.glm )$coeff[-1, 1])
+        beta <- exp(summary( result.glm )$coeff[-1, 1][1])
         data.frame (
           "ANOMALY" = key$ANOMALY,
           "FIGURE" = key$FIGURE,
           "GROUP" = key$GROUP,
           "SUBGROUP" = key$SUBGROUP,
           "AREA_OF_TEST" = cols[g],
-          "PVALUE" = summary(result.glm)$coeff[-1, 4],
+          "PVALUE" = pvalue,
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
           "BETA" = beta
@@ -179,7 +186,7 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
 
   write.csv2(result, file.path(
     resultFolder,
-    paste(file_result_prefix , "poisson_regression_result.csv", sep = "")
+    paste(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")
   ), row.names = FALSE)
 
   case_summary <- read.csv(file.path(workingFolder, "../Case/summary.csv"))
@@ -296,7 +303,7 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
 
   write.csv2(result, file.path(
     resultFolder,
-    paste(file_result_prefix , "poisson_regression_result.csv", sep = "")
+    paste(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")
   ), row.names = FALSE)
 
 
@@ -305,12 +312,12 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
   # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
 
   # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
-  # result <- read_csv(file.path(resultFolder,paste(file_result_prefix , "poisson_regression_result.csv", sep = "")))
+  # result <- read_csv(file.path(resultFolder,paste(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
   # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolder =  report.dir, filePrefix ="diff_meth_sites")
 
-  # case_vs_control_poisson_regression_result <-
+  # case_vs_control_binomial_regression_corrected_result <-
   #   read.csv2(
-  #     "/home/lcorsaro/Desktop/experiments_data/DIOSSINA_DESIO/3_semseeker_result/Pivots/case_vs_control_poisson_regression_result_1.csv"
+  #     "/home/lcorsaro/Desktop/experiments_data/DIOSSINA_DESIO/3_semseeker_result/Pivots/case_vs_control_binomial_regression_corrected_result_1.csv"
   #   )
   # keys <- unique(result[, c("ANOMALY", "FIGURE", "GROUP", "SUBGROUP")])
   #
@@ -333,7 +340,7 @@ inferenceAnalysisWithoutCorrection <- function(sampleSheet, resultFolder, logFol
   #     next
   #   #######inserisco nella funzione i pvalues ottenuti dalla differential (non aggiustati)
   #
-  #   file_prefix <- paste0("case_vs_control_poisson_regression_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
+  #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
   #   qqunifPlot(diffmeth.p.val$PVALUE,
   #               resultFolder = resultFolder,
   #               filePrefix = file_prefix)
