@@ -9,7 +9,8 @@ semseeker(
   sampleSheet,
   methylationData,
   resultFolder,
-  bonferroniThreshold = 0.05
+  bonferroniThreshold = 0.05,
+  covariates = NULL
 )
 }
 \arguments{
@@ -20,7 +21,9 @@ samples}
 
 \item{resultFolder}{folder to save computed epimutations and bedgraphs files.}
 
-\item{bonferroniThreshold}{= 0.05 #threshold to define which pValue
+\item{bonferroniThreshold}{= 0.05 #threshold to define which pValue}
+
+\item{covariates}{vector of column name from sample sheet to use as covariates
 accept for lesions definition}
 }
 \value{
