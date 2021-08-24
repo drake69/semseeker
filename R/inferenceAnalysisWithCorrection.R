@@ -180,9 +180,10 @@ inferenceAnalysisWithCorrection <- function(sampleSheet, resultFolder, logFolder
           "BETA" = beta
         )
       }
-    result_temp$PVALUEADJ <- p.adjust(result_temp$PVALUE,method = "BH", n = dim(result_temp)[1])
     result <- rbind(result, result_temp)
   }
+
+  result$PVALUEADJ <- p.adjust(result$PVALUE,method = "BH", n = dim(result)[1])
 
   write.csv2(result, file.path(
     resultFolder,
