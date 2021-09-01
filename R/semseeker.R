@@ -138,7 +138,7 @@ semseeker <- function(sampleSheet,
     multipleFileColNames = c("CHR", "START", "END", "SAMPLEID", "VALUE")
   )
 
-  figures <- c("HYPO", "HYPER")
+  figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("MUTATIONS","LESIONS")
   mergeMultipleBed(
     populations,
@@ -151,7 +151,7 @@ semseeker <- function(sampleSheet,
 
 
   populations <- c("Reference","Control","Case")
-  figures <- c("HYPO", "HYPER")
+  figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("MUTATIONS","LESIONS")
 
   subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
@@ -163,11 +163,11 @@ semseeker <- function(sampleSheet,
   )
 
   geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) ,resultFolder)
-  try(
-    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) ,resultFolder)
-  )
+  # createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder)
+  # createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) ,resultFolder)
+  # try(
+  #   createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) ,resultFolder)
+  # )
 
 
   probesPrefix <- "PROBES_Island_"
@@ -179,11 +179,11 @@ semseeker <- function(sampleSheet,
   )
 
   islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 ,resultFolder)
-  try(
-    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3) ,resultFolder)
-  )
+  # createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder)
+  # createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 ,resultFolder)
+  # try(
+  #   createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3) ,resultFolder)
+  # )
 
   subGroups <- c("DMR")
   probesPrefix = "PROBES_DMR_"
@@ -194,25 +194,22 @@ semseeker <- function(sampleSheet,
   )
 
   dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder)
+  # createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder)
 
-  colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  totalBed <- rbind(geneBed, dmrBed, islandBed, stringsAsFactors = TRUE)
-  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 ,resultFolder)
+  # colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  # colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  # colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  # totalBed <- rbind(geneBed, dmrBed, islandBed, stringsAsFactors = TRUE)
+  # createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 ,resultFolder)
 
   rm(populationControlRangeBetaValues)
 
   message("Starting inference Analysis.")
-  if(is.null(covariates) || length(covariates)==0)
-  {
-    inferenceAnalysisWithoutCorrection(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder)
-  }
-  else
-  {
-    inferenceAnalysisWithCorrection(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, covariates = covariates)
-  }
+  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates, transformation = `log`)
+  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates, transformation = `log`)
+  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="poisson", covariates= covariates)
+  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates)
+  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates)
 
   message("Job Completed !")
 }

@@ -58,15 +58,16 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
   parallel::clusterExport(envir=environment(), cl = computation_cluster,
                           varlist = list( "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample",
                                       "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame",
+                                      "getMutations", "analyzeSingleSampleBothThresholds",
                                       "PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body"))
 
   ### get beta_values ########################################################
   sampleSheet <- sampleSheet[order(sampleSheet[, "Sample_ID"], decreasing = FALSE), ]
   sampleSheet[, "Probes_Count"] <- 0
-  sampleSheet[, "Hyper_Mutations"] <- 0
-  sampleSheet[, "Hyper_Lesions"] <- 0
-  sampleSheet[, "Hypo_Mutations"] <- 0
-  sampleSheet[, "Hypo_Lesions"] <- 0
+  sampleSheet[, "MUTATIONS_HYPER"] <- 0
+  sampleSheet[, "LESIONS_HYPER"] <- 0
+  sampleSheet[, "MUTATIONS_HYPO"] <- 0
+  sampleSheet[, "LESIONS_HYPO"] <- 0
 
   existentSamples <- colnames(methylationData)
   sampleNames <- sampleSheet$Sample_ID
@@ -125,8 +126,8 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
 
       # browser()
       sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Probes_Count", cellValue = sampleStatusTemp["probesCount"])
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Mutations", cellValue = sampleStatusTemp["mutationCount"])
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Lesions", cellValue = sampleStatusTemp["lesionCount"])
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPER", cellValue = sampleStatusTemp["mutationCount"])
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPER", cellValue = sampleStatusTemp["lesionCount"])
 
       sampleStatusTemp <- analyzeSingleSample(
         values = betaValues[i], slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaInferiorThresholds, comparison = `<`, sampleName = sampleDetail$Sample_ID,
@@ -134,12 +135,15 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
       )
 
       # # browser()
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Mutations", cellValue = sampleStatusTemp["mutationCount"])
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Lesions", cellValue = sampleStatusTemp["lesionCount"])
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPO", cellValue = sampleStatusTemp["mutationCount"])
+      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPO", cellValue = sampleStatusTemp["lesionCount"])
 
       tempExtension <- stringi::stri_rand_strings(1, 10)
       filePath <- paste0(summaryFileName, tempExtension, sep = "")
       utils::write.table(sampleDetail, file = filePath, quote = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
+
+      analyzeSingleSampleBothThresholds(values= betaValues[i], resultFolder =  resultFolder,betaSuperiorThresholds =  betaSuperiorThresholds,
+                                        betaInferiorThresholds =  betaInferiorThresholds, sampleName =  sampleDetail$Sample_ID, probeFeatures =  probeFeatures )
 
       if (.Platform$OS.type == "windows") {
 
@@ -187,8 +191,8 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
   #
   #     # browser()
   #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Probes_Count", cellValue = sampleStatusTemp["probesCount"])
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Mutations", cellValue = sampleStatusTemp["mutationCount"])
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hyper_Lesions", cellValue = sampleStatusTemp["lesionCount"])
+  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPER", cellValue = sampleStatusTemp["mutationCount"])
+  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPER", cellValue = sampleStatusTemp["lesionCount"])
   #
   #     sampleStatusTemp <- analyzeSingleSample(
   #       values = betaData, slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaInferiorThresholds, comparison = `<`, sampleName = sampleDetail$Sample_ID,
@@ -196,8 +200,8 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
   #     )
   #
   #     # # browser()
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Mutations", cellValue = sampleStatusTemp["mutationCount"])
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Hypo_Lesions", cellValue = sampleStatusTemp["lesionCount"])
+  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPO", cellValue = sampleStatusTemp["mutationCount"])
+  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPO", cellValue = sampleStatusTemp["lesionCount"])
   #
   #     tempExtension <- stringi::stri_rand_strings(1, 10)
   #     filePath <- paste0(summaryFileName, tempExtension, sep = "")

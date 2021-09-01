@@ -27,33 +27,9 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
   message(sampleName, " ", "Sample analysis WarmedUP ...", Sys.time())
   message(sampleName, " ", "Start sample analyze ", Sys.time())
 
-  ### get probesOverThreshold ################################################################################################
-
-  mutation <- as.numeric(comparison(values, thresholds))
-  message(sampleName, " ", "Got probesOverThreshold ", Sys.time())
-
-  ### get mutationAnnotatedSorted ################################################################################################
-  if (!test_match_order(row.names(mutation), probeFeatures$PROBE)) {
-    stop("Wrong order matching Probes and Mutation!", Sys.time())
-  }
-
-  mutationAnnotated <- data.frame(as.data.frame(probeFeatures), "MUTATIONS" = mutation, row.names = probeFeatures$PROBE)
-
-  if (!test_match_order(row.names(mutationAnnotated), probeFeatures$PROBE)) {
-    stop("Wrong order matching Probes and Mutation!", Sys.time())
-  }
-
-  mutationAnnotatedSorted <- sortByCHRandSTART(mutationAnnotated)
-
-  if (!test_match_order(mutationAnnotatedSorted$PROBE, row.names(mutationAnnotatedSorted))) {
-    stop("Mutation annotation sorted is not coherent with probe informations order!")
-  }
-
-  result <- c("mutationCount" = sum(mutationAnnotatedSorted$MUTATIONS), "lesionCount" = 0, "probesCount" = 0)
+  mutationAnnotatedSorted <- getMutations(values, comparison,thresholds, probeFeatures, sampleName)
 
   mutationAnnotatedSortedToSave <- subset(mutationAnnotatedSorted, MUTATIONS == 1)[, c("CHR", "START", "END")]
-  message(sampleName, " ", "Got mutationAnnotatedSorted ", Sys.time())
-
   dumpSampleAsBedFile(
     dataToDump = mutationAnnotatedSortedToSave,
     fileExtension = paste(".", subFileExtension, ".MUTATIONS.bed", sep = ""),
@@ -62,6 +38,8 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
     sampleName = sampleName,
     multipleFileColNames = c("CHR", "START", "END", "SAMPLEID")
   )
+  result["mutationCount"] <- if (!is.null(mutationAnnotatedSortedToSave)) dim(mutationAnnotatedSortedToSave)[1] else 0
+
 
   lesionWeighted <- getLesions(bonferroniThreshold = bonferroniThreshold, slidingWindowSize = slidingWindowSize, grouping_column = "CHR", mutationAnnotatedSorted = mutationAnnotatedSorted)
   dumpSampleAsBedFile(
@@ -73,8 +51,9 @@ analyzeSingleSample <- function(values, slidingWindowSize, resultFolder, thresho
     multipleFileColNames = c("CHR", "START", "END", "SAMPLEID")
   )
 
-  result["lesionCount"] <- dim(lesionWeighted)[1]
+  result["lesionCount"] <- if (!is.null(lesionWeighted)) dim(lesionWeighted)[1] else 0
   result["probesCount"] <- dim(probeFeatures)[1]
+
   # if (result["lesionCount"] > dim(mutationAnnotatedSortedToSave)[1])
   # {
   #   ##
