@@ -17,7 +17,7 @@ dumpSampleAsBedFile <- function(dataToDump, fileExtension, resultFolder, resultS
     dir.create(paste0(resultFolder, "/", resultSubFolder, "/", sep = ""))
   }
 
-  if (!plyr::empty(dataToDump) && !startsWith(x = as.character(dataToDump[1, "CHR"]), prefix = "CHR")) {
+  if (!plyr::empty(dataToDump) && !startsWith(x = toupper(as.character(dataToDump[1, "CHR"])), prefix = "CHR")) {
     chr <- rep(x = "chr", dim(dataToDump)[1])
     chr <- paste0(chr, dataToDump[, "CHR"], sep = "")
     dataToDump[, "CHR"] <- chr
@@ -38,7 +38,7 @@ dumpSampleAsBedFile <- function(dataToDump, fileExtension, resultFolder, resultS
     colnames(dataToDump) <- multipleFileColNames
 
     utils::write.table(dataToDump, file = filePath, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
-    message(sampleName, " ", "saved files ", fileExtension, Sys.time())
+    message(sampleName, " ", "saved files ", fileExtension, " ", Sys.time())
   }
 }
 

@@ -8,7 +8,13 @@
 getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, mutationAnnotatedSorted)
 {
 
-  # browser()
+  if( is.null(mutationAnnotatedSorted))
+    return (mutationAnnotatedSorted)
+
+  if(nrow(mutationAnnotatedSorted)==0)
+    return (mutationAnnotatedSorted)
+
+    # browser()
   mutationAnnotatedSortedLocal <- mutationAnnotatedSorted
   summed <- aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = sum)
   colnames(summed) <- c(grouping_column,"MUTATIONS_COUNT")
