@@ -127,6 +127,16 @@ semseeker <- function(sampleSheet,
     # rm(populationMatrixToAnalyze)
   }
 
+  case_summary <- read.csv(file.path(resultFolder, "/Case/summary.csv"))
+  ctrl_summary <- read.csv(file.path(resultFolder, "/Control/summary.csv"))
+  reference_summary <-  read.csv(file.path(resultFolder, "/Reference/summary.csv"))
+  studySummary <- rbind(case_summary, ctrl_summary, reference_summary)
+
+  studySummary$MUTATIONS_BOTH <- studySummary$MUTATIONS_HYPER + studySummary$MUTATIONS_HYPO
+  studySummary$LESIONS_BOTH <- studySummary$LESIONS_HYPER + studySummary$LESIONS_HYPO
+
+  write.csv2(studySummary, file.path(resultFolder, "sample_sheet_result.csv"))
+
 
   populations <- c("Reference","Control","Case")
   mergeMultipleBed(
@@ -205,11 +215,11 @@ semseeker <- function(sampleSheet,
   rm(populationControlRangeBetaValues)
 
   message("Starting inference Analysis.")
-  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates, transformation = `log`)
-  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates, transformation = `log`)
-  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="poisson", covariates= covariates)
-  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates)
-  inferenceAnalysis(sampleSheet = sampleSheet, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates)
+  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates, transformation = `log`)
+  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates, transformation = `log`)
+  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="poisson", covariates= covariates)
+  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates)
+  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates)
 
   message("Job Completed !")
 }

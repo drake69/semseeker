@@ -1,5 +1,5 @@
 
-apply_model <- function(df, g_start, family, covariates, key, transformation, dototal, logFolder)
+apply_model <- function(df, g_start, family, covariates = NULL, key, transformation, dototal, logFolder)
 {
 
   nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
@@ -22,9 +22,11 @@ apply_model <- function(df, g_start, family, covariates, key, transformation, do
     df_values <- df_values[, colSums(df_values) > 0]
   }
 
+  df_colnames <- colnames(df)
   if( !is.null(dim(df_values))  & dototal) {
     sum_area <- apply(df_values, 1, sum)
     df_values <- cbind(df_values, data.frame("TOTAL"=sum_area))
+    df_colnames <- c(df_colnames, "TOTAL")
   }
 
   if(family != "poisson")
@@ -33,11 +35,12 @@ apply_model <- function(df, g_start, family, covariates, key, transformation, do
   transformation_label <- "NONE"
   if(!is.null(transformation))
   {
-    transformation_label <- as.character(substitute(transformation))
     df_values <- transformation(df_values)
+    transformation_label <- as.character(substitute(transformation))
   }
 
-  df <- cbind(df_head, df_values)
+  df <- as.data.frame(cbind(df_head, df_values))
+  colnames(df) <- df_colnames
   cols <- colnames(df)
   iters <- length(cols)
 
@@ -68,7 +71,7 @@ apply_model <- function(df, g_start, family, covariates, key, transformation, do
       sig.formula <- as.formula(paste0("Sample_Group","~", covariates_model, sep=""))
     }
 
-    result.glm  <- glm( sig.formula, family = family, data = df)
+    result.glm  <- glm( sig.formula, family = family, data = as.data.frame(df))
     pvalue <- summary( result.glm )$coeff[-1, 4][1]
     pvalueadjusted <- pvalue
     # beta <- exp(summary( result.glm )$coeff[-1, 1][1])
@@ -91,5 +94,7 @@ apply_model <- function(df, g_start, family, covariates, key, transformation, do
   }
   result_temp$PVALUEADJ <- p.adjust(result_temp$PVALUE,method = "BH")
   result_temp$TRANSFORMATION <- transformation_label
+  parallel::stopCluster(computation_cluster)
+  gc()
   return(result_temp)
 }

@@ -1,29 +1,27 @@
-inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, family, transformation = NULL)
+inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates, family, transformation = NULL)
 {
 
   # browser()
 
-
   workingFolder <- file.path(resultFolder, "Pivots/")
-  resultFolder <-  file.path(resultFolder, "Inference/")
+  inferenceFolder <-  file.path(resultFolder, "Inference/")
   file_result_prefix <- "case_vs_control_"
 
-  sampleSheet <- subset(sampleSheet, Sample_Group!="Reference")
+  studySummary <- subset(studySummary, Sample_Group!="Reference")
   #########################################################################################################
   #########################################################################################################
 
-  if(!dir.exists(resultFolder))
-    dir.create(resultFolder)
+  if(!dir.exists(inferenceFolder))
+    dir.create(inferenceFolder)
 
-  # sampleSheet$Sample_Group <- as.numeric(sampleSheet[,"Sample_Group"] == "Case")
   if(is.null(covariates) || length(covariates)==0)
   {
-    sample_names <- data.frame(sampleSheet[, c("Sample_ID", "Sample_Group")])
+    sample_names <- data.frame(studySummary[, c("Sample_ID", "Sample_Group")])
   } else
   {
-    sample_names <- data.frame(sampleSheet[, c("Sample_ID", "Sample_Group", covariates)])
+    sample_names <- data.frame(studySummary[, c("Sample_ID", "Sample_Group", covariates)])
   }
-  # sample_names <- data.frame(sampleSheet)
+  # sample_names <- data.frame(studySummary)
   result = data.frame (
     "ANOMALY" = "",
     "FIGURE" = "",
@@ -65,22 +63,6 @@ inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, 
   }
 
 
-  case_summary <- read.csv(file.path(workingFolder, "../Case/summary.csv"))
-  ctrl_summary <- read.csv(file.path(workingFolder, "../Control/summary.csv"))
-  # reference_summary <-  read.csv(file.path(workingFolder, "../Reference/summary.csv"))
-  # summary <- rbind(case_summary, ctrl_summary, reference_summary)
-
-  study_summary <- rbind(case_summary, ctrl_summary)
-
-  # if(!is.null(covariates) && !length(covariates)==0)
-  #   study_summary <- merge(study_summary, sampleSheet[, c("Sample_ID", covariates)] , by.x="Sample_ID", by.y="Sample_ID")
-  # else
-  #   study_summary <- merge(study_summary, sampleSheet[, c("Sample_ID", covariates)] , by.x="Sample_ID", by.y="Sample_ID")
-
-  study_summary$MUTATIONS_BOTH <- study_summary$MUTATIONS_HYPER + study_summary$MUTATIONS_HYPO
-  study_summary$LESIONS_BOTH <- study_summary$LESIONS_HYPER + study_summary$LESIONS_HYPO
-
-
   keys <- expand.grid("ANOMALY"=c("LESIONS","MUTATIONS"), "FIGURE"=c("HYPER","HYPO","BOTH"))
   cols <- paste(keys$ANOMALY,"_",keys$FIGURE, sep="")
   keys$GROUP = "POPULATION"
@@ -88,7 +70,7 @@ inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, 
   iters <- length(cols)
 
   if(!is.null(covariates) && !length(covariates)==0)
-    study_summary <- study_summary[, c("Sample_Group", covariates, cols) ]
+    studySummary <- studySummary[, c("Sample_Group", covariates, cols) ]
 
   for(i in 1:nrow(keys))
   {
@@ -96,9 +78,40 @@ inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, 
     # family <- "poisson"
     # transformation <- NULL
     g_start <- 2 + length(covariates)
-    result_temp <- apply_model(df = study_summary[, c("Sample_Group", covariates, cols[i])], g_start = g_start , family = family, covariates = covariates, key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder)
+    result_temp <- apply_model(df = studySummary[, c("Sample_Group", covariates, cols[i])], g_start = g_start , family = family, covariates = covariates, key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder)
     result <- rbind(result, result_temp)
   }
+
+
+  studySummaryToPlot <- studySummary
+  studySummaryToPlot$Sample_Group  <- relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
+
+  chartFolder <- paste(inferenceFolder, "/Charts/", sep="")
+  if (chartFolder != "" && !dir.exists(chartFolder)) {
+    dir.create(chartFolder)
+  }
+
+  chartFolder <- paste(inferenceFolder, "/Charts/POPULATION_COMPARISON/", sep="")
+  if (chartFolder != "" && !dir.exists(chartFolder)) {
+    dir.create(chartFolder)
+  }
+
+  filename = paste( chartFolder,"/MUTATIONS.png",sep="")
+  grDevices::png(file= filename, width=2000, height=2000)
+  par(mfrow=c(1,3))
+  graphics::boxplot(MUTATIONS_HYPO~Sample_Group,main="Hypo Mutations", data = studySummaryToPlot)
+  graphics::boxplot(MUTATIONS_BOTH~Sample_Group, main="Both Type of Mutations", data = studySummaryToPlot)
+  graphics::boxplot(MUTATIONS_HYPER~Sample_Group,main="Hyper Mutations", data = studySummaryToPlot)
+  grDevices::dev.off()
+
+  filename = paste( chartFolder,"/LESIONS.png",sep="")
+  grDevices::png(file= filename, width=2000, height=2000)
+  par(mfrow=c(1,3))
+  graphics::boxplot(LESIONS_HYPO~Sample_Group,main="Hypo Lesions", data = studySummaryToPlot)
+  graphics::boxplot(LESIONS_BOTH~Sample_Group, main="Both Type of Lesions", data = studySummaryToPlot)
+  graphics::boxplot(LESIONS_HYPER~Sample_Group,main="Hyper Lesions", data = studySummaryToPlot)
+  grDevices::dev.off()
+
 
   anomalies <- c("MUTATIONS", "LESIONS")
   figures <- c("HYPO", "HYPER", "BOTH")
@@ -163,7 +176,7 @@ inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, 
   for (i in 1:nkeys)
   {
     # i <- 25
-    rm(df)
+    rm(list = c("df"))
     key <- keys [i,]
     # print(key)
     fname <-file.path(workingFolder,paste("/", key$ANOMALY, "_", key$FIGURE, "_", key$GROUP, "_", key$SUBGROUP, ".csv" , sep =""))
@@ -222,7 +235,7 @@ inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, 
   }
 
   write.csv2(result, file.path(
-    resultFolder,
+    inferenceFolder,
     paste(file_result_prefix , transformation_label, "_", family, file_suffix, sep = "")
   ), row.names = FALSE)
 
@@ -232,8 +245,8 @@ inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, 
   # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
 
   # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
-  # result <- read_csv(file.path(resultFolder,paste(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
-  # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolder =  report.dir, filePrefix ="diff_meth_sites")
+  # result <- read_csv(file.path(inferenceFolder,paste(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
+  # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, inferenceFolder =  report.dir, filePrefix ="diff_meth_sites")
 
   # case_vs_control_binomial_regression_corrected_result <-
   #   read.csv2(
@@ -262,7 +275,7 @@ inferenceAnalysis <- function(sampleSheet, resultFolder, logFolder, covariates, 
   #
   #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
   #   qqunifPlot(diffmeth.p.val$PVALUE,
-  #               resultFolder = resultFolder,
+  #               inferenceFolder = inferenceFolder,
   #               filePrefix = file_prefix)
   # }
   #
