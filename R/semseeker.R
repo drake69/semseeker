@@ -215,12 +215,13 @@ semseeker <- function(sampleSheet,
   rm(populationControlRangeBetaValues)
 
   message("Starting inference Analysis.")
-  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates, transformation = `log`)
-  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates, transformation = `log`)
-  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="poisson", covariates= covariates)
-  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates)
-  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates)
-
+  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates, transformation = "log")
+  inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates, transformation = "log")
+  geneontology_analysis(resultFolder = resultFolder, fileName = "case_vs_control_log_binomial_regression_corrected_result.csv")
+  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="poisson", covariates= covariates)
+  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates)
+  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates)
+  euristic_analysis(resultFolder = resultFolder)
   message("Job Completed !")
 }
 

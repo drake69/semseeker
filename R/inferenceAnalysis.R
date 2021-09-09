@@ -35,7 +35,8 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
     "AIC" = "",
     "RESIDUALS.SUM" = "",
     "FAMILY" = "",
-    "TRANSFORMATION" = ""
+    "TRANSFORMATION" = "",
+    "SHAPIRO.PVALUE" = ""
   )
 
   result <- result[-1,]
@@ -56,11 +57,6 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
   # binomiale che si vuole usare per la regressione logistica
 
-  transformation_label <- "NONE"
-  if(!is.null(transformation))
-  {
-    transformation_label <- as.character(substitute(transformation))
-  }
 
 
   keys <- expand.grid("ANOMALY"=c("LESIONS","MUTATIONS"), "FIGURE"=c("HYPER","HYPO","BOTH"))
@@ -72,6 +68,8 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   if(!is.null(covariates) && !length(covariates)==0)
     studySummary <- studySummary[, c("Sample_Group", covariates, cols) ]
 
+  # browser()
+
   for(i in 1:nrow(keys))
   {
     # i <- 1
@@ -82,6 +80,9 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
     result <- rbind(result, result_temp)
   }
 
+  result <- result[order(result$PVALUEADJ),]
+
+  # browser()
 
   studySummaryToPlot <- studySummary
   studySummaryToPlot$Sample_Group  <- relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
@@ -225,18 +226,19 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
 
 
   result[ result$AREA_OF_TEST=="TOTAL","PVALUEADJ" ] <- p.adjust(result[ result$AREA_OF_TEST=="TOTAL","PVALUE" ],method = "BH")
+  result <- result[order(result$PVALUEADJ),]
 
   if(is.null(covariates) || length(covariates)==0)
   {
-    file_suffix <- "_regression_corrected_result.csv"
+    file_suffix <- "_regression_result.csv"
   } else
   {
-    file_suffix <- "_regression_result.csv"
+    file_suffix <- "_regression_corrected_result.csv"
   }
 
   write.csv2(result, file.path(
     inferenceFolder,
-    paste(file_result_prefix , transformation_label, "_", family, file_suffix, sep = "")
+    paste(file_result_prefix , transformation, "_", family, file_suffix, sep = "")
   ), row.names = FALSE)
 
 
