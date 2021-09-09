@@ -35,11 +35,11 @@ annotateBed <- function (
   finalBed <- NULL
   bedFileName <- file.path( resultFolder, paste0("/", columnLabel, "_annotatedBed.bed" ,sep=""))
 
-  if(file.exists(bedFileName))
-  {
-    finalBed <-    utils::read.csv(bedFileName, stringsAsFactors = TRUE)
-    return(finalBed)
-  }
+  # if(file.exists(bedFileName))
+  # {
+  #   finalBed <-    utils::read.csv(bedFileName, stringsAsFactors = TRUE)
+  #   return(finalBed)
+  # }
 
   for (pop in populations) {
     for (fig in figures) {

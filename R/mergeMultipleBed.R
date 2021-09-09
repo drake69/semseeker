@@ -35,6 +35,10 @@ mergeMultipleBed <- function(populations,figures,anomalies, fileExtension, resul
 
         message ("Merging bed into a multiple bed file.")
         if (.Platform$OS.type == "windows") {
+          command <- paste0("del ", (destinationFile), sep = "")
+          command <- gsub ("/","\\\\",command)
+          #print(command)
+          shell(command, intern = TRUE)
 
           command <- paste0("type ", (sourceFiles), " > ",(destinationFile), sep = "")
           command <- gsub ("/","\\\\",command)
@@ -49,7 +53,7 @@ mergeMultipleBed <- function(populations,figures,anomalies, fileExtension, resul
         } else
         {
           system(paste0("cat ", sourceFiles, " >> ", destinationFile, sep = ""))
-          # system(paste0("rm ", sourceFiles, sep = ""))
+          system(paste0("rm ", sourceFiles, sep = ""))
         }
       }
     }

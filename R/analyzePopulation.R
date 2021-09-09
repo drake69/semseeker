@@ -139,7 +139,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
       sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPO", cellValue = sampleStatusTemp["lesionCount"])
 
       tempExtension <- stringi::stri_rand_strings(1, 10)
-      filePath <- paste0(summaryFileName, tempExtension, sep = "")
+      filePath <- file.path(paste(summaryFileName, tempExtension,sep=""))
       utils::write.table(sampleDetail, file = filePath, quote = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
 
       analyzeSingleSampleBothThresholds(values= betaValues[i], resultFolder =  resultFolder,betaSuperiorThresholds =  betaSuperiorThresholds,
