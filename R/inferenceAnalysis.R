@@ -100,9 +100,9 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   filename = paste( chartFolder,"/MUTATIONS.png",sep="")
   grDevices::png(file= filename, width=2000, height=2000)
   par(mfrow=c(1,3))
-  graphics::boxplot(MUTATIONS_HYPO~Sample_Group,main="Hypo Mutations", data = studySummaryToPlot)
-  graphics::boxplot(MUTATIONS_BOTH~Sample_Group, main="Both Type of Mutations", data = studySummaryToPlot)
-  graphics::boxplot(MUTATIONS_HYPER~Sample_Group,main="Hyper Mutations", data = studySummaryToPlot)
+  graphics::boxplot(MUTATIONS_HYPO~Sample_Group,main="Hypo Mutations", data = studySummaryToPlot, cex=2)
+  graphics::boxplot(MUTATIONS_BOTH~Sample_Group, main="Both Type of Mutations", data = studySummaryToPlot, cex=2)
+  graphics::boxplot(MUTATIONS_HYPER~Sample_Group,main="Hyper Mutations", data = studySummaryToPlot, cex=2)
   grDevices::dev.off()
 
   filename = paste( chartFolder,"/LESIONS.png",sep="")
@@ -236,12 +236,14 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
     file_suffix <- "_regression_corrected_result.csv"
   }
 
+  fileName <- paste(file_result_prefix , transformation, "_", family, file_suffix, sep = "")
   write.csv2(result, file.path(
     inferenceFolder,
-    paste(file_result_prefix , transformation, "_", family, file_suffix, sep = "")
+    fileName
   ), row.names = FALSE)
 
 
+  return(fileName)
   # res.pvalue <- subset(result, PVALUE < 0.05)
   # res.pvalue$beta_gt1 <- res.pvalue$BETA>1
   # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)

@@ -1,14 +1,15 @@
-geneontology_analysis <- function(resultFolder, fileName){
+geneontology_analysis_webgestalt <- function(resultFolder, fileName){
 
   fileName <- file.path(resultFolder, "Inference", fileName)
 
   geneAnnotated <- read.csv(fileName, sep=";", dec=",")
-  resultFolderWebGestalt <- file.path(resultFolder,"Inference","geneontology")
+  resultFolderWebGestalt <- file.path(resultFolder,"Inference","geneontology_webgestalt")
   dir.create(resultFolderWebGestalt)
+  geneAnnotatedFile <- subset(geneAnnotatedFile, GROUP=="GENE" & SUBGROUP!="SAMPLE" & AREA_OF_TEST !="TOTAL" & SUBGROUP!="TOTAL" & FIGURE=="BOTH" & (PVALUE  <0.05 | PVALUEADJ < 0.05))
 
   for (pval in c("PVALUE", "PVALUEADJ"))
   {
-    geneAnnotated <- subset(geneAnnotated, GROUP=="GENE" & SUBGROUP!="SAMPLE" & AREA_OF_TEST !="TOTAL" & SUBGROUP!="TOTAL" & FIGURE=="BOTH" & geneAnnotated[,pval]  <0.05)
+    geneAnnotated <- subset(geneAnnotatedFile, GROUP=="GENE" & SUBGROUP!="SAMPLE" & AREA_OF_TEST !="TOTAL" & SUBGROUP!="TOTAL" & FIGURE=="BOTH" & geneAnnotatedFile[,pval]  <0.05)
 
     keys <- unique(geneAnnotated[, c("ANOMALY","FIGURE","SUBGROUP")] )
 
@@ -42,15 +43,20 @@ geneontology_analysis <- function(resultFolder, fileName){
               sigMethod ="top")
 
             filename = file.path(paste( resultFolderWebGestalt,"/",projectName,".png",sep=""))
+            filenameResult = file.path(paste( resultFolderWebGestalt,"/",projectName,".csv",sep=""))
+            write.csv2(enrichResult, filenameResult)
             grDevices::png(file= filename, width=2000, height=2000)
             enrichResult <- as.data.frame(enrichResult)
             enrichResult <- enrichResult[order(enrichResult$expect),]
             graphics::par(mar = c(5, 30, 5, 5)) # Set the margin on all sides to 6
-            graphics::barplot(height=enrichResult$expect, names=enrichResult$description, col=enrichResult$FDR, horiz=T, las=1)
-            graphics::mtext( paste(pval, "gene", keys[i,"ANOMALY"], keys[i,"FIGURE"], keys[i,"SUBGROUP"], sep=" "), side = 3, line = 1, cex = 1.2)
+            par(cex.lab = 4)
+            graphics::barplot(height=enrichResult$expect, names=wrap.it(paste(enrichResult$description,"(FDR=", round(enrichResult$FDR,2),")", sep=" "),25) , horiz=T, las = 1 ,cex.names= 2, space=0.1)
+            graphics::mtext( paste(pval, "gene", keys[i,"ANOMALY"], keys[i,"FIGURE"], keys[i,"SUBGROUP"], sep=" "), side = 3, line = 1, cex = 2)
             grDevices::dev.off()
+            # break
           } ,
           finally={
+            # break
             next
           }
         )
