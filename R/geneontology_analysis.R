@@ -2,7 +2,7 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
 
   fileName <- file.path(resultFolder, "Inference", fileName)
 
-  geneAnnotated <- read.csv(fileName, sep=";", dec=",")
+  geneAnnotatedFile <- read.csv(fileName, sep=";", dec=",")
   resultFolderWebGestalt <- file.path(resultFolder,"Inference","geneontology_webgestalt")
   dir.create(resultFolderWebGestalt)
   geneAnnotatedFile <- subset(geneAnnotatedFile, GROUP=="GENE" & SUBGROUP!="SAMPLE" & AREA_OF_TEST !="TOTAL" & SUBGROUP!="TOTAL" & FIGURE=="BOTH" & (PVALUE  <0.05 | PVALUEADJ < 0.05))
