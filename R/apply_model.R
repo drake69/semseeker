@@ -2,8 +2,6 @@
 apply_model <- function(df, g_start, family, covariates = NULL, key, transformation, dototal, logFolder)
 {
 
-
-
   nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
   outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
   # print(outFile)
@@ -83,8 +81,9 @@ apply_model <- function(df, g_start, family, covariates = NULL, key, transformat
       sig.formula <- as.formula(paste0("Sample_Group","~", covariates_model, sep=""))
     }
 
-    # browser()
+    browser()
     shapiro_pvalue <- shapiro.test(df[,cols[g]])
+    bartlett_pvalue <- bartlett.test( x=df[,cols[g]] ,g=df$Sample_Group)
 
     result.glm  <- glm( sig.formula, family = family, data = as.data.frame(df))
     pvalue <- summary( result.glm )$coeff[-1, 4][1]
@@ -98,18 +97,24 @@ apply_model <- function(df, g_start, family, covariates = NULL, key, transformat
         "GROUP" = key$GROUP,
         "SUBGROUP" = key$SUBGROUP,
         "AREA_OF_TEST" = cols[g],
-        "PVALUE" = pvalue,
+        "PVALUE" = round(pvalue,3),
         "PVALUEADJ" = pvalueadjusted,
         "TEST" = "SINGLE_AREA",
-        "BETA" = summary( result.glm )$coeff[-1, 1][1],
-        "AIC" = result.glm$aic,
-        "RESIDUALS.SUM" = sum(result.glm$residuals),
+        "BETA" = round(summary( result.glm )$coeff[-1, 1][1],3),
+        "AIC" = round(result.glm$aic,3),
+        "RESIDUALS.SUM" = round(sum(result.glm$residuals),3),
         "FAMILY" = family,
         "TRANSFORMATION" = transformation,
-        "SHAPIRO.PVALUE" = shapiro_pvalue$p.value
+        "COVARIATES" = paste(covariates,collapse=" "),
+        "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
+        "BARTLETT.PVALUE" = round(bartlett_pvalue$p.value,3),
+        "MEAN.CASE" = round(mean(df[df$Sample_Group==1,cols[g]]),3),
+        "MEAN.CONTROL"=round(mean(df[df$Sample_Group==0,cols[g]]),3),
+        "SD.CASE"=round(sd(df[df$Sample_Group==1,cols[g]]),3),
+        "SD.CONTROL"= round(sd(df[df$Sample_Group==0,cols[g]]),3)
       )
   }
-  result_temp$PVALUEADJ <- p.adjust(result_temp$PVALUE,method = "BH")
+  result_temp$PVALUEADJ <- round(p.adjust(result_temp$PVALUE,method = "BH"),3)
   parallel::stopCluster(computation_cluster)
   gc()
   return(result_temp)
