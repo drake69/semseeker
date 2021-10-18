@@ -17,7 +17,16 @@
 createHeatmap <-
   function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ,resultFolder) {
 
-    chartFolder <- paste(resultFolder, "/Charts/", sep="")
+    nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
+    outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
+    # print(outFile)
+    computation_cluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
+    doParallel::registerDoParallel(computation_cluster)
+
+    # options(digits = 22)
+    parallel::clusterExport(envir=environment(), cl = computation_cluster, varlist =c())
+
+        chartFolder <- paste(resultFolder, "/Charts/", sep="")
     if (chartFolder != "" && !dir.exists(chartFolder)) {
       dir.create(chartFolder)
     }
@@ -53,9 +62,11 @@ createHeatmap <-
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Case"] <- "Red"
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Control"] <- "Blue"
 
-    for (anomaly in anomalies)
+    foreach::foreach(g = 1:length(anomalies)) %dopar%
+    # for (anomaly in anomalies)
     {
 
+      anomaly <- anomalies[g]
       # tempDataFrame <- subset(inputBedDataFrame, ANOMALY == anomaly)
       # if(dim(tempDataFrame)[1]==0)
       #   next
@@ -110,4 +121,7 @@ createHeatmap <-
                      margins = c(25, 25))
       grDevices::dev.off()
     }
+    parallel::stopCluster(computation_cluster)
+    gc()
+
 }
