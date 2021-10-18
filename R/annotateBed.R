@@ -55,8 +55,8 @@ annotateBed <- function (
     }
   }
 
-  message("Annotated bed:")
-  message(bedFileName)
+  # message("Annotated bed:")
+  # message(bedFileName)
   utils::write.csv(finalBed,bedFileName, row.names = FALSE)
   return(finalBed)
 
