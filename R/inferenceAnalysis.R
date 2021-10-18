@@ -36,7 +36,13 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
     "RESIDUALS.SUM" = "",
     "FAMILY" = "",
     "TRANSFORMATION" = "",
-    "SHAPIRO.PVALUE" = ""
+    "COVARIATES" = "",
+    "SHAPIRO.PVALUE" = "",
+    "BARTLETT.PVALUE" = "",
+    "MEAN.CASE" ="",
+    "MEAN.CONTROL"="",
+    "SD.CASE"="",
+    "SD.CONTROL"=""
   )
 
   result <- result[-1,]
@@ -108,9 +114,9 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   filename = paste( chartFolder,"/LESIONS.png",sep="")
   grDevices::png(file= filename, width=2000, height=2000)
   par(mfrow=c(1,3))
-  graphics::boxplot(LESIONS_HYPO~Sample_Group,main="Hypo Lesions", data = studySummaryToPlot)
-  graphics::boxplot(LESIONS_BOTH~Sample_Group, main="Both Type of Lesions", data = studySummaryToPlot)
-  graphics::boxplot(LESIONS_HYPER~Sample_Group,main="Hyper Lesions", data = studySummaryToPlot)
+  graphics::boxplot(LESIONS_HYPO~Sample_Group,main="Hypo Lesions", data = studySummaryToPlot, cex=2)
+  graphics::boxplot(LESIONS_BOTH~Sample_Group, main="Both Type of Lesions", data = studySummaryToPlot, cex=2)
+  graphics::boxplot(LESIONS_HYPER~Sample_Group,main="Hyper Lesions", data = studySummaryToPlot, cex=2)
   grDevices::dev.off()
 
 
@@ -225,7 +231,7 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   }
 
 
-  result[ result$AREA_OF_TEST=="TOTAL","PVALUEADJ" ] <- p.adjust(result[ result$AREA_OF_TEST=="TOTAL","PVALUE" ],method = "BH")
+  result[ result$AREA_OF_TEST=="TOTAL","PVALUEADJ" ] <- round(p.adjust(result[ result$AREA_OF_TEST=="TOTAL","PVALUE" ],method = "BH"),3)
   result <- result[order(result$PVALUEADJ),]
 
   if(is.null(covariates) || length(covariates)==0)
