@@ -82,7 +82,7 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
     # family <- "poisson"
     # transformation <- NULL
     g_start <- 2 + length(covariates)
-    result_temp <- apply_model(df = studySummary[, c("Sample_Group", covariates, cols[i])], g_start = g_start , family = family, covariates = covariates, key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder)
+    result_temp <- apply_model(tempDataFrame = studySummary[, c("Sample_Group", covariates, cols[i])], g_start = g_start , family = family, covariates = covariates, key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder)
     result <- rbind(result, result_temp)
   }
 
@@ -104,7 +104,7 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   }
 
   filename = paste( chartFolder,"/MUTATIONS.png",sep="")
-  grDevices::png(file= filename, width=2000, height=2000)
+  grDevices::png(file= filename, width=2480)
   par(mfrow=c(1,3))
   graphics::boxplot(MUTATIONS_HYPO~Sample_Group,main="Hypo Mutations", data = studySummaryToPlot, cex=2)
   graphics::boxplot(MUTATIONS_BOTH~Sample_Group, main="Both Type of Mutations", data = studySummaryToPlot, cex=2)
@@ -112,7 +112,7 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   grDevices::dev.off()
 
   filename = paste( chartFolder,"/LESIONS.png",sep="")
-  grDevices::png(file= filename, width=2000, height=2000)
+  grDevices::png(file= filename, width=2480)
   par(mfrow=c(1,3))
   graphics::boxplot(LESIONS_HYPO~Sample_Group,main="Hypo Lesions", data = studySummaryToPlot, cex=2)
   graphics::boxplot(LESIONS_BOTH~Sample_Group, main="Both Type of Lesions", data = studySummaryToPlot, cex=2)
@@ -183,7 +183,7 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
   for (i in 1:nkeys)
   {
     # i <- 25
-    rm(list = c("df"))
+    rm(list = c("tempDataFrame"))
     key <- keys [i,]
     # print(key)
     fname <-file.path(workingFolder,paste("/", key$ANOMALY, "_", key$FIGURE, "_", key$GROUP, "_", key$SUBGROUP, ".csv" , sep =""))
@@ -193,38 +193,38 @@ inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates,
       print("File Not found!")
       next
     }
-    df <- read.csv(fname, sep = ";")
-    row.names(df) <- df$X
-    df <- df[,-1]
-    df <- t(df)
-    if(dim(df)[1]<=1)
+    tempDataFrame <- read.csv(fname, sep = ";")
+    row.names(tempDataFrame) <- tempDataFrame$X
+    tempDataFrame <- tempDataFrame[,-1]
+    tempDataFrame <- t(tempDataFrame)
+    if(dim(tempDataFrame)[1]<=1)
       next
-    # df <- df[,-2]
-    df <- as.data.frame(df)
-    df <- subset(df, POPULATION != "Reference")
-    df <- subset(df, POPULATION != 0)
+    # tempDataFrame <- tempDataFrame[,-2]
+    tempDataFrame <- as.data.frame(tempDataFrame)
+    tempDataFrame <- subset(tempDataFrame, POPULATION != "Reference")
+    tempDataFrame <- subset(tempDataFrame, POPULATION != 0)
 
-    df <-  merge( x =  sample_names, y =  df,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
-    df$POPULATION <- sample_names$Sample_Group
-    df[is.na(df)] <- 0
-    df <- df[, !(names(df) %in% c("POPULATION","Sample_ID"))]
+    tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
+    tempDataFrame$POPULATION <- sample_names$Sample_Group
+    tempDataFrame[is.na(tempDataFrame)] <- 0
+    tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
 
-    cols <- (gsub(" ", "_", colnames(df[])))
+    cols <- (gsub(" ", "_", colnames(tempDataFrame[])))
     cols <- (gsub("-", "_", cols))
     cols <- (gsub(":", "_", cols))
     cols <- (gsub("/", "_", cols))
     cols <- (gsub("'", "_", cols))
 
-    colnames(df) <- cols
+    colnames(tempDataFrame) <- cols
 
-    df <- as.data.frame(df)
-    # df$Sample_Group <- as.factor(df$Sample_Group)
-    # df$Sample_Group  <- relevel(df$Sample_Group, "Control")
+    tempDataFrame <- as.data.frame(tempDataFrame)
+    # tempDataFrame$Sample_Group <- as.factor(tempDataFrame$Sample_Group)
+    # tempDataFrame$Sample_Group  <- relevel(tempDataFrame$Sample_Group, "Control")
 
     g_start <- 2 + length(covariates)
 
 
-    result_temp <- apply_model(df = df, g_start = g_start, family = family, covariates = covariates, key = key, transformation= transformation, dototal = TRUE, logFolder= logFolder)
+    result_temp <- apply_model(tempDataFrame = tempDataFrame, g_start = g_start, family = family, covariates = covariates, key = key, transformation= transformation, dototal = TRUE, logFolder= logFolder)
 
     # n_adj <- iters - g_start
     result <- rbind(result, result_temp)
