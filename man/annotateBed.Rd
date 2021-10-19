@@ -13,7 +13,8 @@ annotateBed(
   probesPrefix,
   columnLabel,
   groupingColumnLabel,
-  resultFolder
+  resultFolder,
+  logFolder
 )
 }
 \arguments{
