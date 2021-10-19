@@ -33,7 +33,7 @@ mergeMultipleBed <- function(populations,figures,anomalies, fileExtension, resul
 
         system(paste0("echo '" ,paste(multipleFileColNames, collapse = "\t") ,  "'  > ", destinationFile, sep = ""))
 
-        message ("Merging bed into a multiple bed file.")
+        # message ("Merging bed into a multiple bed file.")
         if (.Platform$OS.type == "windows") {
           command <- paste0("del ", (destinationFile), sep = "")
           command <- gsub ("/","\\\\",command)
