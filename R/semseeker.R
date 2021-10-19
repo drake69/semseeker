@@ -18,6 +18,8 @@ semseeker <- function(sampleSheet,
                       covariates = NULL) {
 
   sampleSheet <- as.data.frame(sampleSheet)
+  sampleSheet <- sampleSheet[,!(colnames(sampleSheet) %in% c("Probes_Count", "MUTATIONS_HYPER", "LESIONS_HYPER", "MUTATIONS_HYPO", "LESIONS_HYPO", "MUTATIONS_BOTH", "LESIONS_BOTH"))]
+  methylationData <- as.data.frame(methylationData)
   # set digits to 22
   withr::local_options(list(digits = 22))
   slidingWindowSize <- 11
@@ -58,6 +60,17 @@ semseeker <- function(sampleSheet,
     stop(" Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values Reference,  Control and Case")
   }
 
+  if (length(colnames(methylationData) %in% sampleSheet$Sample_ID)==0)
+  {
+    stop("The methylation data has not values as the expected from the sample sheet in column Sample_ID!")
+  }
+
+  if (!(covariates %in% colnames(sampleSheet)))
+  {
+    stop("The covariates value are not available in the sample sheet!")
+  }
+
+
   if (logFolder != "" && !dir.exists(logFolder)) {
     dir.create(logFolder)
   }
@@ -91,6 +104,13 @@ semseeker <- function(sampleSheet,
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes = 3)
   write.table(x = populationControlRangeBetaValues, file = file.path(resultFolder, "beta_thresholds.csv"), sep=";")
+
+  # remove duplicated samples due to the reference population
+
+  referenceSamples <- sampleSheet[sampleSheet$Sample_Group == "Reference",]
+  otherSamples <- sampleSheet[sampleSheet$Sample_Group != "Reference",]
+  referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
+  sampleSheet <- rbind(otherSamples, referenceSamples)
 
   for (i in 1:3) {
 
@@ -169,43 +189,34 @@ semseeker <- function(sampleSheet,
   probesPrefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  try(
-    createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  )
+  createExcelPivot (logFolder =  logFolder, resultFolder =  resultFolder, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups,
+                   probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
-  geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) ,resultFolder)
-  try(
-    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) ,resultFolder)
-  )
+  geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder, logFolder = logFolder )
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder, logFolder)
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) ,resultFolder, logFolder)
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) ,resultFolder, logFolder)
 
 
   probesPrefix <- "PROBES_Island_"
   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
-  try(
-    createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  )
+  createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
-  islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 ,resultFolder)
-  try(
-    createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3) ,resultFolder)
-  )
+  islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder , logFolder  )
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder, logFolder)
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 ,resultFolder, logFolder)
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3) ,resultFolder, logFolder)
 
   subGroups <- c("DMR")
   probesPrefix = "PROBES_DMR_"
   mainGroupLabel =  "DMR"
   subGroupLabel="GROUP"
-  try(
-    createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
-  )
+  createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
-  dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
-  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder)
+  dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder , logFolder  )
+  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder, logFolder)
 
   colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
