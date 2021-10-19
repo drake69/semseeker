@@ -27,32 +27,50 @@ annotateBed <- function (
   probesPrefix ,
   columnLabel ,
   groupingColumnLabel,
-  resultFolder
-  )
+  resultFolder,
+  logFolder)
   {
 
+  nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
+  outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
+  # print(outFile)
+  computation_cluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
+  doParallel::registerDoParallel(computation_cluster)
+
+  # options(digits = 22)
+  parallel::clusterExport(envir=environment(), cl = computation_cluster, varlist =c("readMultipleBed","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
+                                                                                    "PROBES_Gene_TSS1500","PROBES_Gene_TSS200","PROBES_Gene_Whole","PROBES_Gene_ExonBnd","PROBES_Gene_1stExon",
+                                                                                    "PROBES_DMR_DMR","PROBES_Island_Island","PROBES_Island_N_Shelf","PROBES_Island_N_Shore","PROBES_Island_Whole"))
 
   finalBed <- NULL
-  bedFileName <- file.path( resultFolder, paste0("/", columnLabel, "_annotatedBed.bed" ,sep=""))
+  bedFileName <- file.path( resultFolder, paste0("/", columnLabel, "_annotatedBed.csv" ,sep=""))
 
-  # if(file.exists(bedFileName))
-  # {
-  #   finalBed <-    utils::read.csv(bedFileName, stringsAsFactors = TRUE)
-  #   return(finalBed)
-  # }
+  if(file.exists(bedFileName))
+  {
+    finalBed <-    utils::read.csv(bedFileName, stringsAsFactors = TRUE)
+    return(finalBed)
+  }
 
-  for (pop in populations) {
-    for (fig in figures) {
-      for (anomal in anomalies) {
-        for (grp in groups)
-        {
-          probes <- get(paste(probesPrefix, grp,sep=""))
-          resFolder <- paste0(resultFolder,"/",pop,sep="")
-          tempBed <-  readMultipleBed( resultFolder = resFolder  , anomalyLabel =  anomal, figureLable =  fig, probeFeatures =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
-          finalBed <- rbind(finalBed, tempBed)
-        }
-      }
-    }
+  keys <-
+    expand.grid(
+      "POPULATION" = populations,
+      "FIGURE" = figures,
+      "ANOMALY" = anomalies,
+      "GROUP" = groups
+    )
+
+  finalBed <- foreach::foreach(g = 1:nrow(keys), .combine = rbind) %dopar%
+  {
+    anomal <- keys[g,"ANOMALY"]
+    pop <- keys[g,"POPULATION"]
+    fig <- keys[g,"FIGURE"]
+    grp <- keys[g,"GROUP"]
+
+    probes <- get(paste(probesPrefix, grp,sep=""))
+    resFolder <- paste0(resultFolder,"/",pop,sep="")
+    # tempBed <-
+    readMultipleBed( resultFolder = resFolder  , anomalyLabel =  anomal, figureLable =  fig, probeFeatures =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
+    # finalBed <- rbind(finalBed, tempBed)
   }
 
   # message("Annotated bed:")
