@@ -6,7 +6,7 @@ createExcelPivot <-
     POPULATION <- NULL
 
 
-    finalBed <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel, resultFolder)
+    finalBed <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel, resultFolder, logFolder)
 
     if (is.null(finalBed))
       return()
@@ -31,47 +31,19 @@ createExcelPivot <-
     tempPopData <- subset(finalBed, freq >0 )
     sheetList <- vector(mode="list")
     sheetListNames <- vector(mode="list")
-    # i <- 1
-    # for (grp in unique(tempPopData[,subGroupLabel]))
-    # {
-    #   temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
-    #   if(dim(temp)[1]==0)
-    #     next
-    #   for (anomaly in anomalies)
-    #   {
-    #     tempAnomaly <- subset(temp, ANOMALY == anomaly )
-    #     if(dim(tempAnomaly)[1]==0)
-    #       next
-    #     for (figure in figures)
-    #     {
-    #       tempDataFrame <- subset(tempAnomaly, FIGURE == figure)
-    #       if(dim(tempDataFrame)[1]==0)
-    #         next
-    #       tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
-    #       # browser()
-    #       # row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
-    #       fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
-    #       write.csv2(t(tempDataFrame), fileName)
-    #       sheetList[[i]] <- tempDataFrame
-    #       sheetListNames[i] <- gsub(" ","", paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
-    #       i <- i +1
-    #     }
-    #   }
-    # }
-#
-#     nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
-#     outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
-#     print(outFile)
-#     computation_cluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
-#     doParallel::registerDoParallel(computation_cluster)
-#
-#     # options(digits = 22)
-#     parallel::clusterExport(envir=environment(), cl = computation_cluster,
-#                             varlist = list(  "sheetList", "sheetListNames"))
+    nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
+    outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
+    print(outFile)
+    computation_cluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
+    doParallel::registerDoParallel(computation_cluster)
+
+    # options(digits = 22)
+    parallel::clusterExport(envir=environment(), cl = computation_cluster,
+                            varlist = list(  "sheetList", "sheetListNames"))
 
     keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    # foreach::foreach(i=1:nrow(keys), .export = c("sheetList", "sheetListNames")) %dopar%
-    for(i in 1:nrow(keys))
+    sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+    # for(i in 1:nrow(keys))
       {
         grp <- keys[i,1]
         temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
@@ -91,11 +63,20 @@ createExcelPivot <-
         tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
         fileName <- paste(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
         write.csv2(t(tempDataFrame), fileName)
-        sheetList[[i]] <- tempDataFrame
-        sheetListNames[i] <- gsub(" ","", paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
+        # sheetList[[i]] <- as.data.frame(row.names = colnames(tempDataFrame), t(tempDataFrame))
+        list(as.data.frame(row.names = colnames(tempDataFrame), t(tempDataFrame)))
+        # colnames(sheetList[[i]]) <- sheetList[[i]][1,]
+        # sheetList[[i]] <- sheetList[[i]][-1,]
       }
 
-
+    # browser()
+    for(i in 1:nrow(keys))
+    {
+      grp <- keys[i,1]
+      anomaly <- keys[i,2]
+      figure <- keys[i,3]
+      sheetListNames[i] <- gsub(" ","", paste( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
+    }
 
     fileName <- paste(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
     names(sheetList) <- as.vector(sheetListNames)
@@ -109,4 +90,8 @@ createExcelPivot <-
     )
     message("Saved spreadsheet file:")
     message(fileName)
+
+    parallel::stopCluster(computation_cluster)
+    gc()
+
 }
