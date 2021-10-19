@@ -1,5 +1,5 @@
 
-apply_model <- function(df, g_start, family, covariates = NULL, key, transformation, dototal, logFolder)
+apply_model <- function(tempDataFrame, g_start, family, covariates = NULL, key, transformation, dototal, logFolder)
 {
 
   nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
@@ -11,18 +11,18 @@ apply_model <- function(df, g_start, family, covariates = NULL, key, transformat
   # options(digits = 22)
   parallel::clusterExport(envir=environment(), cl = computation_cluster, varlist =c())
 
-  df$Sample_Group[df$Sample_Group=="Control"] <- 0
-  df$Sample_Group[df$Sample_Group=="Case"] <- 1
-  df$Sample_Group <- as.numeric(df$Sample_Group)
+  tempDataFrame$Sample_Group[tempDataFrame$Sample_Group=="Control"] <- 0
+  tempDataFrame$Sample_Group[tempDataFrame$Sample_Group=="Case"] <- 1
+  tempDataFrame$Sample_Group <- as.numeric(tempDataFrame$Sample_Group)
 
-  df_head <- df[,1:(g_start-1)]
-  df_values <- sapply(df[,g_start:ncol(df)], as.numeric)
+  df_head <- tempDataFrame[,1:(g_start-1)]
+  df_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)
 
-  if( ncol(df) - g_start  > 1) {
+  if( ncol(tempDataFrame) - g_start  > 1) {
     df_values <- df_values[, colSums(df_values) > 0]
   }
 
-  df_colnames <- colnames(df)
+  df_colnames <- colnames(tempDataFrame)
   if( !is.null(dim(df_values))  & dototal) {
     sum_area <- apply(df_values, 1, sum)
     df_values <- cbind(df_values, data.frame("TOTAL"=sum_area))
@@ -49,9 +49,9 @@ apply_model <- function(df, g_start, family, covariates = NULL, key, transformat
     transformation = "NONE"
     }
 
-  df <- as.data.frame(cbind(df_head, df_values))
-  colnames(df) <- df_colnames
-  cols <- colnames(df)
+  tempDataFrame <- as.data.frame(cbind(df_head, df_values))
+  colnames(tempDataFrame) <- df_colnames
+  cols <- colnames(tempDataFrame)
   iters <- length(cols)
 
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind) %dopar%
@@ -82,10 +82,10 @@ apply_model <- function(df, g_start, family, covariates = NULL, key, transformat
     }
 
     browser()
-    shapiro_pvalue <- shapiro.test(df[,cols[g]])
-    bartlett_pvalue <- bartlett.test( x=df[,cols[g]] ,g=df$Sample_Group)
+    shapiro_pvalue <- shapiro.test(tempDataFrame[,cols[g]])
+    bartlett_pvalue <- bartlett.test( x=tempDataFrame[,cols[g]] ,g=tempDataFrame$Sample_Group)
 
-    result.glm  <- glm( sig.formula, family = family, data = as.data.frame(df))
+    result.glm  <- glm( sig.formula, family = family, data = as.data.frame(tempDataFrame))
     pvalue <- summary( result.glm )$coeff[-1, 4][1]
     pvalueadjusted <- pvalue
     browser()
@@ -108,10 +108,10 @@ apply_model <- function(df, g_start, family, covariates = NULL, key, transformat
         "COVARIATES" = paste(covariates,collapse=" "),
         "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
         "BARTLETT.PVALUE" = round(bartlett_pvalue$p.value,3),
-        "MEAN.CASE" = round(mean(df[df$Sample_Group==1,cols[g]]),3),
-        "MEAN.CONTROL"=round(mean(df[df$Sample_Group==0,cols[g]]),3),
-        "SD.CASE"=round(sd(df[df$Sample_Group==1,cols[g]]),3),
-        "SD.CONTROL"= round(sd(df[df$Sample_Group==0,cols[g]]),3)
+        "MEAN.CASE" = round(mean(tempDataFrame[tempDataFrame$Sample_Group==1,cols[g]]),3),
+        "MEAN.CONTROL"=round(mean(tempDataFrame[tempDataFrame$Sample_Group==0,cols[g]]),3),
+        "SD.CASE"=round(sd(tempDataFrame[tempDataFrame$Sample_Group==1,cols[g]]),3),
+        "SD.CONTROL"= round(sd(tempDataFrame[tempDataFrame$Sample_Group==0,cols[g]]),3)
       )
   }
   result_temp$PVALUEADJ <- round(p.adjust(result_temp$PVALUE,method = "BH"),3)
