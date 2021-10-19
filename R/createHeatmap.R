@@ -10,12 +10,13 @@
 #' @param groupLabel name of column to group the data set
 #' @param subGroupLabel  name of column to sub group the data set
 #' @param resultFolder folder as root for bedfiles organized per anomaly
+#' @param  logFolder log folder used by the parallel cluster
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
 
 #'
 createHeatmap <-
-  function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ,resultFolder) {
+  function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ,resultFolder, logFolder) {
 
     nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
     outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
@@ -26,7 +27,7 @@ createHeatmap <-
     # options(digits = 22)
     parallel::clusterExport(envir=environment(), cl = computation_cluster, varlist =c())
 
-        chartFolder <- paste(resultFolder, "/Charts/", sep="")
+    chartFolder <- paste(resultFolder, "/Charts/", sep="")
     if (chartFolder != "" && !dir.exists(chartFolder)) {
       dir.create(chartFolder)
     }
@@ -59,11 +60,12 @@ createHeatmap <-
     inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
     inputBedDataFrame <- subset(inputBedDataFrame, POPULATION != "Reference")
     pops <- unique(inputBedDataFrame$POPULATION)
-    levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Case"] <- "Red"
+    levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Case"] <- "Cyan"
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Control"] <- "Blue"
 
-    foreach::foreach(g = 1:length(anomalies)) %dopar%
-    # for (anomaly in anomalies)
+    # foreach::foreach(g = 1:length(anomalies)) %dopar%
+    for(g in 1:length(anomalies))
+      # for (anomaly in anomalies)
     {
 
       anomaly <- anomalies[g]
@@ -108,17 +110,38 @@ createHeatmap <-
       tempDataFrame <- subset(inputBedDataFrame, ANOMALY == anomaly)
       if(dim(tempDataFrame)[1]==0)
         next
+
       tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "FREQ", sum)
       row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
 
+      mainTitle <- paste( paste( pops, collapse ="_Vs_")," ", groupLabel," ",anomaly, sep="")
+      if(nrow(tempDataFrame)>65535 || ncol(tempDataFrame)>65535)
+      {
+        #reduce
+        temp2 <- as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]])
+        temp <- apply(temp2,2, sum)
+        temp1 <- sort(temp, decreasing = T)
+        limit <- temp1[1000]
+        if(sum(temp1==limit)>1)
+          limit <- limit + 1
+        tempDataFrame <- data.frame(tempDataFrame[,1:2], temp2[,temp1 > limit])
+        rm(temp)
+        rm(temp1)
+        rm(temp2)
+        mainTitle <- paste( mainTitle," (first 1000)",  sep="")
+      }
+
       # col<- colorRampPalette(c("violet","white","blue"))(1024)
 
-      filename = paste( chartFolder,"/",paste( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, "_1.png",sep="")
-      grDevices::png(file= filename, width=2000, height=2000)
+      filename = paste( chartFolder,"/",paste( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
+      grDevices::png(file= filename, width=2480, height = 2480)
       stats::heatmap(as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]]),
+                     # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
                      scale = "column",
                      RowSideColors =as.vector(tempDataFrame$POPULATION),
-                     margins = c(25, 25))
+                     margins = c(25, 25),
+                     main = mainTitle
+                    )
       grDevices::dev.off()
     }
     parallel::stopCluster(computation_cluster)
