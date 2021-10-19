@@ -15,7 +15,7 @@ createPivotResultFromMultipleBedGeneric <- function(resultFolder, genomicAreaMai
 
   POSITION <- NULL
 
-  fileName <- paste(resultFolder, "/", genomicAreaMain , "._annotatedBed.bed", sep = "")
+  fileName <- paste(resultFolder, "/", genomicAreaMain , "._annotatedBed.csv", sep = "")
   annotatedBed <- read_csv(fileName)
   annotatedBed <- subset(annotatedBed, POPULATION !="Reference")
   annotatedBed$GROUP <- as.factor(annotatedBed$GROUP)
