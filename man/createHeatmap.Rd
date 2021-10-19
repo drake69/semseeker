@@ -10,7 +10,8 @@ createHeatmap(
   anomalies,
   groupLabel,
   groupColumnIDs,
-  resultFolder
+  resultFolder,
+  logFolder
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ createHeatmap(
 \item{groupLabel}{name of column to group the data set}
 
 \item{resultFolder}{folder as root for bedfiles organized per anomaly}
+
+\item{logFolder}{log folder used by the parallel cluster}
 
 \item{populations}{vectors of populations name used to group populations
 for differential analysis}
