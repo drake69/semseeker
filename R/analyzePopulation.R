@@ -48,14 +48,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
     dir.create(resultFolder)
   }
 
-  nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
-  outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
-  print(outFile)
-  computation_cluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
-  doParallel::registerDoParallel(computation_cluster)
-
-  # options(digits = 22)
-  parallel::clusterExport(envir=environment(), cl = computation_cluster,
+  parallel::clusterExport(envir=environment(), cl = computationCluster,
                           varlist = list( "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample",
                                       "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame",
                                       "getMutations", "analyzeSingleSampleBothThresholds",
@@ -227,7 +220,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
   # }
   #
   #
-  # parallel::parApply(computation_cluster, methylationData[, columnIndexes] , 2, myTest)
+  # parallel::parApply(computationCluster, methylationData[, columnIndexes] , 2, myTest)
 
 
   sampleSheet <- utils::read.csv(file = summaryFileName)
@@ -250,7 +243,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
   # probes_above_high_thresholds) # epiMutationBelow <- data.frame(epiMutationBelowBurden, probes_below_low_thresholds) epiMutation <- subset(epiMutation, epiMutation$Burden > 0) write.table(epiMutation, paste(resultFolder, '/',
   # 'EPIMUTATIONs.txt', sep = ''), sep = '\t', row.names = FALSE, quote = FALSE) rm(epiMutation) rm(epiMutationBelowBurden) message('Got epiMutation ', Sys.time() )
 
-  parallel::stopCluster(computation_cluster)
+  gc()
 
   message("Completed population analysis ", Sys.time())
 
