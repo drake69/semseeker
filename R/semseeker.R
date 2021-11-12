@@ -4,9 +4,8 @@
 #' @param sampleSheet dataframe with at least a column Sample_ID to identify
 #' samples
 #' @param methylationData matrix of methylation data
-#' @param resultFolder folder to save computed epimutations and bedgraphs files.
 #' @param bonferroniThreshold = 0.05 #threshold to define which pValue
-#' @param covariates vector of column name from sample sheet to use as covariates
+#' @param inferenceDetails dataframe of details to calculate inferential statistics
 #' accept for lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
@@ -15,18 +14,19 @@ semseeker <- function(sampleSheet,
                       methylationData,
                       resultFolder,
                       bonferroniThreshold = 0.05,
-                      covariates = NULL) {
+                      inferenceDetails = NULL) {
 
+
+  init_env(resultFolder)
+
+
+  message(folderLog)
   sampleSheet <- as.data.frame(sampleSheet)
   sampleSheet <- sampleSheet[,!(colnames(sampleSheet) %in% c("Probes_Count", "MUTATIONS_HYPER", "LESIONS_HYPER", "MUTATIONS_HYPO", "LESIONS_HYPO", "MUTATIONS_BOTH", "LESIONS_BOTH"))]
   methylationData <- as.data.frame(methylationData)
   # set digits to 22
   withr::local_options(list(digits = 22))
   slidingWindowSize <- 11
-
-  if (resultFolder != "" && !dir.exists(resultFolder)) {
-    dir.create(resultFolder)
-  }
 
   methDataTemp <- data.frame( PROBE= rownames(methylationData), methylationData)
   methDataTemp <- methDataTemp[with(methDataTemp, order(PROBE)), ]
@@ -49,8 +49,6 @@ semseeker <- function(sampleSheet,
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
 
-  logFolder <- paste0(tempdir(),"/log")
-
   populationControlRangeBetaValues <- NULL
 
   needColumns <- c("Sample_ID", "Sample_Group")
@@ -65,15 +63,17 @@ semseeker <- function(sampleSheet,
     stop("The methylation data has not values as the expected from the sample sheet in column Sample_ID!")
   }
 
-  if (!(covariates %in% colnames(sampleSheet)))
+  if(!is.null(inferenceDetails))
   {
-    stop("The covariates value are not available in the sample sheet!")
+    covariates <- unlist(t(strsplit( gsub(" ","",inferenceDetails$covariates),split = "+", fixed = T)))
+
+    if ( length(covariates)>0 & !( covariates  %in% colnames(sampleSheet)))
+    {
+      message(covariates[!(covariates%in% colnames(sampleSheet))])
+      stop("The covariates value are not available in the sample sheet!")
+    }
   }
 
-
-  if (logFolder != "" && !dir.exists(logFolder)) {
-    dir.create(logFolder)
-  }
 
   populationGroups <- as.factor(sampleSheet$Sample_Group)
   # expected R as reference, S as Study, C as Control
@@ -92,7 +92,7 @@ semseeker <- function(sampleSheet,
   referencePopulationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == "Reference", ]
   referencePopulationMatrix <- data.frame(PROBE = row.names(methylationData), methylationData[, referencePopulationSampleSheet$Sample_ID])
 
-  # browser()
+  #
   # methylationData <- data.frame(PROBE = row.names(methylationData), methylationData[ , which(!(colnames(methylationData)%in%referencePopulationSampleSheet$Sample_ID))]  )
 
 
@@ -102,86 +102,67 @@ semseeker <- function(sampleSheet,
     stop("Empty methylationData ")
   }
 
+
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes = 3)
-  write.table(x = populationControlRangeBetaValues, file = file.path(resultFolder, "beta_thresholds.csv"), sep=";")
+
+  write.table(x = populationControlRangeBetaValues, file = file_path_build(resultFolderData ,"beta_thresholds","csv"), sep=";")
 
   # remove duplicated samples due to the reference population
-
   referenceSamples <- sampleSheet[sampleSheet$Sample_Group == "Reference",]
   otherSamples <- sampleSheet[sampleSheet$Sample_Group != "Reference",]
   referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
   sampleSheet <- rbind(otherSamples, referenceSamples)
 
-  for (i in 1:3) {
+  for (populationName in populations) {
 
-    # browser()
-    # i <- 2
-    populationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == populations[i], ]
-    populationName <- populations[[i]]
-
+    #
+    populationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == populationName, ]
     populationMatrixColumns <- colnames(methylationData[, populationSampleSheet$Sample_ID])
-    # populationMatrixToAnalyze <- data.frame(PROBE = row.names(methylationData), methylationData[, populationSampleSheet$Sample_ID])
 
     if (length(populationMatrixColumns)==0) {
       message("WARNING: Population ",populationName, " is empty ", Sys.time())
       next
     }
 
-    # extractEpiMutations(values = populationMatrixToAnalyze,resultFolder = resultFolder, thresholds = populationControlRangeBetaValues,
-                        # populationName = populationSampleSheet$Sample_Group, probeFeatures= PROBES)
-
-    analizePopulation(
-      methylationData = methylationData,
+    # browser()
+    resultPopulation <- analizePopulation(
+      methylationData = methylationData[, populationMatrixColumns] ,
       slidingWindowSize = slidingWindowSize,
-      resultFolder = resultFolder,
-      logFolder = logFolder,
       betaSuperiorThresholds = populationControlRangeBetaValues$betaSuperiorThresholds,
       betaInferiorThresholds = populationControlRangeBetaValues$betaInferiorThresholds,
       sampleSheet = populationSampleSheet,
       betaMedians = populationControlRangeBetaValues$betaMedianValues,
-      populationName = populationName,
       bonferroniThreshold = bonferroniThreshold,
       probeFeatures = PROBES
     )
 
+    resultPopulation <- as.data.frame(resultPopulation)
+    if(nrow(resultPopulation) != nrow(populationSampleSheet) )
+      browser()
+
+    if(!exists("resultSampleSheet"))
+      resultSampleSheet <- resultPopulation
+    else
+      resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
+
     rm(populationSampleSheet)
-    # rm(populationMatrixToAnalyze)
   }
 
-  case_summary <- read.csv(file.path(resultFolder, "/Case/summary.csv"))
-  ctrl_summary <- read.csv(file.path(resultFolder, "/Control/summary.csv"))
-  reference_summary <-  read.csv(file.path(resultFolder, "/Reference/summary.csv"))
-  studySummary <- rbind(case_summary, ctrl_summary, reference_summary)
+  browser()
+  samplesID <- sampleSheet$Sample_ID
+  sampleSheet <- sampleSheet[, !(colnames(sampleSheet) %in% colnames(resultSampleSheet))]
+  sampleSheet$Sample_ID <- samplesID
 
-  studySummary$MUTATIONS_BOTH <- studySummary$MUTATIONS_HYPER + studySummary$MUTATIONS_HYPO
-  studySummary$LESIONS_BOTH <- studySummary$LESIONS_HYPER + studySummary$LESIONS_HYPO
+  sampleSheet <- merge(sampleSheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
+  rm(methylationData)
+  gc()
+  write.csv2(sampleSheet, file.path(resultFolderData , "sample_sheet_result.csv"))
 
-  write.csv2(studySummary, file.path(resultFolder, "sample_sheet_result.csv"))
+  if(length(sampleSheet$Sample_Group=="Reference")>0){
+    populations <- c("Reference","Control","Case")
+  }  else
+    populations <- c("Control","Case")
 
-
-  populations <- c("Reference","Control","Case")
-  mergeMultipleBed(
-    populations,
-    figures = c("METHYLATION"),
-    anomalies = c("DELTAS"),
-    fileExtension = ".bedgraph",
-    resultFolder = resultFolder,
-    multipleFileColNames = c("CHR", "START", "END", "SAMPLEID", "VALUE")
-  )
-
-  figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS")
-  mergeMultipleBed(
-    populations,
-    figures,
-    anomalies,
-    fileExtension = ".bed",
-    resultFolder = resultFolder,
-    multipleFileColNames = c("CHR", "START", "END", "SAMPLEID")
-  )
-
-
-  populations <- c("Reference","Control","Case")
   figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("MUTATIONS","LESIONS")
 
@@ -189,52 +170,53 @@ semseeker <- function(sampleSheet,
   probesPrefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  createExcelPivot (logFolder =  logFolder, resultFolder =  resultFolder, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups,
-                   probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
-  geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder, logFolder = logFolder )
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3) ,resultFolder, logFolder)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) ,resultFolder, logFolder)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3) ,resultFolder, logFolder)
+  createExcelPivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+
+  geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3))
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) )
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3))
 
 
   probesPrefix <- "PROBES_Island_"
   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
-  createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  createExcelPivot ( populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
-  islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder , logFolder  )
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3 ,resultFolder, logFolder)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1 ,resultFolder, logFolder)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3) ,resultFolder, logFolder)
+  islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3)
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1)
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3))
 
   subGroups <- c("DMR")
   probesPrefix = "PROBES_DMR_"
   mainGroupLabel =  "DMR"
   subGroupLabel="GROUP"
-  createExcelPivot (logFolder, resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  createExcelPivot (populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
-  dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder , logFolder  )
-  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 ,resultFolder, logFolder)
+  dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,)
+  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 )
 
   colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
 
   totalBed <- rbind(geneBed, dmrBed, islandBed, stringsAsFactors = TRUE)
-  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3 ,resultFolder)
+  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3)
 
   rm(populationControlRangeBetaValues)
 
-  message("Starting inference Analysis.")
-  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates, transformation = "log")
-  fileName <- inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates, transformation = "log")
-  geneontology_analysis_webgestalt(resultFolder = resultFolder, fileName = fileName)
-  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="poisson", covariates= covariates)
-  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="gaussian", covariates= covariates)
-  # inferenceAnalysis(studySummary = studySummary, resultFolder = resultFolder, logFolder= logFolder, family="binomial", covariates= covariates)
-  euristic_analysis_webgestalt(resultFolder = resultFolder)
+  # message("Starting inference Analysis.")
+  # inferenceAnalysis(resultFolder = resultFolder, folderLog= folderLog, inferenceDetails)
+  parallel::stopCluster(computationCluster)
+  doParallel::stopImplicitCluster()
+  gc()
+  # geneontology_analysis_webgestalt(resultFolder = resultFolder, fileName = fileName)
+  # euristic_analysis_webgestalt(resultFolder = resultFolder)
   message("Job Completed !")
+
+
 }
 

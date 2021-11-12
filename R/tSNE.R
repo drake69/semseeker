@@ -62,7 +62,7 @@
 #
 # library(Rtsne)
 # inputBedDataFrame <- subset(geneBed, POPULATION != "Reference")
-# inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste(inputBedDataFrame[, 1],"_",inputBedDataFrame[, 3],"_",inputBedDataFrame$FIGURE,sep=""))
+# inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste0(inputBedDataFrame[, 1],"_",inputBedDataFrame[, 3],"_",inputBedDataFrame$FIGURE,sep=""))
 # inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
 #
 # tempDataFrame <- subset(inputBedDataFrame, ANOMALY == "LESIONS")

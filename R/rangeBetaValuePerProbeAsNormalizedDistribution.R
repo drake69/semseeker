@@ -7,8 +7,6 @@
 #' @return methylation matrix as normalized distribution
 
 rangeBetaValuePerProbeAsNormalizedDistribution <- function(populationMatrix, iqrTimes = 3) {
-  computationCluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1)
-  doParallel::registerDoParallel(computationCluster)
 
   populationMatrixDim <- dim(populationMatrix)
   betaValues <- populationMatrix[, 2:populationMatrixDim[2]]
@@ -35,6 +33,6 @@ rangeBetaValuePerProbeAsNormalizedDistribution <- function(populationMatrix, iqr
 
   result <- list(betaInferiorThresholds = betaInferiorThresholds, betaSuperiorThresholds = betaSuperiorThresholds, betaMedianValues = betaMedianValues)
 
-  parallel::stopCluster(computationCluster)
+  gc()
   return(result)
 }

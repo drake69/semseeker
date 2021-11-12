@@ -7,11 +7,9 @@
 analyzeSingleSample(
   values,
   slidingWindowSize,
-  resultFolder,
   thresholds,
-  comparison,
-  sampleName,
-  subFileExtension,
+  figure,
+  sampleDetail,
   bonferroniThreshold = 0.05,
   probeFeatures
 )
@@ -21,19 +19,15 @@ analyzeSingleSample(
 
 \item{slidingWindowSize}{size of window sliding to calculate hypergeometric}
 
-\item{resultFolder}{folder to store result files}
-
 \item{thresholds}{threshold to use for comparison}
-
-\item{comparison}{function to use for compare}
-
-\item{sampleName}{name of sample to analyze}
-
-\item{subFileExtension}{extension to pre pend to file name}
 
 \item{bonferroniThreshold}{bonferroni threshold to validate pValue}
 
 \item{probeFeatures}{probes features probe, chr, start,end}
+
+\item{sampleDetail$Sample_ID}{name of sample to analyze}
+
+\item{subFileExtension}{extension to pre pend to file name}
 }
 \value{
 list of lesion count  and probes count

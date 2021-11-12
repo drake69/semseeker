@@ -5,7 +5,7 @@
 #
 # json_file <- "~/Downloads/ewas_datahub_metadata-3.txt"
 #
-# json_data <- fromJSON(paste(readLines(json_file), collapse = ""))
+# json_data <- fromJSON(paste0(readLines(json_file), collapse = ""))
 #
 # mydata <- data.frame("project id"="")
 # mydata <- mydata[mydata$project.id !=NULL]

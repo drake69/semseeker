@@ -1,7 +1,7 @@
 # Core wrapping function
 wrap.it <- function(x, len)
 {
-  sapply(x, function(y) paste(strwrap(y, len),
+  sapply(x, function(y) paste0(strwrap(y, len),
                               collapse = "\n"),
          USE.NAMES = FALSE)
 }

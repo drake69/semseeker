@@ -12,9 +12,7 @@ annotateBed(
   groups,
   probesPrefix,
   columnLabel,
-  groupingColumnLabel,
-  resultFolder,
-  logFolder
+  groupingColumnLabel
 )
 }
 \arguments{
@@ -31,8 +29,6 @@ annotateBed(
 \item{columnLabel}{label of the column of the genomic area gene, island ,dmr etc..}
 
 \item{groupingColumnLabel}{label of the column of the genomic sub area body, tss1500}
-
-\item{resultFolder}{folder to which build the folder tree and save the annotated bed}
 }
 \value{
 original bed with genomic area infos
@@ -46,5 +42,5 @@ probesPrefix <- "PROBES_Island_"
 subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
 mainGroupLabel <- "ISLAND"
 subGroupLabel <- "RELATION_TO_CPGISLAND"
-islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,resultFolder  )
+islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel  )
 }

@@ -6,15 +6,12 @@
 analysis organized into files and folders per anomaly and produce a pivot}
 \usage{
 createPivotResultFromMultipleBedGeneric(
-  resultFolder,
   genomicAreaMain,
   genomicAreaSub,
   sampleSheet
 )
 }
 \arguments{
-\item{resultFolder}{folder as root for bedfiles organized per anomaly}
-
 \item{anomalyLabel}{anomaly definition used to lable folder and files eg
 MUTATIONS, LESIONS}
 

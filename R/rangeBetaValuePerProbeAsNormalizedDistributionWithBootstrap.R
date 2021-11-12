@@ -8,9 +8,6 @@
 
 rangeBetaValuePerProbeAsNormalizedDistributionWithBootstrap <- function(populationMatrix, iqrTimes = 3) {
 
-  computationCluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1)
-  doParallel::registerDoParallel(computationCluster)
-
   populationMatrixDim <- dim(populationMatrix)
   betaValues <- populationMatrix[, 2:populationMatrixDim[2]]
   row.names(betaValues) <- populationMatrix[, 1]
@@ -36,6 +33,6 @@ rangeBetaValuePerProbeAsNormalizedDistributionWithBootstrap <- function(populati
 
   result <- list(betaInferiorThresholds = betaInferiorThresholds, betaSuperiorThresholds = betaSuperiorThresholds, betaMedianValues = betaMedianValues)
 
-  parallel::stopCluster(computationCluster)
+  gc()
   return(result)
 }

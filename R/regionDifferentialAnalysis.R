@@ -27,19 +27,19 @@
 #'     i <- NULL
 #'     FIGURE <- NULL
 #'
-#'     chartFolder <- paste(resultFolder, "/Charts/", sep = "")
+#'     chartFolder <- paste0(resultFolder, "/Charts/", sep = "")
 #'     if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'       dir.create(chartFolder)
 #'     }
 #'
 #'     chartFolder <-
-#'       paste(resultFolder, "/Charts/", mainGroupLabel, "/", sep = "")
+#'       paste0(resultFolder, "/Charts/", mainGroupLabel, "/", sep = "")
 #'     if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'       dir.create(chartFolder)
 #'     }
 #'
 #'     chartFolder <-
-#'       paste(resultFolder,
+#'       paste0(resultFolder,
 #'             "/Charts/",
 #'             mainGroupLabel,
 #'             "/SingleGene",
@@ -48,22 +48,22 @@
 #'       dir.create(chartFolder)
 #'     }
 #'
-#'     logFolder <- paste(resultFolder, "/logs/", sep = "")
+#'     logFolder <- paste0(resultFolder, "/logs/", sep = "")
 #'     if (logFolder != "" && !dir.exists(logFolder)) {
 #'       dir.create(logFolder)
 #'     }
 #'     outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
-#'     computation_cluster <-
+#'     computationCluster <-
 #'       parallel::makeCluster(
 #'         parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1,
 #'         type = "PSOCK",
 #'         outfile = outFile
 #'       )
-#'     doParallel::registerDoParallel(computation_cluster)
+#'     doParallel::registerDoParallel(computationCluster)
 #'
 #'     # options(digits = 22)
 #'     parallel::clusterExport(
-#'       computation_cluster,
+#'       computationCluster,
 #'       list(
 #'         "analyzeSingleSample",
 #'         "dumpSampleAsBedFile",
@@ -128,9 +128,9 @@
 #'
 #'     system(paste0(
 #'       "echo '",
-#'       paste(colnames(testResult), collapse = "\t"),
+#'       paste0(colnames(testResult), collapse = "\t"),
 #'       "' > ",
-#'       paste(
+#'       paste0(
 #'         resultFolder,
 #'         "/Differential_analysis_",
 #'         mainGroupLabel,
@@ -154,7 +154,7 @@
 #'
 #'     # fd <- filteredData %>%  dplyr::group_by(filteredData[,mainGroupLabel],filteredData[,subGroupLabel],filteredData$FIGURE)
 #'     # fd <- dplyr::group_split(fd)
-#'     # filterOnlye <-  parallel::parLapply(computation_cluster, fd, function(i) unique(length(i$POPULATION))<2)
+#'     # filterOnlye <-  parallel::parLapply(computationCluster, fd, function(i) unique(length(i$POPULATION))<2)
 #'     # numberOfTest <- length(fd)
 #'
 #'     # tfun <- function(tempData){
@@ -168,7 +168,7 @@
 #'     #
 #'     #   freqData <- tempData[,c("freq")]
 #'     #   popData <- tempData[,c("POPULATION")]
-#'     #   combination <-   paste(fig, "_", pop, "_", mainGroup, "_", subGroup, sep="")
+#'     #   combination <-   paste0(fig, "_", pop, "_", mainGroup, "_", subGroup, sep="")
 #'     #
 #'     #   testResult[,mainGroupLabel] <-mainGroup
 #'     #   testResult$FIGURE <- fig
@@ -200,7 +200,7 @@
 #'     #   try(
 #'     #     if(reswt$p.value < 0.05/numberOfTest)
 #'     #     {
-#'     #       system(paste0( "echo '",paste( testResult[1,], collapse = "\t"), "' >> ", paste(resultFolder,"/Differential_analysis_Gene.csv", sep = "")))
+#'     #       system(paste0( "echo '",paste0( testResult[1,], collapse = "\t"), "' >> ", paste0(resultFolder,"/Differential_analysis_Gene.csv", sep = "")))
 #'     #
 #'     #       chart_dataset <- tempData
 #'     #       Groups <- as.factor(chart_dataset[, selection_column])
@@ -213,11 +213,11 @@
 #'     #           geom = c("boxplot"),
 #'     #           fill = Groups,
 #'     #           alpha = I(0.5),
-#'     #           ylab = paste ( fig, " COUNTS")
+#'     #           ylab = paste0 ( fig, " COUNTS")
 #'     #         ) + ggplot2::ggtitle(paste0(fig, " " , mainGroup, sep="")) +  ggplot2::theme(plot.title =  ggplot2::element_text(hjust = 0.5)) + ggplot2::geom_jitter(position =  ggplot2::position_jitter(0.2))
 #'     #
 #'     #       ggplot2::ggsave(
-#'     #         filename = paste(chartFolder,pop ,"_" ,fig ,  "_Box_Plot_Gene_", mainGroup, "_", subGroup, ".jpg",sep=""),
+#'     #         filename = paste0(chartFolder,pop ,"_" ,fig ,  "_Box_Plot_Gene_", mainGroup, "_", subGroup, ".jpg",sep=""),
 #'     #         plot = chart_object[[i]],
 #'     #         device = NULL,
 #'     #         path = NULL,
@@ -232,16 +232,16 @@
 #'     #   )
 #'     #
 #'     # }
-#'     # parallel::parLapply(cl = computation_cluster, fd, fun = tfun(fd) )
+#'     # parallel::parLapply(cl = computationCluster, fd, fun = tfun(fd) )
 #'
-#'     headFile <- paste(c(mainGroupLabel,"FIGURE",subGroupLabel,"MEDIAN","VARIANCE","SAMPLE_COUNT"),collapse ="\t")
-#'     system(paste0("echo '",headFile,"'> ",paste(resultFolder,"/Differential_analysis_",mainGroupLabel ,"_Alone.csv",sep = "")))
+#'     headFile <- paste0(c(mainGroupLabel,"FIGURE",subGroupLabel,"MEDIAN","VARIANCE","SAMPLE_COUNT"),collapse ="\t")
+#'     system(paste0("echo '",headFile,"'> ",paste0(resultFolder,"/Differential_analysis_",mainGroupLabel ,"_Alone.csv",sep = "")))
 #'
-#'     headFile <-paste( c(mainGroupLabel,"FIGURE",subGroupLabel,"P_VALUE","P_VALUE_CORRECTED","EXECUTED_TEST","POPULATIONS"),collapse="\t")
-#'     system(paste0("echo '",headFile,"' > ",paste(resultFolder,"/Differential_analysis_",mainGroupLabel ,".csv",sep = "")))
+#'     headFile <-paste0( c(mainGroupLabel,"FIGURE",subGroupLabel,"P_VALUE","P_VALUE_CORRECTED","EXECUTED_TEST","POPULATIONS"),collapse="\t")
+#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolder,"/Differential_analysis_",mainGroupLabel ,".csv",sep = "")))
 #'
-#'     headFile <-paste( c(mainGroupLabel,"FIGURE",subGroupLabel,"CASE_MEDIAN","CASE_VARIANCE","CONTROL_MEDIAN","CONTROL_VARIANCE"),collapse="\t")
-#'     system(paste0("echo '",headFile,"' > ",paste(resultFolder,"/Differential_analysis_No_Test_",mainGroupLabel ,".csv",sep = "")))
+#'     headFile <-paste0( c(mainGroupLabel,"FIGURE",subGroupLabel,"CASE_MEDIAN","CASE_VARIANCE","CONTROL_MEDIAN","CONTROL_VARIANCE"),collapse="\t")
+#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolder,"/Differential_analysis_No_Test_",mainGroupLabel ,".csv",sep = "")))
 #'
 #'     # foreach::foreach(i = 1:numberOfTest) %dopar% {
 #'     for (i in 1:numberOfTest) {
@@ -280,12 +280,12 @@
 #'           testResult[1,"VARIANCE"] <- stats::var(as.vector(tempData$freq))
 #'           testResult[1,"SAMPLE_COUNT"] <- length(as.vector(tempData$freq))
 #'           testResultToDump <-
-#'             paste(testResult[1, ], collapse = "\t")
+#'             paste0(testResult[1, ], collapse = "\t")
 #'           system(paste0(
 #'             "echo '",
 #'             testResultToDump,
 #'             "' >> ",
-#'             paste(
+#'             paste0(
 #'               resultFolder,
 #'               "/Differential_analysis_",
 #'               mainGroupLabel ,
@@ -293,7 +293,7 @@
 #'               sep = ""
 #'             )
 #'           ))
-#'           combination <-  paste(fig, "_", paste(unique(tempData$POPULATION), collapse = "_Vs_"), "_", mainGroup, "_", subGroup, sep = "")
+#'           combination <-  paste0(fig, "_", paste0(unique(tempData$POPULATION), collapse = "_Vs_"), "_", mainGroup, "_", subGroup, sep = "")
 #'           print(combination)
 #'           next
 #'         }
@@ -336,12 +336,12 @@
 #'           testResult$CONTROL_MEDIAN <-  stats::median(subset(tempData, POPULATION =="Control")$freq)
 #'           testResult$CONTROL_VARIANCE <-  stats::var(subset(tempData, POPULATION =="Control")$freq)
 #'           testResultToDump <-
-#'             paste(testResult[1, ], collapse = "\t")
+#'             paste0(testResult[1, ], collapse = "\t")
 #'           system(paste0(
 #'             "echo '",
 #'             testResultToDump,
 #'             "' >> ",
-#'             paste(
+#'             paste0(
 #'               resultFolder,
 #'               "/Differential_analysis_No_Test_",
 #'               mainGroupLabel ,
@@ -368,7 +368,7 @@
 #'         testResult[1, subGroupLabel] <- subGroup
 #'         testResult$EXECUTED_TEST <- numberOfTest
 #'         testResult$POPULATIONS <- 2
-#'         combination <-  paste(fig, "_", paste(unique(tempData$POPULATION), collapse = "_Vs_"), "_", mainGroup, "_", subGroup, sep = "")
+#'         combination <-  paste0(fig, "_", paste0(unique(tempData$POPULATION), collapse = "_Vs_"), "_", mainGroup, "_", subGroup, sep = "")
 #'         print(combination)
 #'
 #'         testResult$P_VALUE <- reswt$p.value
@@ -376,12 +376,12 @@
 #'
 #'         if (reswt$p.value < 0.05 / numberOfTest)
 #'         {
-#'           testResultToDump <- paste(testResult[1, ], collapse = "\t")
+#'           testResultToDump <- paste0(testResult[1, ], collapse = "\t")
 #'           system(paste0(
 #'             "echo '",
 #'             testResultToDump,
 #'             "' >> ",
-#'             paste(
+#'             paste0(
 #'               resultFolder,
 #'               "/Differential_analysis_",
 #'               mainGroupLabel ,
@@ -401,14 +401,14 @@
 #'               geom = c("boxplot"),
 #'               fill = Groups,
 #'               alpha = I(0.5),
-#'               ylab = paste (fig, " COUNTS")
+#'               ylab = paste0 (fig, " COUNTS")
 #'             ) + ggplot2::ggtitle(paste0(fig, " " , mainGroup, sep = "")) +  ggplot2::theme(plot.title =  ggplot2::element_text(hjust = 0.5)) + ggplot2::geom_jitter(position =  ggplot2::position_jitter(0.2))
 #'
 #'           ggplot2::ggsave(
-#'             filename = paste(
+#'             filename = paste0(
 #'               chartFolder,
 #'               "/",
-#'               paste(unique(tempData$POPULATION), collapse = "_Vs_"),
+#'               paste0(unique(tempData$POPULATION), collapse = "_Vs_"),
 #'               "_" ,
 #'               fig ,
 #'               "_Box_Plot_",
@@ -446,6 +446,6 @@
 #'     #     tempData <- data.frame(subset(tempData, subGroupLabel == subGroup))
 #'     #     tfun(tempData)
 #'     # }
-#'     # write.csv(testResults,paste(resultFolder,"/Differential_analysis_Gene.csv"))
+#'     # write.csv(testResults,paste0(resultFolder,"/Differential_analysis_Gene.csv"))
 #'
 #'   }
