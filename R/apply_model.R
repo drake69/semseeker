@@ -1,19 +1,17 @@
 
-apply_model <- function(tempDataFrame, g_start, family, covariates = NULL, key, transformation, dototal, logFolder)
+apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independentVariable, depthAnalysis=3)
 {
 
-  nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
-  outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
-  # print(outFile)
-  computation_cluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
-  doParallel::registerDoParallel(computation_cluster)
+  # browser()
+  # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
 
-  # options(digits = 22)
-  parallel::clusterExport(envir=environment(), cl = computation_cluster, varlist =c())
+  if(independentVariable=="Sample_Group")
+  {
+    tempDataFrame[, independentVariable][tempDataFrame[, independentVariable]=="Control"] <- FALSE
+    tempDataFrame[, independentVariable][tempDataFrame[, independentVariable]=="Case"] <- TRUE
+    # tempDataFrame[, independentVariable] <- as.numeric(tempDataFrame[, independentVariable])
+  }
 
-  tempDataFrame$Sample_Group[tempDataFrame$Sample_Group=="Control"] <- 0
-  tempDataFrame$Sample_Group[tempDataFrame$Sample_Group=="Case"] <- 1
-  tempDataFrame$Sample_Group <- as.numeric(tempDataFrame$Sample_Group)
 
   df_head <- tempDataFrame[,1:(g_start-1)]
   df_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)
@@ -25,97 +23,257 @@ apply_model <- function(tempDataFrame, g_start, family, covariates = NULL, key, 
   df_colnames <- colnames(tempDataFrame)
   if( !is.null(dim(df_values))  & dototal) {
     sum_area <- apply(df_values, 1, sum)
-    df_values <- cbind(df_values, data.frame("TOTAL"=sum_area))
-    df_colnames <- c(df_colnames, "TOTAL")
+    df_values <- data.frame(df_values,"TOTAL"=sum_area)
+    df_colnames <- c(df_colnames,"TOTAL")
+    if(depthAnalysis==2)
+    {
+      # browser()
+      df_values <- df_values[, colnames(df_values) %in% c( independentVariable, "TOTAL") ]
+      df_colnames <- c( independentVariable, "TOTAL")
+    }
   }
 
   # browser()
-
-  if(family != "poisson")
+  if(family_test != "poisson")
     df_values <- df_values + 0.001
 
-  if( !is.null(transformation))
-  {
-    if(  transformation=="log10")
-    {
-      df_values <- log10(df_values)
-    }
-    if(transformation=="log")
-    {
-      df_values <- log(df_values)
-    }
-  } else
-  {
-    transformation = "NONE"
-    }
+  transformation <- as.character(transformation)
+  if(is.null(transformation) | length(transformation)==0 | is.na(transformation))
+    transformation <- "none"
 
-  tempDataFrame <- as.data.frame(cbind(df_head, df_values))
+  df_values_orig <- df_values
+  try(
+    {
+      df_values = switch(
+        as.character(transformation),
+        "scale" = scale(df_values),
+        "log" = log(df_values),
+        "log2" = log2(df_values),
+        "log10"= log10(df_values),
+        "exp" = exp(df_values),
+        "johnson" =  Johnson::RE.Johnson(df_values)$transformed,
+        "none" = df_values,
+        df_values
+      )
+    }
+  )
+
+
+  if(setequal(df_values,df_values_orig) & transformation !="none")
+    transformation <- paste0("NA_", transformation, sep="")
+
+
+  if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="t.test" & family_test!="poisson")
+  {
+    independentVariableValues <- tempDataFrame[, independentVariable]
+    independentVariableValuesOrig <- tempDataFrame[, independentVariable]
+    try(
+      {
+        independentVariableValues = switch(
+          as.character(transformation),
+          "scale" = scale(independentVariableValues),
+          "log" = log(independentVariableValues),
+          "log2" = log2(independentVariableValues),
+          "log10"= log10(independentVariableValues),
+          "exp" = exp(independentVariableValues),
+          "johnson" =  Johnson::RE.Johnson(independentVariableValues)$transformed,
+          "none" = independentVariableValues,
+          independentVariableValues
+        )
+      }
+    )
+
+    if(setequal(df_values,df_values_orig) & transformation !="none")
+      transformation <- paste0("NA_", transformation, sep="")
+    else
+    {
+      tempDataFrame[, independentVariable] <- independentVariableValues
+      }
+  }
+
+  tempDataFrame <- data.frame(df_head, df_values)
+  # browser()
   colnames(tempDataFrame) <- df_colnames
   cols <- colnames(tempDataFrame)
   iters <- length(cols)
 
-  result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind) %dopar%
-  # for (g in g_start:iters)
+  # result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind) %dopar%
+  for (g in g_start:iters)
   {
     #g <- 2
-
-    if (family=="poisson")
+    burdenValue <- cols[g]
+    if (family_test=="poisson")
     {
       if(is.null(covariates) || length(covariates)==0)
       {
-        covariates_model <- cols[g]
+        covariates_model <- independentVariable
       } else
       {
-        covariates_model <- paste(paste0(c("Sample_Group", covariates),collapse="+", sep=""))
+        covariates_model <- paste0(paste0(c(independentVariable, covariates),collapse="+", sep=""))
       }
-      sig.formula <- as.formula(paste0(cols[g],"~", covariates_model, sep=""))
-    } else
-    {
-      if(is.null(covariates) || length(covariates)==0)
-      {
-        covariates_model <- cols[g]
-      } else
-      {
-        covariates_model <- paste(paste0(c(cols[g], covariates),collapse="+", sep=""))
-      }
-      sig.formula <- as.formula(paste0("Sample_Group","~", covariates_model, sep=""))
+      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
     }
 
-    browser()
-    shapiro_pvalue <- shapiro.test(tempDataFrame[,cols[g]])
-    bartlett_pvalue <- bartlett.test( x=tempDataFrame[,cols[g]] ,g=tempDataFrame$Sample_Group)
+    if(family_test=="wilcoxon" | family_test=="t.test")
+    {
+      covariates_model <- independentVariable
+      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+    }
 
-    result.glm  <- glm( sig.formula, family = family, data = as.data.frame(tempDataFrame))
-    pvalue <- summary( result.glm )$coeff[-1, 4][1]
+    if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
+    {
+      covariates_model <- independentVariable
+      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+    }
+
+    if (family_test=="gaussian")
+    {
+      if(is.null(covariates) || length(covariates)==0)
+      {
+        covariates_model <- independentVariable
+      } else
+      {
+        covariates_model <- paste0(paste0(c(independentVariable, covariates),collapse="+", sep=""))
+      }
+      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+    }
+
+    if (family_test=="binomial")
+    {
+      # inversion of roles for variable
+      if(is.null(covariates) || length(covariates)==0)
+      {
+        covariates_model <- burdenValue
+      } else
+      {
+        covariates_model <- paste0(paste0(c(burdenValue, covariates),collapse="+", sep=""))
+      }
+      sig.formula <- as.formula(paste0(independentVariable,"~", covariates_model, sep=""))
+    }
+
+    # browser()
+    if(family_test=="binomial" | family_test=="poisson" | family_test=="wilcoxon" | family_test=="t.test")
+    {
+      bartlett_pvalue <- bartlett.test( as.formula(paste0(burdenValue,"~", independentVariable, sep="")), data= as.data.frame(tempDataFrame) )
+    }
+
+    if(family_test=="gaussian" | family_test=="spearman" | family_test=="kendall" | family_test=="pearson")
+    {
+      localDataFrame <- data.frame("depVar"=tempDataFrame[, burdenValue],"indepVar"=1 )
+      localDataFrame <- rbind( localDataFrame,  data.frame("depVar"=tempDataFrame[, independentVariable],"indepVar"=2 ))
+      bartlett_pvalue <- bartlett.test( as.formula("depVar ~ indepVar"), data= localDataFrame )
+    }
+
+    shapiro_pvalue <- shapiro.test(tempDataFrame[,burdenValue])
+
+    if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
+    {
+      result.glm  <- glm( sig.formula, family = family_test, data = as.data.frame(tempDataFrame))
+      pvalue <- summary(result.glm )$coeff[-1, 4][1]
+    }
+
+    if(family_test=="wilcoxon")
+    {
+      result.w  <- wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
+      pvalue <- result.w$p.value
+    }
+
+    if(family_test=="t.test")
+    {
+      result.w  <-t.test(sig.formula, data = as.data.frame(tempDataFrame))
+      pvalue <- result.w$p.value
+    }
+
+    if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
+    {
+      result.cor <- cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independentVariable]), method = family_test)
+      pvalue <- result.cor$p.value
+    }
+
+
     pvalueadjusted <- pvalue
-    browser()
+    # browser()
     # beta <- exp(summary( result.glm )$coeff[-1, 1][1])
     # result_temp <-
-      data.frame (
+
+    if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" & family_test!="kendall")
+    {
+      independentVariableData <- na.omit(tempDataFrame[tempDataFrame[, independentVariable]==TRUE,burdenValue])
+      dependentVariableData <- na.omit(tempDataFrame[tempDataFrame[, independentVariable]==FALSE,burdenValue])
+      local_result <- data.frame (
+        "INDIPENDENT.VARIABLE"= independentVariable,
         "ANOMALY" = key$ANOMALY,
         "FIGURE" = key$FIGURE,
         "GROUP" = key$GROUP,
         "SUBGROUP" = key$SUBGROUP,
-        "AREA_OF_TEST" = cols[g],
+        "AREA_OF_TEST" = burdenValue,
         "PVALUE" = round(pvalue,3),
         "PVALUEADJ" = pvalueadjusted,
         "TEST" = "SINGLE_AREA",
-        "BETA" = round(summary( result.glm )$coeff[-1, 1][1],3),
-        "AIC" = round(result.glm$aic,3),
-        "RESIDUALS.SUM" = round(sum(result.glm$residuals),3),
-        "FAMILY" = family,
-        "TRANSFORMATION" = transformation,
-        "COVARIATES" = paste(covariates,collapse=" "),
+        "BETA" = if(exists("result.glm")) round(summary(result.glm )$coeff[-1, 1][1],3)  else NA,
+        "AIC" = if(exists("result.glm")) round(result.glm$aic,3)  else NA,
+        "RESIDUALS.SUM" = if(exists("result.glm")) round(sum(result.glm$residuals),3)  else NA,
+        "FAMILY" = family_test,
+        "transformation" = transformation,
+        "COVARIATES" = paste0(covariates,collapse=" "),
         "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
-        "BARTLETT.PVALUE" = round(bartlett_pvalue$p.value,3),
-        "MEAN.CASE" = round(mean(tempDataFrame[tempDataFrame$Sample_Group==1,cols[g]]),3),
-        "MEAN.CONTROL"=round(mean(tempDataFrame[tempDataFrame$Sample_Group==0,cols[g]]),3),
-        "SD.CASE"=round(sd(tempDataFrame[tempDataFrame$Sample_Group==1,cols[g]]),3),
-        "SD.CONTROL"= round(sd(tempDataFrame[tempDataFrame$Sample_Group==0,cols[g]]),3)
+        "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) round(bartlett_pvalue$p.value,3)  else NA,
+        "COUNT.CASE"=length(independentVariableData),
+        "MEAN.CASE" = round(mean(independentVariableData),3),
+        "SD.CASE"=round(sd(independentVariableData),3),
+        "COUNT.CONTROL"=length(na.omit(dependentVariableData)),
+        "MEAN.CONTROL"=round(mean(dependentVariableData),3),
+        "SD.CONTROL"= round(sd(dependentVariableData),3),
+        "RHO"= if(exists("result.cor"))  round(result.cor$estimate) else NA
       )
+    } else
+    {
+      # browser()
+      dependentVariableData <- na.omit(tempDataFrame[!is.na(tempDataFrame[,independentVariable]),burdenValue])
+      independentVariableData <- na.omit(tempDataFrame[  ,independentVariable])
+      local_result <- data.frame (
+        "INDIPENDENT.VARIABLE"= independentVariable,
+        "ANOMALY" = key$ANOMALY,
+        "FIGURE" = key$FIGURE,
+        "GROUP" = key$GROUP,
+        "SUBGROUP" = key$SUBGROUP,
+        "AREA_OF_TEST" = burdenValue,
+        "PVALUE" = round(pvalue,3),
+        "PVALUEADJ" = pvalueadjusted,
+        "TEST" = "SINGLE_AREA",
+        "BETA" = if(exists("result.glm")) round(summary( result.glm )$coeff[-1, 1][1],3) else NA,
+        "AIC" = if(exists("result.glm")) round(result.glm$aic,3)  else NA,
+        "RESIDUALS.SUM" = if(exists("result.glm")) round(sum(result.glm$residuals),3)  else NA,
+        "FAMILY" = family_test,
+        "transformation" = transformation,
+        "COVARIATES" = paste0(covariates,collapse=" "),
+        "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
+        "BARTLETT.PVALUE" = NA,
+        "COUNT.CASE"=length(dependentVariableData),
+        "MEAN.CASE" = round(mean(dependentVariableData),3),
+        "SD.CASE"=round(sd(dependentVariableData ),3),
+        "COUNT.CONTROL"=length(independentVariableData),
+        "MEAN.CONTROL"=round(mean(independentVariableData),3),
+        "SD.CONTROL"= round(sd(independentVariableData),3),
+        "RHO"= if(exists("result.cor"))  round(result.cor$estimate) else NA
+      )
+    }
+    if (exists("result_temp"))
+    {
+      result_temp <- rbind(result_temp, local_result)
+    }
+    else
+    {
+      result_temp <- local_result
+    }
   }
-  result_temp$PVALUEADJ <- round(p.adjust(result_temp$PVALUE,method = "BH"),3)
-  parallel::stopCluster(computation_cluster)
+
+  result_temp <- unique(result_temp)
+
+
+  result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
+  result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
+
   gc()
   return(result_temp)
 }

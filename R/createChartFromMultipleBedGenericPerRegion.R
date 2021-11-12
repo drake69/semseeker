@@ -9,39 +9,24 @@
 #' @param probesPrefix definition of prefix to use probes to load
 #' @param mainGroupLabel name of column to group the data set
 #' @param subGroupLabel  name of column to sub group the data set
-#' @param resultFolder folder as root for bedfiles organized per anomaly
 #'
 #' @return list of pivot by column identified with mainGroupLabel and by Sample
 
 #'
-createChartFromMultipleBedGenericPerRegion <-
-  function(resultFolder, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel ) {
+createChartFromMultipleBedGenericPerRegion <- function(populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel ) {
 
   HYPO <- NULL
   HYPER <- NULL
   POPULATION <- NULL
 
-  chartFolder <- paste(resultFolder, "/Charts/", sep="")
-  if (chartFolder != "" && !dir.exists(chartFolder)) {
-    dir.create(chartFolder)
-  }
+  chartFolder <- dir_check_and_create(resultFolderChart, mainGroupLabel, "Grouped")
 
-  chartFolder <- paste(resultFolder, "/Charts/", mainGroupLabel,"/", sep="")
-  if (chartFolder != "" && !dir.exists(chartFolder)) {
-    dir.create(chartFolder)
-  }
-
-  chartFolder <- paste(resultFolder, "/Charts/", mainGroupLabel,"/Grouped", sep="")
-  if (chartFolder != "" && !dir.exists(chartFolder)) {
-    dir.create(chartFolder)
-  }
-
-  finalBed <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel, resultFolder)
+  finalBed <-  annotateBed(populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
 
   if (is.null(finalBed))
     return()
 
-  finalBed <- data.frame(finalBed, "KEY" = paste(finalBed$POPULATION,"_", finalBed[,mainGroupLabel], sep=""))
+  finalBed <- data.frame(finalBed, "KEY" = paste0(finalBed$POPULATION,"_", finalBed[,mainGroupLabel], sep=""))
   finalBed[,mainGroupLabel] <- as.factor(finalBed[,mainGroupLabel])
   finalBed[,"KEY"] <- as.factor(finalBed[,"KEY"])
   finalBed[,"FIGURE"] <- as.factor(finalBed[,"FIGURE"])
@@ -84,12 +69,12 @@ createChartFromMultipleBedGenericPerRegion <-
       #   " the size of the circle represents the count of locus having these figures \n"
       # " the transparency is the case/control ratio black means only case white means only control"
 
-      myplot <- myplot  + ggplot2::ggtitle (paste("Count Hyper methylated probes \n Vs. Hypo Methylated Probes per ", mainGroupLabel, "  in the region: ", grp ," (", dim(temp)[1],")" ,  sep=""))
+      myplot <- myplot  + ggplot2::ggtitle (paste0("Count Hyper methylated probes \n Vs. Hypo Methylated Probes per ", mainGroupLabel, "  in the region: ", grp ," (", dim(temp)[1],")" ,  sep=""))
       # myplot
 
       try(
         ggplot2::ggsave(
-          filename = paste( chartFolder,"/",paste( unique(tempPopData$POPULATION), collapse ="_Vs_"),"_", mainGroupLabel, "_", grp, ".jpg",sep=""),
+          filename = paste0( chartFolder,"/",paste0( unique(tempPopData$POPULATION), collapse ="_Vs_"),"_", mainGroupLabel, "_", grp, ".jpg",sep=""),
           plot = myplot,
           device = NULL,
           path = NULL,
