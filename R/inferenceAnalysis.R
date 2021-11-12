@@ -1,296 +1,305 @@
-inferenceAnalysis <- function(studySummary, resultFolder, logFolder, covariates, family, transformation = NULL)
+inferenceAnalysis <- function(inferenceDetails)
 {
 
-  # browser()
-
-  workingFolder <- file.path(resultFolder, "Pivots/")
-  inferenceFolder <-  file.path(resultFolder, "Inference/")
-  file_result_prefix <- "case_vs_control_"
-
-  studySummary <- subset(studySummary, Sample_Group!="Reference")
-  #########################################################################################################
-  #########################################################################################################
-
-  if(!dir.exists(inferenceFolder))
-    dir.create(inferenceFolder)
-
-  if(is.null(covariates) || length(covariates)==0)
+  # covariates, family_test, transformation = NULL, independentVariable, depthAnalysis=3
+  # covariates= covariates, transformation = "log",independentVariable = "Sample_Group", depthAnalysis=2
+  inferenceDetails <- unique(inferenceDetails)
+  for(i in 1:nrow(inferenceDetails))
   {
-    sample_names <- data.frame(studySummary[, c("Sample_ID", "Sample_Group")])
-  } else
-  {
-    sample_names <- data.frame(studySummary[, c("Sample_ID", "Sample_Group", covariates)])
-  }
-  # sample_names <- data.frame(studySummary)
-  result = data.frame (
-    "ANOMALY" = "",
-    "FIGURE" = "",
-    "GROUP" = "",
-    "SUBGROUP" = "",
-    "AREA_OF_TEST" = "",
-    "PVALUE" = "",
-    "PVALUEADJ" = "",
-    "TEST" = "",
-    "BETA" = "",
-    "AIC" = "",
-    "RESIDUALS.SUM" = "",
-    "FAMILY" = "",
-    "TRANSFORMATION" = "",
-    "COVARIATES" = "",
-    "SHAPIRO.PVALUE" = "",
-    "BARTLETT.PVALUE" = "",
-    "MEAN.CASE" ="",
-    "MEAN.CONTROL"="",
-    "SD.CASE"="",
-    "SD.CONTROL"=""
-  )
+    #browser()
+    inferenceDetail <- inferenceDetails[i,]
 
-  result <- result[-1,]
-  # sample_names[, c("Sample_Group")]  <-  toupper(sample_names[, c("Sample_Group")])
-  # sample_names <- sample_names[complete.cases(sample_names),]
-  sample_names <- subset(sample_names, sample_names[, "Sample_Group"]  != "Reference")
+    filterpvalue <- if(!is.null(inferenceDetail$filterpvalue)) inferenceDetail$filterpvalue else TRUE
 
-  if(!is.null(covariates) && !length(covariates)==0)
-  {
-    sample_names <-   sample_names[, c("Sample_ID", "Sample_Group", covariates)]
-    colnames(sample_names) <- c("Sample_ID", "Sample_Group", covariates)
-  } else
-  {
-    sample_names <-   sample_names[, c("Sample_ID", "Sample_Group")]
-    colnames(sample_names) <- c("Sample_ID", "Sample_Group")
-  }
-  ######################################################################################################
-  # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
-  # binomiale che si vuole usare per la regressione logistica
-
-
-
-  keys <- expand.grid("ANOMALY"=c("LESIONS","MUTATIONS"), "FIGURE"=c("HYPER","HYPO","BOTH"))
-  cols <- paste(keys$ANOMALY,"_",keys$FIGURE, sep="")
-  keys$GROUP = "POPULATION"
-  keys$SUBGROUP = "SAMPLE"
-  iters <- length(cols)
-
-  if(!is.null(covariates) && !length(covariates)==0)
-    studySummary <- studySummary[, c("Sample_Group", covariates, cols) ]
-
-  # browser()
-
-  for(i in 1:nrow(keys))
-  {
-    # i <- 1
-    # family <- "poisson"
-    # transformation <- NULL
-    g_start <- 2 + length(covariates)
-    result_temp <- apply_model(tempDataFrame = studySummary[, c("Sample_Group", covariates, cols[i])], g_start = g_start , family = family, covariates = covariates, key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder)
-    result <- rbind(result, result_temp)
-  }
-
-  result <- result[order(result$PVALUEADJ),]
-
-  # browser()
-
-  studySummaryToPlot <- studySummary
-  studySummaryToPlot$Sample_Group  <- relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
-
-  chartFolder <- paste(inferenceFolder, "/Charts/", sep="")
-  if (chartFolder != "" && !dir.exists(chartFolder)) {
-    dir.create(chartFolder)
-  }
-
-  chartFolder <- paste(inferenceFolder, "/Charts/POPULATION_COMPARISON/", sep="")
-  if (chartFolder != "" && !dir.exists(chartFolder)) {
-    dir.create(chartFolder)
-  }
-
-  filename = paste( chartFolder,"/MUTATIONS.png",sep="")
-  grDevices::png(file= filename, width=2480)
-  par(mfrow=c(1,3))
-  graphics::boxplot(MUTATIONS_HYPO~Sample_Group,main="Hypo Mutations", data = studySummaryToPlot, cex=2)
-  graphics::boxplot(MUTATIONS_BOTH~Sample_Group, main="Both Type of Mutations", data = studySummaryToPlot, cex=2)
-  graphics::boxplot(MUTATIONS_HYPER~Sample_Group,main="Hyper Mutations", data = studySummaryToPlot, cex=2)
-  grDevices::dev.off()
-
-  filename = paste( chartFolder,"/LESIONS.png",sep="")
-  grDevices::png(file= filename, width=2480)
-  par(mfrow=c(1,3))
-  graphics::boxplot(LESIONS_HYPO~Sample_Group,main="Hypo Lesions", data = studySummaryToPlot, cex=2)
-  graphics::boxplot(LESIONS_BOTH~Sample_Group, main="Both Type of Lesions", data = studySummaryToPlot, cex=2)
-  graphics::boxplot(LESIONS_HYPER~Sample_Group,main="Hyper Lesions", data = studySummaryToPlot, cex=2)
-  grDevices::dev.off()
-
-
-  anomalies <- c("MUTATIONS", "LESIONS")
-  figures <- c("HYPO", "HYPER", "BOTH")
-
-  group =  "GENE"
-  subGroups <-
-    c("Body",
-      "TSS1500",
-      "5'UTR",
-      "TSS200",
-      "1stExon",
-      "3'UTR",
-      "ExonBnd",
-      "Whole")
-
-  # genes <- data.frame("group" = group, "area" = subGroups)
-
-  keys <-
-    expand.grid(
-      "ANOMALY" = anomalies,
-      "FIGURE" = figures,
-      "GROUP" = group,
-      "SUBGROUP" = subGroups
-    )
-
-  group <- "ISLAND"
-  subGroups <- c("N_Shore", "S_Shore", "N_Shelf", "S_Shelf", "Island", "Whole")
-
-  # islands <- data.frame("group" = group, "area" = subGroups)
-
-  keys <-
-    rbind(
-      expand.grid(
-        "ANOMALY" = anomalies,
-        "FIGURE" = figures,
-        "GROUP" = group,
-        "SUBGROUP" = subGroups
-      ),
-      keys
-    )
-
-
-  group =  "DMR"
-  subGroups <- c("DMR")
-
-  # dmrs <- data.frame("group" = group, "area" = subGroups)
-
-  keys <-
-    rbind(
-      expand.grid(
-        "ANOMALY" = anomalies,
-        "FIGURE" = figures,
-        "GROUP" = group,
-        "SUBGROUP" = subGroups
-      ),
-      keys
-    )
-
-  # browser()
-  # areas <- rbind(genes, islands, dmrs)
-  nkeys <- dim(keys)[1]
-  for (i in 1:nkeys)
-  {
-    # i <- 25
-    rm(list = c("tempDataFrame"))
-    key <- keys [i,]
-    # print(key)
-    fname <-file.path(workingFolder,paste("/", key$ANOMALY, "_", key$FIGURE, "_", key$GROUP, "_", key$SUBGROUP, ".csv" , sep =""))
-    print(fname)
-    if (!file.exists(fname))
+    covariates <- inferenceDetail$covariates
+    covariates <- if(length(covariates)!=0 & !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split = "+", fixed = T)))
+    family_test <- inferenceDetail$family_test
+    if( is.null(family_test) || length(family_test)==0)
     {
-      print("File Not found!")
+      message("Warning: one test family_test is missed! Skipped.")
+      #browser()
       next
     }
-    tempDataFrame <- read.csv(fname, sep = ";")
-    row.names(tempDataFrame) <- tempDataFrame$X
-    tempDataFrame <- tempDataFrame[,-1]
-    tempDataFrame <- t(tempDataFrame)
-    if(dim(tempDataFrame)[1]<=1)
+    # browser()
+    transformation <- inferenceDetail$transformation
+    if(is.null(transformation) | length(transformation)==0)
+    {
+      transformation <- NULL
+    }
+
+    independentVariable <- gsub(" ","", inferenceDetail$independentVariable)
+    if( is.null(independentVariable) || length(independentVariable)==0)
+    {
+      message("Warning: one indipendent variable is missed! Skipped.")
+      #browser()
       next
-    # tempDataFrame <- tempDataFrame[,-2]
-    tempDataFrame <- as.data.frame(tempDataFrame)
-    tempDataFrame <- subset(tempDataFrame, POPULATION != "Reference")
-    tempDataFrame <- subset(tempDataFrame, POPULATION != 0)
+    }
 
-    tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
-    tempDataFrame$POPULATION <- sample_names$Sample_Group
-    tempDataFrame[is.na(tempDataFrame)] <- 0
-    tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
+    depthAnalysis <- inferenceDetail$depthAnalysis
+    if( is.null(depthAnalysis) || length(depthAnalysis)==0)
+    {
+      depthAnalysis <- 1
+      message("Warning: missed depth analysis inference forced to 1.")
+    }
 
-    cols <- (gsub(" ", "_", colnames(tempDataFrame[])))
-    cols <- (gsub("-", "_", cols))
-    cols <- (gsub(":", "_", cols))
-    cols <- (gsub("/", "_", cols))
-    cols <- (gsub("'", "_", cols))
+    studySummary <-   read.csv2(file_path_build(resultFolderData, "sample_sheet_result","csv"))
+    resultFolderPivot <- dir_check_and_create(resultFolderData,"Pivots")
 
-    colnames(tempDataFrame) <- cols
+    file_result_prefix <- paste0( depthAnalysis,"_", independentVariable,"_",sep="")
 
-    tempDataFrame <- as.data.frame(tempDataFrame)
-    # tempDataFrame$Sample_Group <- as.factor(tempDataFrame$Sample_Group)
-    # tempDataFrame$Sample_Group  <- relevel(tempDataFrame$Sample_Group, "Control")
+    studySummary <- subset(studySummary, Sample_Group!="Reference")
+    #########################################################################################################
+    #########################################################################################################
 
-    g_start <- 2 + length(covariates)
+    if(!dir.exists(resultFolderInference))
+      dir.create(resultFolderInference)
+
+    if (!(independentVariable %in% colnames(studySummary)))
+    {
+      message(" This indipendent variabile:", independentVariable, " is missed! Skipping")
+      #browser()
+      next
+    }
+
+    if(is.null(covariates) || length(covariates)==0)
+    {
+      sample_names <- data.frame(studySummary[, c("Sample_ID", independentVariable)])
+    } else
+    {
+      sample_names <- data.frame(studySummary[, c("Sample_ID", independentVariable, covariates)])
+    }
+    # sample_names <- data.frame(studySummary)
+    result = data.frame (
+      "INDIPENDENT.VARIABLE"="",
+      "ANOMALY" = "",
+      "FIGURE" = "",
+      "GROUP" = "",
+      "SUBGROUP" = "",
+      "AREA_OF_TEST" = "",
+      "PVALUE" = "",
+      "PVALUEADJ" = "",
+      "TEST" = "",
+      "BETA" = "",
+      "AIC" = "",
+      "RESIDUALS.SUM" = "",
+      "FAMILY" = "",
+      "TRANSFORMATION" = "",
+      "COVARIATES" = "",
+      "SHAPIRO.PVALUE" = "",
+      "BARTLETT.PVALUE" = "",
+      "COUNT.CASE","",
+      "MEAN.CASE" ="",
+      "SD.CASE"="",
+      "COUNT.CONTROL"="",
+      "MEAN.CONTROL"="",
+      "SD.CONTROL"="",
+      "RHO"=""
+    )
+    result <- result[-1,]
 
 
-    result_temp <- apply_model(tempDataFrame = tempDataFrame, g_start = g_start, family = family, covariates = covariates, key = key, transformation= transformation, dototal = TRUE, logFolder= logFolder)
 
-    # n_adj <- iters - g_start
-    result <- rbind(result, result_temp)
+    if(!is.null(covariates) && !length(covariates)==0)
+    {
+      sample_names <-   sample_names[, c("Sample_ID", independentVariable, covariates)]
+      colnames(sample_names) <- c("Sample_ID", independentVariable, covariates)
+    } else
+    {
+      sample_names <-   sample_names[, c("Sample_ID", independentVariable)]
+      colnames(sample_names) <- c("Sample_ID", independentVariable)
+    }
+    ######################################################################################################
+    # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
+    # binomiale che si vuole usare per la regressione logistica
+
+
+    keys <- expand.grid("ANOMALY"=c("LESIONS","MUTATIONS"), "FIGURE"=c("HYPER","HYPO","BOTH"))
+    cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep="")
+    keys$GROUP = "POPULATION"
+    keys$SUBGROUP = "SAMPLE"
+    iters <- length(cols)
+
+    if(!is.null(covariates) && !length(covariates)==0)
+      studySummary <- studySummary[, c(independentVariable, covariates, cols) ]
+
+    # #browser()
+
+    for(i in 1:nrow(keys))
+    {
+      # i <- 1
+      # family_test <- "poisson"
+      # transformation <- NULL
+      g_start <- 2 + length(covariates)
+      result_temp <- apply_model(tempDataFrame = studySummary[, c(independentVariable, covariates, cols[i])], g_start = g_start , family = family_test, covariates = covariates,
+                                 key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder, independentVariable, depthAnalysis)
+      result <- rbind(result, result_temp)
+    }
+
+    result <- result[order(result$PVALUEADJ),]
+
+    # #browser()
+    studySummaryToPlot <- studySummary
+    studySummaryToPlot$Sample_Group  <- relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
+
+    if(family_test=="binomial")
+    {
+
+      chartFolder <- dir_check_and_create(resultFolderChart,"POPULATION_COMPARISON")
+
+      filename = file_path_build(cartFolder,file_result_prefix, "MUTATIONS.png",sep="")
+      grDevices::png(file= filename, width=2480,height=2480)
+      par(mfrow=c(1,3))
+      graphics::boxplot(MUTATIONS_HYPO~ studySummaryToPlot[,independentVariable],main="Hypo Mutations", data = studySummaryToPlot, cex=2)
+      graphics::boxplot(MUTATIONS_BOTH~studySummaryToPlot[,independentVariable], main="Both Type of Mutations", data = studySummaryToPlot, cex=2)
+      graphics::boxplot(MUTATIONS_HYPER~studySummaryToPlot[,independentVariable],main="Hyper Mutations", data = studySummaryToPlot, cex=2)
+      grDevices::dev.off()
+
+      filename = paste0( chartFolder,"/", file_result_prefix, "LESIONS.png",sep="")
+      grDevices::png(file= filename, width=2480,height=2480)
+      par(mfrow=c(1,3))
+      graphics::boxplot(LESIONS_HYPO~studySummaryToPlot[,independentVariable],main="Hypo Lesions", data = studySummaryToPlot, cex=2)
+      graphics::boxplot(LESIONS_BOTH~studySummaryToPlot[,independentVariable], main="Both Type of Lesions", data = studySummaryToPlot, cex=2)
+      graphics::boxplot(LESIONS_HYPER~studySummaryToPlot[,independentVariable],main="Hyper Lesions", data = studySummaryToPlot, cex=2)
+      grDevices::dev.off()
+    }
+
+    #browser()
+    if(depthAnalysis >1)
+    {
+
+      keys <- annotation_keys()
+      # #browser()
+      # areas <- rbind(genes, islands, dmrs)
+      nkeys <- dim(keys)[1]
+      # #browser()
+
+      parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_model"))
+      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind) %dopar%
+      # for (i in 1:nkeys)
+      {
+        # i <- 25
+        if(exists("tempDataFrame"))
+          rm(list = c("tempDataFrame"))
+        key <- keys [i,]
+        # print(key)
+        fname <-file_path_build(workingFolder,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+        # print(fname)
+        if (file.exists(fname))
+        {
+          tempDataFrame <- read.csv(fname, sep = ";")
+          row.names(tempDataFrame) <- tempDataFrame$X
+          tempDataFrame <- tempDataFrame[,-1]
+          tempDataFrame <- t(tempDataFrame)
+          if(nrow(tempDataFrame)>1)
+          {
+            message(nrow(tempDataFrame))
+            # tempDataFrame <- tempDataFrame[,-2]
+            tempDataFrame <- as.data.frame(tempDataFrame)
+            tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
+            tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
+
+            # #browser()
+            tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
+            tempDataFrame$POPULATION <- sample_names[, independentVariable]
+            tempDataFrame[is.na(tempDataFrame)] <- 0
+            #  we want to preserve the NA in the indipendent variables to be removed by the models
+            tempDataFrame[, independentVariable] <- sample_names[, independentVariable]
+            tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
+
+            cols <- (gsub(" ", "_", colnames(tempDataFrame[])))
+            cols <- (gsub("-", "_", cols))
+            cols <- (gsub(":", "_", cols))
+            cols <- (gsub("/", "_", cols))
+            cols <- (gsub("'", "_", cols))
+
+            colnames(tempDataFrame) <- cols
+
+            tempDataFrame <- as.data.frame(tempDataFrame)
+            # tempDataFrame$Sample_Group <- as.factor(tempDataFrame$Sample_Group)
+            # tempDataFrame$Sample_Group  <- relevel(tempDataFrame$Sample_Group, "Control")
+
+            g_start <- 2 + length(covariates)
+
+            result_temp <- apply_model(tempDataFrame = tempDataFrame, g_start = g_start, family = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE, logFolder= logFolder, independentVariable, depthAnalysis)
+
+            # #browser()
+            # n_adj <- iters - g_start
+            # result <- rbind(result, result_temp)
+            result_temp
+          }
+        }
+      }
+    }
+
+    if(exists("result_temp_foreach"))
+      result <- rbind(result, result_temp_foreach)
+
+    # browser()
+    result <- unique(result)
+    # result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="LESIONS" ,"PVALUEADJ" ] <- round(p.adjust(result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="LESIONS","PVALUE" ],method = "BH"),3)
+    # result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="MUTATIONS" ,"PVALUEADJ" ] <- round(p.adjust(result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="MUTATIONS","PVALUE" ],method = "BH"),3)
+
+    result <- result[order(result$PVALUEADJ),]
+
+    if(filterpvalue)
+        result <- subset(result, PVALUE < 0.05 | PVALUEADJ < 0.05)
+
+    if(nrow(result)>0)
+    {
+      if(is.null(covariates) || length(covariates)==0)
+      {
+        file_suffix <- "_test_result"
+      } else
+      {
+        file_suffix <- "_test_corrected_result"
+      }
+
+      fileName <- file_path_build(resultFolderInference,c(file_result_prefix , transformation, family_test, file_suffix),"csv")
+      write.csv2(result,fileName , row.names = FALSE)
+    }
+
+
+    # res.pvalue <- subset(result, PVALUE < 0.05)
+    # res.pvalue$beta_gt1 <- res.pvalue$BETA>1
+    # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
+
+    # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
+    # result <- read_csv(file.path(resultFolderInference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
+    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolderInference =  report.dir, filePrefix ="diff_meth_sites")
+
+    # case_vs_control_binomial_regression_corrected_result <-
+    #   read.csv2(
+    #     "/home/lcorsaro/Desktop/experiments_data/DIOSSINA_DESIO/3_semseeker_result/Pivots/case_vs_control_binomial_regression_corrected_result_1.csv"
+    #   )
+    # keys <- unique(result[, c("ANOMALY", "FIGURE", "GROUP", "SUBGROUP")])
+    #
+    # for (i in 1:dim(keys)[1])
+    # {
+    #   # i <- 2
+    #   key <- keys[i, ]
+    #   diffmeth.p.val <-
+    #     subset(result,
+    #            ANOMALY == key$ANOMALY)
+    #   diffmeth.p.val <-
+    #     subset(diffmeth.p.val, FIGURE == key$FIGURE)
+    #   diffmeth.p.val <- subset(diffmeth.p.val, GROUP == key$GROUP)
+    #
+    #   diffmeth.p.val <-
+    #     subset(diffmeth.p.val, SUBGROUP == key$SUBGROUP)
+    #
+    #   diffmeth.p.val <- subset(diffmeth.p.val,PVALUE !=0 )
+    #   if (dim(diffmeth.p.val)[1] <= 1)
+    #     return
+    #   #######inserisco nella funzione i pvalues ottenuti dalla differential (non aggiustati)
+    #
+    #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
+    #   qqunifPlot(diffmeth.p.val$PVALUE,
+    #               resultFolderInference = resultFolderInference,
+    #               filePrefix = file_prefix)
+    # }
+    #
+    #
+    #
+    # qqunif.plot(pvalues)
   }
-
-
-  result[ result$AREA_OF_TEST=="TOTAL","PVALUEADJ" ] <- round(p.adjust(result[ result$AREA_OF_TEST=="TOTAL","PVALUE" ],method = "BH"),3)
-  result <- result[order(result$PVALUEADJ),]
-
-  if(is.null(covariates) || length(covariates)==0)
-  {
-    file_suffix <- "_regression_result.csv"
-  } else
-  {
-    file_suffix <- "_regression_corrected_result.csv"
-  }
-
-  fileName <- paste(file_result_prefix , transformation, "_", family, file_suffix, sep = "")
-  write.csv2(result, file.path(
-    inferenceFolder,
-    fileName
-  ), row.names = FALSE)
-
-
-  return(fileName)
-  # res.pvalue <- subset(result, PVALUE < 0.05)
-  # res.pvalue$beta_gt1 <- res.pvalue$BETA>1
-  # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
-
-  # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
-  # result <- read_csv(file.path(inferenceFolder,paste(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
-  # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, inferenceFolder =  report.dir, filePrefix ="diff_meth_sites")
-
-  # case_vs_control_binomial_regression_corrected_result <-
-  #   read.csv2(
-  #     "/home/lcorsaro/Desktop/experiments_data/DIOSSINA_DESIO/3_semseeker_result/Pivots/case_vs_control_binomial_regression_corrected_result_1.csv"
-  #   )
-  # keys <- unique(result[, c("ANOMALY", "FIGURE", "GROUP", "SUBGROUP")])
-  #
-  # for (i in 1:dim(keys)[1])
-  # {
-  #   # i <- 2
-  #   key <- keys[i, ]
-  #   diffmeth.p.val <-
-  #     subset(result,
-  #            ANOMALY == key$ANOMALY)
-  #   diffmeth.p.val <-
-  #     subset(diffmeth.p.val, FIGURE == key$FIGURE)
-  #   diffmeth.p.val <- subset(diffmeth.p.val, GROUP == key$GROUP)
-  #
-  #   diffmeth.p.val <-
-  #     subset(diffmeth.p.val, SUBGROUP == key$SUBGROUP)
-  #
-  #   diffmeth.p.val <- subset(diffmeth.p.val,PVALUE !=0 )
-  #   if (dim(diffmeth.p.val)[1] <= 1)
-  #     next
-  #   #######inserisco nella funzione i pvalues ottenuti dalla differential (non aggiustati)
-  #
-  #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
-  #   qqunifPlot(diffmeth.p.val$PVALUE,
-  #               inferenceFolder = inferenceFolder,
-  #               filePrefix = file_prefix)
-  # }
-  #
-  #
-  #
-  # qqunif.plot(pvalues)
-
 }

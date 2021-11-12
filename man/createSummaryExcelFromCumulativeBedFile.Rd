@@ -5,16 +5,9 @@
 \title{createSummaryExcelFromCumulativeBedFile build an excel summary of figures and
 anomaly staring from the cumulative bed files into the result folder}
 \usage{
-createSummaryExcelFromCumulativeBedFile(
-  resultFolder,
-  probeFeatures,
-  sampleSheet
-)
+createSummaryExcelFromCumulativeBedFile(probeFeatures, sampleSheet)
 }
 \arguments{
-\item{resultFolder}{where the bed files are located and organized with
-anomaly and figure built tree}
-
 \item{probeFeatures}{probes information CHR, START, END and rowname
 as probenames}
 
@@ -24,6 +17,5 @@ as probenames}
 a saved excel file
 }
 \description{
-createSummaryExcelFromCumulativeBedFile build an excel summary of figures and
-anomaly staring from the cumulative bed files into the result folder
+anomaly and figure built tree
 }

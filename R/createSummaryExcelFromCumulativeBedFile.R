@@ -1,7 +1,6 @@
 #' createSummaryExcelFromCumulativeBedFile build an excel summary of figures and
 #' anomaly staring from the cumulative bed files into the result folder
 #'
-#' @param resultFolder where the bed files are located and organized with
 #' anomaly and figure built tree
 #' @param probeFeatures probes information CHR, START, END and rowname
 #' as probenames
@@ -11,18 +10,16 @@
 
 #'
 createSummaryExcelFromCumulativeBedFile <-
-  function(resultFolder,
-           probeFeatures,
+  function(probeFeatures,
            sampleSheet) {
 
     lesionsComparison <- NULL
     lesionsComparisonByGene <- NULL
 
-    fileName <- paste0(resultFolder, "/", "results.xlsx", sep = "")
+    fileName <- file_path_build(resultFolderData ,"results","xlsx")
 
     hyperLesionsResult <-
       createPivotResultFromMultipleBed(
-        resultFolder = resultFolder,
         anomalyLabel = "LESIONS",
         figureLable = "HYPER",
         probeFeatures = probeFeatures
@@ -34,7 +31,6 @@ createSummaryExcelFromCumulativeBedFile <-
 
     hypoLesionsResult <-
       createPivotResultFromMultipleBed(
-        resultFolder = resultFolder,
         anomalyLabel = "LESIONS",
         figureLable = "HYPO",
         probeFeatures = probeFeatures
@@ -45,7 +41,6 @@ createSummaryExcelFromCumulativeBedFile <-
 
     hyperMutationsResult <-
       createPivotResultFromMultipleBed(
-        resultFolder = resultFolder,
         anomalyLabel = "MUTATIONS",
         figureLable = "HYPER",
         probeFeatures = probeFeatures
@@ -56,7 +51,6 @@ createSummaryExcelFromCumulativeBedFile <-
 
     hypoMutationsResult <-
       createPivotResultFromMultipleBed(
-        resultFolder = resultFolder,
         anomalyLabel = "MUTATIONS",
         figureLable = "HYPO",
         probeFeatures = probeFeatures

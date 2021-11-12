@@ -4,16 +4,16 @@
 \alias{getMutations}
 \title{getMutations}
 \usage{
-getMutations(values, comparison, thresholds, probeFeatures, sampleName)
+getMutations(values, figure, thresholds, probeFeatures, sampleName)
 }
 \arguments{
 \item{values}{values of methylation}
 
-\item{comparison}{function to use for compare}
-
 \item{thresholds}{threshold to use for comparison}
 
 \item{probeFeatures}{probes features probe, chr, start,end}
+
+\item{comparison}{function to use for compare}
 }
 \value{
 mutations

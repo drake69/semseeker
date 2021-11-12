@@ -4,21 +4,12 @@
 \alias{dumpSampleAsBedFile}
 \title{given data and colnames dump as bed file}
 \usage{
-dumpSampleAsBedFile(
-  dataToDump,
-  fileExtension,
-  resultFolder,
-  resultSubFolder,
-  sampleName,
-  multipleFileColNames
-)
+dumpSampleAsBedFile(dataToDump, fileName)
 }
 \arguments{
 \item{dataToDump}{data frame to dump into bed file with CHR, START, END}
 
 \item{fileExtension}{extension to give to written file}
-
-\item{resultFolder}{root folder to save dumped files}
 
 \item{resultSubFolder}{folder under the root result folder to group files}
 

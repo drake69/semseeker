@@ -6,7 +6,6 @@
 analysis organized into files and folders per anomaly and produce a pivot}
 \usage{
 createChartFromMultipleBedGenericPerRegion(
-  resultFolder,
   populations,
   figures,
   anomalies,
@@ -17,8 +16,6 @@ createChartFromMultipleBedGenericPerRegion(
 )
 }
 \arguments{
-\item{resultFolder}{folder as root for bedfiles organized per anomaly}
-
 \item{populations}{vectors of populations name used to group populations
 for differential analysis}
 

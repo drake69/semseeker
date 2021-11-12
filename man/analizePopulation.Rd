@@ -8,13 +8,10 @@ report of pivot}
 analizePopulation(
   methylationData,
   slidingWindowSize,
-  resultFolder,
-  logFolder,
   betaSuperiorThresholds,
   betaInferiorThresholds,
   sampleSheet,
   betaMedians,
-  populationName,
   bonferroniThreshold = 0.05,
   probeFeatures
 )
@@ -24,10 +21,6 @@ analizePopulation(
 
 \item{slidingWindowSize}{size of the sliding widows to compute epilesions
 default 11 probes.}
-
-\item{resultFolder}{folder to save computed epimutations and bedgraphs files.}
-
-\item{logFolder}{folder to output log}
 
 \item{betaSuperiorThresholds}{data frame to select, from the sample sheet,
 samples to use as control as study population and as refereces two vectors
@@ -42,9 +35,6 @@ selector followed by selection value,}
 
 \item{betaMedians}{name of samplesheet's column to use as control population
 selector followed by selection value,}
-
-\item{populationName}{name of samplesheet's column to use as control
-population selector followed by selection value,}
 
 \item{bonferroniThreshold}{threshold to define which pValue accept for}
 

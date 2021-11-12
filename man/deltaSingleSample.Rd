@@ -6,25 +6,21 @@
 \usage{
 deltaSingleSample(
   values,
-  resultFolder,
   highThresholds,
   lowThresholds,
-  sampleName,
+  sampleDetail,
   betaMedians,
-  subFileExtension,
   probeFeatures
 )
 }
 \arguments{
 \item{values}{values of methylation}
 
-\item{resultFolder}{folder to store result files}
-
 \item{highThresholds}{highest threshold to use for comparison}
 
 \item{lowThresholds}{lowest threshold to use for comparison}
 
-\item{sampleName}{name of sample to analyze}
+\item{sampleDetail}{details of sample to analyze}
 
 \item{betaMedians}{median to use for calculation}
 

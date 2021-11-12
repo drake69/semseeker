@@ -8,9 +8,15 @@
 #' @return mutations
 #'
 #'
-getMutations <- function(values, comparison,thresholds, probeFeatures, sampleName)
+getMutations <- function(values, figure,thresholds, probeFeatures, sampleName)
 {
   ### get probesOverThreshold ################################################################################################
+
+  comparison <- switch(
+    figure,
+    "HYPO"=`<`,
+    "HYPER"=`>`
+  )
 
   mutation <- as.numeric(comparison(values, thresholds))
   message(sampleName, " ", "Got probesOverThreshold ", Sys.time())

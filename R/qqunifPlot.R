@@ -1,7 +1,7 @@
 qqunifPlot<-function(pvalues,resultFolder,filePrefix,
                       should.thin=T, thin.obs.places=2, thin.exp.places=2,
-                      xlab=expression(paste("Expected (",-log[10], " p-value)")),
-                      ylab=expression(paste("Observed (",-log[10], " p-value)")),
+                      xlab=expression(paste0("Expected (",-log[10], " p-value)")),
+                      ylab=expression(paste0("Observed (",-log[10], " p-value)")),
                       draw.conf=TRUE, conf.points=1000, conf.col="lightgray", conf.alpha=.05,
                       already.transformed=FALSE, pch=20, aspect="iso", prepanel=prepanel.qqunif,
                       par.settings=list(superpose.symbol=list(pch=pch)), ...) {
@@ -107,7 +107,7 @@ qqunifPlot<-function(pvalues,resultFolder,filePrefix,
                            panel.abline(0,1);
                          }, par.settings=par.settings, ...
   )
-  trellis.device(device="png", filename=file.path(resultFolder,paste( "qqplot_", filePrefix, ".png", sep="")))
+  trellis.device(device="png", filename=file.path(resultFolder,paste0( "qqplot_", filePrefix, ".png", sep="")))
   print(result.chart)
   dev.off()
 }
