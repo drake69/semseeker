@@ -4,8 +4,6 @@
 #' @param methylationData whole matrix of data to analyze.
 #' @param slidingWindowSize size of the sliding widows to compute epilesions
 #' default 11 probes.
-#' @param resultFolder folder to save computed epimutations and bedgraphs files.
-#' @param logFolder folder to output log
 #' @param betaSuperiorThresholds  data frame to select, from the sample sheet,
 #' samples to use as control as study population and as refereces two vectors
 #' within the first vector the names of the selection colum and tha second
@@ -16,52 +14,28 @@
 #' selector followed by selection value,
 #' @param betaMedians name of samplesheet's column to use as control population
 #' selector followed by selection value,
-#' @param populationName name of samplesheet's column to use as control
-#' population selector followed by selection value,
 #' @param bonferroniThreshold threshold to define which pValue accept for
 #' @param probeFeatures probes detail from 27 to EPIC illumina dataset
 #' lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
 
 #' @importFrom foreach %dopar%
-analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, logFolder, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, populationName, bonferroniThreshold = 0.05, probeFeatures) {
+analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, bonferroniThreshold = 0.05, probeFeatures) {
 
-  if (.Platform$OS.type == "windows") {
-    withAutoprint({
-      utils::memory.size()
-      utils::memory.size(TRUE)
-      utils::memory.limit(16000)
-    })
-  }
 
+  # browser()
   start_time <- Sys.time()
   message("... warmingUP ", Sys.time())
 
-  if (logFolder != "" && !dir.exists(logFolder)) {
-    dir.create(logFolder)
-  }
-
-  resultFolderBase <- resultFolder
   # population folder check
-  resultFolder <- paste0(resultFolder, "/", populationName)
-  if (resultFolder != "" && !dir.exists(resultFolder)) {
-    dir.create(resultFolder)
-  }
 
   parallel::clusterExport(envir=environment(), cl = computationCluster,
-                          varlist = list( "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample",
+                          varlist = list( "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample","dir_check_and_create","resultFolderData","file_path_build","analyzeSingleSampleBoth","keys.figures",
                                       "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame",
-                                      "getMutations", "analyzeSingleSampleBothThresholds",
-                                      "PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body"))
+                                      "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body"))
 
   ### get beta_values ########################################################
   sampleSheet <- sampleSheet[order(sampleSheet[, "Sample_ID"], decreasing = FALSE), ]
-  sampleSheet[, "Probes_Count"] <- 0
-  sampleSheet[, "MUTATIONS_HYPER"] <- 0
-  sampleSheet[, "LESIONS_HYPER"] <- 0
-  sampleSheet[, "MUTATIONS_HYPO"] <- 0
-  sampleSheet[, "LESIONS_HYPO"] <- 0
-
   existentSamples <- colnames(methylationData)
   sampleNames <- sampleSheet$Sample_ID
   sampleToSelect <- existentSamples[sampleNames %in% existentSamples]
@@ -74,182 +48,98 @@ analizePopulation <- function(methylationData, slidingWindowSize, resultFolder, 
   message("WarmedUP ...", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  summaryFileName <- file.path(resultFolder, "summary.csv")
-  system(paste0("echo '", paste(colnames(sampleSheet), collapse = ","), "' > ", summaryFileName, sep = ""))
+  summaryFileName <- file.path(resultFolderData, "summary.csv")
 
-  columnIndexes <- which((colnames(methylationData)%in%sampleSheet$Sample_ID))
-
-  # browser()
-  i <- NULL
-  # for (i in columnIndexes) {
-
-
-  splittedColumnIndexes <- split(columnIndexes, ceiling(seq_along(columnIndexes)/200))
-
-  # availableRam <- memuse::Sys.meminfo()$freeram@size
-  # mDataSize <-  pryr::object_size(methylationData)
-  # maxDataSize <- availableRam * 0.9 /nCore
-
-  for (x in 1:length(splittedColumnIndexes))
-  {
-    # browser()
-    betaValues <- methylationData[,as.vector(unlist(splittedColumnIndexes[x]))]
-
-    # betaValuesHyper <- betaValues[betaValues > betaSuperiorThresholds]  - betaSuperiorThresholds
-    # betaValuesHypo <- betaInferiorThresholds - betaValues[betaValues < betaInferiorThresholds]
-
-    foreach::foreach(i = 1:dim(betaValues)[2] , .packages=c("dplyr")) %dopar% {
-    # for(i in 1:dim(betaValues)[2] ) {
-
-      sampleName <- colnames(betaValues)[i]
-      # browser()
-      message("Starting sample analysis number: ", i, " ", Sys.time())
-      sampleDetail <- sampleSheet[sampleSheet$Sample_ID==sampleName, ]
-      colnames(sampleDetail) <- colnames(sampleSheet)
-
-      deltaSingleSample(
-        probeFeatures = probeFeatures,  values = betaValues[i], resultFolder = resultFolder, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleName = sampleDetail$Sample_ID,
-        betaMedians = betaMedians, subFileExtension = "DELTAS"
-      )
-
-      sampleStatusTemp <- analyzeSingleSample(
-        values = betaValues[i], slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaSuperiorThresholds, comparison = `>`, sampleName = sampleDetail$Sample_ID,
-        subFileExtension = "HYPER", bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures
-      )
-
-      # browser()
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Probes_Count", cellValue = sampleStatusTemp["probesCount"])
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPER", cellValue = sampleStatusTemp["mutationCount"])
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPER", cellValue = sampleStatusTemp["lesionCount"])
-
-      sampleStatusTemp <- analyzeSingleSample(
-        values = betaValues[i], slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaInferiorThresholds, comparison = `<`, sampleName = sampleDetail$Sample_ID,
-        subFileExtension = "HYPO", probeFeatures = probeFeatures
-      )
-
-      # # browser()
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPO", cellValue = sampleStatusTemp["mutationCount"])
-      sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPO", cellValue = sampleStatusTemp["lesionCount"])
-
-      tempExtension <- stringi::stri_rand_strings(1, 10)
-      filePath <- file.path(paste(summaryFileName, tempExtension,sep=""))
-      utils::write.table(sampleDetail, file = filePath, quote = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
-
-      analyzeSingleSampleBothThresholds(values= betaValues[i], resultFolder =  resultFolder,betaSuperiorThresholds =  betaSuperiorThresholds,
-                                        betaInferiorThresholds =  betaInferiorThresholds, sampleName =  sampleDetail$Sample_ID, probeFeatures =  probeFeatures )
-
-      if (.Platform$OS.type == "windows") {
-
-        command <- paste0("type ", (filePath), " > ",(summaryFileName), sep = "")
-        command <- gsub ("/","\\\\",command)
-        shell(command, intern = TRUE)
-
-        command <- paste0("del ", (filePath), sep = "")
-        command <- gsub ("/","\\\\",command)
-        #print(command)
-        shell(command, intern = TRUE)
-        # system2(paste0("type ", shQuote(filePath), " > ",shQuote(summaryFileName), sep = ""))
-        # system2(paste0("rm ", filePath, sep = ""))
-      } else
-      {
-        system(paste0("cat ", filePath, " >> ", summaryFileName, sep = ""))
-        system(paste0("rm ", filePath, sep = ""))
-      }
-
-      gc()
-    }
-
-    rm(betaValues)
-    gc()
-  }
-
-
-  # myTest <- function(betaData)
+  # columnIndexes <- which((colnames(methylationData)%in%sampleSheet$Sample_ID))
+  # splittedColumnIndexes <- split(columnIndexes, ceiling(seq_along(columnIndexes)/200))
+  # for (x in 1:length(splittedColumnIndexes))
   # {
-  #     sampleName <- colnames(betadata)
-  #     # browser()
-  #     message("Starting sample analysis number: ", i, " ", Sys.time())
-  #     sampleDetail <- sampleSheet[sampleSheet$Sample_ID==sampleName, ]
-  #     colnames(sampleDetail) <- colnames(sampleSheet)
+  #   betaValues <- methylationData[,as.vector(unlist(splittedColumnIndexes[x]))]
+  #   foreach::foreach(i = 1:ncol(betaValues) , .packages=c("dplyr")) %dopar%{
   #
-  #     deltaSingleSample(
-  #       probeFeatures = probeFeatures,  values = betaData, resultFolder = resultFolder, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleName = sampleDetail$Sample_ID,
-  #       betaMedians = betaMedians, subFileExtension = "DELTAS"
-  #     )
   #
-  #     sampleStatusTemp <- analyzeSingleSample(
-  #       values = betaData, slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaSuperiorThresholds, comparison = `>`, sampleName = sampleDetail$Sample_ID,
-  #       subFileExtension = "HYPER", bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures
-  #     )
+  #     localSampleDetail <- sampleSheet[sampleSheet$Sample_ID==colnames(betaValues)[i],]
+  #     message("Meth data rows: ", nrow(betaValues[i]))
+  #     message("Starting sample analysis number: ", localSampleDetail$Sample_ID, " ", Sys.time())
   #
-  #     # browser()
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "Probes_Count", cellValue = sampleStatusTemp["probesCount"])
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPER", cellValue = sampleStatusTemp["mutationCount"])
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPER", cellValue = sampleStatusTemp["lesionCount"])
+  #     localBetaValues <- betaValues[i]
+  #     message("####",length(localBetaValues))
+  #     message("betas selected - !", length(localBetaValues))
   #
-  #     sampleStatusTemp <- analyzeSingleSample(
-  #       values = betaData, slidingWindowSize = slidingWindowSize, resultFolder = resultFolder, thresholds = betaInferiorThresholds, comparison = `<`, sampleName = sampleDetail$Sample_ID,
-  #       subFileExtension = "HYPO", probeFeatures = probeFeatures
-  #     )
+  #     message("class sample detail:",class(localSampleDetail))
   #
-  #     # # browser()
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "MUTATIONS_HYPO", cellValue = sampleStatusTemp["mutationCount"])
-  #     sampleDetail <- addCellToDataFrame(sampleDetail, colSelection = "Sample_ID", cellValueSelection = sampleDetail$Sample_ID, colname = "LESIONS_HYPO", cellValue = sampleStatusTemp["lesionCount"])
+  #     deltaResult <- deltaSingleSample(values = localBetaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
+  #     message( "Deltas done !")
   #
-  #     tempExtension <- stringi::stri_rand_strings(1, 10)
-  #     filePath <- paste0(summaryFileName, tempExtension, sep = "")
-  #     utils::write.table(sampleDetail, file = filePath, quote = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
+  #     hyperResult <- analyzeSingleSample(values = localBetaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+  #     message( "Hyper done !")
+  #     hypoResult <- analyzeSingleSample(values = localBetaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+  #     message( "Hypo done !")
+  #     bothResult <- analyzeSingleSampleBoth(sampleDetail =  localSampleDetail)
+  #     message( "Both done !")
+  #     sampleStatusTemp <- c( "Sample_ID"=localSampleDetail$Sample_ID, deltaResult, hyperResult, hypoResult, bothResult)
+  #     message( "sampleStatusTemp done !")
   #
-  #     if (.Platform$OS.type == "windows") {
   #
-  #       command <- paste0("type ", (filePath), " > ",(summaryFileName), sep = "")
-  #       command <- gsub ("/","\\\\",command)
-  #       shell(command, intern = TRUE)
+  #     sampleStatusTemp <- data.frame(sampleStatusTemp)
+  #     sampleStatusTemp <- data.frame(t(sampleStatusTemp))
+  #     rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
+  #     sampleStatusTemp
   #
-  #       command <- paste0("del ", (filePath), sep = "")
-  #       command <- gsub ("/","\\\\",command)
-  #       #print(command)
-  #       shell(command, intern = TRUE)
-  #       # system2(paste0("type ", shQuote(filePath), " > ",shQuote(summaryFileName), sep = ""))
-  #       # system2(paste0("rm ", filePath, sep = ""))
-  #     } else
-  #     {
-  #       system(paste0("cat ", filePath, " >> ", summaryFileName, sep = ""))
-  #       system(paste0("rm ", filePath, sep = ""))
   #     }
   # }
-  #
-  #
-  # parallel::parApply(computationCluster, methylationData[, columnIndexes] , 2, myTest)
+
+  cycles <- nrow(sampleSheet)
+  # browser()
+    summaryPopulation <- foreach::foreach(i = 1:cycles, .combine='rbind', .export=ls(envir=globalenv()), .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
+    # for(i in 1:nrow(sampleSheet) ) {
+
+      localSampleDetail <- sampleSheet[i,]
+      message("Meth data rows: ", nrow(methylationData))
+      message("Starting sample analysis number: ", localSampleDetail$Sample_ID, " ", Sys.time())
+
+      betaValues <- methylationData[, localSampleDetail$Sample_ID]
+      message("####",length(betaValues))
+      message("betas selected - !", length(betaValues))
+
+      message("class sample detail:",class(localSampleDetail))
+
+      deltaResult <- deltaSingleSample(values = betaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
+      message( "Deltas done !")
+
+      hyperResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+      message( "Hyper done !")
+      hypoResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+      message( "Hypo done !")
+      bothResult <- analyzeSingleSampleBoth(sampleDetail =  localSampleDetail)
+      message( "Both done !")
+      sampleStatusTemp <- c( "Sample_ID"=localSampleDetail$Sample_ID, deltaResult, hyperResult, hypoResult, bothResult)
+      message( "sampleStatusTemp done !")
 
 
-  sampleSheet <- utils::read.csv(file = summaryFileName)
-  #file.remove(summaryFileName)
+      sampleStatusTemp <- data.frame(sampleStatusTemp)
+      sampleStatusTemp <- data.frame(t(sampleStatusTemp))
+      rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
+      message("Iteration: ", i)
+      # if(!exists("summaryPopulation"))
+      #   summaryPopulation <- sampleStatusTemp
+      # else
+      #   summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
+      as.data.frame(sampleStatusTemp)
 
-  ### get countProbesEpiMutatedPerSample ######################################################### probes_above_high_thresholds <- beta_values > betaSuperiorThresholds probes_below_low_thresholds <- beta_values <
-  ### betaInferiorThresholds count_probes_above_high_threshold_per_sample <- colSums(probes_above_high_thresholds) count_probes_below_low_threshold_per_sample <- colSums(probes_below_low_thresholds)
-  ### count_probes_out_of_range_per_sample <- count_probes_above_high_threshold_per_sample + count_probes_below_low_threshold_per_sample count_probes_epi_mutated_per_sample <- data.frame( 'Sample' = sampleSheet$Sample_ID,
-  ### count_probes_below_low_threshold_per_sample, count_probes_above_high_threshold_per_sample, count_probes_out_of_range_per_sample) write.table(count_probes_epi_mutated_per_sample, paste(resultFolder, '/', 'TAB_EPIMUT.txt', sep =
-  ### ''), sep = '\t', row.names = FALSE, col.names = FALSE, quote = FALSE) message('Got countProbesEpiMutatedPerSample ', Sys.time() ) rm(count_probes_above_high_threshold_per_sample) rm(count_probes_below_low_threshold_per_sample)
-  ### rm(count_probes_out_of_range_per_sample) rm(count_probes_epi_mutated_per_sample)
+    }
+    message("Row count result:", nrow(summaryPopulation))
+    rm(methylationData)
+    gc()
 
-  ### get epiMutationBurden ##############################################################################
 
-  # probesOutOfRange <- (probes_above_high_thresholds) + (probes_below_low_thresholds) epiMutationPerProbes <- rowSums(probesOutOfRange) epiMutationBurden <- data.frame( row.names = probePositions$PROBE, epiMutationPerProbes,
-  # probePositions$PROBE) colnames(epiMutationBurden) <- c('Burden', 'PROBE') epiMutationAbovePerProbes <- rowSums(probes_above_high_thresholds) epiMutationAboveBurden <- data.frame(row.names = probePositions$PROBE,
-  # epiMutationAbovePerProbes, probePositions$PROBE) colnames(epiMutationAboveBurden) <- c('Burden', 'PROBE') epiMutationBelowBurden <- data.frame(rowSums(probes_below_low_thresholds), probePositions$PROBE)
-  # colnames(epiMutationBelowBurden) <- c('Burden', 'PROBE') epiMutation <- data.frame(epiMutationBurden, probesOutOfRange) rm(epiMutationBurden) rm(probesOutOfRange) rm(epiMutationPerProbes) rm(epiMutationAbovePerProbes)
-  # message('Got epiMutationBelowBurden ', Sys.time() ) ### get epiMutation ############################################################################## # epiMutationAbove <- data.frame(epiMutationAboveBurden,
-  # probes_above_high_thresholds) # epiMutationBelow <- data.frame(epiMutationBelowBurden, probes_below_low_thresholds) epiMutation <- subset(epiMutation, epiMutation$Burden > 0) write.table(epiMutation, paste(resultFolder, '/',
-  # 'EPIMUTATIONs.txt', sep = ''), sep = '\t', row.names = FALSE, quote = FALSE) rm(epiMutation) rm(epiMutationBelowBurden) message('Got epiMutation ', Sys.time() )
-
-  gc()
+    createMultipleBed()
 
   message("Completed population analysis ", Sys.time())
-
-  # xPlot <- colnames(dataToGraph)[-c('SAMPLEID')] plot( xPlot, dataToGraph[2,2:dim(dataToGraph)[2]] ,type = 'l',col = 'red') for (z in 3:dim(dataToGraph)[1]) { lines(xPlot, dataToGraph[z,2:dim(dataToGraph)[2]], col = 'green') }
   end_time <- Sys.time()
   time_taken <- (end_time - start_time)
   message("Completed population with Excel summary", Sys.time(), " Time taken: ", time_taken)
+
+  return(summaryPopulation)
 }
 
