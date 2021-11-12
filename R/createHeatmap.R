@@ -9,33 +9,17 @@
 #' @param probesPrefix definition of prefix to use probes to load
 #' @param groupLabel name of column to group the data set
 #' @param subGroupLabel  name of column to sub group the data set
-#' @param resultFolder folder as root for bedfiles organized per anomaly
 #' @param  logFolder log folder used by the parallel cluster
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
 
 #'
 createHeatmap <-
-  function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ,resultFolder, logFolder) {
+  function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
-    nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
-    outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
-    # print(outFile)
-    computation_cluster <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
-    doParallel::registerDoParallel(computation_cluster)
+    parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
 
-    # options(digits = 22)
-    parallel::clusterExport(envir=environment(), cl = computation_cluster, varlist =c())
-
-    chartFolder <- paste(resultFolder, "/Charts/", sep="")
-    if (chartFolder != "" && !dir.exists(chartFolder)) {
-      dir.create(chartFolder)
-    }
-
-    chartFolder <- paste(resultFolder, "/Charts/", groupLabel,"/", sep="")
-    if (chartFolder != "" && !dir.exists(chartFolder)) {
-      dir.create(chartFolder)
-    }
+    chartFolder <- dir_check_and_create(resultFolderChart,groupLabel)
 
     if (is.null(inputBedDataFrame))
       return()
@@ -48,14 +32,14 @@ createHeatmap <-
     inputBedDataFrame$ANOMALY <- as.factor(inputBedDataFrame$ANOMALY)
     inputBedDataFrame$POPULATION <- as.factor(inputBedDataFrame$POPULATION)
 
-    # inputBedDataFrame <- data.frame(inputBedDataFrame, "KEY" = paste(inputBedDataFrame[, groupColumnID],"_",inputBedDataFrame$FIGURE,sep=""))
+    # inputBedDataFrame <- data.frame(inputBedDataFrame, "KEY" = paste0(inputBedDataFrame[, groupColumnID],"_",inputBedDataFrame$FIGURE,sep=""))
     if(length(groupColumnIDs)==2)
     {
-      inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste(inputBedDataFrame[, groupColumnIDs[1]],"_",inputBedDataFrame[, groupColumnIDs[2]],"_",inputBedDataFrame$FIGURE,sep=""))
+      inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste0(inputBedDataFrame[, groupColumnIDs[1]],"_",inputBedDataFrame[, groupColumnIDs[2]],"_",inputBedDataFrame$FIGURE,sep=""))
     }
     if(length(groupColumnIDs)==1)
     {
-      inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste(inputBedDataFrame[, groupColumnIDs[1]],"_",inputBedDataFrame$FIGURE,sep=""))
+      inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste0(inputBedDataFrame[, groupColumnIDs[1]],"_",inputBedDataFrame$FIGURE,sep=""))
     }
     inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
     inputBedDataFrame <- subset(inputBedDataFrame, POPULATION != "Reference")
@@ -85,12 +69,12 @@ createHeatmap <-
       # mine.heatmap <- mine.heatmap + ggplot2::ylab(label = "SAMPLE NAME")
       # mine.heatmap <- mine.heatmap +  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
       #
-      # # filename = paste( chartFolder,"/",paste( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
+      # # filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
       # # grDevices::png(file= filename, width=1200, height=1200)
       # # mine.heatmap
       # # grDevices::dev.off()
       #
-      # filename = paste( chartFolder,"/",paste( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
+      # filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
       #
       # try(
       #   ggplot2::ggsave(
@@ -114,8 +98,8 @@ createHeatmap <-
       tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "FREQ", sum)
       row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
 
-      mainTitle <- paste( paste( pops, collapse ="_Vs_")," ", groupLabel," ",anomaly, sep="")
-      if(nrow(tempDataFrame)>65535 || ncol(tempDataFrame)>65535)
+      mainTitle <- paste0( paste0( pops, collapse ="_Vs_")," ", groupLabel," ",anomaly, sep="")
+      if(nrow(tempDataFrame)>1000 || ncol(tempDataFrame)>1000)
       {
         #reduce
         temp2 <- as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]])
@@ -128,12 +112,12 @@ createHeatmap <-
         rm(temp)
         rm(temp1)
         rm(temp2)
-        mainTitle <- paste( mainTitle," (first 1000)",  sep="")
+        mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
       }
 
       # col<- colorRampPalette(c("violet","white","blue"))(1024)
 
-      filename = paste( chartFolder,"/",paste( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
+      filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
       grDevices::png(file= filename, width=2480, height = 2480)
       stats::heatmap(as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]]),
                      # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
@@ -144,7 +128,5 @@ createHeatmap <-
                     )
       grDevices::dev.off()
     }
-    parallel::stopCluster(computation_cluster)
     gc()
-
 }
