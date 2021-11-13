@@ -136,9 +136,11 @@ semseeker <- function(sampleSheet,
       probeFeatures = PROBES
     )
 
+    createMultipleBed(populationSampleSheet)
+
     resultPopulation <- as.data.frame(resultPopulation)
-    if(nrow(resultPopulation) != nrow(populationSampleSheet) )
-      browser()
+    # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
+    #   browser()
 
     if(!exists("resultSampleSheet"))
       resultSampleSheet <- resultPopulation
@@ -148,7 +150,7 @@ semseeker <- function(sampleSheet,
     rm(populationSampleSheet)
   }
 
-  browser()
+  # browser()
   samplesID <- sampleSheet$Sample_ID
   sampleSheet <- sampleSheet[, !(colnames(sampleSheet) %in% colnames(resultSampleSheet))]
   sampleSheet$Sample_ID <- samplesID
