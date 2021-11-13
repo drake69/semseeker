@@ -4,28 +4,37 @@ test_that("readMultipleBed", {
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   init_env(tempFolder)
-  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")
-  Sample_Group <- "Control"
 
-  nitem <- 100
-
-  tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
-  values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
+  nitem <- 5e4
+  nsamples <- 5
+  methylationData <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
+  methylationData <- as.data.frame(matrix(methylationData,nitem,nsamples))
   probeFeatures <- PROBES[!is.na(PROBES$CHR),]
   probeFeatures <- probeFeatures[probeFeatures$PROBE %in% sample(x=probeFeatures[,"PROBE"] , size=nitem),]
-  row.names(tresholds) <- probeFeatures$PROBE
-  row.names(values) <- row.names(tresholds)
 
-  sampleDetail <- data.frame("Sample_ID"=Sample_ID, "Sample_Group"=Sample_Group)
+  betaSuperiorThresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
+  betaInferiorThresholds <- data.frame(rnorm(nitem, mean=0.2, sd=0.2))
 
-  sp <- analyzeSingleSample(values = values,
-                            slidingWindowSize = 11,
-                            thresholds = tresholds,
-                            figure = "HYPO",
-                            sampleDetail = sampleDetail ,
-                            bonferroniThreshold = 0.05,
-                            probeFeatures = probeFeatures)
+  row.names(betaSuperiorThresholds) <- probeFeatures$PROBE
+  row.names(betaInferiorThresholds) <- probeFeatures$PROBE
+  row.names(methylationData) <- probeFeatures$PROBE
 
+  Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z0-9]")
+  colnames(methylationData) <- Sample_ID
+  Sample_Group <- rep("Control",nsamples)
+  sampleSheet <- data.frame(Sample_Group, Sample_ID)
+
+  sp <- analizePopulation(methylationData=methylationData,
+                          slidingWindowSize = 11,
+                          betaSuperiorThresholds = betaSuperiorThresholds,
+                          betaInferiorThresholds = betaInferiorThresholds,
+                          sampleSheet = sampleSheet,
+                          betaMedians = betaSuperiorThresholds - betaInferiorThresholds,
+                          bonferroniThreshold = 0.01,
+                          probeFeatures = probeFeatures
+  )
+
+  createMultipleBed(sampleSheet)
 
   figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("MUTATIONS","LESIONS")
@@ -34,16 +43,12 @@ test_that("readMultipleBed", {
   probesPrefix = "PROBES_Gene_"
   columnLabel =  "GENE"
   groupingColumnLabel="GROUP"
-  populationName <- Sample_Group
+  populationName <- unique(Sample_Group)
 
   probeFeatures <- get(paste0(probesPrefix,"Whole",sep=""))
 
+  res <-readMultipleBed ("MUTATIONS", "BOTH", probeFeatures, columnLabel, populationName, groupingColumnLabel)
 
-
-  res <-readMultipleBed ("MUTATIONS", "HYPO", probeFeatures, columnLabel, populationName, groupingColumnLabel)
-
-  # outputFolder <- dir_check_and_create(resultFolderData,c("Control","MUTATIONS_HYPO"))
-  # fileName <- file_path_build(outputFolder,c(Sample_ID,"MUTATIONS","HYPO"), "bed")
   expect_true(nrow(res)>0)
 }
 )

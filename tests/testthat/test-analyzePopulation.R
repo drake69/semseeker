@@ -1,6 +1,3 @@
-
-
-
 test_that("analizePopulation", {
 
   library(stringi)
@@ -24,22 +21,22 @@ test_that("analizePopulation", {
   Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z0-9]")
   colnames(methylationData) <- Sample_ID
   Sample_Group <- rep("Control",nsamples)
-  sampleSheet <- data.frame(Sample_Group, Sample_ID)
+  mySampleSheet <- data.frame(Sample_Group, Sample_ID)
 
   sp <- analizePopulation(methylationData=methylationData,
                     slidingWindowSize = 11,
                     betaSuperiorThresholds = betaSuperiorThresholds,
                     betaInferiorThresholds = betaInferiorThresholds,
-                    sampleSheet = sampleSheet,
+                    sampleSheet = mySampleSheet,
                     betaMedians = betaSuperiorThresholds - betaInferiorThresholds,
                     bonferroniThreshold = 0.01,
                     probeFeatures = probeFeatures
                     )
 
-  expect_true(nrow(sp)==nrow(sampleSheet))
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
-  unlink(tempFolder, recursive = TRUE)
+  expect_true(nrow(sp)==nrow(mySampleSheet))
+  # doParallel::stopImplicitCluster()
+  # parallel::stopCluster(computationCluster)
+  # unlink(tempFolder, recursive = TRUE)
   # outputFolder <- dir_check_and_create(resultFolderData,c("Control","MUTATIONS_HYPO"))
   # fileName <- file_path_build(outputFolder,c("MULTIPLE","MUTATIONS","HYPO"), "bed")
   # expect_equal(2 * 2, 4)
