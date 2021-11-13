@@ -50,90 +50,48 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
 
   summaryFileName <- file.path(resultFolderData, "summary.csv")
 
-  # columnIndexes <- which((colnames(methylationData)%in%sampleSheet$Sample_ID))
-  # splittedColumnIndexes <- split(columnIndexes, ceiling(seq_along(columnIndexes)/200))
-  # for (x in 1:length(splittedColumnIndexes))
-  # {
-  #   betaValues <- methylationData[,as.vector(unlist(splittedColumnIndexes[x]))]
-  #   foreach::foreach(i = 1:ncol(betaValues) , .packages=c("dplyr")) %dopar%{
-  #
-  #
-  #     localSampleDetail <- sampleSheet[sampleSheet$Sample_ID==colnames(betaValues)[i],]
-  #     message("Meth data rows: ", nrow(betaValues[i]))
-  #     message("Starting sample analysis number: ", localSampleDetail$Sample_ID, " ", Sys.time())
-  #
-  #     localBetaValues <- betaValues[i]
-  #     message("####",length(localBetaValues))
-  #     message("betas selected - !", length(localBetaValues))
-  #
-  #     message("class sample detail:",class(localSampleDetail))
-  #
-  #     deltaResult <- deltaSingleSample(values = localBetaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
-  #     message( "Deltas done !")
-  #
-  #     hyperResult <- analyzeSingleSample(values = localBetaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-  #     message( "Hyper done !")
-  #     hypoResult <- analyzeSingleSample(values = localBetaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-  #     message( "Hypo done !")
-  #     bothResult <- analyzeSingleSampleBoth(sampleDetail =  localSampleDetail)
-  #     message( "Both done !")
-  #     sampleStatusTemp <- c( "Sample_ID"=localSampleDetail$Sample_ID, deltaResult, hyperResult, hypoResult, bothResult)
-  #     message( "sampleStatusTemp done !")
-  #
-  #
-  #     sampleStatusTemp <- data.frame(sampleStatusTemp)
-  #     sampleStatusTemp <- data.frame(t(sampleStatusTemp))
-  #     rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
-  #     sampleStatusTemp
-  #
-  #     }
-  # }
-
   cycles <- nrow(sampleSheet)
   # browser()
-    summaryPopulation <- foreach::foreach(i = 1:cycles, .combine='rbind', .export=ls(envir=globalenv()), .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
-    # for(i in 1:nrow(sampleSheet) ) {
+  summaryPopulation <- foreach::foreach(i = 1:cycles, .combine='rbind', .export=ls(envir=globalenv()), .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
+  # for(i in 1:nrow(sampleSheet) ) {
 
-      localSampleDetail <- sampleSheet[i,]
-      message("Meth data rows: ", nrow(methylationData))
-      message("Starting sample analysis number: ", localSampleDetail$Sample_ID, " ", Sys.time())
+    localSampleDetail <- sampleSheet[i,]
+    message("Meth data rows: ", nrow(methylationData))
+    message("Starting sample analysis number: ", localSampleDetail$Sample_ID, " ", Sys.time())
 
-      betaValues <- methylationData[, localSampleDetail$Sample_ID]
-      message("####",length(betaValues))
-      message("betas selected - !", length(betaValues))
+    betaValues <- methylationData[, localSampleDetail$Sample_ID]
+    message("####",length(betaValues))
+    message("betas selected - !", length(betaValues))
 
-      message("class sample detail:",class(localSampleDetail))
+    message("class sample detail:",class(localSampleDetail))
 
-      deltaResult <- deltaSingleSample(values = betaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
-      message( "Deltas done !")
+    deltaResult <- deltaSingleSample(values = betaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
+    message( "Deltas done !")
 
-      hyperResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-      message( "Hyper done !")
-      hypoResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-      message( "Hypo done !")
-      bothResult <- analyzeSingleSampleBoth(sampleDetail =  localSampleDetail)
-      message( "Both done !")
-      sampleStatusTemp <- c( "Sample_ID"=localSampleDetail$Sample_ID, deltaResult, hyperResult, hypoResult, bothResult)
-      message( "sampleStatusTemp done !")
-
-
-      sampleStatusTemp <- data.frame(sampleStatusTemp)
-      sampleStatusTemp <- data.frame(t(sampleStatusTemp))
-      rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
-      message("Iteration: ", i)
-      # if(!exists("summaryPopulation"))
-      #   summaryPopulation <- sampleStatusTemp
-      # else
-      #   summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
-      as.data.frame(sampleStatusTemp)
-
-    }
-    message("Row count result:", nrow(summaryPopulation))
-    rm(methylationData)
-    gc()
+    hyperResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+    message( "Hyper done !")
+    hypoResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+    message( "Hypo done !")
+    bothResult <- analyzeSingleSampleBoth(sampleDetail =  localSampleDetail)
+    message( "Both done !")
+    sampleStatusTemp <- c( "Sample_ID"=localSampleDetail$Sample_ID, deltaResult, hyperResult, hypoResult, bothResult)
+    message( "sampleStatusTemp done !")
 
 
-    createMultipleBed()
+    sampleStatusTemp <- data.frame(sampleStatusTemp)
+    sampleStatusTemp <- data.frame(t(sampleStatusTemp))
+    rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
+    message("Iteration: ", i)
+    # if(!exists("summaryPopulation"))
+    #   summaryPopulation <- sampleStatusTemp
+    # else
+    #   summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
+    as.data.frame(sampleStatusTemp)
+
+  }
+  message("Row count result:", nrow(summaryPopulation))
+  rm(methylationData)
+  gc()
 
   message("Completed population analysis ", Sys.time())
   end_time <- Sys.time()
