@@ -33,6 +33,8 @@ test_that("annotateBed", {
                           probeFeatures = probeFeatures
   )
 
+  createMultipleBed(sampleSheet = sampleSheet)
+
   populations <- c("Control")
 
   figures <- c("HYPO", "HYPER", "BOTH")

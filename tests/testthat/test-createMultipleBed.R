@@ -35,10 +35,10 @@ test_that("createMultipleBed", {
 
   createMultipleBed(sampleSheet)
 
-  tempresultFolder <-dir_check_and_create(resultFolderData,c("CONTROL","MUTATIONS_HYPO"))
+  tempresultFolder <-dir_check_and_create(resultFolderData,c("Control","MUTATIONS_BOTH"))
 
-  fileToRead <- file_path_build(tempresultFolder, c("MULTIPLE", "MUTATIONS" ,"HYPO" ), "bed")
-  localFileRes < - read.table(fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+  fileToRead <- file_path_build(tempresultFolder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")
+  localFileRes <- read.table(fileToRead, sep="\t")
 
   expect_true(nrow(localFileRes)>0)
 
