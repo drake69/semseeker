@@ -53,8 +53,8 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
             resultTemp <- AnnotationDbi::mget(x=searchedGenes,envir=org.Hs.egALIAS2EG,mode = "any",ifnotfound = NA,inherits = FALSE)
             foundGenes <- names(resultTemp)
             notfoundGenes <- gsub("_","-",searchedGenes[!( searchedGenes %in% foundGenes )])
-            if(length(notfoundGenes)>0)
-              browser()
+            # if(length(notfoundGenes)>0)
+            #   browser()
             # resultTemp1 <- AnnotationDbi::mget(x=notfoundGenes,envir=org.Hs.egALIAS2EG,mode = "any",ifnotfound = NA,inherits = FALSE)
             # foundGenes1 <- names(resultTemp1)
             # notfoundGenes1 <- notfoundGenes[!( notfoundGenes %in% foundGenes1 )]

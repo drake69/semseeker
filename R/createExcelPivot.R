@@ -7,7 +7,7 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
 
     finalBed <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
 
-    browser()
+    # browser()
     if (is.null(finalBed))
       return()
 

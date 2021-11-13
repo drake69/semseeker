@@ -13,7 +13,7 @@
 readMultipleBed <- function(anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
 {
   POSITION  <- NULL
-  browser()
+  # browser()
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
   souceFolder <- dir_check_and_create(resultFolderData, c(as.character(populationName),f))
 
@@ -42,6 +42,7 @@ readMultipleBed <- function(anomalyLabel, figureLable, probeFeatures, columnLabe
   sourceData[is.na(sourceData)] <- ""
   sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLEID", groupingColumnLabel))
   # output with column freq
+  message("multiple nrow data", nrow(sourceData))
 
   if(nrow(sourceData)==0)
     return(NULL)
