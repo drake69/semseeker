@@ -43,7 +43,7 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
     fileName = fileName
   )
 
-  browser()
+  # browser()
   folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"LESIONS",figure),"bed")
   lesions <- unique(lesions)
