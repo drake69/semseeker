@@ -65,7 +65,7 @@ annotateBed <- function (
 
   # message("Annotated bed:")
   # message(bedFileName)
-  utils::write.table(finalBed,bedFileName, row.names = FALSE, sep = "\t")
+  utils::write.table(finalBed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
   if(nrow(finalBed)==0)
    stop("Empty file to annotate !")
