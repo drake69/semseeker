@@ -32,8 +32,8 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
     parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
 
     keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
-    # for(i in 1:nrow(keys))
+    # sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+    for(i in 1:nrow(keys))
       {
         # i <- 1
         grp <- keys[i,1]
@@ -48,15 +48,15 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
 
         figure <- keys[i,3]
         tempDataFrame <- subset(tempAnomaly, FIGURE == figure)
-        if(dim(tempDataFrame)[1]==0)
-          next
-
-        tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
-        fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
-        write.csv2(t(tempDataFrame), fileName)
-        tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
-        colnames(tempDataFrame) <- tempDataFrame[1,]
-        list(tempDataFrame[-1,])
+        if(nrow(tempDataFrame)!=0)
+        {
+          tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
+          fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
+          write.csv2(t(tempDataFrame), fileName)
+          tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
+          colnames(tempDataFrame) <- tempDataFrame[1,]
+          list(tempDataFrame[-1,])
+        }
       }
 
     # browser()
