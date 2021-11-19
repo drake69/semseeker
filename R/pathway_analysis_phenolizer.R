@@ -86,11 +86,12 @@ file_path_build <- function(baseFolder, detailsFilename, extension){
 
 string_normalize <- function (string)
 {
+  string <- gsub("__","_", string)
   string <- gsub(" ", "_", string)
   string <- (gsub("-", "_", string))
   string <- (gsub(":", "_", string))
   string <- (gsub("/", "_", string))
   string <- (gsub("'", "_", string))
-  return(string)
+  return(toupper(string))
 
 }
