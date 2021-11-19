@@ -31,7 +31,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
 
   parallel::clusterExport(envir=environment(), cl = computationCluster,
                           varlist = list( "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample","dir_check_and_create","resultFolderData","file_path_build","analyzeSingleSampleBoth","keys.figures",
-                                      "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame",
+                                      "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions",
                                       "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body"))
 
   ### get beta_values ########################################################
