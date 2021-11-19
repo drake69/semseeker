@@ -1,6 +1,14 @@
 phenolyzer_call <- function(term)
 {
 
+  # cpan App::cpanminus
+  # biotools:phenolyzer
+  # cpanm Module::Name
+  # cd /usr/local/lib/
+  # git clone https://github.com/WGLab/phenolyzer.git
+  # sudo cpan Bio::OntologyIO
+  # sudo cpan Graph::Directed
+
   pkgFolder <- system.file(package="semseeker")
 
   cleanedTerm <- string_normalize(term)
