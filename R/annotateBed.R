@@ -28,19 +28,21 @@ annotateBed <- function (
   groupingColumnLabel)
   {
 
-  parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("readMultipleBed","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
-                                                                                    "PROBES_Gene_TSS1500","PROBES_Gene_TSS200","PROBES_Gene_Whole","PROBES_Gene_ExonBnd","PROBES_Gene_1stExon",
-                                                                                    "PROBES_DMR_DMR","PROBES_Island_Island","PROBES_Island_N_Shelf","PROBES_Island_S_Shelf","PROBES_Island_N_Shore","PROBES_Island_S_Shore",
-                                                                                    "PROBES_Island_Whole"))
-
   finalBed <- NULL
   bedFileName <- file_path_build( resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
 
   if(file.exists(bedFileName))
   {
-    finalBed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t")
+    finalBed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
+    finalBed$freq = as.numeric(finalBed$freq)
     return(finalBed)
   }
+
+  parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("readMultipleBed","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
+                                                                                    "PROBES_Gene_TSS1500","PROBES_Gene_TSS200","PROBES_Gene_Whole","PROBES_Gene_ExonBnd","PROBES_Gene_1stExon",
+                                                                                    "PROBES_DMR_DMR","PROBES_Island_Island","PROBES_Island_N_Shelf","PROBES_Island_S_Shelf","PROBES_Island_N_Shore","PROBES_Island_S_Shore",
+                                                                                    "PROBES_Island_Whole"))
+
 
   keys <-
     expand.grid(
@@ -65,6 +67,7 @@ annotateBed <- function (
 
   # message("Annotated bed:")
   # message(bedFileName)
+  # browser()
   utils::write.table(finalBed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
   if(nrow(finalBed)==0)
