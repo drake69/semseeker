@@ -233,10 +233,9 @@ semseeker_pheno <- function(sampleSheet,
 
   probesFilter <- probes_go_association_phenolizer(pheno_term, onlySeed = TRUE )
 
-  browser()
+  # browser()
   methylationData <- methylationData[ rownames(methylationData) %in% probesFilter, ]
 
-  resultFolder <- dir_check_and_create(resultFolder, pheno_term)
   semseeker(sampleSheet = sampleSheet,
             methylationData = methylationData,
             resultFolder = resultFolder,
