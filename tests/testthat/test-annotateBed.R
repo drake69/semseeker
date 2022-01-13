@@ -45,7 +45,7 @@ test_that("annotateBed", {
   columnLabel =  "GENE"
   groupingColumnLabel="GROUP"
 
-
+  # create and read
   finalBed <- annotateBed (
     populations ,
     figures ,
@@ -56,8 +56,27 @@ test_that("annotateBed", {
     groupingColumnLabel)
 
   bedFileName <- file_path_build( resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
+
+  # file extsits
   expect_true(file.exists(bedFileName))
 
+  # not empty data set
   expect_true(nrow(finalBed)>0)
+
+  # has the correct header
+  expect_true( columnLabel %in% colnames(finalBed))
+
+  #read again  existent
+  finalBed <- annotateBed (
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probesPrefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
+  expect_true( columnLabel %in% colnames(finalBed))
+
 
 })
