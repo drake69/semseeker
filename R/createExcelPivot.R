@@ -32,13 +32,13 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
     parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
 
     keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    # sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
-    for(i in 1:nrow(keys))
+    sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+    # for(i in 1:nrow(keys))
       {
         # i <- 1
         grp <- keys[i,1]
         temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
-        if(dim(temp)[1]==0)
+        if(nrow(temp)==0)
           next
 
         anomaly <- keys[i,2]
