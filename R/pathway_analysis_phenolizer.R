@@ -12,7 +12,7 @@ inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 
   init_env(resultFolder)
 
-  geneAnnotatedFile <- read.csv(file.path(resultFolderData, "/GENE_annotatedBed.csv"))
+  geneAnnotatedFile <- read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
   geneAnnotatedFile <-subset(geneAnnotatedFile,POPULATION != "Reference")
 
   anomalies <- c("LESIONS","MUTATIONS")

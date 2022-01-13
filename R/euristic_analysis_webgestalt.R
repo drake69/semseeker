@@ -3,7 +3,7 @@ euristic_analysis_webgestalt <- function(resultFolder)
 
   init_env(resultFolder)
 
-  geneAnnotated <- read.csv(file.path(resultFolderData, "/GENE_annotatedBed.csv"))
+  geneAnnotated <- read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
   resultFolderWebGestalt <- dir_check_and_create(resultFolderEuristic ,"Webgestalt")
 
   geneAnnotated <- subset(geneAnnotated, POPULATION != "Reference" & FIGURE =="BOTH")

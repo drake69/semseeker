@@ -3,7 +3,7 @@ euristic_analysis_phenolizer <- function(resultFolder, terms)
 
   init_env(resultFolder)
 
-  geneAnnotatedFile <- read.csv(file.path(resultFolderData , "GENE_annotatedBed.csv"))
+  geneAnnotatedFile <- read.csv(file.path(resultFolderData , "GENE_ANNOTATED.csv"))
   geneAnnotatedFile <-subset(geneAnnotatedFile,POPULATION != "Reference")
   # semen;azoospermia,sperm;hypertension;thyroid hormones;semen quality
 
