@@ -72,7 +72,7 @@ This how to obtain the analyzed data:
             resultFolder = "~/semseeker_result/")
 
 Input requirements:
-- the samplesheet dataframe should contain a column called Population, the admitted values are: Case, Control, Reference
+- the samplesheet dataframe should contain a column called Population, the admitted values are: Case, Control, Reference. if you don0t have the Reference population you canm duplicate the Control population rows and use Reference in the Population column.
 - the methylationData dataframe should have as columns name the same names in Sample_ID column of the sample sheet.
 
 The outcomes are:
