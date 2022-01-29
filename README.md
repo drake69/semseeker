@@ -71,6 +71,10 @@ This how to obtain the analyzed data:
             methylationData = normalizedData,
             resultFolder = "~/semseeker_result/")
 
+Input requirements:
+- the samplesheet dataframe should contain a column called Population, the admitted values are: Case, Control, Reference
+- the methylationData dataframe should have as columns name the same names in Sample_ID column of the sample sheet.
+
 The outcomes are:
 <ul>
 <li>
