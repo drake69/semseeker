@@ -9,7 +9,10 @@ install_github("drake69/semseeker")
 
 library("semseeker")
 
+
 workingFolder <- file.path(getwd(),"/tmp")
+dir.create(workingFolder)
+
 sampleSheet <- buildDataSetFromGEO("GSE186766",workingFolder, TRUE)
 
 # ChAMP need the sample name variable as first column
@@ -72,3 +75,4 @@ sampleSheet <- rbind(sampleSheet, reference)
 semseeker (sampleSheet = sampleSheet,
            methylationData = normalizedData,
            resultFolder = file.path(workingFolder,"/semseeker_result/"))
+
