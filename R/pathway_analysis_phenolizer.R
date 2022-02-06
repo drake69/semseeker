@@ -4,7 +4,6 @@
 #' @param terms
 #'
 #' @return
-#' @export
 #'
 #' @examples
 inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
