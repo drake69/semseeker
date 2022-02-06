@@ -4,7 +4,7 @@
 #' @param workingFolder where sample sheet and files will be saved
 #' @param downloadFiles true if you wnatr download files from Gene Expression Ombibus (GEO)
 #'
-#' @return samplesheet, and sample's file saved and samplesheet tab separated saved
+#' @return samplesheet, and sample's file saved and samplesheet csv
 #' @export
 #'
 #' @examples buildDataSetFromGEO("GSE186766","~/", TRUE)
@@ -68,11 +68,14 @@ buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
       }
     }
 
+    #remove commas from  values
+    samplesheet <- apply(samplesheet, 2, function(x){gsub(",","_",x)})
+
     write.table(
       samplesheet,
       paste(workingFolder, "/", "final_samplesheet.csv", sep = ""),
       row.names = FALSE,
-      sep="\t",
+      sep=",",
       quote = FALSE
     )
 
