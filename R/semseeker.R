@@ -62,9 +62,9 @@ semseeker <- function(sampleSheet,
     stop(" Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values Reference,  Control and Case")
   }
 
-  if (length(colnames(methylationData) %in% sampleSheet$Sample_ID)==0)
+  if (sum(colnames(methylationData) %in% sampleSheet$Sample_ID)!=ncol(methylationData))
   {
-    stop("The methylation data has not values as the expected from the sample sheet in column Sample_ID!")
+    stop("The methylation data has not the column's names as expected from the sample sheet in column Sample_ID!")
   }
 
   if(!is.null(inferenceDetails))
