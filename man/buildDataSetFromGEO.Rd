@@ -14,7 +14,7 @@ buildDataSetFromGEO(GEOgse, workingFolder, downloadFiles = FALSE)
 \item{downloadFiles}{true if you wnatr download files from Gene Expression Ombibus (GEO)}
 }
 \value{
-samplesheet, and sample's file saved and samplesheet tab separated saved
+samplesheet, and sample's file saved and samplesheet csv
 }
 \description{
 buildDataSetFromGEO
