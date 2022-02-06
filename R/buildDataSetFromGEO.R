@@ -79,5 +79,5 @@ buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
       quote = FALSE
     )
 
-    return(samplesheet)
+    return(as.data.frame(samplesheet))
 }
