@@ -1,4 +1,10 @@
-init_env <- function(resultFolder)
+#' init environment
+#'
+#' @param resultFolder where result of semseeker will bestored
+#' @param maxResources percentage of how many available cores will be used default 90%, rounded to the lowest integer
+#' @return
+#' @export
+init_env <- function(resultFolder, maxResources = 90)
 {
 
   if (.Platform$OS.type == "windows") {
@@ -19,7 +25,8 @@ init_env <- function(resultFolder)
   folderLog <<- dir_check_and_create("/tmp",c("semseeker","log"))
 
   # bootstrap cluster
-  nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
+  nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE)
+  nCore <- floor(nCore * maxResources/100 )
   outFile <- file.path(folderLog, "cluster_r.out")
   # print(outFile)
   computationCluster <<- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)

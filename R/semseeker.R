@@ -5,8 +5,8 @@
 #' samples
 #' @param methylationData matrix of methylation data
 #' @param bonferroniThreshold = 0.05 #threshold to define which pValue
-#' @param inferenceDetails dataframe of details to calculate inferential statistics
-#' accept for lesions definition
+#' @param inferenceDetails dataframe of details to calculate inferential statistics accept for lesions definition
+#' @param maxResources percentage of how many available cores will be used default 90%, rounded to the lowest integer
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
 #'
@@ -14,10 +14,11 @@ semseeker <- function(sampleSheet,
                       methylationData,
                       resultFolder,
                       bonferroniThreshold = 0.05,
-                      inferenceDetails = NULL) {
+                      inferenceDetails = NULL,
+                      maxResources = 90) {
 
 
-  init_env(resultFolder)
+  init_env(resultFolder, maxResources)
 
 
   message(folderLog)
@@ -34,6 +35,9 @@ semseeker <- function(sampleSheet,
   methylationData <- methDataTemp[, -c(1)]
 
   rm(methDataTemp)
+  if(dim(methylationData)[1] <= 485512)
+    message("WARNING: Actually semseeker works with EPIC, with 450K and 27K some probes will be lost.")
+
   # if(dim(methylationData)[1] < 485512)
   #   PROBES <- PROBES[!is.na(PROBES$METH_450K),]
   #
