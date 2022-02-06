@@ -12,17 +12,17 @@ library("semseeker")
 workingFolder <- file.path(getwd(),"/tmp")
 sampleSheet <- buildDataSetFromGEO("GSE186766",workingFolder, TRUE)
 
-# we need the Sample_Group, the sample sheet of the example has the column pathology we can use to distinguish Cases vs Controls
+# ChAMP need the sample name variable as first column
+# so let's move the Sample_ID as first column
+sampleSheet <- data.frame("Sample_ID"=sampleSheet$Sample_ID, sampleSheet[, colnames(sampleSheet)!="Sample_ID"])
 
-sampleSheet <- read.table("~/Documents/Progetti_Sviluppo/semseeker/tmp/final_samplesheet.csv", sep="\t", header = TRUE)
-
-sampleSheet$Sample_Group <- sampleSheet$`pathology:ch1`
-sampleSheet[sampleSheet$Sample_Group=="AN", "Sample_Group"] <- "Case"
-sampleSheet[sampleSheet$Sample_Group=="control", "Sample_Group"] <- "Control"
-
-reference <- sampleSheet[sampleSheet$Sample_Group=="Control",]
-reference[, "Sample_Group"] <- "Reference"
-sampleSheet <- rbind(sampleSheet, reference)
+write.table(
+  sampleSheet,
+  paste(workingFolder, "/", "final_samplesheet.csv", sep = ""),
+  row.names = FALSE,
+  sep=",",
+  quote = FALSE
+)
 
 library(ChAMP)
 idat_folder <- workingFolder
@@ -43,7 +43,7 @@ myLoadN <- champ.load(directory = idat_folder,
                       population=NULL,
                       filterMultiHit=TRUE,
                       filterXY=TRUE,
-                      force=FALSE,
+                      force=TRUE,
                       arraytype="EPIC")
 
 # normalize with ChAMP
@@ -57,9 +57,18 @@ normalizedData<-champ.norm(beta=myLoadN$beta,
                     cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
 )
 
-# saveRDS(normalizedData, file.path(workingFolder,"/normalizedData.rds"))
-# normalizedData <- readRDS("~/normalizedData.rds")
+
+# we need the Sample_Group, the sample sheet of the example has the column pathology we can use to distinguish Cases vs Controls
+sampleSheet$Sample_Group <- sampleSheet$pathology.ch1
+sampleSheet[sampleSheet$Sample_Group=="AN", "Sample_Group"] <- "Case"
+sampleSheet[sampleSheet$Sample_Group=="control", "Sample_Group"] <- "Control"
+
+# we have not the reference Sample_Group so we reuse the Control sample group as reference
+reference <- subset(sampleSheet,Sample_Group=="Control")
+reference$Sample_Group <- "Reference"
+sampleSheet <- rbind(sampleSheet, reference)
+
 
 semseeker (sampleSheet = sampleSheet,
            methylationData = normalizedData,
-           resultFolder = file.path(workingFolder,"~/semseeker_result/"))
+           resultFolder = file.path(workingFolder,"/semseeker_result/"))
