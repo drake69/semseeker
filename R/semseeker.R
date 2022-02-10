@@ -91,6 +91,7 @@ semseeker <- function(sampleSheet,
   referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
   sampleSheet <- rbind(otherSamples, referenceSamples)
 
+  populations <-  c("Reference","Control","Case")
   for (populationName in populations) {
 
     #
