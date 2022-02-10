@@ -21,17 +21,14 @@ semseeker <- function(sampleSheet,
   init_env(resultFolder, maxResources)
 
 
-  message(folderLog)
-  sampleSheet <- as.data.frame(sampleSheet)
-  sampleSheet <- sampleSheet[,!(colnames(sampleSheet) %in% c("Probes_Count", "MUTATIONS_HYPER", "LESIONS_HYPER", "MUTATIONS_HYPO", "LESIONS_HYPO", "MUTATIONS_BOTH", "LESIONS_BOTH"))]
-  methylationData <- as.data.frame(methylationData)
   # set digits to 22
   withr::local_options(list(digits = 22))
   slidingWindowSize <- 11
 
+
+  methylationData <- as.data.frame(methylationData)
   methDataTemp <- data.frame( PROBE= rownames(methylationData), methylationData)
   methDataTemp <- methDataTemp[with(methDataTemp, order(PROBE)), ]
-
   methylationData <- methDataTemp[, -c(1)]
 
   rm(methDataTemp)
@@ -45,26 +42,11 @@ semseeker <- function(sampleSheet,
   #   PROBES <- PROBES[!is.na(PROBES$METH_27K),]
 
   PROBES <- PROBES[(PROBES$PROBE %in% rownames(methylationData)),]
-
   methylationData <- methylationData[rownames(methylationData) %in% PROBES$PROBE, ]
 
   #PROBES <- sortByCHRandSTART(PROBES)
   if (!test_match_order(row.names(methylationData), PROBES$PROBE)) {
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
-  }
-
-  populationControlRangeBetaValues <- NULL
-
-  needColumns <- c("Sample_ID", "Sample_Group")
-  missedColumns <- needColumns[!(needColumns %in% colnames(sampleSheet))]
-
-  if (length(missedColumns) > 0) {
-    stop(" Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values Reference,  Control and Case")
-  }
-
-  if (sum(colnames(methylationData) %in% sampleSheet$Sample_ID)!=ncol(methylationData))
-  {
-    stop("The methylation data has not the column's names as expected from the sample sheet in column Sample_ID!")
   }
 
   if(!is.null(inferenceDetails))
@@ -79,18 +61,11 @@ semseeker <- function(sampleSheet,
   }
 
 
-  populationGroups <- as.factor(sampleSheet$Sample_Group)
-  # expected R as reference, S as Study, C as Control
-
-  # reference population
-  populations <-  c("Reference","Control","Case")
-  sampleSheet$Sample_Group <- R.utils::toCamelCase(tolower(sampleSheet$Sample_Group), capitalize=TRUE)
-  sampleSheet$Sample_Group <- as.factor(sampleSheet$Sample_Group)
-  matchedPopulation <- levels(sampleSheet$Sample_Group) %in% populations
-  if (is.element(FALSE, matchedPopulation)) {
-    stop("File:",sampleSheetPath, " Sample_Group should contain only: Reference, Control, Case")
+  populationCheckResult <- populationCheck(sampleSheet, methylationData)
+  if(!is.null(populationCheckResult))
+  {
+    stop(populationCheckResult)
   }
-
 
   # reference population
   referencePopulationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == "Reference", ]
@@ -105,7 +80,6 @@ semseeker <- function(sampleSheet,
     message("Empty methylationData ", Sys.time())
     stop("Empty methylationData ")
   }
-
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes = 3)
 
