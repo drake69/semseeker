@@ -55,17 +55,18 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
           write.csv2(t(tempDataFrame), fileName)
           tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
           colnames(tempDataFrame) <- tempDataFrame[1,]
-          list(tempDataFrame[-1,])
+
+          #store in the first row the names of the sheet
+          tempDataFrame[1,] <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
+          list(tempDataFrame)
         }
       }
 
     # browser()
-    for(i in 1:nrow(keys))
+    for(i in 1:length(sheetList))
     {
-      grp <- keys[i,1]
-      anomaly <- keys[i,2]
-      figure <- keys[i,3]
-      sheetListNames[i] <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
+      sheetListNames[[i]] <- sheetList[[i]] [1,1]
+      sheetList [[i]] <- sheetList[[i]][-1,]
     }
 
     fileName <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
