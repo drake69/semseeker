@@ -177,7 +177,7 @@ semseeker <- function(sampleSheet,
   subGroupLabel="GROUP"
   createExcelPivot (populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
-  dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel,)
+  dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
   createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 )
 
   colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
