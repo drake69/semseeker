@@ -33,7 +33,7 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
                       quote =FALSE)
 
           projectName <- paste0(pval, "gene", anomaly, figure, subgroup,type, sep="_")
-          tempGeneFileName <- stringi::stri_rand_strings(1, 16, pattern = "[A-Za-z0-9]")
+          tempGeneFileName <- stringi::stri_rand_strings(1, 16, pattern = "[A-Za-z]")
           geneFile <- system.file("extdata", tempGeneFileName, package="WebGestaltR")
 
 

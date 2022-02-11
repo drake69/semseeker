@@ -8,7 +8,6 @@ test_that("createExcelPivot", {
   probesPrefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-
   createExcelPivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
 

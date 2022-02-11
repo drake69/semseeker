@@ -1,7 +1,7 @@
 test_that("analizePopulation", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z]"),sep="")
   init_env(tempFolder)
 
   nitem <- 5e4
@@ -18,7 +18,7 @@ test_that("analizePopulation", {
   row.names(betaInferiorThresholds) <- probeFeatures$PROBE
   row.names(methylationData) <- probeFeatures$PROBE
 
-  Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z0-9]")
+  Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
   colnames(methylationData) <- Sample_ID
   Sample_Group <- rep("Control",nsamples)
   mySampleSheet <- data.frame(Sample_Group, Sample_ID)

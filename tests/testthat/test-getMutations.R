@@ -1,7 +1,7 @@
 testthat::test_that("getMutations",{
 
   library(stringi)
-  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")
+  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 
   nitem <- 5e4
   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
