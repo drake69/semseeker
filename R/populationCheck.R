@@ -23,13 +23,16 @@ populationCheck <- function(sampleSheet, methylationData)
   {
     result <- paste(result,  (" some samples have Sample_Group with NA !"))
   }
-
-  # Exist at least 3 samples per Sample_Group==Reference
-  tabsample <- table(sampleSheet$Sample_Group)
-  if(tabsample ["Reference"]<3)
+  else
   {
-    result <- paste(result,  (" Requuired at least three samples for the Reference Sample Group"))
+    # Exist at least 3 samples per Sample_Group==Reference
+    tabsample <- table(sampleSheet$Sample_Group)
+    if(tabsample ["Reference"]<3)
+    {
+      result <- paste(result,  (" Requuired at least three samples for the Reference Sample Group"))
+    }
   }
+
 
   if (sum(colnames(methylationData) %in% sampleSheet$Sample_ID)!=ncol(methylationData))
   {
