@@ -20,7 +20,8 @@ dumpSampleAsBedFile <- function(dataToDump, fileName) {
   }
 
   # bed coordinate must start from zero!
-  dataToDump$START <- dataToDump$START - 1
+  dataToDump$START <- as.numeric(dataToDump$START) - 1
+  dataToDump$END <- as.numeric(dataToDump$END)
   if (!plyr::empty(dataToDump)) {
 
   # save file bed per sample
