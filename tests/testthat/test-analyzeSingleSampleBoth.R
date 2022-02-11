@@ -1,9 +1,9 @@
 test_that("analyseSingleSampleBoth", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z]"),sep="")
   init_env(tempFolder)
-  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")
+  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z]")
   Sample_Group <- "Control"
 
   sampleDetail <- data.frame("Sample_ID"= Sample_ID,"Sample_Group"= Sample_Group)

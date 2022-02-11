@@ -1,10 +1,10 @@
 testthat::test_that("deltaSingleSample",{
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z]"),sep="")
   init_env(tempFolder)
 
-  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")
+  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 
   nitem <- 5e4
   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.5, sd=0.7))
