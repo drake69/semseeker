@@ -2,6 +2,7 @@ install.packages("devtools")
 library("devtools")
 install_github("drake69/semseeker")
 library("semseeker")
+packageVersion('semseeker')
 
 workingFolder <- file.path("~/Downloads/GSE139307")
 dir.create(workingFolder)
@@ -53,6 +54,9 @@ normalizedData<-champ.norm(beta=myLoadN$beta,
                            cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
 )
 
+# sampleSheet <- read.csv("~/Downloads/GSE139307/final_samplesheet.csv")
+# normalizedData <- readRDS("~/Downloads/GSE139307/normalizeddata.rds")
+
 
 # we need the Sample_Group, the sample sheet of the example has the column pathology we can use to distinguish Cases vs Controls
 sampleSheet$Sample_Group <- sampleSheet$dioxin.group.ch1
@@ -63,6 +67,7 @@ sampleSheet[sampleSheet$Sample_Group!="Control", "Sample_Group"] <- "Case"
 reference <- subset(sampleSheet,Sample_Group=="Control")
 reference$Sample_Group <- "Reference"
 sampleSheet <- rbind(sampleSheet, reference)
+
 
 
 semseeker (sampleSheet = sampleSheet,
