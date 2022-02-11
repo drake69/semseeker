@@ -14,9 +14,6 @@ populationCheck <- function(sampleSheet, methylationData)
     result <- paste(result,  " Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values Reference,  Control and Case")
   }
 
-  #Exist at least 3 samples per Sample_Group
-
-
   if(sum(is.na(sampleSheet$Sample_ID)))
   {
     result <- paste(result,  (" some samples have Sample_ID with NA !"))
@@ -25,6 +22,13 @@ populationCheck <- function(sampleSheet, methylationData)
   if(sum(is.na(sampleSheet$Sample_Group)))
   {
     result <- paste(result,  (" some samples have Sample_Group with NA !"))
+  }
+
+  # Exist at least 3 samples per Sample_Group==Reference
+  tabsample <- table(sampleSheet$Sample_Group)
+  if(tabsample ["Reference"]<3)
+  {
+    result <- paste(result,  (" Requuired at least three samples for the Reference Sample Group"))
   }
 
   if (sum(colnames(methylationData) %in% sampleSheet$Sample_ID)!=ncol(methylationData))
