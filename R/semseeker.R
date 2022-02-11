@@ -6,7 +6,7 @@
 #' @param methylationData matrix of methylation data
 #' @param bonferroniThreshold = 0.05 #threshold to define which pValue
 #' @param inferenceDetails dataframe of details to calculate inferential statistics accept for lesions definition
-#' @param maxResources percentage of how many available cores will be used default 90%, rounded to the lowest integer
+#' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
 #'

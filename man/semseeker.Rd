@@ -24,7 +24,7 @@ samples}
 
 \item{inferenceDetails}{dataframe of details to calculate inferential statistics accept for lesions definition}
 
-\item{maxResources}{percentage of how many available cores will be used default 90%, rounded to the lowest integer}
+\item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 }
 \value{
 files into the result folder with pivot table and bedgraph.
