@@ -28,7 +28,4 @@ testthat::test_that("getMutations",{
 
   expect_false(length(lesions)==0)
 
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
-
 })

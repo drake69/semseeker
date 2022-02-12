@@ -24,7 +24,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
 
   # browser()
   start_time <- Sys.time()
-  message("... warmingUP ", Sys.time())
+  message("AnalyzePopulation warmingUP ", Sys.time())
 
   ### get beta_values ########################################################
   sampleSheet <- sampleSheet[order(sampleSheet[, "Sample_ID"], decreasing = FALSE), ]
@@ -37,15 +37,15 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
     message("These samples data are missed: ", paste0(missedSample, sep = " "), Sys.time())
   }
 
-  message("WarmedUP ...", Sys.time())
+  message("WarmedUP AnalyzePopulation", Sys.time())
   message("Start population analyze ", Sys.time())
 
   summaryFileName <- file.path(resultFolderData, "summary.csv")
 
 
-  summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind', .export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
+  # summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind', .export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
   # summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind',.export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
-  # for(i in 1:nrow(sampleSheet) ) {
+  for(i in 1:nrow(sampleSheet) ) {
 
     localSampleDetail <- sampleSheet[i,]
     message("Meth data rows: ", nrow(methylationData))
@@ -74,11 +74,11 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
     sampleStatusTemp <- data.frame(t(sampleStatusTemp))
     rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
     message("Iteration: ", i)
-    # if(!exists("summaryPopulation"))
-    #   summaryPopulation <- sampleStatusTemp
-    # else
-    #   summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
-    as.data.frame(sampleStatusTemp)
+    if(!exists("summaryPopulation"))
+      summaryPopulation <- sampleStatusTemp
+    else
+      summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
+    # as.data.frame(sampleStatusTemp)
   }
 
   message("Row count result:", nrow(summaryPopulation))
