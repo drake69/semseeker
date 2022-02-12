@@ -3,7 +3,7 @@
 # semseeker
 
 <!-- badges: start -->
-r badge_devel("drake69/semseeker", "blue")
+`r badge_devel("drake69/semseeker", "blue")`
 `r badge_lifecycle("stable")`
 `r badge_repostatus("Active")`
 `r badge_codecov("drake69/semseeker")`
