@@ -1,7 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # semseeker
-badge_devel("drake69/semseeker", "blue")
 
 <!-- badges: start -->
 `r badge_devel("drake69/semseeker", "blue")`
