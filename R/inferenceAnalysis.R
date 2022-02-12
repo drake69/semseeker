@@ -146,7 +146,7 @@ inferenceAnalysis <- function(inferenceDetails)
 
       chartFolder <- dir_check_and_create(resultFolderChart,"POPULATION_COMPARISON")
 
-      filename = file_path_build(cartFolder,file_result_prefix, "MUTATIONS.png",sep="")
+      filename <- file_path_build(cartFolder,file_result_prefix, "MUTATIONS.png")
       grDevices::png(file= filename, width=2480,height=2480)
       par(mfrow=c(1,3))
       graphics::boxplot(MUTATIONS_HYPO~ studySummaryToPlot[,independentVariable],main="Hypo Mutations", data = studySummaryToPlot, cex=2)
