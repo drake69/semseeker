@@ -111,19 +111,19 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
       {
         covariates_model <- paste0(paste0(c(independentVariable, covariates),collapse="+", sep=""))
       }
-      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+      sig.formula  <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
     }
 
     if(family_test=="wilcoxon" | family_test=="t.test")
     {
       covariates_model <- independentVariable
-      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+      sig.formul <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
     }
 
     if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
     {
       covariates_model <- independentVariable
-      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+      sig.formul <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
     }
 
     if (family_test=="gaussian")
@@ -135,7 +135,7 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
       {
         covariates_model <- paste0(paste0(c(independentVariable, covariates),collapse="+", sep=""))
       }
-      sig.formula <- as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+      sig.formul <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
     }
 
     if (family_test=="binomial")
@@ -148,45 +148,45 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
       {
         covariates_model <- paste0(paste0(c(burdenValue, covariates),collapse="+", sep=""))
       }
-      sig.formula <- as.formula(paste0(independentVariable,"~", covariates_model, sep=""))
+      sig.formul <- stats::as.formula(paste0(independentVariable,"~", covariates_model, sep=""))
     }
 
     # browser()
     if(family_test=="binomial" | family_test=="poisson" | family_test=="wilcoxon" | family_test=="t.test")
     {
-      bartlett_pvalue <- bartlett.test( as.formula(paste0(burdenValue,"~", independentVariable, sep="")), data= as.data.frame(tempDataFrame) )
+      bartlett_pvalue <- stats::bartlett.test( stats::as.formula(paste0(burdenValue,"~", independentVariable, sep="")), data= as.data.frame(tempDataFrame) )
     }
 
     if(family_test=="gaussian" | family_test=="spearman" | family_test=="kendall" | family_test=="pearson")
     {
       localDataFrame <- data.frame("depVar"=tempDataFrame[, burdenValue],"indepVar"=1 )
       localDataFrame <- rbind( localDataFrame,  data.frame("depVar"=tempDataFrame[, independentVariable],"indepVar"=2 ))
-      bartlett_pvalue <- bartlett.test( as.formula("depVar ~ indepVar"), data= localDataFrame )
+      bartlett_pvalue <- stats::bartlett.test( stats::as.formula("depVar ~ indepVar"), data= localDataFrame )
     }
 
-    shapiro_pvalue <- shapiro.test(tempDataFrame[,burdenValue])
+    shapiro_pvalue <- stats::shapiro.test(tempDataFrame[,burdenValue])
 
     if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
     {
-      result.glm  <- glm( sig.formula, family = family_test, data = as.data.frame(tempDataFrame))
+      result.glm  <- stats::glm( sig.formula, family = family_test, data = as.data.frame(tempDataFrame))
       pvalue <- summary(result.glm )$coeff[-1, 4][1]
     }
 
     if(family_test=="wilcoxon")
     {
-      result.w  <- wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
+      result.w  <- stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
       pvalue <- result.w$p.value
     }
 
     if(family_test=="t.test")
     {
-      result.w  <-t.test(sig.formula, data = as.data.frame(tempDataFrame))
+      result.w  <- stats::t.test(sig.formula, data = as.data.frame(tempDataFrame))
       pvalue <- result.w$p.value
     }
 
     if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
     {
-      result.cor <- cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independentVariable]), method = family_test)
+      result.cor <- stats::cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independentVariable]), method = family_test)
       pvalue <- result.cor$p.value
     }
 
@@ -198,8 +198,8 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
 
     if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" & family_test!="kendall")
     {
-      independentVariableData <- na.omit(tempDataFrame[tempDataFrame[, independentVariable]==TRUE,burdenValue])
-      dependentVariableData <- na.omit(tempDataFrame[tempDataFrame[, independentVariable]==FALSE,burdenValue])
+      independentVariableData <- stats::na.omit(tempDataFrame[tempDataFrame[, independentVariable]==TRUE,burdenValue])
+      dependentVariableData <- stats::na.omit(tempDataFrame[tempDataFrame[, independentVariable]==FALSE,burdenValue])
       local_result <- data.frame (
         "INDIPENDENT.VARIABLE"= independentVariable,
         "ANOMALY" = key$ANOMALY,
@@ -219,18 +219,18 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
         "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
         "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) round(bartlett_pvalue$p.value,3)  else NA,
         "COUNT.CASE"=length(independentVariableData),
-        "MEAN.CASE" = round(mean(independentVariableData),3),
-        "SD.CASE"=round(sd(independentVariableData),3),
-        "COUNT.CONTROL"=length(na.omit(dependentVariableData)),
-        "MEAN.CONTROL"=round(mean(dependentVariableData),3),
-        "SD.CONTROL"= round(sd(dependentVariableData),3),
+        "MEAN.CASE" = round(stats::mean(independentVariableData),3),
+        "SD.CASE"=round(stats::sd(independentVariableData),3),
+        "COUNT.CONTROL"=length(stats::na.omit(dependentVariableData)),
+        "MEAN.CONTROL"=round(stats::mean(dependentVariableData),3),
+        "SD.CONTROL"= round(stats::sd(dependentVariableData),3),
         "RHO"= if(exists("result.cor"))  round(result.cor$estimate) else NA
       )
     } else
     {
       # browser()
-      dependentVariableData <- na.omit(tempDataFrame[!is.na(tempDataFrame[,independentVariable]),burdenValue])
-      independentVariableData <- na.omit(tempDataFrame[  ,independentVariable])
+      dependentVariableData <- stats::na.omit(tempDataFrame[!is.na(tempDataFrame[,independentVariable]),burdenValue])
+      independentVariableData <- stats::na.omit(tempDataFrame[  ,independentVariable])
       local_result <- data.frame (
         "INDIPENDENT.VARIABLE"= independentVariable,
         "ANOMALY" = key$ANOMALY,
@@ -250,11 +250,11 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
         "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
         "BARTLETT.PVALUE" = NA,
         "COUNT.CASE"=length(dependentVariableData),
-        "MEAN.CASE" = round(mean(dependentVariableData),3),
-        "SD.CASE"=round(sd(dependentVariableData ),3),
+        "MEAN.CASE" = round(stats::mean(dependentVariableData),3),
+        "SD.CASE"=round(stats::sd(dependentVariableData ),3),
         "COUNT.CONTROL"=length(independentVariableData),
-        "MEAN.CONTROL"=round(mean(independentVariableData),3),
-        "SD.CONTROL"= round(sd(independentVariableData),3),
+        "MEAN.CONTROL"=round(stats::mean(independentVariableData),3),
+        "SD.CONTROL"= round(stats::sd(independentVariableData),3),
         "RHO"= if(exists("result.cor"))  round(result.cor$estimate) else NA
       )
     }
@@ -271,8 +271,8 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
   result_temp <- unique(result_temp)
 
 
-  result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
-  result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
+  result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
+  result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
 
   gc()
   return(result_temp)

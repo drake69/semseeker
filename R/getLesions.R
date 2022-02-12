@@ -2,7 +2,7 @@
 # slidingWindowSize <- 11
 # bonferroniThreshold <- 0.01
 # grouping_column <- "GENE"
-# mutationAnnotatedSortedLocal <- read.csv2("/home/lcorsaro/Documents/SEMSEEKER_TEST_BWS/mutations_annotated_sorted_gene.csv")
+# mutationAnnotatedSortedLocal <- utils::read.csv2("/home/lcorsaro/Documents/SEMSEEKER_TEST_BWS/mutations_annotated_sorted_gene.csv")
 
 #' @importFrom dplyr %>%
 getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, mutationAnnotatedSorted)
@@ -16,9 +16,9 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
 
     # browser()
   mutationAnnotatedSortedLocal <- mutationAnnotatedSorted
-  summed <- aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = sum)
+  summed <- stats::aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = sum)
   colnames(summed) <- c(grouping_column,"MUTATIONS_COUNT")
-  counted <- aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = length)
+  counted <- stats::aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = length)
   colnames(counted) <- c(grouping_column,"PROBES_COUNT")
   mutationAnnotatedSortedLocal <- merge(mutationAnnotatedSortedLocal,summed, by = grouping_column)
   mutationAnnotatedSortedLocal <- merge(mutationAnnotatedSortedLocal,counted, by = grouping_column)
@@ -38,7 +38,7 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
 
   # browser()
   # calculate enrichment for each window
-  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(ENRICHMENT = ave(MUTATIONS, eval(parse(text = grouping_column)), FUN = function(x) enrichement_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
+  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(ENRICHMENT = stats::ave(MUTATIONS, eval(parse(text = grouping_column)), FUN = function(x) enrichement_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   basepair_calculator<-function(x,lags){
     tmp_min=-zoo::rollmax( -x, lags, align = "center", fill = 0)
@@ -48,7 +48,7 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
     return(tmp)
   }
   #calculate the base pair count for each window
-  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(BASEPAIR_COUNT = ave(START, eval(parse(text = grouping_column)), FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
+  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(BASEPAIR_COUNT = stats::ave(START, eval(parse(text = grouping_column)), FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 

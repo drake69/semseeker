@@ -2,7 +2,7 @@
 # sample_sheet_result <- read_delim("~/Desktop/experiments_data/DIOSSINA_DESIO/20211018/sample_sheet_result.csv",delim = ";", escape_double = FALSE, locale = locale(decimal_mark = ",",grouping_mark = "."), trim_ws = TRUE)
 # sample_sheet_result$Sample_ID <- paste0(sample_sheet_result$Sentrix_Position,"_", sample_sheet_result$Sentrix_ID, sep="")
 #
-# sample_sheet_result_pheno <- read_csv("Desktop/experiments_data/DIOSSINA_DESIO/Samplesheet_Completed_Diossina_With_Phenotype.csv")
+# sample_sheet_result_pheno <- utils::read.csv("Desktop/experiments_data/DIOSSINA_DESIO/Samplesheet_Completed_Diossina_With_Phenotype.csv")
 # sample_sheet_result_pheno$Sample_ID <- paste0(sample_sheet_result_pheno$Sentrix_Position,"_", sample_sheet_result_pheno$Sentrix_ID, sep="")
 #
 # sample_sheet_result <- merge(sample_sheet_result, sample_sheet_result_pheno, by.x="Sample_ID", by.y="Sample_ID", all.x = T)
@@ -32,7 +32,7 @@
 # }
 # nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
 # outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
-# computationCluster <<- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
+# computationCluster  <-  parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
 # doParallel::registerDoParallel(computationCluster)
 #
 #
@@ -62,7 +62,7 @@
 #                      "cor.spearman"="",
 #                      "cor.kendall"="",
 #                      "cor.pearson"="",
-#                      "mean"="",
+#                      "stats::mean"="",
 #                      "sd"="",
 #                      "key"="",
 #                      "p.adj.area.sperman"="",
@@ -131,8 +131,8 @@
 #                    "cor.spearman"=res.spearman$estimate,
 #                    "cor.kendall"=res.kendall$estimate,
 #                    "cor.pearson"=res.pearson.estimate,
-#                    "mean"=mean(var1),
-#                    "sd"=sd(var1),
+#                    "stats::mean"=stats::mean(var1),
+#                    "sd"=stats::sd(var1),
 #                    "key"=key,
 #                    "p.adj.area.spearman"="",
 #                    "p.adj.area.kendall"="",
@@ -142,9 +142,9 @@
 #         )
 #       }
 #
-#     hh$p.adj.area.kendall <- p.adjust(hh$p.value.kendall,"BH")
-#     hh$p.adj.area.spearman <- p.adjust(hh$p.value.spearman,"BH")
-#     hh$p.adj.area.pearson <- p.adjust(hh$p.value.pearson,"BH")
+#     hh$p.adj.area.kendall <- stats::p.adjust(hh$p.value.kendall,"BH")
+#     hh$p.adj.area.spearman <- stats::p.adjust(hh$p.value.spearman,"BH")
+#     hh$p.adj.area.pearson <- stats::p.adjust(hh$p.value.pearson,"BH")
 #     mmm <- rbind(mmm,hh)
 #     #
 #     # mcorr <- rcorr(as.matrix(tempDataFrame[, !(colnames(tempDataFrame) %in% c("Sample_ID","POPULATION")) ] ),type="pearson")
@@ -156,9 +156,9 @@
 # }
 #
 #
-# mmm$p.adj.kendall <- p.adjust(mmm$p.value.kendall,"BH")
-# mmm$p.adj.spearman <- p.adjust(mmm$p.value.spearman,"BH")
-# mmm$p.adj.pearson <- p.adjust(hh$p.value.pearson,"BH")
+# mmm$p.adj.kendall <- stats::p.adjust(mmm$p.value.kendall,"BH")
+# mmm$p.adj.spearman <- stats::p.adjust(mmm$p.value.spearman,"BH")
+# mmm$p.adj.pearson <- stats::p.adjust(hh$p.value.pearson,"BH")
 #
 # write_csv(mmm,"~/Desktop/experiments_data/DIOSSINA_DESIO/20211018/Inference/correlation.csv")
 #

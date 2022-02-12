@@ -6,8 +6,6 @@
 #'
 #' @return samplesheet, and sample's file saved and samplesheet csv
 #' @export
-#'
-#' @examples buildDataSetFromGEO("GSE186766","~/", TRUE)
 buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
 
     gse <- GEOquery::getGEO(GEOgse, GSEMatrix = TRUE)
@@ -52,7 +50,7 @@ buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
           if(!file.exists(localFileName) &&  !file.exists(localFileNameUnzipped))
           {
             fileName <-  gsub("_COLOR.idat.gz",color, fileName)
-            download.file(
+            utils::download.file(
               url = fileName,
               destfile =  localFileName,
               # method =  "internal",
@@ -71,7 +69,7 @@ buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
     #remove commas from  values
     samplesheet <- apply(samplesheet, 2, function(x){gsub(",","_",x)})
 
-    write.table(
+    utils::write.table(
       samplesheet,
       paste(workingFolder, "/", "final_samplesheet.csv", sep = ""),
       row.names = FALSE,

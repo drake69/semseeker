@@ -83,7 +83,7 @@ semseeker <- function(sampleSheet,
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes = 3)
 
-  write.table(x = populationControlRangeBetaValues, file = file_path_build(resultFolderData ,"beta_thresholds","csv"), sep=";")
+  utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(resultFolderData ,"beta_thresholds","csv"), sep=";")
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sampleSheet[sampleSheet$Sample_Group == "Reference",]
@@ -137,7 +137,7 @@ semseeker <- function(sampleSheet,
   sampleSheet <- merge(sampleSheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(methylationData)
   gc()
-  write.csv2(sampleSheet, file.path(resultFolderData , "sample_sheet_result.csv"))
+  utils::write.csv2(sampleSheet, file.path(resultFolderData , "sample_sheet_result.csv"))
 
   if(length(sampleSheet$Sample_Group=="Reference")>0){
     populations <- c("Reference","Control","Case")
@@ -190,12 +190,12 @@ semseeker <- function(sampleSheet,
   rm(populationControlRangeBetaValues)
 
   # message("Starting inference Analysis.")
-  # inferenceAnalysis(resultFolder = resultFolder, folderLog= folderLog, inferenceDetails)
+  # inferenceAnalysis(resultFolderData = resultFolderData, logFolder= logFolder, inferenceDetails)
   parallel::stopCluster(computationCluster)
   doParallel::stopImplicitCluster()
   gc()
-  # geneontology_analysis_webgestalt(resultFolder = resultFolder, fileName = fileName)
-  # euristic_analysis_webgestalt(resultFolder = resultFolder)
+  # geneontology_analysis_webgestalt(resultFolderData = resultFolderData, fileName = fileName)
+  # euristic_analysis_webgestalt(resultFolderData = resultFolderData)
   message("Job Completed !")
 
 

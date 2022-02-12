@@ -42,8 +42,8 @@ inferenceAnalysis <- function(inferenceDetails)
       message("Warning: missed depth analysis inference forced to 1.")
     }
 
-    studySummary <-   read.csv2(file_path_build(resultFolderData, "sample_sheet_result","csv"))
-    resultFolderPivot <- dir_check_and_create(resultFolderData,"Pivots")
+    studySummary <-   utils::read.csv2(file_path_build(resultFolderData, "sample_sheet_result","csv"))
+    resultFolderDataPivot <- dir_check_and_create(resultFolderData,"Pivots")
 
     file_result_prefix <- paste0( depthAnalysis,"_", independentVariable,"_",sep="")
 
@@ -51,8 +51,8 @@ inferenceAnalysis <- function(inferenceDetails)
     #########################################################################################################
     #########################################################################################################
 
-    if(!dir.exists(resultFolderInference))
-      dir.create(resultFolderInference)
+    if(!dir.exists(resultFolderDataInference))
+      dir.create(resultFolderDataInference)
 
     if (!(independentVariable %in% colnames(studySummary)))
     {
@@ -139,16 +139,16 @@ inferenceAnalysis <- function(inferenceDetails)
 
     # #browser()
     studySummaryToPlot <- studySummary
-    studySummaryToPlot$Sample_Group  <- relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
+    studySummaryToPlot$Sample_Group  <- stats::relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
 
     if(family_test=="binomial")
     {
 
-      chartFolder <- dir_check_and_create(resultFolderChart,"POPULATION_COMPARISON")
+      chartFolder <- dir_check_and_create(resultFolderDataChart,"POPULATION_COMPARISON")
 
-      filename <- file_path_build(cartFolder,file_result_prefix, "MUTATIONS.png")
+      filename <- file_path_build(chartFolder,file_result_prefix, "MUTATIONS.png")
       grDevices::png(file= filename, width=2480,height=2480)
-      par(mfrow=c(1,3))
+      graphics::par(mfrow=c(1,3))
       graphics::boxplot(MUTATIONS_HYPO~ studySummaryToPlot[,independentVariable],main="Hypo Mutations", data = studySummaryToPlot, cex=2)
       graphics::boxplot(MUTATIONS_BOTH~studySummaryToPlot[,independentVariable], main="Both Type of Mutations", data = studySummaryToPlot, cex=2)
       graphics::boxplot(MUTATIONS_HYPER~studySummaryToPlot[,independentVariable],main="Hyper Mutations", data = studySummaryToPlot, cex=2)
@@ -156,7 +156,7 @@ inferenceAnalysis <- function(inferenceDetails)
 
       filename = paste0( chartFolder,"/", file_result_prefix, "LESIONS.png",sep="")
       grDevices::png(file= filename, width=2480,height=2480)
-      par(mfrow=c(1,3))
+      graphics::par(mfrow=c(1,3))
       graphics::boxplot(LESIONS_HYPO~studySummaryToPlot[,independentVariable],main="Hypo Lesions", data = studySummaryToPlot, cex=2)
       graphics::boxplot(LESIONS_BOTH~studySummaryToPlot[,independentVariable], main="Both Type of Lesions", data = studySummaryToPlot, cex=2)
       graphics::boxplot(LESIONS_HYPER~studySummaryToPlot[,independentVariable],main="Hyper Lesions", data = studySummaryToPlot, cex=2)
@@ -182,11 +182,11 @@ inferenceAnalysis <- function(inferenceDetails)
           rm(list = c("tempDataFrame"))
         key <- keys [i,]
         # print(key)
-        fname <-file_path_build(workingFolder,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+        fname <-file_path_build(resultFolderData,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
         # print(fname)
         if (file.exists(fname))
         {
-          tempDataFrame <- read.csv(fname, sep = ";")
+          tempDataFrame <- utils::read.csv(fname, sep = ";")
           row.names(tempDataFrame) <- tempDataFrame$X
           tempDataFrame <- tempDataFrame[,-1]
           tempDataFrame <- t(tempDataFrame)
@@ -216,7 +216,7 @@ inferenceAnalysis <- function(inferenceDetails)
 
             tempDataFrame <- as.data.frame(tempDataFrame)
             # tempDataFrame$Sample_Group <- as.factor(tempDataFrame$Sample_Group)
-            # tempDataFrame$Sample_Group  <- relevel(tempDataFrame$Sample_Group, "Control")
+            # tempDataFrame$Sample_Group  <- stats::relevel(tempDataFrame$Sample_Group, "Control")
 
             g_start <- 2 + length(covariates)
 
@@ -236,8 +236,8 @@ inferenceAnalysis <- function(inferenceDetails)
 
     # browser()
     result <- unique(result)
-    # result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="LESIONS" ,"PVALUEADJ" ] <- round(p.adjust(result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="LESIONS","PVALUE" ],method = "BH"),3)
-    # result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="MUTATIONS" ,"PVALUEADJ" ] <- round(p.adjust(result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="MUTATIONS","PVALUE" ],method = "BH"),3)
+    # result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="LESIONS" ,"PVALUEADJ" ] <- round(stats::p.adjust(result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="LESIONS","PVALUE" ],method = "BH"),3)
+    # result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="MUTATIONS" ,"PVALUEADJ" ] <- round(stats::p.adjust(result[ result$AREA_OF_TEST=="TOTAL" & result$ANOMALY=="MUTATIONS","PVALUE" ],method = "BH"),3)
 
     result <- result[order(result$PVALUEADJ),]
 
@@ -254,8 +254,8 @@ inferenceAnalysis <- function(inferenceDetails)
         file_suffix <- "_test_corrected_result"
       }
 
-      fileName <- file_path_build(resultFolderInference,c(file_result_prefix , transformation, family_test, file_suffix),"csv")
-      write.csv2(result,fileName , row.names = FALSE)
+      fileName <- file_path_build(resultFolderDataInference,c(file_result_prefix , transformation, family_test, file_suffix),"csv")
+      utils::write.csv2(result,fileName , row.names = FALSE)
     }
 
 
@@ -264,11 +264,11 @@ inferenceAnalysis <- function(inferenceDetails)
     # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
 
     # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
-    # result <- read_csv(file.path(resultFolderInference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
-    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolderInference =  report.dir, filePrefix ="diff_meth_sites")
+    # result <- utils::read.csv(file.path(resultFolderDataInference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
+    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolderDataInference =  report.dir, filePrefix ="diff_meth_sites")
 
     # case_vs_control_binomial_regression_corrected_result <-
-    #   read.csv2(
+    #   utils::read.csv2(
     #     "/home/lcorsaro/Desktop/experiments_data/DIOSSINA_DESIO/3_semseeker_result/Pivots/case_vs_control_binomial_regression_corrected_result_1.csv"
     #   )
     # keys <- unique(result[, c("ANOMALY", "FIGURE", "GROUP", "SUBGROUP")])
@@ -294,7 +294,7 @@ inferenceAnalysis <- function(inferenceDetails)
     #
     #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
     #   qqunifPlot(diffmeth.p.val$PVALUE,
-    #               resultFolderInference = resultFolderInference,
+    #               resultFolderDataInference = resultFolderDataInference,
     #               filePrefix = file_prefix)
     # }
     #

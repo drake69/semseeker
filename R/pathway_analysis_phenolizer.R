@@ -1,15 +1,15 @@
 #' inference_pathway_analysis_phenolizer calculate and att to sample sheet result
 #' the number of mutations or the lesioned gene per each sample
-#' @param resultFolder where semseeker result are saved
+#' @param resultFolderData where semseeker result are saved
 #' @param terms gene HP term to be searched
 #'
 #' @return
 inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 {
 
-  init_env(resultFolder)
+   init_env(resultFolder)
 
-  geneAnnotatedFile <- read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
+  geneAnnotatedFile <- utils::read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
   geneAnnotatedFile <-subset(geneAnnotatedFile,POPULATION != "Reference")
 
   anomalies <- c("LESIONS","MUTATIONS")
@@ -38,10 +38,10 @@ inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 
       colnames(res_prio_burden) <- c(anomalyColumn,"SAMPLEID")
 
-      sampleSheetResult <- read.csv2(file.path(resultFolderData,"sample_sheet_result.csv"))
+      sampleSheetResult <- utils::read.csv2(file.path(resultFolderData,"sample_sheet_result.csv"))
       sampleSheetResult <- sampleSheetResult[, !(colnames(sampleSheetResult)%in% anomalyColumn)]
       sampleSheetResult <- merge(sampleSheetResult, res_prio_burden, by.x="Sample_ID",by.y="SAMPLEID")
-      write.csv2(sampleSheetResult,file.path(resultFolderData,"sample_sheet_result.csv"),row.names = FALSE)
+      utils::write.csv2(sampleSheetResult,file.path(resultFolderData,"sample_sheet_result.csv"),row.names = FALSE)
     }
   }
 }
@@ -81,14 +81,14 @@ file_path_build <- function(baseFolder, detailsFilename, extension){
 }
 
 
-string_normalize <- function (string)
+string_normalize <- function (input_string)
 {
-  string <- gsub("__","_", string)
-  string <- gsub(" ", "_", string)
-  string <- (gsub("-", "_", string))
-  string <- (gsub(":", "_", string))
-  string <- (gsub("/", "_", string))
-  string <- (gsub("'", "_", string))
-  return(toupper(string))
+  input_string <- gsub("__","_", input_string)
+  input_string <- gsub(" ", "_", input_string)
+  input_string <- (gsub("-", "_", input_string))
+  input_string <- (gsub(":", "_", input_string))
+  input_string <- (gsub("/", "_", input_string))
+  input_string <- (gsub("'", "_", input_string))
+  return(toupper(input_string))
 
 }

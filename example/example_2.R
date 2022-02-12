@@ -4,6 +4,10 @@ install_github("drake69/semseeker")
 library("semseeker")
 packageVersion('semseeker')
 
+devtools::install_github("hrbrmstr/dtupdate")
+library(dtupdate)
+github_update()
+
 workingFolder <- file.path("~/Downloads/GSE139307")
 dir.create(workingFolder)
 
@@ -50,12 +54,12 @@ normalizedData<-champ.norm(beta=myLoadN$beta,
                            resultsDir= resultFolder,
                            method="SWAN",
                            plotBMIQ=FALSE,
-                           arraytype="EPIC",
+                           arraytype="450K",
                            cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
 )
 
-# sampleSheet <- read.csv("~/Downloads/GSE139307/final_samplesheet.csv")
-# normalizedData <- readRDS("~/Downloads/GSE139307/normalizeddata.rds")
+sampleSheet <- read.csv("~/Downloads/GSE139307/final_samplesheet.csv")
+normalizedData <- readRDS("~/Downloads/GSE139307/normalizeddata.rds")
 
 
 # we need the Sample_Group, the sample sheet of the example has the column pathology we can use to distinguish Cases vs Controls

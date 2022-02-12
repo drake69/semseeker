@@ -1,15 +1,17 @@
 pathway_burden_phenolizer <- function(resultFolder, terms)
 {
 
-  init_env(resultFolder)
+   init_env(resultFolder)
 
+  populations <- c("Case","Control")
   figures <- c("BOTH")
   anomalies <- c("MUTATIONS")
   subGroups <- c("Whole")
 
-  probesPrefix = "PROBES_Gene_"
-  mainGroupLabel =  "GENE"
-  subGroupLabel="GROUP"
+  probesPrefix <- "PROBES_Gene_"
+  mainGroupLabel <-  "GENE"
+  subGroupLabel <- "GROUP"
+
 
   geneAnnotatedFile <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
 
@@ -19,11 +21,11 @@ pathway_burden_phenolizer <- function(resultFolder, terms)
   anomalies <- c("MUTATIONS")
   # anomalies <- c("MUTATIONS","LESIONS")
   # term <- "spermatogenesis"
-  samples <- read.csv(file_path_build(baseFolder =  resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
+  samples <- utils::read.csv(file_path_build(baseFolder =  resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
   for (anomaly in anomalies)
   {
     # anomaly <- "MUTATIONS"
-    geneAnnotated <-subset(geneAnnotatedFile,ANOMALY == anomaly & FIGURE=="BOTH" & GROUP=="Whole")
+    geneAnnotated <-subset(geneAnnotatedFile,geneAnnotatedFile$ANOMALY == anomaly & geneAnnotatedFile$FIGURE=="BOTH" & geneAnnotatedFile$GROUP=="Whole")
     for (term in terms)
     {
 
@@ -42,6 +44,6 @@ pathway_burden_phenolizer <- function(resultFolder, terms)
         result <- merge(result, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID",all.x=TRUE)
     }
   }
-  fileName <- file_path_build (dir_check_and_create(resultFolder,c("Pathway","Phenolyzer")), c("mutations","both",term,"burden","pathway"),"csv")
-  write.table(result,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
+  fileName <- file_path_build (dir_check_and_create(resultFolderData,c("Pathway","Phenolyzer")), c("mutations","both",term,"burden","pathway"),"csv")
+  utils::write.table(result,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
 }

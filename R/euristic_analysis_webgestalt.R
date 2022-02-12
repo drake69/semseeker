@@ -1,12 +1,12 @@
 euristic_analysis_webgestalt <- function(resultFolder)
 {
 
-  init_env(resultFolder)
+   init_env(resultFolder)
 
-  geneAnnotated <- read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
-  resultFolderWebGestalt <- dir_check_and_create(resultFolderEuristic ,"Webgestalt")
+  geneAnnotated <- utils::read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
+  resultFolderDataWebGestalt <- dir_check_and_create(resultFolderDataEuristic ,"Webgestalt")
 
-  geneAnnotated <- subset(geneAnnotated, POPULATION != "Reference" & FIGURE =="BOTH")
+  geneAnnotated <- subset(geneAnnotated, geneAnnotated$POPULATION != "Reference" & FIGURE =="BOTH")
   geneAnnotated <- unique(geneAnnotated[,c("GENE","GROUP","POPULATION","ANOMALY","FIGURE","SAMPLEID")])
   geneAnnotated$freq <- 1
   keys <- unique(geneAnnotated[,c("GROUP","ANOMALY","FIGURE")])
@@ -18,7 +18,7 @@ euristic_analysis_webgestalt <- function(resultFolder)
       figure= keys[i,"FIGURE"]
       group= keys[i,"GROUP"]
       anomaly= keys[i,"ANOMALY"]
-      geneMutation <- subset(geneAnnotated, FIGURE==figure & ANOMALY==anomaly & GROUP==group)
+      geneMutation <- subset(geneAnnotated, geneAnnotated$FIGURE==figure & geneAnnotatedANOMALY==anomaly & geneAnnotatedGROUP==group)
       if(nrow(geneMutation)==0)
         next
       geneMutation <- reshape2::dcast(data = geneMutation, POPULATION  ~ GENE, value.var = "freq", sum)
@@ -28,9 +28,9 @@ euristic_analysis_webgestalt <- function(resultFolder)
       if(nrow(geneMutation)==0)
         next
       geneMutation$gene <- rownames(geneMutation)
-      geneMutation <- subset(geneMutation, Case > 0 & Control ==0)
+      geneMutation <- subset(geneMutation, geneMutation$Case > 0 & geneMutation$Control ==0)
 
-      write.table(unique(row.names(geneMutation)),
+      utils::write.table(unique(row.names(geneMutation)),
                   file.path(system.file(package="WebGestaltR"),"extdata/interestingGenes.txt"),
                   row.names=FALSE,
                   col.names = FALSE ,
@@ -48,15 +48,15 @@ euristic_analysis_webgestalt <- function(resultFolder)
             interestGeneType="genesymbol",
             referenceSet= "genome",
             isOutput=FALSE,
-            outputDirectory= resultFolderWebGestalt,
+            outputDirectory= resultFolderDataWebGestalt,
             projectName= projectName,
             sigMethod ="top")
 
           if(min(enrichResult$FDR) < 0.05)
              projectName <- paste0("@", projectName)
-          filename = file_path_build(resultFolderWebGestalt,projectName,"png")
-          filenameResult = file_path_build(resultFolderWebGestalt,projectName,"csv")
-          write.csv(enrichResult, filenameResult)
+          filename = file_path_build(resultFolderDataWebGestalt,projectName,"png")
+          filenameResult = file_path_build(resultFolderDataWebGestalt,projectName,"csv")
+          utils::write.csv(enrichResult, filenameResult)
           grDevices::png(file= filename, width=2480,height=2480)
           enrichResult <- as.data.frame(enrichResult)
           enrichResult <- enrichResult[order(enrichResult$expect),]

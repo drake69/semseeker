@@ -9,15 +9,7 @@
 #' @param groupingColumnLabel label of the column of the genomic sub area body, tss1500
 #'
 #' @return original bed with genomic area infos
-
 #'
-#' @examples
-#' probesPrefix <- "PROBES_Island_"
-#' subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
-#' mainGroupLabel <- "ISLAND"
-#' subGroupLabel <- "RELATION_TO_CPGISLAND"
-#' islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups
-#'  ,probesPrefix ,mainGroupLabel,subGroupLabel  )
 
 annotateBed <- function (
   populations ,

@@ -1,13 +1,14 @@
 Package: semseeker
 Type: Package
 Title: Calculate Stochastic Epimutations SEM
-Version: 0.3.1
+Version: 0.3.2
 Author: Luigi Corsaro, Davide Gentilini, Lucio Calzari
 Maintainer: Luigi Corsaro <l.corsaro@a-company.it>
 Description: Find epimutaion and epilesion inside methylation dataset.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: true
 URL: http://github.com/drake69/semseeker
 BugReports: https://github.com/drake69/semseeker/issues
 Imports:
@@ -19,7 +20,6 @@ Imports:
     gdata,
     ggplot2,
     gtools,
-    Johnson,
     lattice,
     missMDA,
     openxlsx,
@@ -27,18 +27,19 @@ Imports:
     plyr,
     RColorBrewer,
     reshape2,
-    rrvgo,
     R.utils,
     slider,
     stats,
     stringi,
     utils,
-    WebGestaltR,
     withr,
     zoo
 RoxygenNote: 7.1.2
 Suggests: 
     covr,
-    testthat
+    Johnson,
+    testthat,
+    rrvgo,
+    WebGestaltR
 Depends: 
     R (>= 2.10)

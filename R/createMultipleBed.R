@@ -14,13 +14,13 @@ createMultipleBed <- function(sampleSheet){
       sample <- sampleSheet[j,]
       # if(sample$Sample_ID=="R07C01_203991450116")
       #    message(j)
-      tempresultFolder <-dir_check_and_create(resultFolderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-      fileToRead <- file_path_build(tempresultFolder, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
+      tempresultFolderData <-dir_check_and_create(resultFolderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+      fileToRead <- file_path_build(tempresultFolderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
       message("createMultipleBed file 2 read:", fileToRead)
       if(file.exists(fileToRead))
       {
         message("createMultipleBed read file:", fileToRead)
-        localtemp <- read.csv2(fileToRead, sep="\t", header = FALSE)
+        localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
         localtemp$Sample_ID <- sample$Sample_ID
         if(!exists("localFileRes"))
           localFileRes <- localtemp
@@ -30,8 +30,8 @@ createMultipleBed <- function(sampleSheet){
     }
     if(exists("localFileRes"))
     {
-      fileToWrite <- file_path_build(tempresultFolder, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
-      write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+      fileToWrite <- file_path_build(tempresultFolderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
+      utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
       rm(localFileRes)
       message("createMultipleBed, file saved!")
     }
