@@ -3,35 +3,29 @@
 #' @param values values of methylation
 #' @param slidingWindowSize size of window sliding to calculate hypergeometric
 #' @param thresholds threshold to use for comparison
-#' @param sampleDetail$Sample_ID name of sample to analyze
-#' @param probeFeatures probes features probe, chr, start,end
-#' @param subFileExtension extension to pre pend to file name
+#' @param sampleDetail details of the sample to analyze
+#' @param figure which figure's of sasmple will be analized HYPO or HYPER
 #' @param bonferroniThreshold bonferroni threshold to validate pValue
+#' @param probeFeatures probes details to be used
 #'
 #' @return list of lesion count  and probes count
 #'
 #'
 analyzeSingleSample <- function(values, slidingWindowSize, thresholds, figure, sampleDetail, bonferroniThreshold = 0.05, probeFeatures) {
 
-  #
-  MUTATIONS <- NULL
-  CHR <- NULL
-
   # browser()
-
-
   start_time_single_sample <- Sys.time()
-  message(sampleDetail$Sample_ID, " ", "... Sample analysis warmingUP ", Sys.time())
+  message(sampleDetail$Sample_ID, " ", "SingleSample Sample analysis warmingUP ", Sys.time())
   result <- ""
   result <- result[-1]
 
   # colnames(values) <- "VALUE"
 
-  message(sampleDetail$Sample_ID, " ", "Sample analysis WarmedUP ...", Sys.time())
-  message(sampleDetail$Sample_ID, " ", "Start sample analyze ", Sys.time())
+  message(sampleDetail$Sample_ID, " ", "SingleSample Sample analysis WarmedUP ...", Sys.time())
+  message(sampleDetail$Sample_ID, " ", "SingleSample Start sample analyze ", Sys.time())
 
   mutationAnnotatedSorted <- getMutations(values, figure,thresholds, probeFeatures, sampleDetail$Sample_ID)
-  mutationAnnotatedSortedToSave <- subset(mutationAnnotatedSorted, MUTATIONS == 1)[, c("CHR", "START", "END")]
+  mutationAnnotatedSortedToSave <- subset(mutationAnnotatedSorted, mutationAnnotatedSorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
 
   # browser()
   folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))

@@ -16,7 +16,7 @@ pathway_burden_phenolizer <- function(resultFolder, terms)
   geneAnnotatedFile <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
 
   geneAnnotatedFile$GENE <- string_normalize(geneAnnotatedFile$GENE)
-  geneAnnotatedFile <-subset(geneAnnotatedFile,POPULATION != "Reference")
+  geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
 
   anomalies <- c("MUTATIONS")
   # anomalies <- c("MUTATIONS","LESIONS")

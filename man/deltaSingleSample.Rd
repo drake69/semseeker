@@ -24,7 +24,7 @@ deltaSingleSample(
 
 \item{betaMedians}{median to use for calculation}
 
-\item{subFileExtension}{extension to pre pend to file name}
+\item{probeFeatures}{}
 }
 \value{
 none

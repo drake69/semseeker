@@ -29,5 +29,9 @@ test_that("populationCheck", {
   #Lost Sample_Group Values
   mySampleSheet$Sample_Group <- NA
   expect_true(!is.null(populationCheck(mySampleSheet, methylationData)))
+
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
+
 })
 

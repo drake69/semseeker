@@ -21,13 +21,13 @@ analyzeSingleSample(
 
 \item{thresholds}{threshold to use for comparison}
 
+\item{figure}{which figure's of sasmple will be analized HYPO or HYPER}
+
+\item{sampleDetail}{details of the sample to analyze}
+
 \item{bonferroniThreshold}{bonferroni threshold to validate pValue}
 
-\item{probeFeatures}{probes features probe, chr, start,end}
-
-\item{sampleDetail$Sample_ID}{name of sample to analyze}
-
-\item{subFileExtension}{extension to pre pend to file name}
+\item{probeFeatures}{probes details to be used}
 }
 \value{
 list of lesion count  and probes count

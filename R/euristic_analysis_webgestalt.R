@@ -4,9 +4,9 @@ euristic_analysis_webgestalt <- function(resultFolder)
    init_env(resultFolder)
 
   geneAnnotated <- utils::read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
-  resultFolderDataWebGestalt <- dir_check_and_create(resultFolderDataEuristic ,"Webgestalt")
+  resultFolderDataWebGestalt <- dir_check_and_create(resultFolderEuristic ,"Webgestalt")
 
-  geneAnnotated <- subset(geneAnnotated, geneAnnotated$POPULATION != "Reference" & FIGURE =="BOTH")
+  geneAnnotated <- subset(geneAnnotated, geneAnnotated$POPULATION != "Reference" & geneAnnotated$FIGURE =="BOTH")
   geneAnnotated <- unique(geneAnnotated[,c("GENE","GROUP","POPULATION","ANOMALY","FIGURE","SAMPLEID")])
   geneAnnotated$freq <- 1
   keys <- unique(geneAnnotated[,c("GROUP","ANOMALY","FIGURE")])
@@ -18,7 +18,7 @@ euristic_analysis_webgestalt <- function(resultFolder)
       figure= keys[i,"FIGURE"]
       group= keys[i,"GROUP"]
       anomaly= keys[i,"ANOMALY"]
-      geneMutation <- subset(geneAnnotated, geneAnnotated$FIGURE==figure & geneAnnotatedANOMALY==anomaly & geneAnnotatedGROUP==group)
+      geneMutation <- subset(geneAnnotated, geneAnnotated$FIGURE==figure & geneAnnotated$ANOMALY==anomaly & geneAnnotated$GROUP==group)
       if(nrow(geneMutation)==0)
         next
       geneMutation <- reshape2::dcast(data = geneMutation, POPULATION  ~ GENE, value.var = "freq", sum)

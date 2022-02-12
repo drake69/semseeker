@@ -1,6 +1,6 @@
 #' #' Title
 #' #'
-#' #' @param resultFolderData
+#' #' @param resultFolder
 #' #' @param populations
 #' #' @param figures
 #' #' @param anomalies
@@ -10,7 +10,7 @@
 #' #' @param subGroupLabel
 #' #'
 #' #' @return
-#' 
+#'
 #' #'
 #' #' @examples
 #' #' @importFrom dplyr %>%

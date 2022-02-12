@@ -1,4 +1,4 @@
-probes_go_association_phenolizer <- function(terms, onlySeed = TRUE)
+probes_go_association_phenolizer <- function(terms, onlySeed = TRUE, resultFolder)
 {
    init_env(resultFolder)
   for (term in terms)
@@ -6,7 +6,7 @@ probes_go_association_phenolizer <- function(terms, onlySeed = TRUE)
     # term <- "HP:0000798"
     prio_genes <- phenolyzer_call(term)
     if(onlySeed)
-      prio_genes <- subset(prio_genes, Status=="SeedGene")
+      prio_genes <- subset(prio_genes, prio_genes$Status=="SeedGene")
     if(is.null(prio_genes))
       next
     # geneMutated <- geneMutated[order(geneMutated$Case, decreasing = TRUE),]

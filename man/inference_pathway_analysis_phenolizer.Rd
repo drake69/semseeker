@@ -8,9 +8,9 @@ the number of mutations or the lesioned gene per each sample}
 inference_pathway_analysis_phenolizer(resultFolder, terms)
 }
 \arguments{
-\item{terms}{gene HP term to be searched}
+\item{resultFolder}{where semseeker result are saved}
 
-\item{resultFolderData}{where semseeker result are saved}
+\item{terms}{gene HP term to be searched}
 }
 \value{
 

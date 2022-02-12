@@ -22,17 +22,9 @@
 #' @importFrom foreach %dopar%
 analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, bonferroniThreshold = 0.05, probeFeatures) {
 
-
   # browser()
   start_time <- Sys.time()
   message("... warmingUP ", Sys.time())
-
-  # population folder check
-
-  parallel::clusterExport(envir=environment(), cl = computationCluster,
-                          varlist = list( "analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample","dir_check_and_create","resultFolderData","file_path_build","analyzeSingleSampleBoth","keys.figures",
-                                      "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions",
-                                      "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body"))
 
   ### get beta_values ########################################################
   sampleSheet <- sampleSheet[order(sampleSheet[, "Sample_ID"], decreasing = FALSE), ]
@@ -50,9 +42,9 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
 
   summaryFileName <- file.path(resultFolderData, "summary.csv")
 
-  cycles <- nrow(sampleSheet)
-  # browser()
-  summaryPopulation <- foreach::foreach(i = 1:cycles, .combine='rbind', .export=ls(envir=globalenv()), .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
+
+  summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind', .export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
+  # summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind',.export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
   # for(i in 1:nrow(sampleSheet) ) {
 
     localSampleDetail <- sampleSheet[i,]
@@ -87,8 +79,8 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
     # else
     #   summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
     as.data.frame(sampleStatusTemp)
-
   }
+
   message("Row count result:", nrow(summaryPopulation))
   rm(methylationData)
   gc()

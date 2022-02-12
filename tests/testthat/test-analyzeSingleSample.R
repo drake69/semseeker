@@ -27,4 +27,8 @@ testthat::test_that("analyzeSingleSample",{
   outputFolder <- dir_check_and_create(resultFolderData,c("Control","MUTATIONS_HYPO"))
   fileName <- file_path_build(outputFolder,c(Sample_ID,"MUTATIONS","HYPO"), "bed")
   expect_true(file.exists(fileName))
+
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
+
 })

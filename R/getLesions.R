@@ -38,7 +38,9 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
 
   # browser()
   # calculate enrichment for each window
-  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(ENRICHMENT = stats::ave(MUTATIONS, eval(parse(text = grouping_column)), FUN = function(x) enrichement_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
+  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
+    dplyr::mutate(ENRICHMENT = stats::ave(MUTATIONS, eval(parse(text = grouping_column)),
+                                          FUN = function(x) enrichement_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   basepair_calculator<-function(x,lags){
     tmp_min=-zoo::rollmax( -x, lags, align = "center", fill = 0)
@@ -48,7 +50,8 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
     return(tmp)
   }
   #calculate the base pair count for each window
-  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>% dplyr::mutate(BASEPAIR_COUNT = stats::ave(START, eval(parse(text = grouping_column)), FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
+  mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
+    dplyr::mutate(BASEPAIR_COUNT = stats::ave(START, eval(parse(text = grouping_column)), FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 
@@ -64,15 +67,16 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
   table(lesionWeighted)
   rm(tt)
 
-  lesionWeighted <- data.frame(as.data.frame(mutationAnnotatedSortedLocal), LESIONS = lesionWeighted)
+  lesionWeighted <- data.frame(as.data.frame(mutationAnnotatedSortedLocal), "LESIONS" = lesionWeighted)
 
   lesionWeighted <- sortByCHRandSTART(lesionWeighted)
-  lesionWeighted <- subset(lesionWeighted, LESIONS == 1)[, c("CHR", "START", "END")]
+  lesionWeighted <- subset(lesionWeighted, lesionWeighted$LESIONS == 1)[, c("CHR", "START", "END")]
 
   if (dim(lesionWeighted)[1] > dim(mutationAnnotatedSortedLocal)[1]) {
 
   }
 
+  message("###############   Got lesions for sample !", Sys.time())
   return(lesionWeighted)
 
 }

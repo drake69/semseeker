@@ -9,11 +9,10 @@
 #'
 createPivotResultFromMultipleBedGeneric <- function(genomicAreaMain, genomicAreaSub, sampleSheet) {
 
-  POSITION <- NULL
 
   fileName <- file_path_build( resultFolderData , c(genomicAreaMain , "annotatedBed"), "csv")
   annotatedBed <- utils::read.csv(fileName)
-  annotatedBed <- subset(annotatedBed, POPULATION !="Reference")
+  annotatedBed <- subset(annotatedBed, annotatedBed$POPULATION !="Reference")
   annotatedBed$GROUP <- as.factor(annotatedBed$GROUP)
   # levels(annotatedBed$GROUP)
 
@@ -21,8 +20,8 @@ createPivotResultFromMultipleBedGeneric <- function(genomicAreaMain, genomicArea
 
   annotatedBed$ANOMALY <- as.factor(annotatedBed$ANOMALY)
   annotatedBed$FIGURE <- as.factor(annotatedBed$FIGURE)
-  hypo <- subset(annotatedBed, FIGURE=="HYPER" & ANOMALY == "LESIONS" & GROUP ==genomicAreaSub )[, c(genomicAreaMain,"SAMPLEID","POPULATION","freq")]
-  hyper <- subset(annotatedBed,FIGURE=="HYPO"  & ANOMALY == "LESIONS"& GROUP ==genomicAreaSub)[, c(genomicAreaMain,"SAMPLEID","POPULATION","freq")]
+  hypo <- subset(annotatedBed, annotatedBed$FIGURE=="HYPER" & annotatedBed$ANOMALY == "LESIONS" & annotatedBed$GROUP ==genomicAreaSub )[, c(genomicAreaMain,"SAMPLEID","POPULATION","freq")]
+  hyper <- subset(annotatedBed,annotatedBed$FIGURE=="HYPO"  & annotatedBed$ANOMALY == "LESIONS"& annotatedBed$GROUP ==genomicAreaSub)[, c(genomicAreaMain,"SAMPLEID","POPULATION","freq")]
 
   colnames(hypo) <- c("GENE","SAMPLEID","POPULATION","HYPO")
   colnames(hyper) <- c("GENE","SAMPLEID","POPULATION","HYPER")
@@ -32,19 +31,19 @@ createPivotResultFromMultipleBedGeneric <- function(genomicAreaMain, genomicArea
   merged$HYPO[is.na(merged$HYPO)] <-0
   merged$HYPER[is.na(merged$HYPER)] <-0
   merged$BALANCE <- merged$HYPO - merged$HYPER
-  merged_downregulated <- subset(merged, BALANCE < 0)
+  merged_downregulated <- subset(merged, merged$BALANCE < 0)
   #pivot
   finalResult_down <- reshape2::dcast(data = merged_downregulated,POPULATION+SAMPLEID ~ GENE, value.var = "BALANCE", sum)
 
-  merged_upregulated <- subset(merged, BALANCE > 0)
+  merged_upregulated <- subset(merged, merged$BALANCE > 0)
   #pivot
   finalResult_up <- reshape2::dcast(data = merged_upregulated,POPULATION+SAMPLEID ~ GENE, value.var = "BALANCE", sum)
 
   finalResultdim_up<-dim(finalResult_up)[2]
-  pheno_final_up <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_up[,2:finalResultdim_up], by.x = "Sample_ID", by.y = "SAMPLEID")
+  hyperLesions <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_up[,2:finalResultdim_up], by.x = "Sample_ID", by.y = "SAMPLEID")
 
   finalResultdim_down<-dim(finalResult_down)[2]
-  pheno_final_down <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_down[,2:finalResultdim_down], by.x = "Sample_ID", by.y = "SAMPLEID")
+  hypoLesions <- merge(pheno[,c("Sample_ID","Sample_Group")],finalResult_down[,2:finalResultdim_down], by.x = "Sample_ID", by.y = "SAMPLEID")
 
   sheets <- list(
     SUMMARY = sampleSheet,
