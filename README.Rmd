@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 library("badger")
 badge_devel("drake69/semseeker", "blue")
 badge_lifecycle("stable")
-badge_repostatus("Active")
+# badge_repostatus("Active")
 badge_codecov("drake69/semseeker")
 badge_last_commit("drake69/semseeker")
 badge_github_actions("drake69/semseeker")
