@@ -34,7 +34,5 @@ testthat::test_that("deltaSingleSample",{
   fileName <- file_path_build(outputFolder,c(Sample_ID,"DELTAS","METHYLATION"), "bedgraph")
   expect_true(file.exists(fileName))
 
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
 
 })
