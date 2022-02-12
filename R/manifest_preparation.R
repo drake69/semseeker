@@ -3,8 +3,8 @@
 #  utils::download.file("http://webdata.illumina.com.s3-website-us-east-1.amazonaws.com/downloads/productfiles/methylationEPIC/infinium-methylationepic-v-1-0-b5-manifest-file-csv.zip", temp)
 #
 #  library(readr)
-#  # infinium_methylationepic_v_1_0_b5_manifest_file <- readr::read_csv("~/Downloads/infinium-methylationepic-v-1-0-b5-manifest-file.csv", skip = 7)
-#  infinium_methylationepic_v_1_0_b5_manifest_file <- read_csv("~/Desktop/infinium-methylationepic-v-1-0-b5-manifest-file.csv", skip = 7)
+#  # infinium_methylationepic_v_1_0_b5_manifest_file <- readr::utils::read.csv("~/Downloads/infinium-methylationepic-v-1-0-b5-manifest-file.csv", skip = 7)
+#  infinium_methylationepic_v_1_0_b5_manifest_file <- utils::read.csv("~/Desktop/infinium-methylationepic-v-1-0-b5-manifest-file.csv", skip = 7)
 #  # PROBES <- utils::read.table(unz(temp, "infinium-methylationepic-v-1-0-b5-manifest-file.csv"))
 #  # PROBES <- utils::read.table("~/Desktop/infinium-methylationepic-v-1-0-b5-manifest-file.csv")
 #

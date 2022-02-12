@@ -47,7 +47,7 @@ populationCheck <- function(sampleSheet, methylationData)
   sampleSheet$Sample_Group <- as.factor(sampleSheet$Sample_Group)
   matchedPopulation <- levels(sampleSheet$Sample_Group) %in% populations
   if (is.element(FALSE, matchedPopulation)) {
-    result <- paste(result,  " File:",sampleSheetPath, " Sample_Group should contain only: Reference, Control, Case" )
+    result <- paste(result,  " The Sample_Group should contain only: Reference, Control, Case" )
   }
 
   return(result)

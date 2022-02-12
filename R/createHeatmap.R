@@ -19,7 +19,7 @@ createHeatmap <-
 
     parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
 
-    chartFolder <- dir_check_and_create(resultFolderChart,groupLabel)
+    chartFolder <- dir_check_and_create(resultFolderDataChart,groupLabel)
 
     if (is.null(inputBedDataFrame))
       return()
@@ -42,7 +42,7 @@ createHeatmap <-
       inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste0(inputBedDataFrame[, groupColumnIDs[1]],"_",inputBedDataFrame$FIGURE,sep=""))
     }
     inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
-    inputBedDataFrame <- subset(inputBedDataFrame, POPULATION != "Reference")
+    inputBedDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$POPULATION != "Reference")
     pops <- unique(inputBedDataFrame$POPULATION)
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Case"] <- "Cyan"
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Control"] <- "Blue"
@@ -91,7 +91,7 @@ createHeatmap <-
       #   )
       # )
 
-      tempDataFrame <- subset(inputBedDataFrame, ANOMALY == anomaly)
+      tempDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$ANOMALY == anomaly)
       if(dim(tempDataFrame)[1]==0)
         next
 

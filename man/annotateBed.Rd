@@ -37,11 +37,3 @@ original bed with genomic area infos
 takes a bed and its location (build with the details of popuationa nd genomic area)
 and annoate with detail about genomic area
 }
-\examples{
-probesPrefix <- "PROBES_Island_"
-subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
-mainGroupLabel <- "ISLAND"
-subGroupLabel <- "RELATION_TO_CPGISLAND"
-islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups
- ,probesPrefix ,mainGroupLabel,subGroupLabel  )
-}

@@ -19,12 +19,12 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
     finalBed[,"FIGURE"] <- as.factor(finalBed[,"FIGURE"])
     finalBed[,"POPULATION"] <- as.factor(finalBed[,"POPULATION"])
 
-    numberOfCase <- length(unique(subset(finalBed, POPULATION == "Case" )$SAMPLEID))
-    numberOfControl <- length(unique(subset(finalBed, POPULATION == "Control" )$SAMPLEID))
+    numberOfCase <- length(unique(subset(finalBed, finalBed$POPULATION == "Case" )$SAMPLEID))
+    numberOfControl <- length(unique(subset(finalBed, finalBed$POPULATION == "Control" )$SAMPLEID))
 
      # pop <- "Reference"
      # tempPopData <- subset(finalBed, finalBed[,"POPULATION"] != pop)
-    tempPopData <- subset(finalBed, freq >0 )
+    tempPopData <- subset(finalBed, finalBed$freq >0 )
     sheetList <- vector(mode="list")
     sheetListNames <- vector(mode="list")
 
@@ -42,17 +42,17 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
           next
 
         anomaly <- keys[i,2]
-        tempAnomaly <- subset(temp, ANOMALY == as.character(anomaly))
+        tempAnomaly <- subset(temp, finalBed$ANOMALY == as.character(anomaly))
         if(dim(tempAnomaly)[1]==0)
           next
 
         figure <- keys[i,3]
-        tempDataFrame <- subset(tempAnomaly, FIGURE == figure)
+        tempDataFrame <- subset(tempAnomaly, finalBed$FIGURE == figure)
         if(nrow(tempDataFrame)!=0)
         {
           tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
           fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
-          write.csv2(t(tempDataFrame), fileName)
+          utils::write.csv2(t(tempDataFrame), fileName)
           tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
           colnames(tempDataFrame) <- tempDataFrame[1,]
 

@@ -1,14 +1,14 @@
 
 geneontology_analysis_rrvgo <- function(resultFolder, fileName){
 
-  resultFolderData <- file.path(resultFolder,"Data")
-  resultFolderrrvgo <- dir_check_and_create(resultFolderData,c("Inference","Geneontology","rrvgo",fileName))
+  resultFolderData <- file.path(resultFolderData,"Data")
+  resultFolderDatarrvgo <- dir_check_and_create(resultFolderData,c("Inference","Geneontology","rrvgo",fileName))
   dataFileName <- file.path(resultFolderData, "Inference", fileName)
 
-  geneAnnotatedFile <- read.csv(dataFileName, sep=";", dec=",")
-  geneAnnotatedFile <- subset(geneAnnotatedFile, GROUP=="GENE" & SUBGROUP!="SAMPLE" & AREA_OF_TEST !="TOTAL" & SUBGROUP!="TOTAL")
-  geneAnnotatedFile <- subset(geneAnnotatedFile, FIGURE=="BOTH")
-  geneAnnotatedFile <- subset(geneAnnotatedFile,PVALUE  < 0.05 | PVALUEADJ < 0.05)
+  geneAnnotatedFile <- utils::read.csv(dataFileName, sep=";", dec=",")
+  geneAnnotatedFile <- subset(geneAnnotatedFile, geneAnnotatedFile$GROUP=="GENE" & geneAnnotatedFile$SUBGROUP!="SAMPLE" & geneAnnotatedFile$AREA_OF_TEST !="TOTAL" & geneAnnotatedFile$SUBGROUP!="TOTAL")
+  geneAnnotatedFile <- subset(geneAnnotatedFile, geneAnnotatedFile$FIGURE=="BOTH")
+  geneAnnotatedFile <- subset(geneAnnotatedFile,geneAnnotatedFile$PVALUE  < 0.05 | geneAnnotatedFile$PVALUEADJ < 0.05)
 
   subgroups <- unique(geneAnnotatedFile$SUBGROUP)
 
@@ -45,12 +45,12 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
             subgroup <- key[1,3]
 
             message(type, " ",pval, " ", anomaly, " ", figure, " ", subgroup, " ")
-            geneAnnotated <- subset(geneAnnotatedFile, ANOMALY==anomaly & FIGURE==figure & SUBGROUP== subgroup & geneAnnotatedFile[,pval]   <0.05)
+            geneAnnotated <- subset(geneAnnotatedFile, geneAnnotatedFile$ANOMALY==anomaly & geneAnnotatedFile$FIGURE==figure & geneAnnotatedFile$SUBGROUP== subgroup & geneAnnotatedFile[,pval]   <0.05)
             if(nrow(geneAnnotated) ==0)
               next
 
             searchedGenes <- gsub("_","-",geneAnnotated$AREA_OF_TEST)
-            resultTemp <- AnnotationDbi::mget(x=searchedGenes,envir=org.Hs.egALIAS2EG,mode = "any",ifnotfound = NA,inherits = FALSE)
+            resultTemp <- AnnotationDbi::mget(x=searchedGenes,envir=org.Hs.eg.db::org.Hs.egALIAS2EG,mode = "any",ifnotfound = NA,inherits = FALSE)
             foundGenes <- names(resultTemp)
             notfoundGenes <- gsub("_","-",searchedGenes[!( searchedGenes %in% foundGenes )])
             # if(length(notfoundGenes)>0)
@@ -89,7 +89,7 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
             )
 
                 simMatrix <- rrvgo::calculateSimMatrix(go_analysis[,colName]  ,orgdb="org.Hs.eg.db", ont=type ,method="Rel", keytype = "ENTREZID", semdata = semdata )
-                scores <- setNames(-log10(go_analysis$Pvalue), go_analysis[,colName] )
+                scores <- stats::setNames(-log10(go_analysis$Pvalue), go_analysis[,colName] )
 
                 reducedTerms <- rrvgo::reduceSimMatrix(simMatrix,scores,threshold=0.7,orgdb="org.Hs.eg.db")
 
@@ -106,7 +106,7 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
                 plotFileName <- paste0(pval,"_",type, "_","scatterplot_", anomaly ,"_",figure ,"_", subgroup ,".png", sep = "")
                 # if(min(enrichResult$FDR)<0.05)
                 #   plotFileName <- paste0("@", plotFileName, sep="")
-                plotFileName <- paste0(resultFolderrrvgo,"/", plotFileName, sep="")
+                plotFileName <- paste0(resultFolderDatarrvgo,"/", plotFileName, sep="")
                 sp <- rrvgo::scatterPlot(simMatrix, reducedTerms)
                 sp <- sp + ggplot2::ggtitle(paste0(typeTitle," ", anomaly," ", figureTitle, " ", subgroup ," ", pval, sep = "")) +ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
                 ggplot2::ggsave(plot = sp, filename = plotFileName, width = 10, height = 10, device='png', dpi=600, units = "in", bg="transparent")
@@ -116,7 +116,7 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
                 plotFileName <- paste0(pval,"_",type, "_","heatmap_", anomaly ,"_",figure ,"_", subgroup ," ", pval,".png", sep = "")
                 # if(min(enrichResult$FDR)<0.05)
                 #   plotFileName <- paste0("@", plotFileName, sep="")
-                plotFileName <- paste0(resultFolderrrvgo,"/", plotFileName, sep="")
+                plotFileName <- paste0(resultFolderDatarrvgo,"/", plotFileName, sep="")
                 # #Similarity matrix heatmap
                 grDevices::png(file= plotFileName, width=10, height=10, res = 600, units = "in", bg="transparent")
                 rrvgo::heatmapPlot(simMatrix,reducedTerms,annotateParent=TRUE,annotationLabel="parentTerm",fontsize=6)
@@ -130,7 +130,7 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
                 plotFileName <- paste0(pval,"_",type, "_","treemap_", anomaly ,"_",figure ,"_", subgroup ," ", pval,".png", sep = "")
                 # if(min(enrichResult$FDR)<0.05)
                 #   plotFileName <- paste0("@", plotFileName, sep="")
-                plotFileName <- paste0(resultFolderrrvgo,"/", plotFileName, sep="")
+                plotFileName <- paste0(resultFolderDatarrvgo,"/", plotFileName, sep="")
                 grDevices::png(file= plotFileName, width=10, height=10 , res = 600, units = "in", bg="transparent")
                 rrvgo::treemapPlot(reducedTerms, title = paste0(typeTitle, " ", anomaly ," ",figureTitle ," ", subgroup ," ", pval, sep = ""))
                 # tp <- tp + ggplot2::ggtitle(paste0(typeTitle, " ", anomaly ," ",figureTitle ," ", subgroup , sep = ""))

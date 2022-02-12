@@ -1,26 +1,23 @@
 #' createPivotResultFromMultipleBedGeneric load the multiple bed resulting from
 #' analysis organized into files and folders per anomaly and produce a pivot
 #'
-#' @param anomalyLabel anomaly definition used to lable folder and files eg
-#' MUTATIONS, LESIONS
-#' @param figureLable figure used to create the file HYPO HYPER
-#' @param probeFeatures features of probe CHR and START and NAME
-#' @param columnLabel
+#' @param genomicAreaMain is the genomic area to investigate for example the gene
+#' @param genomicAreaSub is the part of the genomic area main for example the Body of the gene
+#' @param sampleSheet sample sheet to use
 #'
 #' @return list of pivot by column identified with columnLabel and by Sample
-
 #'
 createPivotResultFromMultipleBedGeneric <- function(genomicAreaMain, genomicAreaSub, sampleSheet) {
 
   POSITION <- NULL
 
   fileName <- file_path_build( resultFolderData , c(genomicAreaMain , "annotatedBed"), "csv")
-  annotatedBed <- read_csv(fileName)
+  annotatedBed <- utils::read.csv(fileName)
   annotatedBed <- subset(annotatedBed, POPULATION !="Reference")
   annotatedBed$GROUP <- as.factor(annotatedBed$GROUP)
   # levels(annotatedBed$GROUP)
 
-  pheno <- read_csv(sampleSheet)
+  pheno <- utils::read.csv(sampleSheet)
 
   annotatedBed$ANOMALY <- as.factor(annotatedBed$ANOMALY)
   annotatedBed$FIGURE <- as.factor(annotatedBed$FIGURE)

@@ -1,4 +1,4 @@
-qqunifPlot<-function(pvalues,resultFolder,filePrefix,
+qqunifPlot<-function(pvalues,resultFolderData,filePrefix,
                       should.thin=T, thin.obs.places=2, thin.exp.places=2,
                       xlab=expression(paste0("Expected (",-log[10], " p-value)")),
                       ylab=expression(paste0("Observed (",-log[10], " p-value)")),
@@ -64,11 +64,11 @@ qqunifPlot<-function(pvalues,resultFolder,filePrefix,
     mpts<-matrix(nrow=conf.points*2, ncol=2)
     for(i in seq(from=1, to=conf.points)) {
       mpts[i,1]<- -log10((i-.5)/n)
-      mpts[i,2]<- -log10(qbeta(1-conf.alpha/2, i, n-i))
+      mpts[i,2]<- -log10(stats::qbeta(1-conf.alpha/2, i, n-i))
       mpts[conf.points*2+1-i,1]<- -log10((i-.5)/n)
-      mpts[conf.points*2+1-i,2]<- -log10(qbeta(conf.alpha/2, i, n-i))
+      mpts[conf.points*2+1-i,2]<- -log10(stats::qbeta(conf.alpha/2, i, n-i))
     }
-    grid.polygon(x=mpts[,1],y=mpts[,2], gp=gpar(fill=conf.col, lty=0), default.units="native")
+    grid::grid.polygon(x=mpts[,1],y=mpts[,2], gp=grid::gpar(fill=conf.col, lty=0), default.units="native")
   }
 
   #reduce number of points to plot
@@ -100,14 +100,14 @@ qqunifPlot<-function(pvalues,resultFolder,filePrefix,
                          prepanel=prepanel, scales=list(axs="i"), pch=pch,
                          panel = function(x, y, ...) {
                            if (draw.conf) {
-                             panel.qqconf(n, conf.points=conf.points,
+                             lattice::panel.qqconf(n, conf.points=conf.points,
                                           conf.col=conf.col, conf.alpha=conf.alpha)
                            };
-                           panel.xyplot(x,y, ...);
-                           panel.abline(0,1);
+                           lattice::panel.xyplot(x,y, ...);
+                           lattice::panel.abline(0,1);
                          }, par.settings=par.settings, ...
   )
-  trellis.device(device="png", filename=file.path(resultFolder,paste0( "qqplot_", filePrefix, ".png", sep="")))
+  trellis.device(device="png", filename=file.path(resultFolderData,paste0( "qqplot_", filePrefix, ".png", sep="")))
   print(result.chart)
-  dev.off()
+  grDevices::dev.off()
 }

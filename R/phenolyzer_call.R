@@ -35,7 +35,7 @@ phenolyzer_call <- function(term)
     system(pcommand)
   }
 
-  prio_genes <-  read.csv(filePrioritisedGenes, sep = "\t")
+  prio_genes <-  utils::read.csv(filePrioritisedGenes, sep = "\t")
   if(nrow(prio_genes)==0)
     return (NULL)
   return (prio_genes)

@@ -12,14 +12,11 @@ createPivotResultFromMultipleBedGeneric(
 )
 }
 \arguments{
-\item{anomalyLabel}{anomaly definition used to lable folder and files eg
-MUTATIONS, LESIONS}
+\item{genomicAreaMain}{is the genomic area to investigate for example the gene}
 
-\item{figureLable}{figure used to create the file HYPO HYPER}
+\item{genomicAreaSub}{is the part of the genomic area main for example the Body of the gene}
 
-\item{probeFeatures}{features of probe CHR and START and NAME}
-
-\item{columnLabel}{}
+\item{sampleSheet}{sample sheet to use}
 }
 \value{
 list of pivot by column identified with columnLabel and by Sample

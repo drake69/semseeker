@@ -66,9 +66,9 @@ deltaSingleSample <- function( values, highThresholds, lowThresholds, sampleDeta
  # browser()
  result <- ""
  result <- result[-1]
- result["DELTA_MEAN"] <- round(mean(deltas$DELTA),3)
- result["DELTA_VAR"] <- round(var(deltas$DELTA),3)
- result["DELTA_MEDIAN"] <- round(median(deltas$DELTA),3)
+ result["DELTA_MEAN"] <- round(stats::mean(deltas$DELTA),3)
+ result["DELTA_VAR"] <- round(stats::var(deltas$DELTA),3)
+ result["DELTA_MEDIAN"] <- round(stats::median(deltas$DELTA),3)
 
  dumpSampleAsBedFile( dataToDump = deltasAnnotatedSorted, fileName = file_path_build(folder2Save,c(as.character(sampleDetail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
 

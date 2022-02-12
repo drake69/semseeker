@@ -1,11 +1,11 @@
 pathway_burden_CTD <-  function(resultFolder, ctdDataFrameFile ) {
 
-  init_env(resultFolder)
+   init_env(resultFolder)
   HYPO <- NULL
   HYPER <- NULL
   POPULATION <- NULL
 
-  ctdDataFrame <- read.csv2(ctdDataFrameFile, sep=",")
+  ctdDataFrame <- utils::read.csv2(ctdDataFrameFile, sep=",")
   ctdDataFrame <- as.data.frame(ctdDataFrame)
   colnames(ctdDataFrame) <- string_normalize(colnames(ctdDataFrame))
 
@@ -31,7 +31,7 @@ pathway_burden_CTD <-  function(resultFolder, ctdDataFrameFile ) {
   if (is.null(finalBed))
     return()
 
-  samples <- read.csv(file_path_build(baseFolder =  resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
+  samples <- utils::read.csv(file_path_build(baseFolder =  resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
 
   # foreach::foreach(path in ctdDataFrame$PATHWAY) %dopar%
 
@@ -52,8 +52,8 @@ pathway_burden_CTD <-  function(resultFolder, ctdDataFrameFile ) {
       result <- merge(result, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID",all.x=TRUE)
   }
 
-  fileName <- file_path_build (dir_check_and_create(resultFolder,c("Pathway","CTD")), c("mutations","both","burden","pathway"),"csv")
-  write.table(result,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
+  fileName <- file_path_build (dir_check_and_create(resultFolderData,c("Pathway","CTD")), c("mutations","both","burden","pathway"),"csv")
+  utils::write.table(result,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
 
 
 }

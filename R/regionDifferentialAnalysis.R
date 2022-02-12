@@ -1,6 +1,6 @@
 #' #' Title
 #' #'
-#' #' @param resultFolder
+#' #' @param resultFolderData
 #' #' @param populations
 #' #' @param figures
 #' #' @param anomalies
@@ -27,19 +27,19 @@
 #'     i <- NULL
 #'     FIGURE <- NULL
 #'
-#'     chartFolder <- paste0(resultFolder, "/Charts/", sep = "")
+#'     chartFolder <- paste0(resultFolderData, "/Charts/", sep = "")
 #'     if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'       dir.create(chartFolder)
 #'     }
 #'
 #'     chartFolder <-
-#'       paste0(resultFolder, "/Charts/", mainGroupLabel, "/", sep = "")
+#'       paste0(resultFolderData, "/Charts/", mainGroupLabel, "/", sep = "")
 #'     if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'       dir.create(chartFolder)
 #'     }
 #'
 #'     chartFolder <-
-#'       paste0(resultFolder,
+#'       paste0(resultFolderData,
 #'             "/Charts/",
 #'             mainGroupLabel,
 #'             "/SingleGene",
@@ -48,7 +48,7 @@
 #'       dir.create(chartFolder)
 #'     }
 #'
-#'     logFolder <- paste0(resultFolder, "/logs/", sep = "")
+#'     logFolder <- paste0(resultFolderData, "/logs/", sep = "")
 #'     if (logFolder != "" && !dir.exists(logFolder)) {
 #'       dir.create(logFolder)
 #'     }
@@ -85,7 +85,7 @@
 #'         probesPrefix ,
 #'         mainGroupLabel,
 #'         subGroupLabel,
-#'         resultFolder
+#'         resultFolderData
 #'       )
 #'
 #'     if (is.null(finalBed))
@@ -131,7 +131,7 @@
 #'       paste0(colnames(testResult), collapse = "\t"),
 #'       "' > ",
 #'       paste0(
-#'         resultFolder,
+#'         resultFolderData,
 #'         "/Differential_analysis_",
 #'         mainGroupLabel,
 #'         ".csv",
@@ -200,7 +200,7 @@
 #'     #   try(
 #'     #     if(reswt$p.value < 0.05/numberOfTest)
 #'     #     {
-#'     #       system(paste0( "echo '",paste0( testResult[1,], collapse = "\t"), "' >> ", paste0(resultFolder,"/Differential_analysis_Gene.csv", sep = "")))
+#'     #       system(paste0( "echo '",paste0( testResult[1,], collapse = "\t"), "' >> ", paste0(resultFolderData,"/Differential_analysis_Gene.csv", sep = "")))
 #'     #
 #'     #       chart_dataset <- tempData
 #'     #       Groups <- as.factor(chart_dataset[, selection_column])
@@ -235,13 +235,13 @@
 #'     # parallel::parLapply(cl = computationCluster, fd, fun = tfun(fd) )
 #'
 #'     headFile <- paste0(c(mainGroupLabel,"FIGURE",subGroupLabel,"MEDIAN","VARIANCE","SAMPLE_COUNT"),collapse ="\t")
-#'     system(paste0("echo '",headFile,"'> ",paste0(resultFolder,"/Differential_analysis_",mainGroupLabel ,"_Alone.csv",sep = "")))
+#'     system(paste0("echo '",headFile,"'> ",paste0(resultFolderData,"/Differential_analysis_",mainGroupLabel ,"_Alone.csv",sep = "")))
 #'
 #'     headFile <-paste0( c(mainGroupLabel,"FIGURE",subGroupLabel,"P_VALUE","P_VALUE_CORRECTED","EXECUTED_TEST","POPULATIONS"),collapse="\t")
-#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolder,"/Differential_analysis_",mainGroupLabel ,".csv",sep = "")))
+#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolderData,"/Differential_analysis_",mainGroupLabel ,".csv",sep = "")))
 #'
 #'     headFile <-paste0( c(mainGroupLabel,"FIGURE",subGroupLabel,"CASE_MEDIAN","CASE_VARIANCE","CONTROL_MEDIAN","CONTROL_VARIANCE"),collapse="\t")
-#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolder,"/Differential_analysis_No_Test_",mainGroupLabel ,".csv",sep = "")))
+#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolderData,"/Differential_analysis_No_Test_",mainGroupLabel ,".csv",sep = "")))
 #'
 #'     # foreach::foreach(i = 1:numberOfTest) %dopar% {
 #'     for (i in 1:numberOfTest) {
@@ -286,7 +286,7 @@
 #'             testResultToDump,
 #'             "' >> ",
 #'             paste0(
-#'               resultFolder,
+#'               resultFolderData,
 #'               "/Differential_analysis_",
 #'               mainGroupLabel ,
 #'               "_Alone.csv",
@@ -299,7 +299,7 @@
 #'         }
 #'
 #'
-#'         skipCicle <<- FALSE
+#'         skipCicle  <-  FALSE
 #'         reswt = tryCatch({
 #'           stats::wilcox.test(unlist(freqData) ~ unlist(popData), exact = FALSE)
 #'         }, error = function(e) {
@@ -342,7 +342,7 @@
 #'             testResultToDump,
 #'             "' >> ",
 #'             paste0(
-#'               resultFolder,
+#'               resultFolderData,
 #'               "/Differential_analysis_No_Test_",
 #'               mainGroupLabel ,
 #'               ".csv",
@@ -382,7 +382,7 @@
 #'             testResultToDump,
 #'             "' >> ",
 #'             paste0(
-#'               resultFolder,
+#'               resultFolderData,
 #'               "/Differential_analysis_",
 #'               mainGroupLabel ,
 #'               ".csv",
@@ -446,6 +446,6 @@
 #'     #     tempData <- data.frame(subset(tempData, subGroupLabel == subGroup))
 #'     #     tfun(tempData)
 #'     # }
-#'     # write.csv(testResults,paste0(resultFolder,"/Differential_analysis_Gene.csv"))
+#'     # utils::write.csv(testResults,paste0(resultFolderData,"/Differential_analysis_Gene.csv"))
 #'
 #'   }

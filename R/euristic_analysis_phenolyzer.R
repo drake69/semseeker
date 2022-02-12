@@ -1,9 +1,9 @@
 euristic_analysis_phenolizer <- function(resultFolder, terms)
 {
 
-  init_env(resultFolder)
+   init_env(resultFolder)
 
-  geneAnnotatedFile <- read.csv(file.path(resultFolderData , "GENE_ANNOTATED.csv"))
+  geneAnnotatedFile <- utils::read.csv(file.path(resultFolderData , "GENE_ANNOTATED.csv"))
   geneAnnotatedFile <-subset(geneAnnotatedFile,POPULATION != "Reference")
   # semen;azoospermia,sperm;hypertension;thyroid hormones;semen quality
 
@@ -16,7 +16,7 @@ euristic_analysis_phenolizer <- function(resultFolder, terms)
     # tempDataFrame <- as.data.frame(reshape2::dcast(data = geneAnnotated, SAMPLEID  ~ GENE, value.var = "freq", sum))
     # tempDataFrame <- as.data.frame(t(tempDataFrame))
     # tempDataFrame <- apply(tempDataFrame[],1, as.numeric)
-    # cutOff <- mean(tempDataFrame, na.rm = TRUE)
+    # cutOff <- stats::mean(tempDataFrame, na.rm = TRUE)
     # geneAnnotated <- geneAnnotated[geneAnnotated$freq>cutOff, ]
 
     geneAnnotated <-unique(geneAnnotated[, c("GENE", "POPULATION", "ANOMALY", "SAMPLEID")])
@@ -30,22 +30,22 @@ euristic_analysis_phenolizer <- function(resultFolder, terms)
     geneMutated$gene <- rownames(geneMutated)
     # head(geneMutated[order(geneMutated$Case, decreasing = TRUE),])
 
-    # caseCutOff <- mean(as.numeric(geneMutated$Case))
+    # caseCutOff <- stats::mean(as.numeric(geneMutated$Case))
     # geneMutated <- geneMutated[(as.numeric(geneMutated$Case) > caseCutOff & as.numeric(geneMutated$Control) == 0), ]
     geneMutated <- geneMutated[(as.numeric(geneMutated$Case) > 0 & as.numeric(geneMutated$Control) == 0), ]
 
     geneMutated$gene <- rownames(geneMutated)
-    # write.table(
+    # utils::write.table(
     #   row.names(geneMutated),
-    #   file.path(resultFolder, paste0("/Euristic/Phenolyzer/", anomaly,"_genes_only_case.csv",sep="")),
+    #   file.path(resultFolderData, paste0("/Euristic/Phenolyzer/", anomaly,"_genes_only_case.csv",sep="")),
     #   row.names = FALSE,
     #   col.names = FALSE ,
     #   quote = FALSE,
     #   sep = "\t"
     # )
-    # write.table(
+    # utils::write.table(
     #   geneMutated[order(geneMutated$Case, decreasing = TRUE),] ,
-    #   file.path(resultFolder, paste0("/Euristic/Phenolyzer/", anomaly, "_genes_only_case_all_details.csv", sep="")),
+    #   file.path(resultFolderData, paste0("/Euristic/Phenolyzer/", anomaly, "_genes_only_case_all_details.csv", sep="")),
     #   row.names = FALSE,
     #   col.names = TRUE ,
     #   quote = FALSE,
@@ -65,8 +65,8 @@ euristic_analysis_phenolizer <- function(resultFolder, terms)
       if(nrow(res_prio)>0)
       {
         res_prio <- res_prio[order(res_prio$Score, decreasing = TRUE), ]
-        fileName <- file_path_build (dir_check_and_create(resultFolder,c("Euristic","Phenolyzer")), c("prioritized",anomaly,term,"mutated_genes"),"csv")
-        write.table(res_prio,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
+        fileName <- file_path_build (dir_check_and_create(resultFolderData,c("Euristic","Phenolyzer")), c("prioritized",anomaly,term,"mutated_genes"),"csv")
+        utils::write.table(res_prio,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
       }
     }
   }

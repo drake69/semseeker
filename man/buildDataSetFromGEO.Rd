@@ -19,6 +19,3 @@ samplesheet, and sample's file saved and samplesheet csv
 \description{
 buildDataSetFromGEO
 }
-\examples{
-buildDataSetFromGEO("GSE186766","~/", TRUE)
-}

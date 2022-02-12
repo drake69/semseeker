@@ -17,7 +17,7 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
     if(file.exists(fileName))
     {
       # browser()
-      mutationsTemp <- read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
+      mutationsTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
       mutations <- rbind(mutations, mutationsTemp )
     }
 
@@ -26,7 +26,7 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
     if(file.exists(fileName))
     {
       # browser()
-      lesionsTemp <- read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
+      lesionsTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
       lesions <- rbind(lesions, lesionsTemp )
     }
 

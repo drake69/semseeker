@@ -1,11 +1,14 @@
 geneontology_analysis_webgestalt <- function(resultFolder, fileName){
 
 
-  resultFolderWebGestalt <- check_and_create_dir(resultFolder, c("Inference","geneontology_webgestalt", fileName()))
+  resultFolderDataWebGestalt <- dir_check_and_create(resultFolderData, c("Inference","geneontology_webgestalt", fileName()))
 
-  fileName <- file.path(resultFolder, "Inference", fileName)
-  geneAnnotatedFile <- read.csv(fileName, sep=";", dec=",")
-  geneAnnotatedFile <- subset(geneAnnotatedFile, GROUP=="GENE" & SUBGROUP!="SAMPLE" & AREA_OF_TEST !="TOTAL" & SUBGROUP!="TOTAL" & FIGURE=="BOTH" & (PVALUE  <0.05 | PVALUEADJ < 0.05))
+  fileName <- file.path(resultFolderData, "Inference", fileName)
+  geneAnnotatedFile <- utils::read.csv(fileName, sep=";", dec=",")
+  geneAnnotatedFile <- subset(geneAnnotatedFile, geneAnnotatedFile$GROUP=="GENE" &
+                                geneAnnotatedFile$SUBGROUP!="SAMPLE" & geneAnnotatedFile$AREA_OF_TEST !="TOTAL" &
+                                geneAnnotatedFile$SUBGROUP!="TOTAL" & geneAnnotatedFile$FIGURE=="BOTH" &
+                                (geneAnnotatedFile$PVALUE  <0.05 | geneAnnotatedFile$PVALUEADJ < 0.05))
 
   for(type in c("BP","MF"))
   {
@@ -22,11 +25,11 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
           subgroup <- keys[i,"SUBGROUP"]
           figure <- keys[i,"FIGURE"]
 
-          geneMutation <- subset(geneAnnotated, ANOMALY==anomaly & SUBGROUP==subgroup & FIGURE==figure )
+          geneMutation <- subset(geneAnnotated, geneAnnotated$ANOMALY==anomaly & geneAnnotated$SUBGROUP==subgroup & geneAnnotated$FIGURE==figure )
           print(nrow(geneMutation))
 
           # print(file.path(system.file(package="WebGestaltR"),"extdata/interestingGenes.txt"))
-          write.table(unique(geneMutation$AREA_OF_TEST),
+          utils::write.table(unique(geneMutation$AREA_OF_TEST),
                       file.path(system.file(package="WebGestaltR"),"extdata/interestingGenes.txt"),
                       row.names=FALSE,
                       col.names = FALSE ,
@@ -51,7 +54,7 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
                 interestGeneType="genesymbol",
                 referenceSet= "genome",
                 isOutput=FALSE,
-                outputDirectory= resultFolderWebGestalt,
+                outputDirectory= resultFolderDataWebGestalt,
                 projectName= projectName,
                 sigMethod ="top"
               )
@@ -59,15 +62,15 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
               if(min(enrichResult$FDR) < 0.05)
                 projectName <- paste0("@", projectName, sep="")
 
-              filename = file_path_build(resultFolderWebGestalt,projectName,"png")
-              filenameResult = file_path_build(resultFolderWebGestalt,projectName,"csv")
-              write.csv2(enrichResult, filenameResult)
+              filename = file_path_build(resultFolderDataWebGestalt,projectName,"png")
+              filenameResult = file_path_build(resultFolderDataWebGestalt,projectName,"csv")
+              utils::write.csv2(enrichResult, filenameResult)
 
               grDevices::png(file= filename, width=2048,height=2048, bg = "transparent")
               enrichResult <- as.data.frame(enrichResult)
               enrichResult <- enrichResult[order(enrichResult$expect),]
               graphics::par(mar = c(5, 30, 5, 5)) # Set the margin on all sides to 6
-              par(cex.lab = 4)
+              graphics::par(cex.lab = 4)
               graphics::barplot(height=enrichResult$expect, names=wrap.it(paste0(enrichResult$description,"(FDR=", round(enrichResult$FDR,2),")", sep=" "),25) , horiz=T, las = 1 ,cex.names= 2, space=0.1)
               graphics::mtext( paste0(pval, "gene", anomaly, figure, subgroup, sep=" "), side = 3, line = 1, cex = 2)
               grDevices::dev.off()

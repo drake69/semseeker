@@ -1,6 +1,6 @@
 probes_go_association_phenolizer <- function(terms, onlySeed = TRUE)
 {
-  init_env(resultFolder)
+   init_env(resultFolder)
   for (term in terms)
   {
     # term <- "HP:0000798"

@@ -1,16 +1,18 @@
 test_that("allSemSeeker", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z]"),sep="")
+  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   init_env(tempFolder)
 
   nitem <- 5
   nsamples <- 30
 
-  PROBES$PROBE
 
   methylationData <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylationData <- as.data.frame(matrix(methylationData,nitem,nsamples))
+  probeFeatures <- PROBES[!is.na(PROBES$CHR),]
+  probeFeatures <- probeFeatures[probeFeatures$PROBE %in% sample(x=probeFeatures[,"PROBE"] , size=nitem),]
+  row.names(methylationData) <- probeFeatures$PROBE
 
   Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
   colnames(methylationData) <- Sample_ID

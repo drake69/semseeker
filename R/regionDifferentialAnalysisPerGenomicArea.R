@@ -1,6 +1,6 @@
 #' #' Title
 #' #'
-#' #' @param resultFolder
+#' #' @param resultFolderData
 #' #' @param populations
 #' #' @param figures
 #' #' @param anomalies
@@ -19,22 +19,22 @@
 #'   i <- NULL
 #'   FIGURE <- NULL
 #'
-#'   chartFolder <- paste0(resultFolder, "/Charts/", sep = "")
+#'   chartFolder <- paste0(resultFolderData, "/Charts/", sep = "")
 #'   if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'     dir.create(chartFolder)
 #'   }
 #'
-#'   chartFolder <- paste0(resultFolder, "/Charts/", mainGroupLabel, "/", sep = "")
+#'   chartFolder <- paste0(resultFolderData, "/Charts/", mainGroupLabel, "/", sep = "")
 #'   if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'     dir.create(chartFolder)
 #'   }
 #'
-#'   chartFolder <- paste0(resultFolder, "/Charts/", mainGroupLabel, "/SingleArea", sep = "")
+#'   chartFolder <- paste0(resultFolderData, "/Charts/", mainGroupLabel, "/SingleArea", sep = "")
 #'   if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'     dir.create(chartFolder)
 #'   }
 #'
-#'   logFolder <- paste0(resultFolder, "/logs/", sep = "")
+#'   logFolder <- paste0(resultFolderData, "/logs/", sep = "")
 #'   if (logFolder != "" && !dir.exists(logFolder)) {
 #'     dir.create(logFolder)
 #'   }
@@ -45,7 +45,7 @@
 #'   # options(digits = 22)
 #'   parallel::clusterExport(computationCluster, list("analyzeSingleSample", "dumpSampleAsBedFile", "deltaSingleSample", "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions", "addCellToDataFrame"))
 #'
-#'   finalBed <- annotateBed(populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel, resultFolder)
+#'   finalBed <- annotateBed(populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel, resultFolderData)
 #'
 #'   if (is.null(finalBed))
 #'     return()
@@ -66,7 +66,7 @@
 #'   testResult <- data.frame(mainGroupLabel = "", FIGURE = "", subGroupLabel = "", P.VALUE = "", P.VALUE.CORRECTED = "", EXECUTED_TEST = "", POPULATIONS = "")
 #'   colnames(testResult) <- c( "FIGURE", subGroupLabel, "P.VALUE", "P.VALUE.CORRECTED", "EXECUTED_TEST", "POPULATIONS")
 #'
-#'   system(paste0("echo '", paste0(colnames(testResult), collapse = "\t"), "' > ", paste0(resultFolder, "/Differential_analysis_Area_", mainGroupLabel, ".csv", sep = "")))
+#'   system(paste0("echo '", paste0(colnames(testResult), collapse = "\t"), "' > ", paste0(resultFolderData, "/Differential_analysis_Area_", mainGroupLabel, ".csv", sep = "")))
 #'
 #'   pop <- "Reference"
 #'   filteredData <- data.frame(subset(finalBed, POPULATION != pop))
@@ -75,13 +75,13 @@
 #'   numberOfTest <- dim(keys)[1]
 #'
 #'   headFile <- paste0(c("FIGURE", subGroupLabel, "MEDIAN", "VARIANCE", "SAMPLE_COUNT"), collapse = "\t")
-#'   system(paste0("echo '", headFile, "'> ", paste0(resultFolder, "/Differential_analysis_Area_", mainGroupLabel, "_Alone.csv", sep = "")))
+#'   system(paste0("echo '", headFile, "'> ", paste0(resultFolderData, "/Differential_analysis_Area_", mainGroupLabel, "_Alone.csv", sep = "")))
 #'
 #'   headFile <- paste0(c( "FIGURE", subGroupLabel, "P_VALUE", "P_VALUE_CORRECTED", "EXECUTED_TEST", "POPULATIONS"), collapse = "\t")
-#'   system(paste0("echo '", headFile, "' > ", paste0(resultFolder, "/Differential_analysis_Area_", mainGroupLabel, ".csv", sep = "")))
+#'   system(paste0("echo '", headFile, "' > ", paste0(resultFolderData, "/Differential_analysis_Area_", mainGroupLabel, ".csv", sep = "")))
 #'
 #'   headFile <- paste0(c( "FIGURE", subGroupLabel, "CASE_MEDIAN", "CASE_VARIANCE", "CONTROL_MEDIAN", "CONTROL_VARIANCE"), collapse = "\t")
-#'   system(paste0("echo '", headFile, "' > ", paste0(resultFolder, "/Differential_analysis_No_Test_", mainGroupLabel, ".csv", sep = "")))
+#'   system(paste0("echo '", headFile, "' > ", paste0(resultFolderData, "/Differential_analysis_No_Test_", mainGroupLabel, ".csv", sep = "")))
 #'
 #'   # foreach::foreach(i = 1:numberOfTest) %dopar% {
 #'   for (i in 1:numberOfTest) {
@@ -107,14 +107,14 @@
 #'       testResult[1, "VARIANCE"] <- stats::var(as.vector(tempData$freq))
 #'       testResult[1, "SAMPLE_COUNT"] <- length(as.vector(tempData$freq))
 #'       testResultToDump <- paste0(testResult[1, ], collapse = "\t")
-#'       system(paste0("echo '", testResultToDump, "' >> ", paste0(resultFolder, "/Differential_analysis_Area_", mainGroupLabel, "_Alone.csv", sep = "")))
+#'       system(paste0("echo '", testResultToDump, "' >> ", paste0(resultFolderData, "/Differential_analysis_Area_", mainGroupLabel, "_Alone.csv", sep = "")))
 #'       combination <- paste0(fig, "_", paste0(unique(tempData$POPULATION), collapse = "_Vs_"), "_", subGroup, sep = "")
 #'       print(combination)
 #'       next
 #'     }
 #'
 #'
-#'     skipCicle <<- FALSE
+#'     skipCicle  <-  FALSE
 #'     reswt = tryCatch({
 #'       stats::wilcox.test(unlist(freqData) ~ unlist(popData), exact = FALSE)
 #'     }, error = function(e) {
@@ -140,7 +140,7 @@
 #'       testResult$CONTROL_MEDIAN <- stats::median(subset(tempData, POPULATION == "Control")$freq)
 #'       testResult$CONTROL_VARIANCE <- stats::var(subset(tempData, POPULATION == "Control")$freq)
 #'       testResultToDump <- paste0(testResult[1, ], collapse = "\t")
-#'       system(paste0("echo '", testResultToDump, "' >> ", paste0(resultFolder, "/Differential_analysis_No_Test_Area_", mainGroupLabel, ".csv", sep = "")))
+#'       system(paste0("echo '", testResultToDump, "' >> ", paste0(resultFolderData, "/Differential_analysis_No_Test_Area_", mainGroupLabel, ".csv", sep = "")))
 #'       next
 #'     }
 #'
@@ -158,7 +158,7 @@
 #'
 #'     if (reswt$p.value < 0.05/numberOfTest) {
 #'       testResultToDump <- paste0(testResult[1, ], collapse = "\t")
-#'       system(paste0("echo '", testResultToDump, "' >> ", paste0(resultFolder, "/Differential_analysis_Area_", mainGroupLabel, ".csv", sep = "")))
+#'       system(paste0("echo '", testResultToDump, "' >> ", paste0(resultFolderData, "/Differential_analysis_Area_", mainGroupLabel, ".csv", sep = "")))
 #'
 #'       chart_dataset <- tempData
 #'       Groups <- as.factor(chart_dataset[, selection_column])
