@@ -42,5 +42,6 @@ probesPrefix <- "PROBES_Island_"
 subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
 mainGroupLabel <- "ISLAND"
 subGroupLabel <- "RELATION_TO_CPGISLAND"
-islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel  )
+islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups
+ ,probesPrefix ,mainGroupLabel,subGroupLabel  )
 }

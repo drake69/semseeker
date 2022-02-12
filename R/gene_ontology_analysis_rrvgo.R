@@ -2,7 +2,7 @@
 geneontology_analysis_rrvgo <- function(resultFolder, fileName){
 
   resultFolderData <- file.path(resultFolder,"Data")
-  resultFolderrrvgo <- dir_check_and_create(resultFolderData,"Inference","Geneontology","rrvgo",fileName)
+  resultFolderrrvgo <- dir_check_and_create(resultFolderData,c("Inference","Geneontology","rrvgo",fileName))
   dataFileName <- file.path(resultFolderData, "Inference", fileName)
 
   geneAnnotatedFile <- read.csv(dataFileName, sep=";", dec=",")
