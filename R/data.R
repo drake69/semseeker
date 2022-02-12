@@ -15,7 +15,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_Whole"
 
@@ -26,7 +26,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_1stExon"
 
@@ -36,7 +36,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_3UTR"
 
@@ -46,7 +46,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_5UTR"
 
@@ -56,7 +56,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_Body"
 
@@ -66,7 +66,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_ExonBnd"
 
@@ -76,7 +76,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_TSS200"
 
@@ -86,7 +86,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Gene_TSS1500"
 
@@ -96,7 +96,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Island_Island"
 
@@ -106,7 +106,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Island_N_Shelf"
 
@@ -116,7 +116,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Island_N_Shore"
 
@@ -126,7 +126,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Island_S_Shelf"
 
@@ -136,7 +136,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Island_S_Shore"
 
@@ -146,7 +146,7 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES"
 
@@ -156,6 +156,6 @@
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-#'   of applicants in that year, which stats::means proportions are of people of
+#'   of applicants in that year, which means proportions are of people of
 #'   that sex with that name born in that year).
 "PROBES_Island_Whole"

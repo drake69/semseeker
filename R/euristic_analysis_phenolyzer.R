@@ -4,19 +4,19 @@ euristic_analysis_phenolizer <- function(resultFolder, terms)
    init_env(resultFolder)
 
   geneAnnotatedFile <- utils::read.csv(file.path(resultFolderData , "GENE_ANNOTATED.csv"))
-  geneAnnotatedFile <-subset(geneAnnotatedFile,POPULATION != "Reference")
+  geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
   # semen;azoospermia,sperm;hypertension;thyroid hormones;semen quality
 
   anomalies <- c("MUTATIONS","LESIONS")
   for (anomaly in anomalies)
   {
     # anomaly <- "LESIONS"
-    geneAnnotated <-subset(geneAnnotatedFile,ANOMALY == anomaly)
+    geneAnnotated <-subset(geneAnnotatedFile,geneAnnotatedFile$ANOMALY == anomaly)
 
     # tempDataFrame <- as.data.frame(reshape2::dcast(data = geneAnnotated, SAMPLEID  ~ GENE, value.var = "freq", sum))
     # tempDataFrame <- as.data.frame(t(tempDataFrame))
     # tempDataFrame <- apply(tempDataFrame[],1, as.numeric)
-    # cutOff <- stats::mean(tempDataFrame, na.rm = TRUE)
+    # cutOff <- mean(tempDataFrame, na.rm = TRUE)
     # geneAnnotated <- geneAnnotated[geneAnnotated$freq>cutOff, ]
 
     geneAnnotated <-unique(geneAnnotated[, c("GENE", "POPULATION", "ANOMALY", "SAMPLEID")])
@@ -30,7 +30,7 @@ euristic_analysis_phenolizer <- function(resultFolder, terms)
     geneMutated$gene <- rownames(geneMutated)
     # head(geneMutated[order(geneMutated$Case, decreasing = TRUE),])
 
-    # caseCutOff <- stats::mean(as.numeric(geneMutated$Case))
+    # caseCutOff <- mean(as.numeric(geneMutated$Case))
     # geneMutated <- geneMutated[(as.numeric(geneMutated$Case) > caseCutOff & as.numeric(geneMutated$Control) == 0), ]
     geneMutated <- geneMutated[(as.numeric(geneMutated$Case) > 0 & as.numeric(geneMutated$Control) == 0), ]
 

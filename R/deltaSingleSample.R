@@ -5,15 +5,14 @@
 #' @param lowThresholds lowest threshold to use for comparison
 #' @param sampleDetail details of sample to analyze
 #' @param betaMedians median to use for calculation
-#' @param subFileExtension extension to pre pend to file name
+#' @param probeFeatures
 #'
 #' @return none
 
 #'
 deltaSingleSample <- function( values, highThresholds, lowThresholds, sampleDetail, betaMedians, probeFeatures) {
 
- MUTATIONS <- NULL
- message(sampleDetail$Sample_ID, " ", "... Sample analysis warmingUP ", Sys.time())
+ message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Sample analysis warmingUP ", Sys.time())
 
  # values <- data.frame("VALUE"=values)
 
@@ -21,8 +20,8 @@ deltaSingleSample <- function( values, highThresholds, lowThresholds, sampleDeta
 
  ### get probeFeatures ################################################################################################
 
- message(sampleDetail$Sample_ID, " ", "Sample analysis WarmedUP ...", Sys.time())
- message(sampleDetail$Sample_ID, " ", "Start sample analyze ", Sys.time())
+ message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Sample analysis WarmedUP ...", Sys.time())
+ message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Start sample analyze ", Sys.time())
 
  ### get probesOverThreshold ################################################################################################
  if (!test_match_order(row.names(values), probeFeatures$PROBE)) {
@@ -66,7 +65,7 @@ deltaSingleSample <- function( values, highThresholds, lowThresholds, sampleDeta
  # browser()
  result <- ""
  result <- result[-1]
- result["DELTA_MEAN"] <- round(stats::mean(deltas$DELTA),3)
+ result["DELTA_AVG"] <- round(mean(deltas$DELTA),3)
  result["DELTA_VAR"] <- round(stats::var(deltas$DELTA),3)
  result["DELTA_MEDIAN"] <- round(stats::median(deltas$DELTA),3)
 

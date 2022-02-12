@@ -1,12 +1,13 @@
 #' Calculate stochastic epi mutations from a methylation dataset as outcome
 #' report of pivot
 #'
-#' @param sampleSheet dataframe with at least a column Sample_ID to identify
-#' samples
+#' @param sampleSheet dataframe with at least a column Sample_ID to identify samples
 #' @param methylationData matrix of methylation data
 #' @param bonferroniThreshold = 0.05 #threshold to define which pValue
 #' @param inferenceDetails dataframe of details to calculate inferential statistics accept for lesions definition
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
+#' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
+#' @param resultFolder wherte the result will be saved
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
 #'
@@ -15,7 +16,8 @@ semseeker <- function(sampleSheet,
                       resultFolder,
                       bonferroniThreshold = 0.05,
                       inferenceDetails = NULL,
-                      maxResources = 90) {
+                      maxResources = 90,
+                      iqrTimes = 3 ) {
 
 
   init_env(resultFolder, maxResources)
@@ -81,7 +83,7 @@ semseeker <- function(sampleSheet,
     stop("Empty methylationData ")
   }
 
-  populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes = 3)
+  populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes)
 
   utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(resultFolderData ,"beta_thresholds","csv"), sep=";")
 
@@ -155,9 +157,9 @@ semseeker <- function(sampleSheet,
   createExcelPivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnID = c(3))
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnID = c(1) )
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnID = c(1,3))
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnIDs = c(1) )
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnIDs = c(1,3))
 
 
   probesPrefix <- "PROBES_Island_"
@@ -167,9 +169,9 @@ semseeker <- function(sampleSheet,
   createExcelPivot ( populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
   islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnID = 3)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnID = 1)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnID = c(1,3))
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnIDs = 3)
+  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnIDs = 1)
+  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
 
   subGroups <- c("DMR")
   probesPrefix = "PROBES_DMR_"
@@ -178,14 +180,14 @@ semseeker <- function(sampleSheet,
   createExcelPivot (populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
   dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnID = 1 )
+  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
 
   colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
   colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
 
   totalBed <- rbind(geneBed, dmrBed, islandBed, stringsAsFactors = TRUE)
-  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnID = 3)
+  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
 
   rm(populationControlRangeBetaValues)
 
@@ -201,7 +203,6 @@ semseeker <- function(sampleSheet,
 
 }
 
-
 semseeker_pheno <- function(sampleSheet,
                       methylationData,
                       resultFolder,
@@ -210,7 +211,7 @@ semseeker_pheno <- function(sampleSheet,
                       pheno_term,
                       onlySeed = TRUE) {
 
-  probesFilter <- probes_go_association_phenolizer(pheno_term, onlySeed = TRUE )
+  probesFilter <- probes_go_association_phenolizer(pheno_term, onlySeed = TRUE, resultFolder )
 
   # browser()
   methylationData <- methylationData[ rownames(methylationData) %in% probesFilter, ]

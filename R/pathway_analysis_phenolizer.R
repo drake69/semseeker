@@ -1,8 +1,7 @@
 #' inference_pathway_analysis_phenolizer calculate and att to sample sheet result
 #' the number of mutations or the lesioned gene per each sample
-#' @param resultFolderData where semseeker result are saved
+#' @param resultFolder where semseeker result are saved
 #' @param terms gene HP term to be searched
-#'
 #' @return
 inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 {
@@ -10,13 +9,13 @@ inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
    init_env(resultFolder)
 
   geneAnnotatedFile <- utils::read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
-  geneAnnotatedFile <-subset(geneAnnotatedFile,POPULATION != "Reference")
+  geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
 
   anomalies <- c("LESIONS","MUTATIONS")
   for(anomaly in anomalies){
 
     # anomaly <- "LESIONS"
-    genesAffected <-subset(geneAnnotatedFile,ANOMALY == anomaly)
+    genesAffected <-subset(geneAnnotatedFile,geneAnnotatedFile$ANOMALY == anomaly)
     if(anomaly=="LESIONS")
     {
       # one lesions per gene allowed
@@ -34,7 +33,7 @@ inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
       res_prio_burden <- as.data.frame(apply(res_prio,1,sum))
       res_prio_burden$SAMPLEID <- genesAffected$SAMPLEID
       anomalyColumn <- paste0(anomaly,"_",string_normalize(term), sep="")
-      anomalyColumn <- string (anomalyColumn)
+      anomalyColumn <- as.character(anomalyColumn)
 
       colnames(res_prio_burden) <- c(anomalyColumn,"SAMPLEID")
 

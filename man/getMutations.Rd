@@ -9,11 +9,13 @@ getMutations(values, figure, thresholds, probeFeatures, sampleName)
 \arguments{
 \item{values}{values of methylation}
 
+\item{figure}{figure to get Mutaions of HYPO or HYPER methylation}
+
 \item{thresholds}{threshold to use for comparison}
 
 \item{probeFeatures}{probes features probe, chr, start,end}
 
-\item{comparison}{function to use for compare}
+\item{sampleName}{name of the sample}
 }
 \value{
 mutations

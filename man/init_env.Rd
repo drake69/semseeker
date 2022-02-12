@@ -7,9 +7,9 @@
 init_env(resultFolder, maxResources = 90)
 }
 \arguments{
-\item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
+\item{resultFolder}{where result of semseeker will bestored}
 
-\item{resultFolderData}{where result of semseeker will bestored}
+\item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 }
 \value{
 

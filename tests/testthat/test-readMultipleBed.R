@@ -50,5 +50,9 @@ test_that("readMultipleBed", {
   res <-readMultipleBed ("MUTATIONS", "BOTH", probeFeatures, columnLabel, populationName, groupingColumnLabel)
 
   expect_true(nrow(res)>0)
+
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
+
 }
 )

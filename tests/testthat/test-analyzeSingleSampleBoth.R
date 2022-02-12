@@ -44,4 +44,7 @@ test_that("analyseSingleSampleBoth", {
   expect_true(nrow(mutations)==nrow(fileData))
   expect_true(ncol(fileData)==3 )
 
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
+
 })

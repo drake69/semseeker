@@ -42,5 +42,8 @@ test_that("createMultipleBed", {
 
   expect_true(nrow(localFileRes)>0)
 
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
+
 
 })

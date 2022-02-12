@@ -1,7 +1,7 @@
 test_that("analizePopulation", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 15, pattern = "[A-Za-z0-9]"),sep="")
   init_env(tempFolder)
 
   nitem <- 5e4
@@ -18,24 +18,29 @@ test_that("analizePopulation", {
   row.names(betaInferiorThresholds) <- probeFeatures$PROBE
   row.names(methylationData) <- probeFeatures$PROBE
 
-  Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
+  Sample_ID <- stri_rand_strings(nsamples, 15, pattern = "[A-Za-z]")
   colnames(methylationData) <- Sample_ID
   Sample_Group <- rep("Control",nsamples)
-  mySampleSheet <- data.frame(Sample_Group, Sample_ID)
+  sampleSheet <- data.frame(Sample_Group, Sample_ID)
+  betaMedians <- betaSuperiorThresholds + betaInferiorThresholds / 2
+  slidingWindowSize <- 11
+  bonferroniThreshold <- 0.01
 
   sp <- analizePopulation(methylationData=methylationData,
-                    slidingWindowSize = 11,
+                    slidingWindowSize = slidingWindowSize,
                     betaSuperiorThresholds = betaSuperiorThresholds,
                     betaInferiorThresholds = betaInferiorThresholds,
-                    sampleSheet = mySampleSheet,
-                    betaMedians = betaSuperiorThresholds - betaInferiorThresholds,
-                    bonferroniThreshold = 0.01,
+                    sampleSheet = sampleSheet,
+                    betaMedians = betaMedians,
+                    bonferroniThreshold = bonferroniThreshold,
                     probeFeatures = probeFeatures
                     )
 
-  expect_true(nrow(sp)==nrow(mySampleSheet))
-  # doParallel::stopImplicitCluster()
-  # parallel::stopCluster(computationCluster)
+  message(nrow(sp))
+  message(nrow(sampleSheet))
+  expect_true(nrow(sp)==nrow(sampleSheet))
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
   # unlink(tempFolder, recursive = TRUE)
   # outputFolder <- dir_check_and_create(resultFolderData,c("Control","MUTATIONS_HYPO"))
   # fileName <- file_path_build(outputFolder,c("MULTIPLE","MUTATIONS","HYPO"), "bed")

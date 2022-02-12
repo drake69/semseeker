@@ -59,7 +59,7 @@ qqunifPlot<-function(pvalues,resultFolderData,filePrefix,
 
   #this is a helper function to draw the confidence interval
   panel.qqconf<-function(n, conf.points=1000, conf.col="gray", conf.alpha=.05, ...) {
-    require(grid)
+    # require(grid)
     conf.points = min(conf.points, n-1);
     mpts<-matrix(nrow=conf.points*2, ncol=2)
     for(i in seq(from=1, to=conf.points)) {
@@ -96,18 +96,18 @@ qqunifPlot<-function(pvalues,resultFolderData,filePrefix,
   }
 
   #draw the plot
-  result.chart <- xyplot(pvalues~exp.x, groups=grp, xlab=xlab, ylab=ylab, aspect=aspect,
+  result.chart <- lattice::xyplot(pvalues~exp.x, groups=grp, xlab=xlab, ylab=ylab, aspect=aspect,
                          prepanel=prepanel, scales=list(axs="i"), pch=pch,
                          panel = function(x, y, ...) {
                            if (draw.conf) {
-                             lattice::panel.qqconf(n, conf.points=conf.points,
+                             panel.qqconf(n, conf.points=conf.points,
                                           conf.col=conf.col, conf.alpha=conf.alpha)
                            };
                            lattice::panel.xyplot(x,y, ...);
                            lattice::panel.abline(0,1);
                          }, par.settings=par.settings, ...
   )
-  trellis.device(device="png", filename=file.path(resultFolderData,paste0( "qqplot_", filePrefix, ".png", sep="")))
+  lattice::trellis.device(device="png", filename=file.path(resultFolderData,paste0( "qqplot_", filePrefix, ".png", sep="")))
   print(result.chart)
   grDevices::dev.off()
 }

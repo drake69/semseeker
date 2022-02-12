@@ -33,4 +33,8 @@ testthat::test_that("deltaSingleSample",{
   outputFolder <- dir_check_and_create(resultFolderData,c("Control","DELTAS_METHYLATION"))
   fileName <- file_path_build(outputFolder,c(Sample_ID,"DELTAS","METHYLATION"), "bedgraph")
   expect_true(file.exists(fileName))
+
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
+
 })

@@ -2,33 +2,20 @@
 % Please edit documentation in R/createHeatmap.R
 \name{createHeatmap}
 \alias{createHeatmap}
-\title{createChartFromMultipleBedGenericPerRegion load the multiple bed resulting from
+\title{createHeatmap load the multiple bed resulting from
 analysis organized into files and folders per anomaly and produce a pivot}
 \usage{
 createHeatmap(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs)
 }
 \arguments{
-\item{anomalies}{vector of anomalies MUTATIONS or LESIONS}
+\item{inputBedDataFrame}{data frame to chart}
 
-\item{groupLabel}{name of column to group the data set}
-
-\item{populations}{vectors of populations name used to group populations
-for differential analysis}
-
-\item{figures}{vectors of figure to identify lesions as HYPER or HYPO}
-
-\item{subGroups}{other grouping column over main group}
-
-\item{probesPrefix}{definition of prefix to use probes to load}
-
-\item{subGroupLabel}{name of column to sub group the data set}
-
-\item{logFolder}{log folder used by the parallel cluster}
+\item{groupColumnIDs}{}
 }
 \value{
 list of pivot by column identified with groupLabel and by Sample
 }
 \description{
-createChartFromMultipleBedGenericPerRegion load the multiple bed resulting from
+createHeatmap load the multiple bed resulting from
 analysis organized into files and folders per anomaly and produce a pivot
 }

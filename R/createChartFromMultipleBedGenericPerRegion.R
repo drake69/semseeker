@@ -19,7 +19,7 @@ createChartFromMultipleBedGenericPerRegion <- function(populations, figures, ano
   HYPER <- NULL
   POPULATION <- NULL
 
-  chartFolder <- dir_check_and_create(resultFolderDataChart, c(mainGroupLabel, "Grouped"))
+  chartFolder <- dir_check_and_create(resultFolderChart, c(mainGroupLabel, "Grouped"))
 
   finalBed <-  annotateBed(populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
 
@@ -56,7 +56,7 @@ createChartFromMultipleBedGenericPerRegion <- function(populations, figures, ano
 
       # temp <- log10(temp)
       myplot <- ggplot2::ggplot(temp, ggplot2::aes(HYPO, HYPER))
-      myplot <- myplot  + ggplot2::geom_point(ggplot2::aes(alpha = ALPHA, size = SIZE))
+      myplot <- myplot  + ggplot2::geom_point(ggplot2::aes(alpha = temp$ALPHA, size = temp$SIZE))
 
       # myplot <- myplot  + ggplot2::coord_cartesian(
       #   xlim = max(temp$HYPO),
@@ -67,7 +67,7 @@ createChartFromMultipleBedGenericPerRegion <- function(populations, figures, ano
       # )
       # leg <- "Each symbol represent the number of locus having X hypometilated probes and Y hypermethylated probes\n" +
       #   " the size of the circle represents the count of locus having these figures \n"
-      # " the transparency is the case/control ratio black stats::means only case white stats::means only control"
+      # " the transparency is the case/control ratio black means only case white means only control"
 
       myplot <- myplot  + ggplot2::ggtitle (paste0("Count Hyper methylated probes \n Vs. Hypo Methylated Probes per ", mainGroupLabel, "  in the region: ", grp ," (", dim(temp)[1],")" ,  sep=""))
       # myplot

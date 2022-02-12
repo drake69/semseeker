@@ -72,8 +72,8 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
                                                    conditional = FALSE,
                                                    testDirection = "over")
 
-            Over <- GOstats::hyperGTest(params)
-            go_analysis <- GOstats::summary(Over)
+            Over <- Category::hyperGTest(params)
+            go_analysis <- summary(Over)
 
             # browser()
 

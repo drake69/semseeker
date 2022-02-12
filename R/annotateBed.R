@@ -46,7 +46,7 @@ annotateBed <- function (
     )
 
   # for(g in 1:nrow(keys))
-  finalBed <- foreach::foreach(g = 1:nrow(keys), .combine = rbind) %dopar%
+  finalBed <- foreach::foreach(g=1:nrow(keys), .combine = rbind) %dopar%
   {
     anomal <- keys[g,"ANOMALY"]
     pop <- keys[g,"POPULATION"]

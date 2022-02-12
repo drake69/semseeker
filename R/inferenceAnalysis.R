@@ -47,12 +47,12 @@ inferenceAnalysis <- function(inferenceDetails)
 
     file_result_prefix <- paste0( depthAnalysis,"_", independentVariable,"_",sep="")
 
-    studySummary <- subset(studySummary, Sample_Group!="Reference")
+    studySummary <- subset(studySummary, studySummary$Sample_Group!="Reference")
     #########################################################################################################
     #########################################################################################################
 
-    if(!dir.exists(resultFolderDataInference))
-      dir.create(resultFolderDataInference)
+    if(!dir.exists(resultFolderInference))
+      dir.create(resultFolderInference)
 
     if (!(independentVariable %in% colnames(studySummary)))
     {
@@ -88,10 +88,10 @@ inferenceAnalysis <- function(inferenceDetails)
       "SHAPIRO.PVALUE" = "",
       "BARTLETT.PVALUE" = "",
       "COUNT.CASE","",
-      "MEAN.CASE" ="",
+      "AVG.CASE" ="",
       "SD.CASE"="",
       "COUNT.CONTROL"="",
-      "MEAN.CONTROL"="",
+      "AVG.CONTROL"="",
       "SD.CONTROL"="",
       "RHO"=""
     )
@@ -130,7 +130,7 @@ inferenceAnalysis <- function(inferenceDetails)
       # family_test <- "poisson"
       # transformation <- NULL
       g_start <- 2 + length(covariates)
-      result_temp <- apply_model(tempDataFrame = studySummary[, c(independentVariable, covariates, cols[i])], g_start = g_start , family = family_test, covariates = covariates,
+      result_temp <- apply_model(tempDataFrame = studySummary[, c(independentVariable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
                                  key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder, independentVariable, depthAnalysis)
       result <- rbind(result, result_temp)
     }
@@ -144,7 +144,7 @@ inferenceAnalysis <- function(inferenceDetails)
     if(family_test=="binomial")
     {
 
-      chartFolder <- dir_check_and_create(resultFolderDataChart,"POPULATION_COMPARISON")
+      chartFolder <- dir_check_and_create(resultFolderChart,"POPULATION_COMPARISON")
 
       filename <- file_path_build(chartFolder,file_result_prefix, "MUTATIONS.png")
       grDevices::png(file= filename, width=2480,height=2480)
@@ -220,7 +220,7 @@ inferenceAnalysis <- function(inferenceDetails)
 
             g_start <- 2 + length(covariates)
 
-            result_temp <- apply_model(tempDataFrame = tempDataFrame, g_start = g_start, family = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE, logFolder= logFolder, independentVariable, depthAnalysis)
+            result_temp <- apply_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE, logFolder= logFolder, independentVariable, depthAnalysis)
 
             # #browser()
             # n_adj <- iters - g_start
@@ -242,7 +242,7 @@ inferenceAnalysis <- function(inferenceDetails)
     result <- result[order(result$PVALUEADJ),]
 
     if(filterpvalue)
-        result <- subset(result, PVALUE < 0.05 | PVALUEADJ < 0.05)
+        result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
 
     if(nrow(result)>0)
     {
@@ -254,7 +254,7 @@ inferenceAnalysis <- function(inferenceDetails)
         file_suffix <- "_test_corrected_result"
       }
 
-      fileName <- file_path_build(resultFolderDataInference,c(file_result_prefix , transformation, family_test, file_suffix),"csv")
+      fileName <- file_path_build(resultFolderInference,c(file_result_prefix , transformation, family_test, file_suffix),"csv")
       utils::write.csv2(result,fileName , row.names = FALSE)
     }
 
@@ -264,8 +264,8 @@ inferenceAnalysis <- function(inferenceDetails)
     # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
 
     # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
-    # result <- utils::read.csv(file.path(resultFolderDataInference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
-    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolderDataInference =  report.dir, filePrefix ="diff_meth_sites")
+    # result <- utils::read.csv(file.path(resultFolderInference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
+    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolderInference =  report.dir, filePrefix ="diff_meth_sites")
 
     # case_vs_control_binomial_regression_corrected_result <-
     #   utils::read.csv2(
@@ -294,7 +294,7 @@ inferenceAnalysis <- function(inferenceDetails)
     #
     #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
     #   qqunifPlot(diffmeth.p.val$PVALUE,
-    #               resultFolderDataInference = resultFolderDataInference,
+    #               resultFolderInference = resultFolderInference,
     #               filePrefix = file_prefix)
     # }
     #

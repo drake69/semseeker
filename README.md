@@ -3,10 +3,13 @@
 # semseeker
 
 <!-- badges: start -->
-
-[![Coverage Status](https://img.shields.io/codecov/c/github/drake69/semseeker/master.svg)]
-(https://codecov.io/github/drake69/semseeker?branch=master)
-
+`r badge_devel("drake69/semseeker", "blue")`
+`r badge_lifecycle("stable")`
+`r badge_repostatus("Active")`
+`r badge_codecov("drake69/semseeker")`
+`r badge_last_commit("drake69/semseeker")`
+`r badge_github_actions("drake69/semseeker")`
+`r badge_codefactor("drake69/semseeker")`
 <!-- badges: end -->
 
 The goal of semseeker is to find all methylation localized and enriched

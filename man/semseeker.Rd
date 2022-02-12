@@ -11,20 +11,24 @@ semseeker(
   resultFolder,
   bonferroniThreshold = 0.05,
   inferenceDetails = NULL,
-  maxResources = 90
+  maxResources = 90,
+  iqrTimes = 3
 )
 }
 \arguments{
-\item{sampleSheet}{dataframe with at least a column Sample_ID to identify
-samples}
+\item{sampleSheet}{dataframe with at least a column Sample_ID to identify samples}
 
 \item{methylationData}{matrix of methylation data}
+
+\item{resultFolder}{wherte the result will be saved}
 
 \item{bonferroniThreshold}{= 0.05 #threshold to define which pValue}
 
 \item{inferenceDetails}{dataframe of details to calculate inferential statistics accept for lesions definition}
 
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
+
+\item{iqrTimes}{how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier}
 }
 \value{
 files into the result folder with pivot table and bedgraph.

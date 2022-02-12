@@ -23,4 +23,7 @@ test_that("createExcelPivot", {
   subGroupLabel="GROUP"
   createExcelPivot (populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
+  doParallel::stopImplicitCluster()
+  parallel::stopCluster(computationCluster)
+
 })

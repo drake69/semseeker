@@ -1,7 +1,7 @@
 analyzeSingleSampleBoth <- function(sampleDetail) {
 
   start_time_single_sample <- Sys.time()
-  message(sampleDetail$Sample_ID, " ", "... Sample analysis warmingUP ", Sys.time())
+  message(sampleDetail$Sample_ID, " ", "SingleSampleBoth Sample analysis warmingUP ", Sys.time())
   result <- ""
   result <- result[-1]
 

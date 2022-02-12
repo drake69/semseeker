@@ -9,13 +9,7 @@ dumpSampleAsBedFile(dataToDump, fileName)
 \arguments{
 \item{dataToDump}{data frame to dump into bed file with CHR, START, END}
 
-\item{fileExtension}{extension to give to written file}
-
-\item{resultSubFolder}{folder under the root result folder to group files}
-
-\item{sampleName}{name of the sample to create the file for}
-
-\item{multipleFileColNames}{names to use as header for the files dumped}
+\item{fileName}{name of the file to save data in}
 }
 \value{
 nothing

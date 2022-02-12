@@ -1,13 +1,9 @@
 #' given data and colnames dump as bed file
 #'
 #' @param dataToDump data frame to dump into bed file with CHR, START, END
-#' @param fileExtension extension to give to written file
-#' @param resultSubFolder folder under the root result folder to group files
-#' @param sampleName name of the sample to create the file for
-#' @param multipleFileColNames names to use as header for the files dumped
+#' @param fileName name of the file to save data in
 #'
 #' @return nothing
-
 #'
 
 dumpSampleAsBedFile <- function(dataToDump, fileName) {

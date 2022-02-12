@@ -1,25 +1,19 @@
-#' createChartFromMultipleBedGenericPerRegion load the multiple bed resulting from
+#' createHeatmap load the multiple bed resulting from
 #' analysis organized into files and folders per anomaly and produce a pivot
 #'
-#' @param populations vectors of populations name used to group populations
-#' for differential analysis
-#' @param figures vectors of figure to identify lesions as HYPER or HYPO
-#' @param anomalies vector of anomalies MUTATIONS or LESIONS
-#' @param subGroups other grouping column over main group
-#' @param probesPrefix definition of prefix to use probes to load
-#' @param groupLabel name of column to group the data set
-#' @param subGroupLabel  name of column to sub group the data set
-#' @param  logFolder log folder used by the parallel cluster
+#' @param inputBedDataFrame data frame to chart
+#' @param anomalies
+#' @param groupLabel
+#' @param groupColumnIDs
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
-
 #'
 createHeatmap <-
   function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
     parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
 
-    chartFolder <- dir_check_and_create(resultFolderDataChart,groupLabel)
+    chartFolder <- dir_check_and_create(resultFolderChart,groupLabel)
 
     if (is.null(inputBedDataFrame))
       return()
