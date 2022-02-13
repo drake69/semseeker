@@ -5,25 +5,15 @@
 
 <!-- badges: start -->
 
-    #> Warning: replacing previous import 'lifecycle::last_warnings' by
-    #> 'rlang::last_warnings' when loading 'tibble'
-    #> Warning: replacing previous import 'lifecycle::last_warnings' by
-    #> 'rlang::last_warnings' when loading 'pillar'
-    #> ✓ Setting active project to '/Users/lcorsaro/Documents/Progetti_Sviluppo/
-    #> semseeker'
-
-[![](https://img.shields.io/badge/devel%20version-0.3.2-blue.svg)](https://github.com/drake69/semseeker)
-[![](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![](https://img.shields.io/badge/devel%20version-0.3.3-blue.svg)](https://github.com/drake69/semseeker)
+[![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
 [![R build
 status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
-[![CodeFactor](https://www.codefactor.io/repository/github/drake69/semseeker/badge)](https://www.codefactor.io/repository/github/drake69/semseeker)
 
-[![](https://img.shields.io/badge/devel%20version-0.3.2-blue.svg)](https://github.com/drake69/semseeker)
-[![R-CMD-check](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
-[![Codecov test
-coverage](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker?branch=main)
+<!-- [![R-CMD-check](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions) -->
+<!-- [![Codecov test coverage](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker?branch=main) -->
 <!-- badges: end -->
 
 The goal of semseeker is to find all methylation localized and enriched
