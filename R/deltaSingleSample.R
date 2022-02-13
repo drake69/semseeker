@@ -59,7 +59,7 @@ deltaSingleSample <- function( values, highThresholds, lowThresholds, sampleDeta
 
  deltasAnnotatedSorted <- sortByCHRandSTART(deltasAnnotated)
 
- deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, MUTATIONS == 1)[, c("CHR", "START", "END", "DELTA")]
+ deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$MUTATIONS == 1)[, c("CHR", "START", "END", "DELTA")]
 
  folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),"DELTAS_METHYLATION"))
  # browser()

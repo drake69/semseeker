@@ -51,7 +51,8 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
   }
   #calculate the base pair count for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
-    dplyr::mutate(BASEPAIR_COUNT = stats::ave(START, eval(parse(text = grouping_column)), FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
+    dplyr::mutate(BASEPAIR_COUNT = stats::ave(START, eval(parse(text = grouping_column)),
+                                              FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 
