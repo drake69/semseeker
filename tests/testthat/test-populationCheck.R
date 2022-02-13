@@ -30,8 +30,8 @@ test_that("populationCheck", {
   mySampleSheet$Sample_Group <- NA
   expect_true(!is.null(populationCheck(mySampleSheet, methylationData)))
 
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
+  # doParallel::stopImplicitCluster()
+  # parallel::stopCluster(computationCluster)
 
 })
 

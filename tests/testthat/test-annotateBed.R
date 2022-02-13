@@ -78,8 +78,8 @@ test_that("annotateBed", {
 
   expect_true( columnLabel %in% colnames(finalBed))
 
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
+  # doParallel::stopImplicitCluster()
+  # parallel::stopCluster(computationCluster)
 
 
 })

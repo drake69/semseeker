@@ -28,7 +28,7 @@ testthat::test_that("analyzeSingleSample",{
   fileName <- file_path_build(outputFolder,c(Sample_ID,"MUTATIONS","HYPO"), "bed")
   expect_true(file.exists(fileName))
 
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
+  # doParallel::stopImplicitCluster()
+  # parallel::stopCluster(computationCluster)
 
 })
