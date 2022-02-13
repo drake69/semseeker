@@ -1,9 +1,7 @@
 #' init environment
-#'
 #' @param resultFolder where result of semseeker will bestored
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @return
-#' @export
 init_env <- function(resultFolder, maxResources = 90)
 {
 

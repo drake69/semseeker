@@ -5,7 +5,7 @@
 #' @param lowThresholds lowest threshold to use for comparison
 #' @param sampleDetail details of sample to analyze
 #' @param betaMedians median to use for calculation
-#' @param probeFeatures
+#' @param probeFeatures genomic position of probes
 #'
 #' @return none
 

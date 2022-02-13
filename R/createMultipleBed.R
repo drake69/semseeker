@@ -4,10 +4,10 @@ createMultipleBed <- function(sampleSheet){
   # browser()
   keys <- expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"=keys.figures,"ANOMALY"= keys.anomalies,"EXT"="bed")
   keys <- rbind(keys, expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
-  foreach::foreach(i = 1:nrow(keys), cl = computationCluster) %dopar% {
-  # for (i in 1:nrow(keys)) {
-    # i <- 20
-    key <- keys[i,]
+  foreach::foreach(foreachIndex = 1:nrow(keys), cl = computationCluster) %dopar% {
+  # for (foreachIndex in 1:nrow(keys)) {
+    # foreachIndex <- 20
+    key <- keys[foreachIndex,]
     for(j in 1:nrow(sampleSheet))
     {
       # j <- 54

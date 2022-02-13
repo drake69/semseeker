@@ -10,7 +10,11 @@ createHeatmap(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs)
 \arguments{
 \item{inputBedDataFrame}{data frame to chart}
 
-\item{groupColumnIDs}{}
+\item{anomalies}{vector of anomalies to manage}
+
+\item{groupLabel}{main genomic area to char eg: gene}
+
+\item{groupColumnIDs}{positions of the group coplumn id}
 }
 \value{
 list of pivot by column identified with groupLabel and by Sample

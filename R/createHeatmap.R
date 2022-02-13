@@ -2,9 +2,9 @@
 #' analysis organized into files and folders per anomaly and produce a pivot
 #'
 #' @param inputBedDataFrame data frame to chart
-#' @param anomalies
-#' @param groupLabel
-#' @param groupColumnIDs
+#' @param anomalies vector of anomalies to manage
+#' @param groupLabel main genomic area to char eg: gene
+#' @param groupColumnIDs positions of the group coplumn id
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
 #'

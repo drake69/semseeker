@@ -1,4 +1,8 @@
-
+#' geneontology_analysis_rrvgo
+#' @param resultFolder location of folder of semseeker result
+#' @param fileName name of inference file to use with rrvgo
+#' @return
+#' @import Category GSEABase org.Hs.eg.db
 geneontology_analysis_rrvgo <- function(resultFolder, fileName){
 
   resultFolderData <- file.path(resultFolderData,"Data")
@@ -142,6 +146,3 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
     }
   }
 }
-
-
-
