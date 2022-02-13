@@ -43,9 +43,9 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
   summaryFileName <- file.path(resultFolderData, "summary.csv")
 
 
-  # summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind', .export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
+  summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind', .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
   # summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind',.export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
-  for(i in 1:nrow(sampleSheet) ) {
+  # for(i in 1:nrow(sampleSheet) ) {
 
     localSampleDetail <- sampleSheet[i,]
     message("Meth data rows: ", nrow(methylationData))
@@ -70,15 +70,20 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
     message( "sampleStatusTemp done !")
 
 
+    message("data frame conversion")
     sampleStatusTemp <- data.frame(sampleStatusTemp)
+    message("data frame transposition")
     sampleStatusTemp <- data.frame(t(sampleStatusTemp))
+    message("data frame rows renaming")
     rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
+
     message("Iteration: ", i)
-    if(!exists("summaryPopulation"))
-      summaryPopulation <- sampleStatusTemp
-    else
-      summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
-    # as.data.frame(sampleStatusTemp)
+    # if(!exists("summaryPopulation"))
+    #   summaryPopulation <- sampleStatusTemp
+    # else
+    #   summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
+    message("data frame return")
+    as.data.frame(sampleStatusTemp)
   }
 
   message("Row count result:", nrow(summaryPopulation))
