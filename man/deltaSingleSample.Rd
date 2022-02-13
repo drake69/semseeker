@@ -24,7 +24,7 @@ deltaSingleSample(
 
 \item{betaMedians}{median to use for calculation}
 
-\item{probeFeatures}{}
+\item{probeFeatures}{genomic position of probes}
 }
 \value{
 none

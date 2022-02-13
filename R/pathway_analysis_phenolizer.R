@@ -2,7 +2,7 @@
 #' the number of mutations or the lesioned gene per each sample
 #' @param resultFolder where semseeker result are saved
 #' @param terms gene HP term to be searched
-#' @return
+#' @return null
 inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 {
 
