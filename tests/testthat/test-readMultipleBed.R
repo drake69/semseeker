@@ -51,8 +51,8 @@ test_that("readMultipleBed", {
 
   expect_true(nrow(res)>0)
 
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
+  # doParallel::stopImplicitCluster()
+  # parallel::stopCluster(computationCluster)
 
 }
 )
