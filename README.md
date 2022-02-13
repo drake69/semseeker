@@ -1,15 +1,29 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # semseeker
 
 <!-- badges: start -->
-`r badge_devel("drake69/semseeker", "blue")`
-`r badge_lifecycle("stable")`
-`r badge_repostatus("Active")`
-`r badge_codecov("drake69/semseeker")`
-`r badge_last_commit("drake69/semseeker")`
-`r badge_github_actions("drake69/semseeker")`
-`r badge_codefactor("drake69/semseeker")`
+
+    #> Warning: replacing previous import 'lifecycle::last_warnings' by
+    #> 'rlang::last_warnings' when loading 'tibble'
+    #> Warning: replacing previous import 'lifecycle::last_warnings' by
+    #> 'rlang::last_warnings' when loading 'pillar'
+    #> ✓ Setting active project to '/Users/lcorsaro/Documents/Progetti_Sviluppo/
+    #> semseeker'
+
+[![](https://img.shields.io/badge/devel%20version-0.3.2-blue.svg)](https://github.com/drake69/semseeker)
+[![](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
+[![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
+[![R build
+status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
+[![CodeFactor](https://www.codefactor.io/repository/github/drake69/semseeker/badge)](https://www.codefactor.io/repository/github/drake69/semseeker)
+
+[![](https://img.shields.io/badge/devel%20version-0.3.2-blue.svg)](https://github.com/drake69/semseeker)
+[![R-CMD-check](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker?branch=main)
 <!-- badges: end -->
 
 The goal of semseeker is to find all methylation localized and enriched
@@ -30,7 +44,6 @@ Install the latest release:
 
 This is a basic example which shows how you can create the beta’s
 methylation matrix to use for calculation using ChAMP:
-
 
     library(ChAMP)
     idat_folder <- "~/source_idat/"
@@ -80,53 +93,12 @@ This how to obtain the analyzed data:
 
 # Complete Example
 
-Look in to the example folder of the repository to seea complete and working example with data from Gene Expression Omnibus (GEO)
+Look in to the example folder of the repository to seea complete and
+working example with data from Gene Expression Omnibus (GEO)
 
 # Input requirements
-- the samplesheet dataframe should contain a column called Sample_Group, the admitted values are: Case, Control, Reference. if you don0t have the Refernce population you can duplicate the Control population rows and use Reference in the Sample_Group column.
-- the methylationData dataframe should have as columns name the same names in Sample_ID column of the sample sheet.
 
-# Known limit
-
-Actrually semseekwer works with EPIC data source, for data source as 450K and 27K some probes are missed due the changes of manifest.
-
-# The outcomes are
-<ul>
-<li>
-per each population
-</li>
-<li>
-bed graph file with the delta methylation value above and under the
-outline threshold
-</li>
-<li>
-bed file of found MUTATIONS due to hyper methylation and hypomethylation
-</li>
-<li>
-bed file of found LESIONS due to hyper methylation and hypomethylation
-</li>
-<li>
-a cumulative bed file for lesions with a column identifying the sample
-without annotations - a cumulative bed file for lesions with a column
-identifying the sample annotated with genomic area, gene part, island
-and DMR
-</li>
-<li>
-chart: heatmaps to compare the burden difference cases vs. control per
-genomic area
-</li>
-<li>
-pivots: pivot table to compare the burden difference cases vs. control
-per genomic area
-</li>
-</ul>
-<!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
-<!-- ```{r cars} -->
-<!-- summary(cars) -->
-<!-- ``` -->
-<!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. -->
-<!-- You can also embed plots, for example: -->
-<!-- ```{r pressure, echo = FALSE} -->
-<!-- plot(pressure) -->
-<!-- ``` -->
-<!-- In that case, don't forget to commit and push the resulting figure files, so they display on GitHub! -->
+-   the samplesheet dataframe should contain a column called
+    Sample_Group, the admitted values are: Case, Control, Reference. if
+    you don0t have the Refernce population you can duplicate the Control
+    population rows and use Reference in the Sample_Group column.
