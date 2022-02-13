@@ -43,11 +43,11 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
   summaryFileName <- file.path(resultFolderData, "summary.csv")
 
 
-  summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind', .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
-  # summaryPopulation <- foreach::foreach(i=1:nrow(sampleSheet), .combine='rbind',.export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
-  # for(i in 1:nrow(sampleSheet) ) {
+  summaryPopulation <- foreach::foreach(foreachIndex=1:nrow(sampleSheet), .combine='rbind', .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
+  # summaryPopulation <- foreach::foreach(foreachIndex=1:nrow(sampleSheet), .combine='rbind',.export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
+  # for(foreachIndex in 1:nrow(sampleSheet) ) {
 
-    localSampleDetail <- sampleSheet[i,]
+    localSampleDetail <- sampleSheet[foreachIndex,]
     message("Meth data rows: ", nrow(methylationData))
     message("Starting sample analysis number: ", localSampleDetail$Sample_ID, " ", Sys.time())
 
@@ -77,7 +77,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
     message("data frame rows renaming")
     rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
 
-    message("Iteration: ", i)
+    message("Iteration: ", foreachIndex)
     # if(!exists("summaryPopulation"))
     #   summaryPopulation <- sampleStatusTemp
     # else

@@ -45,13 +45,13 @@ annotateBed <- function (
       "GROUP" = groups
     )
 
-  # for(g in 1:nrow(keys))
-  finalBed <- foreach::foreach(g=1:nrow(keys), .combine = rbind) %dopar%
+  # for(foreachIndex in 1:nrow(keys))
+  finalBed <- foreach::foreach(foreachIndex=1:nrow(keys), .combine = rbind) %dopar%
   {
-    anomal <- keys[g,"ANOMALY"]
-    pop <- keys[g,"POPULATION"]
-    fig <- keys[g,"FIGURE"]
-    grp <- keys[g,"GROUP"]
+    anomal <- keys[foreachIndex,"ANOMALY"]
+    pop <- keys[foreachIndex,"POPULATION"]
+    fig <- keys[foreachIndex,"FIGURE"]
+    grp <- keys[foreachIndex,"GROUP"]
 
     probes <- get(paste0(probesPrefix, grp,sep=""))
     resFolder <- dir_check_and_create(resultFolderData,pop)
