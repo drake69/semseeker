@@ -39,8 +39,8 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
   # browser()
   # calculate enrichment for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
-    dplyr::mutate(ENRICHMENT = stats::ave(MUTATIONS, eval(parse(text = grouping_column)),
-                                          FUN = function(x) enrichement_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
+    dplyr::mutate(ENRICHMENT = stats::ave( MUTATIONS, eval(parse(text = grouping_column)),
+                                           FUN = function(x) enrichement_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   basepair_calculator<-function(x,lags){
     tmp_min=-zoo::rollmax( -x, lags, align = "center", fill = 0)
@@ -51,7 +51,7 @@ getLesions <- function(slidingWindowSize, bonferroniThreshold, grouping_column, 
   }
   #calculate the base pair count for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
-    dplyr::mutate(BASEPAIR_COUNT = stats::ave(START, eval(parse(text = grouping_column)),
+    dplyr::mutate(BASEPAIR_COUNT = stats::ave( START, eval(parse(text = grouping_column)),
                                               FUN = function(x) basepair_calculator(x, slidingWindowSize))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
