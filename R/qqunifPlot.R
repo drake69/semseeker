@@ -1,4 +1,4 @@
-qqunifPlot<-function(pvalues,resultFolderData,filePrefix,
+qqunifPlot<-function(pvalues,filePrefix,
                       should.thin=T, thin.obs.places=2, thin.exp.places=2,
                       xlab=expression(paste0("Expected (",-log[10], " p-value)")),
                       ylab=expression(paste0("Observed (",-log[10], " p-value)")),

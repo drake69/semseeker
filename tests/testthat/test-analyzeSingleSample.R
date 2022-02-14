@@ -24,6 +24,7 @@ testthat::test_that("analyzeSingleSample",{
                       probeFeatures = probeFeatures)
 
 
+  resultFolderData  <-  dir_check_and_create(tempFolder, "Data")
   outputFolder <- dir_check_and_create(resultFolderData,c("Control","MUTATIONS_HYPO"))
   fileName <- file_path_build(outputFolder,c(Sample_ID,"MUTATIONS","HYPO"), "bed")
   expect_true(file.exists(fileName))

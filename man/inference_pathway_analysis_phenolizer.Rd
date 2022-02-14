@@ -13,7 +13,7 @@ inference_pathway_analysis_phenolizer(resultFolder, terms)
 \item{terms}{gene HP term to be searched}
 }
 \value{
-
+null
 }
 \description{
 inference_pathway_analysis_phenolizer calculate and att to sample sheet result

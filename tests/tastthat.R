@@ -1,4 +1,4 @@
-# library(testthat)
-# library(semseeker)
-#
-# test_check("semseeker")
+library(testthat)
+library(semseeker)
+test_check("semseeker")
+

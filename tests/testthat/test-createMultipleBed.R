@@ -35,6 +35,7 @@ test_that("createMultipleBed", {
 
   createMultipleBed(sampleSheet)
 
+  resultFolderData  <-  dir_check_and_create(tempFolder, "Data")
   tempresultFolder <-dir_check_and_create(resultFolderData,c("Control","MUTATIONS_BOTH"))
 
   fileToRead <- file_path_build(tempresultFolder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")

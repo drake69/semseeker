@@ -3,6 +3,7 @@ test_that("analyseSingleSampleBoth", {
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   init_env(tempFolder)
+
   Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z]")
   Sample_Group <- "Control"
 
@@ -25,6 +26,7 @@ test_that("analyseSingleSampleBoth", {
   )
 
   mutations <- subset(mutations, MUTATIONS == 1)[, c("CHR", "START", "END")]
+  resultFolderData  <-  dir_check_and_create(tempFolder, "Data")
   folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", "HYPER", sep = "")))
   dumpSampleAsBedFile(
     dataToDump = mutations,
@@ -44,7 +46,7 @@ test_that("analyseSingleSampleBoth", {
   expect_true(nrow(mutations)==nrow(fileData))
   expect_true(ncol(fileData)==3 )
 
-  doParallel::stopImplicitCluster()
-  parallel::stopCluster(computationCluster)
+  # doParallel::stopImplicitCluster()
+  # parallel::stopCluster(computationCluster)
 
 })

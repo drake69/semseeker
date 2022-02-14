@@ -55,6 +55,7 @@ test_that("annotateBed", {
     columnLabel ,
     groupingColumnLabel)
 
+  resultFolderData  <-  dir_check_and_create(tempFolder, "Data")
   bedFileName <- file_path_build( resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
 
   # file extsits
