@@ -23,7 +23,6 @@ dumpSampleAsBedFile <- function(dataToDump, fileName) {
   # save file bed per sample
     utils::write.table(dataToDump, file = fileName, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
 
-
   # save file bed per sample temporary to reuse for aggregated bed file
     # filePath <- paste(fileName,"",".temp")
     # sampleNames <- rep(sampleName, dim(dataToDump)[1])

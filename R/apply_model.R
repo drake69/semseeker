@@ -1,5 +1,5 @@
 
-apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independentVariable, depthAnalysis=3)
+apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, independentVariable, depthAnalysis=3)
 {
 
   # browser()
