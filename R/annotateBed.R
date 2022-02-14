@@ -37,7 +37,7 @@ annotateBed <- function (
                                                                                     "PROBES_Island_Whole"))
 
 
-  keys <-
+  keysLocal <-
     expand.grid(
       "POPULATION" = populations,
       "FIGURE" = figures,
@@ -45,13 +45,13 @@ annotateBed <- function (
       "GROUP" = groups
     )
 
-  # for(foreachIndex in 1:nrow(keys))
-  finalBed <- foreach::foreach(foreachIndex=1:nrow(keys), .combine = rbind) %dopar%
+  # for(foreachIndex in 1:nrow(keysLocal))
+  finalBed <- foreach::foreach(foreachIndex=1:nrow(keysLocal), .combine = rbind) %dopar%
   {
-    anomal <- keys[foreachIndex,"ANOMALY"]
-    pop <- keys[foreachIndex,"POPULATION"]
-    fig <- keys[foreachIndex,"FIGURE"]
-    grp <- keys[foreachIndex,"GROUP"]
+    anomal <- keysLocal[foreachIndex,"ANOMALY"]
+    pop <- keysLocal[foreachIndex,"POPULATION"]
+    fig <- keysLocal[foreachIndex,"FIGURE"]
+    grp <- keysLocal[foreachIndex,"GROUP"]
 
     probes <- get(paste0(probesPrefix, grp,sep=""))
     resFolder <- dir_check_and_create(resultFolderData,pop)

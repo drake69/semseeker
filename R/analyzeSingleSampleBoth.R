@@ -8,7 +8,7 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
   mutations <- data.frame("CHR"="", "START"="", "END"="")
   lesions <- mutations
 
-  for( figure in keys.figures)
+  for( figure in keys_figures)
   {
     if(figure=="BOTH")
       next

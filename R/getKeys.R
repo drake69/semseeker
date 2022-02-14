@@ -1,11 +1,11 @@
 # getKeys <- function ()
 # {
 #
-#   keys.populations <- c("Reference","Control","Case")
-#   keys.figures <- c("HYPO", "HYPER", "BOTH")
-#   keys.anomalies <- c("MUTATIONS","LESIONS")
+#   keys_populations <- c("Reference","Control","Case")
+#   keys_figures <- c("HYPO", "HYPER", "BOTH")
+#   keys_anomalies <- c("MUTATIONS","LESIONS")
 #
-#   keys <- expand.grid("FIGURE"=keys.figures,"ANOMALY"=keys.anomalies, "POPULATION"=keys.populations)
+#   keys <- expand.grid("FIGURE"=keys_figures,"ANOMALY"=keys_anomalies, "POPULATION"=keys_populations)
 #
 # }
 

@@ -29,36 +29,36 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
     sheetListNames <- vector(mode="list")
 
     # options(digits = 22)
-    parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
+    # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
 
     keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    # sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
-    for(i in 1:nrow(keys))
+    sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+    # for(i in 1:nrow(keys))
       {
         # i <- 1
         grp <- keys[i,1]
         temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
-        if(nrow(temp)==0)
-          next
-
-        anomaly <- keys[i,2]
-        tempAnomaly <- subset(temp, finalBed$ANOMALY == as.character(anomaly))
-        if(dim(tempAnomaly)[1]==0)
-          next
-
-        figure <- keys[i,3]
-        tempDataFrame <- subset(tempAnomaly, finalBed$FIGURE == figure)
-        if(nrow(tempDataFrame)!=0)
+        if(nrow(temp)!=0)
         {
-          tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
-          fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
-          utils::write.csv2(t(tempDataFrame), fileName)
-          tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
-          colnames(tempDataFrame) <- tempDataFrame[1,]
+          anomaly <- keys[i,2]
+          tempAnomaly <- subset(temp, finalBed$ANOMALY == as.character(anomaly))
+          if(nrow(tempAnomaly)!=0)
+          {
+            figure <- keys[i,3]
+            tempDataFrame <- subset(tempAnomaly, finalBed$FIGURE == figure)
+            if(nrow(tempDataFrame)!=0)
+            {
+              tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
+              fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
+              utils::write.csv2(t(tempDataFrame), fileName)
+              tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
+              colnames(tempDataFrame) <- tempDataFrame[1,]
 
-          #store in the first row the names of the sheet
-          tempDataFrame[1,] <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
-          list(tempDataFrame)
+              #store in the first row the names of the sheet
+              tempDataFrame[1,] <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
+              list(tempDataFrame)
+            }
+          }
         }
       }
 

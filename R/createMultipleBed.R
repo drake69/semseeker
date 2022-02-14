@@ -2,12 +2,12 @@ createMultipleBed <- function(sampleSheet){
 
   #create multiple file bed
   # browser()
-  keys <- expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"=keys.figures,"ANOMALY"= keys.anomalies,"EXT"="bed")
-  keys <- rbind(keys, expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
-  foreach::foreach(foreachIndex = 1:nrow(keys), cl = computationCluster) %dopar% {
-  # for (foreachIndex in 1:nrow(keys)) {
+  localKeys <- expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"=keys_figures,"ANOMALY"= keys_anomalies,"EXT"="bed")
+  localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
+  foreach::foreach(foreachIndex = 1:nrow(localKeys), cl = computationCluster) %dopar% {
+  # for (foreachIndex in 1:nrow(localKeys)) {
     # foreachIndex <- 20
-    key <- keys[foreachIndex,]
+    key <- localKeys[foreachIndex,]
     for(j in 1:nrow(sampleSheet))
     {
       # j <- 54
