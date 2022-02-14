@@ -35,6 +35,7 @@ Imports:
     RColorBrewer,
     reshape2,
     R.utils,
+    rlang,
     slider,
     stats,
     stringi,
@@ -44,10 +45,9 @@ Imports:
     zoo
 RoxygenNote: 7.1.2
 Suggests: 
-    covr,
     Johnson,
-    testthat,
     rrvgo,
-    WebGestaltR
+    WebGestaltR,
+    testthat
 Depends: 
     R (>= 2.10)

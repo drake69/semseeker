@@ -46,28 +46,6 @@ inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 }
 
 
-dir_check_and_create <- function  (baseFolder, subFolders)
-{
-
-  parts <- unlist(strsplit(baseFolder, .Platform$file.sep))
-  # do.call(file.path, as.list(c(parts[1:length(parts) - 1], subFolders)))
-  subFolders <- as.vector(sapply(subFolders, as.character))
-  subFolders <-c(parts[1:length(parts)], subFolders)
-
-  for(subFolder in subFolders)
-  {
-    browser
-    if(!exists("subF"))
-      subF <- file.path(subFolder)
-    else
-   {
-     subF <- file.path(subF, subFolder)
-     if(!dir.exists(subF))
-      dir.create(subF)
-    }
-  }
-  return(subF)
-}
 
 file_path_build <- function(baseFolder, detailsFilename, extension){
 

@@ -131,7 +131,7 @@ inferenceAnalysis <- function(inferenceDetails)
       # transformation <- NULL
       g_start <- 2 + length(covariates)
       result_temp <- apply_model(tempDataFrame = studySummary[, c(independentVariable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
-                                 key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= logFolder, independentVariable, depthAnalysis)
+                                 key = keys[i,], transformation = transformation, dototal = FALSE, independentVariable, depthAnalysis)
       result <- rbind(result, result_temp)
     }
 
@@ -220,7 +220,8 @@ inferenceAnalysis <- function(inferenceDetails)
 
             g_start <- 2 + length(covariates)
 
-            result_temp <- apply_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE, logFolder= logFolder, independentVariable, depthAnalysis)
+            result_temp <- apply_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation,
+                                       dototal = TRUE, independentVariable, depthAnalysis)
 
             # #browser()
             # n_adj <- iters - g_start

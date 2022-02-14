@@ -42,7 +42,6 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
 
   summaryFileName <- file.path(resultFolderData, "summary.csv")
 
-
   summaryPopulation <- foreach::foreach(foreachIndex=1:nrow(sampleSheet), .combine='rbind', .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
   # summaryPopulation <- foreach::foreach(foreachIndex=1:nrow(sampleSheet), .combine='rbind',.export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
   # for(foreachIndex in 1:nrow(sampleSheet) ) {

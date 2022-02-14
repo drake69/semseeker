@@ -1,8 +1,8 @@
 testthat::test_that("getMutations",{
 
   library(stringi)
-  # tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 15, pattern = "[A-Za-z0-9]"),sep="")
-  # init_env(tempFolder)
+  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 15, pattern = "[A-Za-z0-9]"),sep="")
+  init_env(tempFolder)
 
   Sample_ID <- stri_rand_strings(1, 15, pattern = "[A-Za-z]")
 

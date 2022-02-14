@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene_ontology_analysis_rrvgo.R
 \name{geneontology_analysis_rrvgo}
 \alias{geneontology_analysis_rrvgo}
-\title{Title}
+\title{geneontology_analysis_rrvgo}
 \usage{
 geneontology_analysis_rrvgo(resultFolder, fileName)
 }
@@ -12,8 +12,8 @@ geneontology_analysis_rrvgo(resultFolder, fileName)
 \item{fileName}{name of inference file to use with rrvgo}
 }
 \value{
-
+null
 }
 \description{
-Title
+geneontology_analysis_rrvgo
 }
