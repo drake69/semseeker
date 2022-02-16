@@ -1,20 +1,21 @@
-createMultipleBed <- function(sampleSheet){
+createMultipleBed <- function(envir, sampleSheet){
 
   #create multiple file bed
   # browser()
-  localKeys <- expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"=keys_figures,"ANOMALY"= keys_anomalies,"EXT"="bed")
+  i <- 0
+  localKeys <- expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"=envir$keys_figures,"ANOMALY"= envir$keys_anomalies,"EXT"="bed")
   localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
-  foreach::foreach(foreachIndex = 1:nrow(localKeys), cl = computationCluster) %dopar% {
-  # for (foreachIndex in 1:nrow(localKeys)) {
-    # foreachIndex <- 20
-    key <- localKeys[foreachIndex,]
+  # foreach::foreach(i = 1:nrow(localKeys)) %dopar% {
+  for (i in 1:nrow(localKeys)) {
+    # i <- 20
+    key <- localKeys[i,]
     for(j in 1:nrow(sampleSheet))
     {
       # j <- 54
       sample <- sampleSheet[j,]
       # if(sample$Sample_ID=="R07C01_203991450116")
       #    message(j)
-      tempresultFolderData <-dir_check_and_create(resultFolderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+      tempresultFolderData <-dir_check_and_create(envir$resultFolderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
       fileToRead <- file_path_build(tempresultFolderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
       message("createMultipleBed file 2 read:", fileToRead)
       if(file.exists(fileToRead))

@@ -1,9 +1,9 @@
 testthat::test_that("analyzeSingleSample",{
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder)
-  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z]")
+  tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  envir <-  init_env(tempFolder)
+  Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
   Sample_Group <- "Control"
 
   nitem <- 8e5
@@ -15,7 +15,7 @@ testthat::test_that("analyzeSingleSample",{
   row.names(tresholds) <- probeFeatures$PROBE
   row.names(values) <- row.names(tresholds)
 
-  sp <- analyzeSingleSample(values = values,
+  sp <- analyzeSingleSample(envir = envir, values = values,
                       slidingWindowSize = 11,
                       thresholds = tresholds,
                       figure = "HYPO",
@@ -24,8 +24,7 @@ testthat::test_that("analyzeSingleSample",{
                       probeFeatures = probeFeatures)
 
 
-  resultFolderData  <-  dir_check_and_create(tempFolder, "Data")
-  outputFolder <- dir_check_and_create(resultFolderData,c("Control","MUTATIONS_HYPO"))
+  outputFolder <- dir_check_and_create(envir$resultFolderData,c("Control","MUTATIONS_HYPO"))
   fileName <- file_path_build(outputFolder,c(Sample_ID,"MUTATIONS","HYPO"), "bed")
   expect_true(file.exists(fileName))
 

@@ -8,7 +8,7 @@ inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 
    init_env(resultFolder)
 
-  geneAnnotatedFile <- utils::read.csv(file.path(resultFolderData, "/GENE_ANNOTATED.csv"))
+  geneAnnotatedFile <- utils::read.csv(file.path(ssEnv$resultFolderData, "/GENE_ANNOTATED.csv"))
   geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
 
   anomalies <- c("LESIONS","MUTATIONS")
@@ -37,10 +37,10 @@ inference_pathway_analysis_phenolizer <- function(resultFolder,terms)
 
       colnames(res_prio_burden) <- c(anomalyColumn,"SAMPLEID")
 
-      sampleSheetResult <- utils::read.csv2(file.path(resultFolderData,"sample_sheet_result.csv"))
+      sampleSheetResult <- utils::read.csv2(file.path(ssEnv$resultFolderData,"sample_sheet_result.csv"))
       sampleSheetResult <- sampleSheetResult[, !(colnames(sampleSheetResult)%in% anomalyColumn)]
       sampleSheetResult <- merge(sampleSheetResult, res_prio_burden, by.x="Sample_ID",by.y="SAMPLEID")
-      utils::write.csv2(sampleSheetResult,file.path(resultFolderData,"sample_sheet_result.csv"),row.names = FALSE)
+      utils::write.csv2(sampleSheetResult,file.path(ssEnv$resultFolderData,"sample_sheet_result.csv"),row.names = FALSE)
     }
   }
 }

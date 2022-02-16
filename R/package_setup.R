@@ -14,16 +14,16 @@
 #   if (any(toset))
 #     options(op.devtools[toset])
 #
-#   devtools::use_package("doParallel")
+#   devtools::use_package("doFuture")
 #   devtools::use_package("checkr")
 #   devtools::use_package("dplyr")
 #   devtools::use_package("foreach")
 #   devtools::use_package("gtools")
 #   devtools::use_package("openxlsx")
-#   devtools::use_package("parallel")
+#   devtools::use_package("Future")
 #   devtools::use_package("plyr")
 #   devtools::use_package("reshape2")
-#   devtools::use_package("stringi")
+#   devtools::use_package("stringr")
 #   devtools::use_package("zoo")
 #
 #   person("Luigi", "Corsaro", email = "l.corsaro@a-company.it", role = c("aut", "cre"))
@@ -41,8 +41,8 @@
 #          call. = FALSE)
 #   }
 #
-#   if (!requireNamespace("doParallel", quietly = TRUE)) {
-#     stop("doParallel is needed for this function to work. Please install it.",
+#   if (!requireNamespace("doFuture", quietly = TRUE)) {
+#     stop("doFuture is needed for this function to work. Please install it.",
 #          call. = FALSE)
 #   }
 #
@@ -71,8 +71,8 @@
 #          call. = FALSE)
 #   }
 #
-#   if (!requireNamespace("parallel", quietly = TRUE)) {
-#     stop("parallel is needed for this function to work. Please install it.",
+#   if (!requireNamespace("Future", quietly = TRUE)) {
+#     stop("Future is needed for this function to work. Please install it.",
 #          call. = FALSE)
 #   }
 #
@@ -81,8 +81,8 @@
 #          call. = FALSE)
 #   }
 #
-#   if (!requireNamespace("stringi", quietly = TRUE)) {
-#     stop("stringi is needed for this function to work. Please install it.",
+#   if (!requireNamespace("stringr", quietly = TRUE)) {
+#     stop("stringr is needed for this function to work. Please install it.",
 #          call. = FALSE)
 #   }
 #

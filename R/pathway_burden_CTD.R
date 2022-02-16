@@ -31,7 +31,7 @@ pathway_burden_CTD <-  function(resultFolder, ctdDataFrameFile ) {
   if (is.null(finalBed))
     return()
 
-  samples <- utils::read.csv(file_path_build(baseFolder =  resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
+  samples <- utils::read.csv(file_path_build(baseFolder =  ssEnv$resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
 
   # foreach::foreach(path in ctdDataFrame$PATHWAY) %dopar%
 
@@ -39,7 +39,7 @@ pathway_burden_CTD <-  function(resultFolder, ctdDataFrameFile ) {
   {
     path <- ctdDataFrame[i,"PATHWAY.ID"]
     toSplit <- paste(ctdDataFrame[ctdDataFrame$PATHWAY.ID==path, "ANNOTATED.GENES"], collapse = "")
-    candidateGenes <- string_normalize(unlist(stringr::str_split(toSplit  ,"\\|")))
+    candidateGenes <- string_normalize(unlist(stringi::stri_split(toSplit  ,"\\|")))
     tempDataFrame <- subset(finalBed, finalBed$FIGURE=="BOTH" & finalBed$ANOMALY=="MUTATIONS" & finalBed$GROUP=="Whole")
     tempDataFrame <- subset(tempDataFrame, tempDataFrame$GENE %in% candidateGenes)
     tempDataFrame$path <- string_normalize(path)
@@ -52,7 +52,7 @@ pathway_burden_CTD <-  function(resultFolder, ctdDataFrameFile ) {
       result <- merge(result, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID",all.x=TRUE)
   }
 
-  fileName <- file_path_build (dir_check_and_create(resultFolderData,c("Pathway","CTD")), c("mutations","both","burden","pathway"),"csv")
+  fileName <- file_path_build (dir_check_and_create(ssEnv$resultFolderData,c("Pathway","CTD")), c("mutations","both","burden","pathway"),"csv")
   utils::write.table(result,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
 
 

@@ -27,9 +27,9 @@ populationCheck <- function(sampleSheet, methylationData)
   {
     # Exist at least 3 samples per Sample_Group==Reference
     tabsample <- table(sampleSheet$Sample_Group)
-    if(tabsample ["Reference"]<3)
+    if(tabsample ["Reference"]<2)
     {
-      result <- paste(result,  (" Requuired at least three samples for the Reference Sample Group"))
+      result <- paste(result,  (" Required at least two samples for the Reference Sample Group"))
     }
   }
 

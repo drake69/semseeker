@@ -1,8 +1,8 @@
 test_that("annotateBed", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder)
+  tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  envir <- init_env(tempFolder)
 
   nitem <- 5e4
   nsamples <- 5
@@ -18,7 +18,7 @@ test_that("annotateBed", {
   row.names(betaInferiorThresholds) <- probeFeatures$PROBE
   row.names(methylationData) <- probeFeatures$PROBE
 
-  Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
+  Sample_ID <- stringi::stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
   colnames(methylationData) <- Sample_ID
   Sample_Group <- rep("Control",nsamples)
   sampleSheet <- data.frame(Sample_Group, Sample_ID)
@@ -33,7 +33,7 @@ test_that("annotateBed", {
                           probeFeatures = probeFeatures
   )
 
-  createMultipleBed(sampleSheet = sampleSheet)
+  createMultipleBed(envir, sampleSheet = sampleSheet)
 
   populations <- c("Control")
 
@@ -55,8 +55,7 @@ test_that("annotateBed", {
     columnLabel ,
     groupingColumnLabel)
 
-  resultFolderData  <-  dir_check_and_create(tempFolder, "Data")
-  bedFileName <- file_path_build( resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build(ssEnv$resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
 
   # file extsits
   expect_true(file.exists(bedFileName))

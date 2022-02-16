@@ -13,7 +13,7 @@
 #' rangeBetaValuePerCHROverCHRAsNormalizedDistribution <- function(populationMatrix, iqrTimes = 1, probeFeatures) {
 #'
 #'   computationCluster <- makeCluster(detectCores(all.tests = FALSE, logical = TRUE) - 1)
-#'   registerDoParallel(computationCluster)
+#'   registerDoFuture(computationCluster)
 #'
 #'   betaValues <- populationMatrix[, -(1)]
 #'

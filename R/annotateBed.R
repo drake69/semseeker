@@ -21,23 +21,32 @@ annotateBed <- function (
   groupingColumnLabel)
   {
 
+  i <- 0
   finalBed <- NULL
-  bedFileName <- file_path_build( resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build( ssEnv$resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
 
   if(file.exists(bedFileName))
   {
-    finalBed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
-    finalBed$freq = as.numeric(finalBed$freq)
+    if(file.info(bedFileName)$size < 10)
+      {
+        finalBed <- NULL
+        message("Given up file:", finalBed, " is empty!")
+      }
+    else
+      {
+        finalBed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
+        finalBed$freq = as.numeric(finalBed$freq)
+      }
     return(finalBed)
   }
 
-  parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("readMultipleBed","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
-                                                                                    "PROBES_Gene_TSS1500","PROBES_Gene_TSS200","PROBES_Gene_Whole","PROBES_Gene_ExonBnd","PROBES_Gene_1stExon",
-                                                                                    "PROBES_DMR_DMR","PROBES_Island_Island","PROBES_Island_N_Shelf","PROBES_Island_S_Shelf","PROBES_Island_N_Shore","PROBES_Island_S_Shore",
-                                                                                    "PROBES_Island_Whole"))
+  # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("readMultipleBed","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
+  #                                                                                   "PROBES_Gene_TSS1500","PROBES_Gene_TSS200","PROBES_Gene_Whole","PROBES_Gene_ExonBnd","PROBES_Gene_1stExon",
+  #                                                                                   "PROBES_DMR_DMR","PROBES_Island_Island","PROBES_Island_N_Shelf","PROBES_Island_S_Shelf","PROBES_Island_N_Shore","PROBES_Island_S_Shore",
+  #                                                                                   "PROBES_Island_Whole"))
 
 
-  keysLocal <-
+  ssEnv$keysLocal <-
     expand.grid(
       "POPULATION" = populations,
       "FIGURE" = figures,
@@ -45,17 +54,22 @@ annotateBed <- function (
       "GROUP" = groups
     )
 
-  # for(foreachIndex in 1:nrow(keysLocal))
-  finalBed <- foreach::foreach(foreachIndex=1:nrow(keysLocal), .combine = rbind) %dopar%
+
+  for(i in 1:nrow(ssEnv$keysLocal))
+  # finalBed <- foreach::foreach(i=1:nrow(ssEnv$keysLocal), .combine = rbind) %dopar%
   {
-    anomal <- keysLocal[foreachIndex,"ANOMALY"]
-    pop <- keysLocal[foreachIndex,"POPULATION"]
-    fig <- keysLocal[foreachIndex,"FIGURE"]
-    grp <- keysLocal[foreachIndex,"GROUP"]
+    anomal <- ssEnv$keysLocal[i,"ANOMALY"]
+    pop <- ssEnv$keysLocal[i,"POPULATION"]
+    fig <- ssEnv$keysLocal[i,"FIGURE"]
+    grp <- ssEnv$keysLocal[i,"GROUP"]
 
     probes <- get(paste0(probesPrefix, grp,sep=""))
-    resFolder <- dir_check_and_create(resultFolderData,pop)
-    readMultipleBed( anomalyLabel =  anomal, figureLable =  fig, probeFeatures =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
+    resFolder <- dir_check_and_create(ssEnv$resultFolderData,pop)
+    tempFile <- readMultipleBed( anomalyLabel =  anomal, figureLable =  fig, probeFeatures =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
+    if(exists("finalBed"))
+      finalBed <- rbind(finalBed, tempFile)
+    else
+      finalBed <- tempFile
   }
 
   # message("Annotated bed:")
@@ -63,12 +77,11 @@ annotateBed <- function (
   # browser()
   utils::write.table(finalBed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
-  if(nrow(finalBed)==0)
-   stop("Empty file to annotate !")
+  # if(nrow(finalBed)==0)
+  #  stop("Empty file to annotate !")
 
   gc()
   return(finalBed)
-
 
 }
 

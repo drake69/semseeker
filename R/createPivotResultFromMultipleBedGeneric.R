@@ -10,7 +10,7 @@
 createPivotResultFromMultipleBedGeneric <- function(genomicAreaMain, genomicAreaSub, sampleSheet) {
 
 
-  fileName <- file_path_build( resultFolderData , c(genomicAreaMain , "annotatedBed"), "csv")
+  fileName <- file_path_build( ssEnv$resultFolderData , c(genomicAreaMain , "annotatedBed"), "csv")
   annotatedBed <- utils::read.csv(fileName)
   annotatedBed <- subset(annotatedBed, annotatedBed$POPULATION !="Reference")
   annotatedBed$GROUP <- as.factor(annotatedBed$GROUP)

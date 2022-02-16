@@ -7,11 +7,11 @@
 #' @param figure which figure's of sasmple will be analized HYPO or HYPER
 #' @param bonferroniThreshold bonferroni threshold to validate pValue
 #' @param probeFeatures probes details to be used
-#'
+#' @param envir environment to get globals
 #' @return list of lesion count  and probes count
 #'
 #'
-analyzeSingleSample <- function(values, slidingWindowSize, thresholds, figure, sampleDetail, bonferroniThreshold = 0.05, probeFeatures) {
+analyzeSingleSample <- function(envir, values, slidingWindowSize, thresholds, figure, sampleDetail, bonferroniThreshold = 0.05, probeFeatures) {
 
   # browser()
   start_time_single_sample <- Sys.time()
@@ -27,8 +27,12 @@ analyzeSingleSample <- function(values, slidingWindowSize, thresholds, figure, s
   mutationAnnotatedSorted <- getMutations(values, figure,thresholds, probeFeatures, sampleDetail$Sample_ID)
   mutationAnnotatedSortedToSave <- subset(mutationAnnotatedSorted, mutationAnnotatedSorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
 
+  message("############# SEARCH")
+  message("############# SEARCH",search())
+  message("############# LS",ls())
   # browser()
-  folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+  message("############# envir$resultFolderData:", envir$resultFolderData)
+  folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   dumpSampleAsBedFile(
     dataToDump = mutationAnnotatedSortedToSave,
     fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"MUTATIONS",figure),"bed")
@@ -36,7 +40,7 @@ analyzeSingleSample <- function(values, slidingWindowSize, thresholds, figure, s
   result[paste("MUTATIONS_", figure, sep="")] <- if (!is.null(mutationAnnotatedSortedToSave)) dim(mutationAnnotatedSortedToSave)[1] else 0
 
   lesionWeighted <- getLesions(bonferroniThreshold = bonferroniThreshold, slidingWindowSize = slidingWindowSize, grouping_column = "CHR", mutationAnnotatedSorted = mutationAnnotatedSorted)
-  folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+  folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   dumpSampleAsBedFile(
     dataToDump = lesionWeighted,
     fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"LESIONS",figure),"bed")

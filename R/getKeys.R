@@ -1,42 +1,42 @@
 # getKeys <- function ()
 # {
 #
-#   keys_populations <- c("Reference","Control","Case")
-#   keys_figures <- c("HYPO", "HYPER", "BOTH")
-#   keys_anomalies <- c("MUTATIONS","LESIONS")
+#   ssEnv$keys_populations <- c("Reference","Control","Case")
+#   ssEnv$keys_figures <- c("HYPO", "HYPER", "BOTH")
+#   ssEnv$keys_anomalies <- c("MUTATIONS","LESIONS")
 #
-#   keys <- expand.grid("FIGURE"=keys_figures,"ANOMALY"=keys_anomalies, "POPULATION"=keys_populations)
+#   ssEnv$keys <- expand.grid("FIGURE"=ssEnv$keys_figures,"ANOMALY"=ssEnv$keys_anomalies, "POPULATION"=ssEnv$keys_populations)
 #
 # }
 
 #
 # getProbesKey <- function()
 # {
-#   probes.subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+#   probes_subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
 #
-#   probes.Prefix = "PROBES_Gene_"
-#   probes.MainGroupLabel =  "GENE"
-#   probes.SubGroupLabel="GROUP"
-#   probes <- expand.grid("prefix"=probes.Prefix,"maingrouplable"= probes.MainGroupLabel,"subgrouplable"= probes.SubGroupLabel,"subgroups"= probes.subGroups)
+#   probes_Prefix = "PROBES_Gene_"
+#   probes_MainGroupLabel =  "GENE"
+#   probes_SubGroupLabel="GROUP"
+#   probes <- expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
 #
 #   # probes.27k
 #   # probes.450k
 #   # probes.850k
 #
-#   probes.subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
+#   probes_subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
 #
-#   probes.Prefix <- "PROBES_Island_"
-#   probes.MainGroupLabel <- "ISLAND"
-#   probes.SubGroupLabel <- "RELATION_TO_CPGISLAND"
-#   probes <- rbind(expand.grid("prefix"=probes.Prefix,"maingrouplable"= probes.MainGroupLabel,"subgrouplable"= probes.SubGroupLabel,"subgroups"= probes.subGroups), probes)
+#   probes_Prefix <- "PROBES_Island_"
+#   probes_MainGroupLabel <- "ISLAND"
+#   probes_SubGroupLabel <- "RELATION_TO_CPGISLAND"
+#   probes <- rbind(expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups), probes)
 #
-#   probes.subGroups <- c("DMR")
+#   probes_subGroups <- c("DMR")
 #
-#   probes.Prefix = "PROBES_DMR_"
-#   probes.MainGroupLabel =  "DMR"
-#   probes.SubGroupLabel="GROUP"
+#   probes_Prefix = "PROBES_DMR_"
+#   probes_MainGroupLabel =  "DMR"
+#   probes_SubGroupLabel="GROUP"
 #
-#   probes <- rbind(expand.grid("prefix"=probes.Prefix,"maingrouplable"= probes.MainGroupLabel,"subgrouplable"= probes.SubGroupLabel,"subgroups"= probes.subGroups), probes)
+#   probes <- rbind(expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups), probes)
 #
 # }
 #

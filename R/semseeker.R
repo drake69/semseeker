@@ -19,8 +19,7 @@ semseeker <- function(sampleSheet,
                       maxResources = 90,
                       iqrTimes = 3 ) {
 
-
-  init_env(resultFolder, maxResources)
+  envir <- init_env(resultFolder, maxResources)
 
 
   # set digits to 22
@@ -85,7 +84,7 @@ semseeker <- function(sampleSheet,
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes)
 
-  utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(resultFolderData ,"beta_thresholds","csv"), sep=";")
+  utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$resultFolderData ,"beta_thresholds","csv"), sep=";")
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sampleSheet[sampleSheet$Sample_Group == "Reference",]
@@ -101,7 +100,7 @@ semseeker <- function(sampleSheet,
     populationMatrixColumns <- colnames(methylationData[, populationSampleSheet$Sample_ID])
 
     if (length(populationMatrixColumns)==0) {
-      message("WARNING: Population ",populationName, " is empty ", Sys.time())
+      message("WARNING: Population ",populationName, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
       next
     }
 
@@ -117,7 +116,7 @@ semseeker <- function(sampleSheet,
       probeFeatures = PROBES
     )
 
-    createMultipleBed(populationSampleSheet)
+    createMultipleBed(envir, populationSampleSheet)
 
     resultPopulation <- as.data.frame(resultPopulation)
     # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
@@ -139,7 +138,7 @@ semseeker <- function(sampleSheet,
   sampleSheet <- merge(sampleSheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(methylationData)
   gc()
-  utils::write.csv2(sampleSheet, file.path(resultFolderData , "sample_sheet_result.csv"))
+  utils::write.csv2(sampleSheet, file.path(envir$resultFolderData , "sample_sheet_result.csv"))
 
   if(length(sampleSheet$Sample_Group=="Reference")>0){
     populations <- c("Reference","Control","Case")
@@ -182,45 +181,36 @@ semseeker <- function(sampleSheet,
   dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
   createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
 
-  colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  if (!is.null(geneBed))
+  {
+    colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  }
 
-  totalBed <- rbind(geneBed, dmrBed, islandBed, stringsAsFactors = TRUE)
-  createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
+  if (!is.null(dmrBed))
+  {
+    colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  }
+
+  if (!is.null(islandBed))
+  {
+    colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
+  }
+
+  totalBed <- rbind(geneBed, dmrBed, islandBed)
+  if (!is.null(totalBed) && nrow(totalBed)>0)
+    createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
 
   rm(populationControlRangeBetaValues)
 
   # message("Starting inference Analysis.")
-  # inferenceAnalysis(resultFolderData = resultFolderData, logFolder= logFolder, inferenceDetails)
-  parallel::stopCluster(computationCluster)
-  doParallel::stopImplicitCluster()
+  # inferenceAnalysis(envir$resultFolderData = envir$resultFolderData, envir$logFolder= envir$logFolder, inferenceDetails)
+  # future::autoStopCluster(computationCluster)
+  # doFuture::stopImplicitCluster()
   gc()
-  # geneontology_analysis_webgestalt(resultFolderData = resultFolderData, fileName = fileName)
-  # euristic_analysis_webgestalt(resultFolderData = resultFolderData)
+  # geneontology_analysis_webgestalt(envir$resultFolderData = envir$resultFolderData, fileName = fileName)
+  # euristic_analysis_webgestalt(envir$resultFolderData = envir$resultFolderData)
   message("Job Completed !")
 
 
 }
 
-semseeker_pheno <- function(sampleSheet,
-                      methylationData,
-                      resultFolder,
-                      bonferroniThreshold = 0.05,
-                      inferenceDetails = NULL,
-                      pheno_term,
-                      onlySeed = TRUE) {
-
-  probesFilter <- probes_go_association_phenolizer(pheno_term, onlySeed = TRUE, resultFolder )
-
-  # browser()
-  methylationData <- methylationData[ rownames(methylationData) %in% probesFilter, ]
-
-  semseeker(sampleSheet = sampleSheet,
-            methylationData = methylationData,
-            resultFolder = resultFolder,
-            inferenceDetails = inferenceDetails)
-
-
-
-}

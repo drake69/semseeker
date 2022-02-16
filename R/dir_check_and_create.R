@@ -18,5 +18,5 @@ dir_check_and_create <- function  (baseFolder, subFolders)
         dir.create(subF)
     }
   }
-  return(subF)
+  return(as.character(subF))
 }

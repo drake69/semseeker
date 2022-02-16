@@ -1,5 +1,5 @@
 #
-# epimut_normalize_champ <- function(sampleFolder, resultFolderData, methodNormalization, useMvalue = FALSE) {
+# epimut_normalize_champ <- function(sampleFolder, ssEnv$resultFolderData, methodNormalization, useMvalue = FALSE) {
 #     # if(endsWith(sampleFolder, suffix ='/')) { message('Sample folder must not end with slash!') return() }
 #
 #     if (.Platform$OS.type == "windows")
@@ -13,7 +13,7 @@
 #
 #     # IMPORTAZIONE DATI
 #
-#     # library(parallel)
+#     # library(Future)
 #     library(ChAMP)
 #     message("Normalizationwarm up ", Sys.time())
 #     loadMethod <- if (methodNormalization == "SWAN") {
@@ -23,14 +23,14 @@
 #     }
 #     dataToNormalize <- champ.load(directory = sampleFolder, method = loadMethod)
 #
-#     normalizationDataFolder <- resultFolderData
+#     normalizationDataFolder <- ssEnv$resultFolderData
 #     if (normalizationDataFolder != "" && !dir.exists(normalizationDataFolder)) {
 #         dir.create(normalizationDataFolder)
 #     }
 #
 #     #
 #
-#     available.cores <- min(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, 8)
+#     available.cores <- min(Future::detectCores(all.tests = FALSE, logical = TRUE) - 1, 8)
 #
 #     # NORMALIZZAZIONE
 #     message("Starting normalization ", Sys.time())
@@ -86,7 +86,7 @@
 # }
 #
 #
-# epimut_normalize_rnbeads <- function(sampleFolder, resultFolderData, methodNormalization) {
+# epimut_normalize_rnbeads <- function(sampleFolder, ssEnv$resultFolderData, methodNormalization) {
 #     # if(endsWith(sampleFolder, suffix ='/')) { message('Sample folder must not end with slash!') return() }
 #
 #     if (.Platform$OS.type == "windows")
@@ -100,7 +100,7 @@
 #
 #     # IMPORTAZIONE DATI
 #
-#     # library(parallel)
+#     # library(Future)
 #     library(ChAMP)
 #     message("Normalizationwarm up ", Sys.time())
 #     loadMethod <- if (methodNormalization == "SWAN") {

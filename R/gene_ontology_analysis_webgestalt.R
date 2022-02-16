@@ -1,9 +1,9 @@
 geneontology_analysis_webgestalt <- function(resultFolder, fileName){
 
 
-  resultFolderDataWebGestalt <- dir_check_and_create(resultFolderData, c("Inference","geneontology_webgestalt", fileName()))
+  ssEnv$resultFolderDataWebGestalt <- dir_check_and_create(ssEnv$resultFolderData, c("Inference","geneontology_webgestalt", fileName()))
 
-  fileName <- file.path(resultFolderData, "Inference", fileName)
+  fileName <- file.path(ssEnv$resultFolderData, "Inference", fileName)
   geneAnnotatedFile <- utils::read.csv(fileName, sep=";", dec=",")
   geneAnnotatedFile <- subset(geneAnnotatedFile, geneAnnotatedFile$GROUP=="GENE" &
                                 geneAnnotatedFile$SUBGROUP!="SAMPLE" & geneAnnotatedFile$AREA_OF_TEST !="TOTAL" &
@@ -15,15 +15,15 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
     for (pval in c("PVALUE", "PVALUEADJ"))
     {
       geneAnnotated <- subset(geneAnnotatedFile, geneAnnotatedFile[,pval]  <0.05)
-      keys <- unique(geneAnnotated[, c("ANOMALY","FIGURE","SUBGROUP")] )
+      ssEnv$keys <- unique(geneAnnotated[, c("ANOMALY","FIGURE","SUBGROUP")] )
 
-      if (nrow(keys)>0)
+      if (nrow(ssEnv$keys)>0)
 
-        for (i in 1:nrow(keys))
+        for (i in 1:nrow(ssEnv$keys))
         {
-          anomaly <- keys[i,"ANOMALY"]
-          subgroup <- keys[i,"SUBGROUP"]
-          figure <- keys[i,"FIGURE"]
+          anomaly <- ssEnv$keys[i,"ANOMALY"]
+          subgroup <- ssEnv$keys[i,"SUBGROUP"]
+          figure <- ssEnv$keys[i,"FIGURE"]
 
           geneMutation <- subset(geneAnnotated, geneAnnotated$ANOMALY==anomaly & geneAnnotated$SUBGROUP==subgroup & geneAnnotated$FIGURE==figure )
           print(nrow(geneMutation))
@@ -54,7 +54,7 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
                 interestGeneType="genesymbol",
                 referenceSet= "genome",
                 isOutput=FALSE,
-                outputDirectory= resultFolderDataWebGestalt,
+                outputDirectory= ssEnv$resultFolderDataWebGestalt,
                 projectName= projectName,
                 sigMethod ="top"
               )
@@ -62,8 +62,8 @@ geneontology_analysis_webgestalt <- function(resultFolder, fileName){
               if(min(enrichResult$FDR) < 0.05)
                 projectName <- paste0("@", projectName, sep="")
 
-              filename = file_path_build(resultFolderDataWebGestalt,projectName,"png")
-              filenameResult = file_path_build(resultFolderDataWebGestalt,projectName,"csv")
+              filename = file_path_build(ssEnv$resultFolderDataWebGestalt,projectName,"png")
+              filenameResult = file_path_build(ssEnv$resultFolderDataWebGestalt,projectName,"csv")
               utils::write.csv2(enrichResult, filenameResult)
 
               grDevices::png(file= filename, width=2048,height=2048, bg = "transparent")

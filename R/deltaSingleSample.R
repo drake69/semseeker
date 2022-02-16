@@ -6,18 +6,12 @@
 #' @param sampleDetail details of sample to analyze
 #' @param betaMedians median to use for calculation
 #' @param probeFeatures genomic position of probes
+#' @param envir environment to get globals
+#' @return summary detail about the analysis
 #'
-#' @return none
-
-#'
-deltaSingleSample <- function( values, highThresholds, lowThresholds, sampleDetail, betaMedians, probeFeatures) {
+deltaSingleSample <- function (envir, values, highThresholds, lowThresholds, sampleDetail, betaMedians, probeFeatures) {
 
  message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Sample analysis warmingUP ", Sys.time())
-
- # values <- data.frame("VALUE"=values)
-
- # browser()
-
  ### get probeFeatures ################################################################################################
 
  message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Sample analysis WarmedUP ...", Sys.time())
@@ -56,20 +50,21 @@ deltaSingleSample <- function( values, highThresholds, lowThresholds, sampleDeta
  }
 
  deltasAnnotated <- data.frame(as.data.frame(probeFeatures), deltas, "MUTATIONS" = mutation)
-
  deltasAnnotatedSorted <- sortByCHRandSTART(deltasAnnotated)
-
  deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$MUTATIONS == 1)[, c("CHR", "START", "END", "DELTA")]
 
- folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),"DELTAS_METHYLATION"))
- # browser()
  result <- ""
  result <- result[-1]
  result["DELTA_AVG"] <- round(mean(deltas$DELTA),3)
  result["DELTA_VAR"] <- round(stats::var(deltas$DELTA),3)
  result["DELTA_MEDIAN"] <- round(stats::median(deltas$DELTA),3)
 
- dumpSampleAsBedFile( dataToDump = deltasAnnotatedSorted, fileName = file_path_build(folder2Save,c(as.character(sampleDetail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
+ message("############# SEARCH")
+ message("############# SEARCH",search())
+ message("############# LS",ls())
+ # message("############# envir$resultFolderData:", envir$resultFolderData)
 
+ folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),"DELTAS_METHYLATION"))
+ dumpSampleAsBedFile(dataToDump = deltasAnnotatedSorted, fileName = file_path_build(folder2Save,c(as.character(sampleDetail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
  return(result)
 }

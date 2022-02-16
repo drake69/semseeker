@@ -25,22 +25,22 @@
 #
 #
 # # bootstrap cluster
-# logFolder <- paste0(tempdir(),"/log")
+# ssEnv$logFolder <- paste0(tempdir(),"/log")
 #
-# if (logFolder != "" && !dir.exists(logFolder)) {
-#   dir.create(logFolder)
+# if (ssEnv$logFolder != "" && !dir.exists(ssEnv$logFolder)) {
+#   dir.create(ssEnv$logFolder)
 # }
-# nCore <- parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1
-# outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
-# computationCluster  <-  parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
-# doParallel::registerDoParallel(computationCluster)
+# nCore <- Future::detectCores(all.tests = FALSE, logical = TRUE) - 1
+# outFile <- paste0(ssEnv$logFolder, "/cluster_r.out", sep = "")
+# computationCluster <- parallel::makeCluster(Future::detectCores(all.tests = FALSE, logical = TRUE) - 1, type = "PSOCK", outfile = outFile)
+# doFuture::registerDoFuture(computationCluster)
 #
 #
 # subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
 # mainGroupLabel =  "GENE"
 # figures <- c("HYPO", "HYPER", "BOTH")
 # anomalies <- c("MUTATIONS","LESIONS")
-# keys <- expand.grid("anomalies"= anomalies, "figures"=figures, "group"="GENE", "subGroup"=subGroups)
+# ssEnv$keys <- expand.grid("anomalies"= anomalies, "figures"=figures, "group"="GENE", "subGroup"=subGroups)
 #
 # flattenCorrMatrix <- function(cormat, pmat) {
 #   ut <- upper.tri(cormat)
@@ -76,13 +76,13 @@
 # {
 #   # j <- "DMR"
 #   message(j)
-#   keys <- excel_sheets(paste0("~/Desktop/experiments_data/DIOSSINA_DESIO/20211018/Pivots/",j,".xlsx", sep=""))
-#   for(i in 1:length(keys))
-#   # sheetList <- foreach::foreach(i=1:length(keys), .combine= rbind ) %dopar%
+#   ssEnv$keys <- excel_sheets(paste0("~/Desktop/experiments_data/DIOSSINA_DESIO/20211018/Pivots/",j,".xlsx", sep=""))
+#   for(i in 1:length(ssEnv$keys))
+#   # sheetList <- foreach::foreach(i=1:length(ssEnv$keys), .combine= rbind ) %dopar%
 #   {
 #     # i <-1
-#     # key <- paste0(keys[i,"anomalies"],"_",keys[i,"figures"],"_",keys[i,"group"],"_",keys[i,"subGroup"] ,sep="")
-#     key <- keys[i]
+#     # key <- paste0(ssEnv$keys[i,"anomalies"],"_",ssEnv$keys[i,"figures"],"_",ssEnv$keys[i,"group"],"_",ssEnv$keys[i,"subGroup"] ,sep="")
+#     key <- ssEnv$keys[i]
 #     # key <- "LESIONS_HYPER_GENE_ExonBnd"
 #     message(key)
 #     tempDataFrame <- read_excel(paste0("~/Desktop/experiments_data/DIOSSINA_DESIO/20211018/Pivots/",j,".xlsx", sep=""), sheet = key)
@@ -110,7 +110,7 @@
 #         res.kendall <- cor.test(var1,var2, method="kendall")
 #
 #         bartlett.p.value <- NA
-#         try (bartlett.p.value  <- bartlett.test(var1,tempDataFrame[,"Sample_Group"])$p.value)
+#         try (bartlett.p.value <- bartlett.test(var1,tempDataFrame[,"Sample_Group"])$p.value)
 #         shapiro.p.value <- NA
 #         try (shapiro.p.value <- shapiro.test(var1)$p.value)
 #
@@ -191,7 +191,7 @@
 # gridExtra::grid.arrange(p1,p2,p3,layout_matrix = lay)
 # grDevices::dev.off()
 #
-# parallel::stopCluster(computationCluster)
+# Future::stopCluster(computationCluster)
 # gc()
 #
 #

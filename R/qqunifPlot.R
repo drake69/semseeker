@@ -107,7 +107,7 @@ qqunifPlot<-function(pvalues,filePrefix,
                            lattice::panel.abline(0,1);
                          }, par.settings=par.settings, ...
   )
-  lattice::trellis.device(device="png", filename=file.path(resultFolderData,paste0( "qqplot_", filePrefix, ".png", sep="")))
+  lattice::trellis.device(device="png", filename=file.path(ssEnv$resultFolderData,paste0( "qqplot_", filePrefix, ".png", sep="")))
   print(result.chart)
   grDevices::dev.off()
 }

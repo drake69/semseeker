@@ -11,9 +11,9 @@
 createHeatmap <-
   function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
-    parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
+    # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
 
-    chartFolder <- dir_check_and_create(resultFolderChart,groupLabel)
+    chartFolder <- dir_check_and_create(ssEnv$resultFolderChart,groupLabel)
 
     if (is.null(inputBedDataFrame))
       return()
@@ -111,16 +111,26 @@ createHeatmap <-
 
       # col<- colorRampPalette(c("violet","white","blue"))(1024)
 
-      filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
-      grDevices::png(file= filename, width=2480, height = 2480)
-      stats::heatmap(as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]]),
-                     # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
-                     scale = "column",
-                     RowSideColors =as.vector(tempDataFrame$POPULATION),
-                     margins = c(25, 25),
-                     main = mainTitle
-                    )
-      grDevices::dev.off()
+      tryCatch(
+        {      # skip heatmap if no enough data are available
+          tt <- tempDataFrame[,3:ncol(tempDataFrame)]
+          if(is.null(tt) || is.na(tt) || ncol(tt) < 2 || nrow(tt) < 2)
+            next
+
+          filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
+          grDevices::png(file= filename, width=2480, height = 2480)
+          stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
+                         # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
+                         scale = "column",
+                         RowSideColors =as.vector(tempDataFrame$POPULATION),
+                         margins = c(25, 25),
+                         main = mainTitle
+          )
+          grDevices::dev.off()
+        },
+        finally = message("Nothing to chart!")
+      )
+
     }
     gc()
 }

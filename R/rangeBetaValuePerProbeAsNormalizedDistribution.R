@@ -12,11 +12,11 @@ rangeBetaValuePerProbeAsNormalizedDistribution <- function(populationMatrix, iqr
   betaValues <- populationMatrix[, 2:populationMatrixDim[2]]
   row.names(betaValues) <- populationMatrix[, 1]
 
-  betaQ1Values <- parallel::parApply(computationCluster, betaValues, 1, stats::quantile, 0.25)
-  betaQ3Values <- parallel::parApply(computationCluster, betaValues, 1, stats::quantile, 0.75)
+  betaQ1Values <- future.apply::future_apply( betaValues, 1, stats::quantile, 0.25)
+  betaQ3Values <- future.apply::future_apply( betaValues, 1, stats::quantile, 0.75)
 
-  betaMedianValues <- parallel::parApply(computationCluster, betaValues, 1, stats::median)
-  betaValuesIQR <- parallel::parApply(computationCluster, betaValues, 1, stats::IQR)
+  betaMedianValues <- future.apply::future_apply( betaValues, 1, stats::median)
+  betaValuesIQR <- future.apply::future_apply( betaValues, 1, stats::IQR)
 
   if (!test_match_order(row.names(betaValues), row.names(betaMedianValues))) {
     stop("Wrong order matching Probes and Mutation!", Sys.time())

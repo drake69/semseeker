@@ -1,6 +1,6 @@
 #' #' Title
 #' #'
-#' #' @param resultFolderData
+#' #' @param ssEnv$resultFolderData
 #' #' @param populations
 #' #' @param figures
 #' #' @param anomalies
@@ -27,19 +27,19 @@
 #'     i <- NULL
 #'     FIGURE <- NULL
 #'
-#'     chartFolder <- paste0(resultFolderData, "/Charts/", sep = "")
+#'     chartFolder <- paste0(ssEnv$resultFolderData, "/Charts/", sep = "")
 #'     if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'       dir.create(chartFolder)
 #'     }
 #'
 #'     chartFolder <-
-#'       paste0(resultFolderData, "/Charts/", mainGroupLabel, "/", sep = "")
+#'       paste0(ssEnv$resultFolderData, "/Charts/", mainGroupLabel, "/", sep = "")
 #'     if (chartFolder != "" && !dir.exists(chartFolder)) {
 #'       dir.create(chartFolder)
 #'     }
 #'
 #'     chartFolder <-
-#'       paste0(resultFolderData,
+#'       paste0(ssEnv$resultFolderData,
 #'             "/Charts/",
 #'             mainGroupLabel,
 #'             "/SingleGene",
@@ -48,18 +48,18 @@
 #'       dir.create(chartFolder)
 #'     }
 #'
-#'     logFolder <- paste0(resultFolderData, "/logs/", sep = "")
-#'     if (logFolder != "" && !dir.exists(logFolder)) {
-#'       dir.create(logFolder)
+#'     ssEnv$logFolder <- paste0(ssEnv$resultFolderData, "/logs/", sep = "")
+#'     if (ssEnv$logFolder != "" && !dir.exists(ssEnv$logFolder)) {
+#'       dir.create(ssEnv$logFolder)
 #'     }
-#'     outFile <- paste0(logFolder, "/cluster_r.out", sep = "")
+#'     outFile <- paste0(ssEnv$logFolder, "/cluster_r.out", sep = "")
 #'     computationCluster <-
-#'       parallel::makeCluster(
-#'         parallel::detectCores(all.tests = FALSE, logical = TRUE) - 1,
+#'      parallel::makeCluster(
+#'         Future::detectCores(all.tests = FALSE, logical = TRUE) - 1,
 #'         type = "PSOCK",
 #'         outfile = outFile
 #'       )
-#'     doParallel::registerDoParallel(computationCluster)
+#'     doFuture::registerDoFuture(computationCluster)
 #'
 #'     # options(digits = 22)
 #'     parallel::clusterExport(
@@ -85,7 +85,7 @@
 #'         probesPrefix ,
 #'         mainGroupLabel,
 #'         subGroupLabel,
-#'         resultFolderData
+#'         ssEnv$resultFolderData
 #'       )
 #'
 #'     if (is.null(finalBed))
@@ -131,7 +131,7 @@
 #'       paste0(colnames(testResult), collapse = "\t"),
 #'       "' > ",
 #'       paste0(
-#'         resultFolderData,
+#'         ssEnv$resultFolderData,
 #'         "/Differential_analysis_",
 #'         mainGroupLabel,
 #'         ".csv",
@@ -141,7 +141,7 @@
 #'
 #'     pop <- "Reference"
 #'     filteredData <- data.frame(subset(finalBed, POPULATION != pop))
-#'     keys <-
+#'     ssEnv$keys <-
 #'       unique(
 #'         data.frame(
 #'           mainGroupLabel = filteredData[, mainGroupLabel],
@@ -149,12 +149,12 @@
 #'           "FIGURE" = filteredData$FIGURE
 #'         )
 #'       )
-#'     colnames(keys) <- c(mainGroupLabel, subGroupLabel, "FIGURE")
-#'     numberOfTest <- dim(keys)[1]
+#'     colnames(ssEnv$keys) <- c(mainGroupLabel, subGroupLabel, "FIGURE")
+#'     numberOfTest <- dim(ssEnv$keys)[1]
 #'
 #'     # fd <- filteredData %>%  dplyr::group_by(filteredData[,mainGroupLabel],filteredData[,subGroupLabel],filteredData$FIGURE)
 #'     # fd <- dplyr::group_split(fd)
-#'     # filterOnlye <-  parallel::parLapply(computationCluster, fd, function(i) unique(length(i$POPULATION))<2)
+#'     # filterOnlye <-  Future::parLapply(computationCluster, fd, function(i) unique(length(i$POPULATION))<2)
 #'     # numberOfTest <- length(fd)
 #'
 #'     # tfun <- function(tempData){
@@ -200,7 +200,7 @@
 #'     #   try(
 #'     #     if(reswt$p.value < 0.05/numberOfTest)
 #'     #     {
-#'     #       system(paste0( "echo '",paste0( testResult[1,], collapse = "\t"), "' >> ", paste0(resultFolderData,"/Differential_analysis_Gene.csv", sep = "")))
+#'     #       system(paste0( "echo '",paste0( testResult[1,], collapse = "\t"), "' >> ", paste0(ssEnv$resultFolderData,"/Differential_analysis_Gene.csv", sep = "")))
 #'     #
 #'     #       chart_dataset <- tempData
 #'     #       Groups <- as.factor(chart_dataset[, selection_column])
@@ -232,20 +232,20 @@
 #'     #   )
 #'     #
 #'     # }
-#'     # parallel::parLapply(cl = computationCluster, fd, fun = tfun(fd) )
+#'     # Future::parLapply(cl = computationCluster, fd, fun = tfun(fd) )
 #'
 #'     headFile <- paste0(c(mainGroupLabel,"FIGURE",subGroupLabel,"MEDIAN","VARIANCE","SAMPLE_COUNT"),collapse ="\t")
-#'     system(paste0("echo '",headFile,"'> ",paste0(resultFolderData,"/Differential_analysis_",mainGroupLabel ,"_Alone.csv",sep = "")))
+#'     system(paste0("echo '",headFile,"'> ",paste0(ssEnv$resultFolderData,"/Differential_analysis_",mainGroupLabel ,"_Alone.csv",sep = "")))
 #'
 #'     headFile <-paste0( c(mainGroupLabel,"FIGURE",subGroupLabel,"P_VALUE","P_VALUE_CORRECTED","EXECUTED_TEST","POPULATIONS"),collapse="\t")
-#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolderData,"/Differential_analysis_",mainGroupLabel ,".csv",sep = "")))
+#'     system(paste0("echo '",headFile,"' > ",paste0(ssEnv$resultFolderData,"/Differential_analysis_",mainGroupLabel ,".csv",sep = "")))
 #'
 #'     headFile <-paste0( c(mainGroupLabel,"FIGURE",subGroupLabel,"CASE_MEDIAN","CASE_VARIANCE","CONTROL_MEDIAN","CONTROL_VARIANCE"),collapse="\t")
-#'     system(paste0("echo '",headFile,"' > ",paste0(resultFolderData,"/Differential_analysis_No_Test_",mainGroupLabel ,".csv",sep = "")))
+#'     system(paste0("echo '",headFile,"' > ",paste0(ssEnv$resultFolderData,"/Differential_analysis_No_Test_",mainGroupLabel ,".csv",sep = "")))
 #'
 #'     # foreach::foreach(i = 1:numberOfTest) %dopar% {
 #'     for (i in 1:numberOfTest) {
-#'         key <- keys[i, ]
+#'         key <- ssEnv$keys[i, ]
 #'         mainGroup <- key[1, mainGroupLabel]
 #'         subGroup <- key[1, subGroupLabel]
 #'         fig <- key$FIGURE
@@ -286,7 +286,7 @@
 #'             testResultToDump,
 #'             "' >> ",
 #'             paste0(
-#'               resultFolderData,
+#'               ssEnv$resultFolderData,
 #'               "/Differential_analysis_",
 #'               mainGroupLabel ,
 #'               "_Alone.csv",
@@ -299,7 +299,7 @@
 #'         }
 #'
 #'
-#'         skipCicle  <-  FALSE
+#'         skipCicle <-  FALSE
 #'         reswt = tryCatch({
 #'           stats::wilcox.test(unlist(freqData) ~ unlist(popData), exact = FALSE)
 #'         }, error = function(e) {
@@ -342,7 +342,7 @@
 #'             testResultToDump,
 #'             "' >> ",
 #'             paste0(
-#'               resultFolderData,
+#'               ssEnv$resultFolderData,
 #'               "/Differential_analysis_No_Test_",
 #'               mainGroupLabel ,
 #'               ".csv",
@@ -382,7 +382,7 @@
 #'             testResultToDump,
 #'             "' >> ",
 #'             paste0(
-#'               resultFolderData,
+#'               ssEnv$resultFolderData,
 #'               "/Differential_analysis_",
 #'               mainGroupLabel ,
 #'               ".csv",
@@ -436,7 +436,7 @@
 #'     #foreach::foreach(i = 1:numberOfTest) %dopar% {
 #'     # for (i in 1:numberOfTest) {
 #'     #
-#'     #     key <- keys[i,]
+#'     #     key <- ssEnv$keys[i,]
 #'     #     mainGroup <- key[,mainGroupLabel]
 #'     #     subGroup <- key[,subGroupLabel]
 #'     #     fig <- key$FIGURE
@@ -446,6 +446,6 @@
 #'     #     tempData <- data.frame(subset(tempData, subGroupLabel == subGroup))
 #'     #     tfun(tempData)
 #'     # }
-#'     # utils::write.csv(testResults,paste0(resultFolderData,"/Differential_analysis_Gene.csv"))
+#'     # utils::write.csv(testResults,paste0(ssEnv$resultFolderData,"/Differential_analysis_Gene.csv"))
 #'
 #'   }

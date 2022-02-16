@@ -1,10 +1,10 @@
 test_that("analyseSingleSampleBoth", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder)
+  tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  envir <- init_env(tempFolder)
 
-  Sample_ID <- stri_rand_strings(1, 7, pattern = "[A-Za-z]")
+  Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
   Sample_Group <- "Control"
 
   sampleDetail <- data.frame("Sample_ID"= Sample_ID,"Sample_Group"= Sample_Group)
@@ -26,15 +26,14 @@ test_that("analyseSingleSampleBoth", {
   )
 
   mutations <- subset(mutations, MUTATIONS == 1)[, c("CHR", "START", "END")]
-  resultFolderData  <-  dir_check_and_create(tempFolder, "Data")
-  folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", "HYPER", sep = "")))
+  folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", "HYPER", sep = "")))
   dumpSampleAsBedFile(
     dataToDump = mutations,
     fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"MUTATIONS","HYPER"),"bed")
   )
 
 
-  res <- analyzeSingleSampleBoth(sampleDetail = sampleDetail)
+  res <- analyzeSingleSampleBoth(envir, sampleDetail = sampleDetail)
 
   expect_true(as.numeric(res["MUTATIONS_BOTH"])!=0)
   expect_true(ncol(mutations)==3 )
