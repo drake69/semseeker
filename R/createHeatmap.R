@@ -111,25 +111,21 @@ createHeatmap <-
 
       # col<- colorRampPalette(c("violet","white","blue"))(1024)
 
-      tryCatch(
-        {      # skip heatmap if no enough data are available
-          tt <- tempDataFrame[,3:ncol(tempDataFrame)]
-          if(is.null(tt) || is.na(tt) || ncol(tt) < 2 || nrow(tt) < 2)
-            next
+      # skip heatmap if no enough data are available
+      tt <- tempDataFrame[,3:ncol(tempDataFrame)]
+      if(is.null(tt) || is.null(dim(tt)) || dim(tt)[1] < 2 || dim(tt)[2] < 2)
+        next
 
-          filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
-          grDevices::png(file= filename, width=2480, height = 2480)
-          stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
-                         # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
-                         scale = "column",
-                         RowSideColors =as.vector(tempDataFrame$POPULATION),
-                         margins = c(25, 25),
-                         main = mainTitle
-          )
-          grDevices::dev.off()
-        },
-        finally = message("Nothing to chart!")
+      filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
+      grDevices::png(file= filename, width=2480, height = 2480)
+      stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
+                     # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
+                     scale = "column",
+                     RowSideColors =as.vector(tempDataFrame$POPULATION),
+                     margins = c(25, 25),
+                     main = mainTitle
       )
+      grDevices::dev.off()
 
     }
     gc()
