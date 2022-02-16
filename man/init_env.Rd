@@ -12,7 +12,7 @@ init_env(resultFolder, maxResources = 90)
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 }
 \value{
-null
+the working environment
 }
 \description{
 init environment

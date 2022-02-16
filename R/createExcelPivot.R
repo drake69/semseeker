@@ -11,7 +11,7 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
     if (is.null(finalBed))
       return()
 
-    reportFolder <- dir_check_and_create(resultFolderData,"Pivots")
+    reportFolder <- dir_check_and_create(ssEnv$resultFolderData,"Pivots")
 
     finalBed <- data.frame(finalBed, "KEY" = finalBed[,mainGroupLabel])
     finalBed[,mainGroupLabel] <- as.factor(finalBed[,mainGroupLabel])
@@ -31,20 +31,20 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
     # options(digits = 22)
     # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
 
-    keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    sheetList <- foreach::foreach(i=1:nrow(keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
-    # for(i in 1:nrow(keys))
+    ssEnv$keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
+    # sheetList <- foreach::foreach(i=1:nrow(ssEnv$keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+    for(i in 1:nrow(ssEnv$keys))
       {
         # i <- 1
-        grp <- keys[i,1]
+        grp <- ssEnv$keys[i,1]
         temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
         if(nrow(temp)!=0)
         {
-          anomaly <- keys[i,2]
+          anomaly <- ssEnv$keys[i,2]
           tempAnomaly <- subset(temp, finalBed$ANOMALY == as.character(anomaly))
           if(nrow(tempAnomaly)!=0)
           {
-            figure <- keys[i,3]
+            figure <- ssEnv$keys[i,3]
             tempDataFrame <- subset(tempAnomaly, finalBed$FIGURE == figure)
             if(nrow(tempDataFrame)!=0)
             {
@@ -56,7 +56,11 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
 
               #store in the first row the names of the sheet
               tempDataFrame[1,] <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
-              list(tempDataFrame)
+              # list(tempDataFrame)
+              if(exists("sheetList"))
+                sheetList <- append(sheetList, list(tempDataFrame))
+              else
+                sheetList <- list(tempDataFrame)
             }
           }
         }

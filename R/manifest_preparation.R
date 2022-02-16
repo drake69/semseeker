@@ -36,36 +36,36 @@
 #
 #  rm(infinium_methylationepic_v_1_0_b5_manifest_file)
 #
-#  keys <- data.frame( PROBE="",GENE="", ACCESSION="", GROUP="", CHR="", START="", POSITION ="")
-#  PROBES_Gene_Body <- keys[keys$GROUP=="Body",]
-#  PROBES_Gene_TSS200 <- keys[keys$GROUP=="TSS200",]
-#  PROBES_Gene_TSS1500 <- keys[keys$GROUP=="TSS1500",]
-#  PROBES_Gene_5UTR <- keys[keys$GROUP=="5'UTR",]
-#  PROBES_Gene_3UTR <- keys[keys$GROUP=="3'UTR",]
-#  PROBES_Gene_ExonBnd <- keys[keys$GROUP=="ExonBnd",]
-#  PROBES_Gene_1stExon <- keys[keys$GROUP=="1stExon",]
+#  ssEnv$keys <- data.frame( PROBE="",GENE="", ACCESSION="", GROUP="", CHR="", START="", POSITION ="")
+#  PROBES_Gene_Body <- ssEnv$keys[ssEnv$keys$GROUP=="Body",]
+#  PROBES_Gene_TSS200 <- ssEnv$keys[ssEnv$keys$GROUP=="TSS200",]
+#  PROBES_Gene_TSS1500 <- ssEnv$keys[ssEnv$keys$GROUP=="TSS1500",]
+#  PROBES_Gene_5UTR <- ssEnv$keys[ssEnv$keys$GROUP=="5'UTR",]
+#  PROBES_Gene_3UTR <- ssEnv$keys[ssEnv$keys$GROUP=="3'UTR",]
+#  PROBES_Gene_ExonBnd <- ssEnv$keys[ssEnv$keys$GROUP=="ExonBnd",]
+#  PROBES_Gene_1stExon <- ssEnv$keys[ssEnv$keys$GROUP=="1stExon",]
 #  dim_matrix <- dim(UCSC_RefGene_Accession)[2]
 #  for (i in 1:dim_matrix ) {
 #
 #
-#    temp_keys <- data.frame( PROBE=PROBES_ID,GENE=UCSC_RefGene_Name[,i], ACCESSION=UCSC_RefGene_Accession[,i], GROUP = UCSC_RefGene_Group[,i], CHR = CHR, START = START, POSITION = i)
-#    temp_keys <- (temp_keys[!is.na(temp_keys$GENE),])
+#    temp_ssEnv$keys <- data.frame( PROBE=PROBES_ID,GENE=UCSC_RefGene_Name[,i], ACCESSION=UCSC_RefGene_Accession[,i], GROUP = UCSC_RefGene_Group[,i], CHR = CHR, START = START, POSITION = i)
+#    temp_ssEnv$keys <- (temp_ssEnv$keys[!is.na(temp_ssEnv$keys$GENE),])
 #
-#    temp_keys_Gene_Body <- temp_keys[temp_keys$GROUP=="Body",]
-#    temp_keys_Gene_TSS200 <- temp_keys[temp_keys$GROUP=="TSS200",]
-#    temp_keys_Gene_TSS1500 <- temp_keys[temp_keys$GROUP=="TSS1500",]
-#    temp_keys_Gene_5UTR <- temp_keys[temp_keys$GROUP=="5'UTR",]
-#    temp_keys_Gene_3UTR <- temp_keys[temp_keys$GROUP=="3'UTR",]
-#    temp_keys_Gene_ExonBnd <- temp_keys[temp_keys$GROUP=="ExonBnd",]
-#    temp_keys_Gene_1stExon <- temp_keys[temp_keys$GROUP=="1stExon",]
+#    temp_ssEnv$keys_Gene_Body <- temp_ssEnv$keys[temp_ssEnv$keys$GROUP=="Body",]
+#    temp_ssEnv$keys_Gene_TSS200 <- temp_ssEnv$keys[temp_ssEnv$keys$GROUP=="TSS200",]
+#    temp_ssEnv$keys_Gene_TSS1500 <- temp_ssEnv$keys[temp_ssEnv$keys$GROUP=="TSS1500",]
+#    temp_ssEnv$keys_Gene_5UTR <- temp_ssEnv$keys[temp_ssEnv$keys$GROUP=="5'UTR",]
+#    temp_ssEnv$keys_Gene_3UTR <- temp_ssEnv$keys[temp_ssEnv$keys$GROUP=="3'UTR",]
+#    temp_ssEnv$keys_Gene_ExonBnd <- temp_ssEnv$keys[temp_ssEnv$keys$GROUP=="ExonBnd",]
+#    temp_ssEnv$keys_Gene_1stExon <- temp_ssEnv$keys[temp_ssEnv$keys$GROUP=="1stExon",]
 #
-#    PROBES_Gene_Body <- rbind(PROBES_Gene_Body,temp_keys_Gene_Body )
-#    PROBES_Gene_TSS200 <- rbind(PROBES_Gene_TSS200,temp_keys_Gene_TSS200 )
-#    PROBES_Gene_TSS1500 <- rbind(PROBES_Gene_TSS1500,temp_keys_Gene_TSS1500 )
-#    PROBES_Gene_5UTR <- rbind(PROBES_Gene_5UTR,temp_keys_Gene_5UTR )
-#    PROBES_Gene_3UTR <- rbind(PROBES_Gene_3UTR,temp_keys_Gene_3UTR )
-#    PROBES_Gene_ExonBnd <- rbind(PROBES_Gene_ExonBnd,temp_keys_Gene_ExonBnd )
-#    PROBES_Gene_1stExon <- rbind(PROBES_Gene_1stExon,temp_keys_Gene_1stExon )
+#    PROBES_Gene_Body <- rbind(PROBES_Gene_Body,temp_ssEnv$keys_Gene_Body )
+#    PROBES_Gene_TSS200 <- rbind(PROBES_Gene_TSS200,temp_ssEnv$keys_Gene_TSS200 )
+#    PROBES_Gene_TSS1500 <- rbind(PROBES_Gene_TSS1500,temp_ssEnv$keys_Gene_TSS1500 )
+#    PROBES_Gene_5UTR <- rbind(PROBES_Gene_5UTR,temp_ssEnv$keys_Gene_5UTR )
+#    PROBES_Gene_3UTR <- rbind(PROBES_Gene_3UTR,temp_ssEnv$keys_Gene_3UTR )
+#    PROBES_Gene_ExonBnd <- rbind(PROBES_Gene_ExonBnd,temp_ssEnv$keys_Gene_ExonBnd )
+#    PROBES_Gene_1stExon <- rbind(PROBES_Gene_1stExon,temp_ssEnv$keys_Gene_1stExon )
 #
 #  }
 
@@ -94,31 +94,31 @@
 #  usethis::use_data(PROBES_Gene_Whole, overwrite = TRUE)
 #
 #
-#  keys <- data.frame( PROBE="",ISLAND="", RELATION_TO_CPGISLAND="", CHR="", START="", POSITION ="")
-#  PROBES_Island_Island <- keys[keys$RELATION_TO_CPGISLAND=="Island",]
-#  PROBES_Island_N_Shore <- keys[keys$RELATION_TO_CPGISLAND=="N_Shore",]
-#  PROBES_Island_S_Shore <- keys[keys$RELATION_TO_CPGISLAND=="S_Shore",]
-#  PROBES_Island_S_Shelf <- keys[keys$RELATION_TO_CPGISLAND=="S_Shelf",]
-#  PROBES_Island_N_Shelf <- keys[keys$RELATION_TO_CPGISLAND=="N_Shelf",]
+#  ssEnv$keys <- data.frame( PROBE="",ISLAND="", RELATION_TO_CPGISLAND="", CHR="", START="", POSITION ="")
+#  PROBES_Island_Island <- ssEnv$keys[ssEnv$keys$RELATION_TO_CPGISLAND=="Island",]
+#  PROBES_Island_N_Shore <- ssEnv$keys[ssEnv$keys$RELATION_TO_CPGISLAND=="N_Shore",]
+#  PROBES_Island_S_Shore <- ssEnv$keys[ssEnv$keys$RELATION_TO_CPGISLAND=="S_Shore",]
+#  PROBES_Island_S_Shelf <- ssEnv$keys[ssEnv$keys$RELATION_TO_CPGISLAND=="S_Shelf",]
+#  PROBES_Island_N_Shelf <- ssEnv$keys[ssEnv$keys$RELATION_TO_CPGISLAND=="N_Shelf",]
 #
-#  temp_keys <- data.frame( PROBE=PROBES_ID, ISLAND= UCSC_CpG_Islands_Name , RELATION_TO_CPGISLAND = Relation_to_UCSC_CpG_Island, CHR = CHR, START = START, POSITION = 1)
-#  temp_keys <- (temp_keys[!is.na(temp_keys$ISLAND),])
+#  temp_ssEnv$keys <- data.frame( PROBE=PROBES_ID, ISLAND= UCSC_CpG_Islands_Name , RELATION_TO_CPGISLAND = Relation_to_UCSC_CpG_Island, CHR = CHR, START = START, POSITION = 1)
+#  temp_ssEnv$keys <- (temp_ssEnv$keys[!is.na(temp_ssEnv$keys$ISLAND),])
 #
-#  temp_keys_Island_Island <- temp_keys[temp_keys$RELATION_TO_CPGISLAND=="Island",]
-#  PROBES_Island_Island <- rbind(PROBES_Island_Island,temp_keys_Island_Island )
+#  temp_ssEnv$keys_Island_Island <- temp_ssEnv$keys[temp_ssEnv$keys$RELATION_TO_CPGISLAND=="Island",]
+#  PROBES_Island_Island <- rbind(PROBES_Island_Island,temp_ssEnv$keys_Island_Island )
 #
-#  temp_keys_Island_N_Shore <- temp_keys[temp_keys$RELATION_TO_CPGISLAND=="N_Shore",]
-#  PROBES_Island_N_Shore <- rbind(PROBES_Island_N_Shore,temp_keys_Island_N_Shore )
+#  temp_ssEnv$keys_Island_N_Shore <- temp_ssEnv$keys[temp_ssEnv$keys$RELATION_TO_CPGISLAND=="N_Shore",]
+#  PROBES_Island_N_Shore <- rbind(PROBES_Island_N_Shore,temp_ssEnv$keys_Island_N_Shore )
 #
-#  temp_keys_Island_S_Shore <- temp_keys[temp_keys$RELATION_TO_CPGISLAND=="S_Shore",]
-#  PROBES_Island_S_Shore <- rbind(PROBES_Island_S_Shore,temp_keys_Island_S_Shore )
+#  temp_ssEnv$keys_Island_S_Shore <- temp_ssEnv$keys[temp_ssEnv$keys$RELATION_TO_CPGISLAND=="S_Shore",]
+#  PROBES_Island_S_Shore <- rbind(PROBES_Island_S_Shore,temp_ssEnv$keys_Island_S_Shore )
 #
 #
-#  temp_keys_Island_N_Shelf <- temp_keys[temp_keys$RELATION_TO_CPGISLAND=="N_Shelf",]
-#  PROBES_Island_N_Shelf <- rbind(PROBES_Island_N_Shelf,temp_keys_Island_N_Shelf )
+#  temp_ssEnv$keys_Island_N_Shelf <- temp_ssEnv$keys[temp_ssEnv$keys$RELATION_TO_CPGISLAND=="N_Shelf",]
+#  PROBES_Island_N_Shelf <- rbind(PROBES_Island_N_Shelf,temp_ssEnv$keys_Island_N_Shelf )
 #
-#  temp_keys_Island_S_Shelf <- temp_keys[temp_keys$RELATION_TO_CPGISLAND=="S_Shelf",]
-#  PROBES_Island_S_Shelf <- rbind(PROBES_Island_S_Shelf,temp_keys_Island_S_Shelf )
+#  temp_ssEnv$keys_Island_S_Shelf <- temp_ssEnv$keys[temp_ssEnv$keys$RELATION_TO_CPGISLAND=="S_Shelf",]
+#  PROBES_Island_S_Shelf <- rbind(PROBES_Island_S_Shelf,temp_ssEnv$keys_Island_S_Shelf )
 #
 #  rm(UCSC_CpG_Islands_Name)
 #  rm(Relation_to_UCSC_CpG_Island)
@@ -133,21 +133,21 @@
 #
 # unique(as.factor(Regulatory_Feature_Group))
 #
-# keys <- data.frame( PROBE="",REGULATORY_FEATURE="", REGULATORY_FEATURE_GROUP="", CHR="", START="", POSITION ="")
-# PROBES_Regulatory_Gene_Associated <- keys[keys$REGULATORY_FEATURE_GROUP=="Gene_Associated",]
-# PROBES_Regulatory_Gene_Associated_Cell_type_specific<- keys[keys$REGULATORY_FEATURE_GROUP=="Gene_Associated_Cell_type_specific",]
-# PROBES_Regulatory_NonGene_Associated<- keys[keys$REGULATORY_FEATURE_GROUP=="NonGene_Associated",]
-# PROBES_Regulatory_NonGene_Associated_Cell_type_specific<- keys[keys$REGULATORY_FEATURE_GROUP=="NonGene_Associated_Cell_type_specific",]
-# PROBES_Regulatory_Promoter_Associated<- keys[keys$REGULATORY_FEATURE_GROUP=="Promoter_Associated",]
-# PROBES_Regulatory_Promoter_Associated_Cell_type_specific<- keys[keys$REGULATORY_FEATURE_GROUP=="Promoter_Associated_Cell_type_specific",]
-# PROBES_Regulatory_Unclassified<- keys[keys$REGULATORY_FEATURE_GROUP=="Unclassified",]
-# PROBES_Regulatory_Unclassified_Cell_type_specific<- keys[keys$REGULATORY_FEATURE_GROUP=="Unclassified_Cell_type_specific",]
+# ssEnv$keys <- data.frame( PROBE="",REGULATORY_FEATURE="", REGULATORY_FEATURE_GROUP="", CHR="", START="", POSITION ="")
+# PROBES_Regulatory_Gene_Associated <- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="Gene_Associated",]
+# PROBES_Regulatory_Gene_Associated_Cell_type_specific<- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="Gene_Associated_Cell_type_specific",]
+# PROBES_Regulatory_NonGene_Associated<- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="NonGene_Associated",]
+# PROBES_Regulatory_NonGene_Associated_Cell_type_specific<- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="NonGene_Associated_Cell_type_specific",]
+# PROBES_Regulatory_Promoter_Associated<- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="Promoter_Associated",]
+# PROBES_Regulatory_Promoter_Associated_Cell_type_specific<- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="Promoter_Associated_Cell_type_specific",]
+# PROBES_Regulatory_Unclassified<- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="Unclassified",]
+# PROBES_Regulatory_Unclassified_Cell_type_specific<- ssEnv$keys[ssEnv$keys$REGULATORY_FEATURE_GROUP=="Unclassified_Cell_type_specific",]
 #
-# temp_keys <- data.frame( PROBE="",REGULATORY_FEATURE=Regulatory_Feature_Name, REGULATORY_FEATURE_GROUP=Regulatory_Feature_Group, CHR=CHR, START=START, POSITION =1)
-# temp_keys <- (temp_keys[!is.na(temp_keys$REGULATORY_FEATURE),])
+# temp_ssEnv$keys <- data.frame( PROBE="",REGULATORY_FEATURE=Regulatory_Feature_Name, REGULATORY_FEATURE_GROUP=Regulatory_Feature_Group, CHR=CHR, START=START, POSITION =1)
+# temp_ssEnv$keys <- (temp_ssEnv$keys[!is.na(temp_ssEnv$keys$REGULATORY_FEATURE),])
 #
-# temp_keys_Regulatory_Gene_Associated <- temp_keys[temp_keys$REGULATORY_FEATURE_GROUP=="Regulatory_Gene_Associated",]
-# PROBES_Regulatory_Gene_Associated <- rbind(PROBES_Regulatory_Gene_Associated,temp_keys_Regulatory_Gene_Associated )
+# temp_ssEnv$keys_Regulatory_Gene_Associated <- temp_ssEnv$keys[temp_ssEnv$keys$REGULATORY_FEATURE_GROUP=="Regulatory_Gene_Associated",]
+# PROBES_Regulatory_Gene_Associated <- rbind(PROBES_Regulatory_Gene_Associated,temp_ssEnv$keys_Regulatory_Gene_Associated )
 #
 # da finire ....
 #

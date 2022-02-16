@@ -111,7 +111,7 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
       {
         covariates_model <- paste0(paste0(c(independentVariable, covariates),collapse="+", sep=""))
       }
-      sig.formula  <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+      sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
     }
 
     if(family_test=="wilcoxon" | family_test=="t.test")
@@ -168,19 +168,19 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
 
     if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
     {
-      result.glm  <- stats::glm( sig.formula, family = family_test, data = as.data.frame(tempDataFrame))
+      result.glm <- stats::glm( sig.formula, family = family_test, data = as.data.frame(tempDataFrame))
       pvalue <- summary(result.glm )$coeff[-1, 4][1]
     }
 
     if(family_test=="wilcoxon")
     {
-      result.w  <- stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
+      result.w <- stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
       pvalue <- result.w$p.value
     }
 
     if(family_test=="t.test")
     {
-      result.w  <- stats::t.test(sig.formula, data = as.data.frame(tempDataFrame))
+      result.w <- stats::t.test(sig.formula, data = as.data.frame(tempDataFrame))
       pvalue <- result.w$p.value
     }
 
@@ -271,8 +271,8 @@ apply_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, 
   result_temp <- unique(result_temp)
 
 
-  result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
-  result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
+  result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"] <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
+  result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"] <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
 
   gc()
   return(result_temp)

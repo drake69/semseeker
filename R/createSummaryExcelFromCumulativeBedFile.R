@@ -16,7 +16,7 @@ createSummaryExcelFromCumulativeBedFile <-
     lesionsComparison <- NULL
     lesionsComparisonByGene <- NULL
 
-    fileName <- file_path_build(resultFolderData ,"results","xlsx")
+    fileName <- file_path_build(ssEnv$resultFolderData ,"results","xlsx")
 
     hyperLesionsResult <-
       createPivotResultFromMultipleBed(

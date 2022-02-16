@@ -1,4 +1,4 @@
-analyzeSingleSampleBoth <- function(sampleDetail) {
+analyzeSingleSampleBoth <- function(envir, sampleDetail) {
 
   start_time_single_sample <- Sys.time()
   message(sampleDetail$Sample_ID, " ", "SingleSampleBoth Sample analysis warmingUP ", Sys.time())
@@ -8,11 +8,11 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
   mutations <- data.frame("CHR"="", "START"="", "END"="")
   lesions <- mutations
 
-  for( figure in keys_figures)
+  for( figure in envir$keys_figures)
   {
     if(figure=="BOTH")
       next
-    folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+    folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
     fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"MUTATIONS",figure),"bed")
     if(file.exists(fileName))
     {
@@ -21,7 +21,7 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
       mutations <- rbind(mutations, mutationsTemp )
     }
 
-    folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+    folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
     fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"LESIONS",figure),"bed")
     if(file.exists(fileName))
     {
@@ -35,7 +35,7 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
   lesions <- lesions[-1,]
 
   figure <- "BOTH"
-  folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+  folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"MUTATIONS",figure),"bed")
   # mutations$SAMPLEID <- mutations$Sample_ID
   dumpSampleAsBedFile(
@@ -44,7 +44,7 @@ analyzeSingleSampleBoth <- function(sampleDetail) {
   )
 
   # browser()
-  folder2Save <- dir_check_and_create(resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+  folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   fileName = file_path_build(folder2Save,c(sampleDetail$Sample_ID,"LESIONS",figure),"bed")
   lesions <- unique(lesions)
   if(nrow(lesions)>0)

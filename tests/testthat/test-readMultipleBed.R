@@ -1,9 +1,10 @@
 test_that("readMultipleBed", {
 
 
+
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder)
+  tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  envir <- init_env(tempFolder)
 
   nitem <- 5e4
   nsamples <- 5
@@ -19,7 +20,7 @@ test_that("readMultipleBed", {
   row.names(betaInferiorThresholds) <- probeFeatures$PROBE
   row.names(methylationData) <- probeFeatures$PROBE
 
-  Sample_ID <- stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
+  Sample_ID <- stringi::stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
   colnames(methylationData) <- Sample_ID
   Sample_Group <- rep("Control",nsamples)
   sampleSheet <- data.frame(Sample_Group, Sample_ID)
@@ -34,7 +35,7 @@ test_that("readMultipleBed", {
                           probeFeatures = probeFeatures
   )
 
-  createMultipleBed(sampleSheet)
+  createMultipleBed(envir, sampleSheet)
 
   figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("MUTATIONS","LESIONS")

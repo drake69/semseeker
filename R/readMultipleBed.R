@@ -12,10 +12,10 @@
 #'
 readMultipleBed <- function(anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
 {
-  POSITION  <- NULL
+  POSITION <- NULL
   # browser()
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
-  souceFolder <- dir_check_and_create(resultFolderData, c(as.character(populationName),f))
+  souceFolder <- dir_check_and_create(ssEnv$resultFolderData, c(as.character(populationName),f))
 
 
   # browser()

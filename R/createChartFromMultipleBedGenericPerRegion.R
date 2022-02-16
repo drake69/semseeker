@@ -19,7 +19,7 @@ createChartFromMultipleBedGenericPerRegion <- function(populations, figures, ano
   HYPER <- NULL
   POPULATION <- NULL
 
-  chartFolder <- dir_check_and_create(resultFolderChart, c(mainGroupLabel, "Grouped"))
+  chartFolder <- dir_check_and_create(ssEnv$resultFolderChart, c(mainGroupLabel, "Grouped"))
 
   finalBed <-  annotateBed(populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
 

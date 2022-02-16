@@ -42,8 +42,8 @@ inferenceAnalysis <- function(inferenceDetails)
       message("Warning: missed depth analysis inference forced to 1.")
     }
 
-    studySummary <-   utils::read.csv2(file_path_build(resultFolderData, "sample_sheet_result","csv"))
-    resultFolderDataPivot <- dir_check_and_create(resultFolderData,"Pivots")
+    studySummary <-   utils::read.csv2(file_path_build(ssEnv$resultFolderData, "sample_sheet_result","csv"))
+    ssEnv$resultFolderDataPivot <- dir_check_and_create(ssEnv$resultFolderData,"Pivots")
 
     file_result_prefix <- paste0( depthAnalysis,"_", independentVariable,"_",sep="")
 
@@ -51,8 +51,8 @@ inferenceAnalysis <- function(inferenceDetails)
     #########################################################################################################
     #########################################################################################################
 
-    if(!dir.exists(resultFolderInference))
-      dir.create(resultFolderInference)
+    if(!dir.exists(ssEnv$resultFolderInference))
+      dir.create(ssEnv$resultFolderInference)
 
     if (!(independentVariable %in% colnames(studySummary)))
     {
@@ -113,10 +113,10 @@ inferenceAnalysis <- function(inferenceDetails)
     # binomiale che si vuole usare per la regressione logistica
 
 
-    keys <- expand.grid("ANOMALY"=c("LESIONS","MUTATIONS"), "FIGURE"=c("HYPER","HYPO","BOTH"))
-    cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep="")
-    keys$GROUP = "POPULATION"
-    keys$SUBGROUP = "SAMPLE"
+    ssEnv$keys <- expand.grid("ANOMALY"=c("LESIONS","MUTATIONS"), "FIGURE"=c("HYPER","HYPO","BOTH"))
+    cols <- paste0(ssEnv$keys$ANOMALY,"_",ssEnv$keys$FIGURE, sep="")
+    ssEnv$keys$GROUP = "POPULATION"
+    ssEnv$keys$SUBGROUP = "SAMPLE"
     iters <- length(cols)
 
     if(!is.null(covariates) && !length(covariates)==0)
@@ -124,14 +124,14 @@ inferenceAnalysis <- function(inferenceDetails)
 
     # #browser()
 
-    for(i in 1:nrow(keys))
+    for(i in 1:nrow(ssEnv$keys))
     {
       # i <- 1
       # family_test <- "poisson"
       # transformation <- NULL
       g_start <- 2 + length(covariates)
       result_temp <- apply_model(tempDataFrame = studySummary[, c(independentVariable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
-                                 key = keys[i,], transformation = transformation, dototal = FALSE, independentVariable, depthAnalysis)
+                                 key = ssEnv$keys[i,], transformation = transformation, dototal = FALSE, independentVariable, depthAnalysis)
       result <- rbind(result, result_temp)
     }
 
@@ -139,12 +139,12 @@ inferenceAnalysis <- function(inferenceDetails)
 
     # #browser()
     studySummaryToPlot <- studySummary
-    studySummaryToPlot$Sample_Group  <- stats::relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
+    studySummaryToPlot$Sample_Group <- stats::relevel(as.factor(studySummaryToPlot$Sample_Group), "Control")
 
     if(family_test=="binomial")
     {
 
-      chartFolder <- dir_check_and_create(resultFolderChart,"POPULATION_COMPARISON")
+      chartFolder <- dir_check_and_create(ssEnv$resultFolderChart,"POPULATION_COMPARISON")
 
       filename <- file_path_build(chartFolder,file_result_prefix, "MUTATIONS.png")
       grDevices::png(file= filename, width=2480,height=2480)
@@ -167,22 +167,22 @@ inferenceAnalysis <- function(inferenceDetails)
     if(depthAnalysis >1)
     {
 
-      keys <- annotation_keys()
+      ssEnv$keys <- annotation_keys()
       # #browser()
       # areas <- rbind(genes, islands, dmrs)
-      nkeys <- dim(keys)[1]
+      nssEnv$keys <- dim(ssEnv$keys)[1]
       # #browser()
 
-      parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_model"))
-      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind) %dopar%
-      # for (i in 1:nkeys)
+      # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_model"))
+      result_temp_foreach <- foreach::foreach(i = 1:nssEnv$keys, .combine = rbind) %dopar%
+      # for (i in 1:nssEnv$keys)
       {
         # i <- 25
         if(exists("tempDataFrame"))
           rm(list = c("tempDataFrame"))
-        key <- keys [i,]
+        key <- ssEnv$keys [i,]
         # print(key)
-        fname <-file_path_build(resultFolderData,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+        fname <-file_path_build(ssEnv$resultFolderData,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
         # print(fname)
         if (file.exists(fname))
         {
@@ -216,7 +216,7 @@ inferenceAnalysis <- function(inferenceDetails)
 
             tempDataFrame <- as.data.frame(tempDataFrame)
             # tempDataFrame$Sample_Group <- as.factor(tempDataFrame$Sample_Group)
-            # tempDataFrame$Sample_Group  <- stats::relevel(tempDataFrame$Sample_Group, "Control")
+            # tempDataFrame$Sample_Group <- stats::relevel(tempDataFrame$Sample_Group, "Control")
 
             g_start <- 2 + length(covariates)
 
@@ -255,7 +255,7 @@ inferenceAnalysis <- function(inferenceDetails)
         file_suffix <- "_test_corrected_result"
       }
 
-      fileName <- file_path_build(resultFolderInference,c(file_result_prefix , transformation, family_test, file_suffix),"csv")
+      fileName <- file_path_build(ssEnv$resultFolderInference,c(file_result_prefix , transformation, family_test, file_suffix),"csv")
       utils::write.csv2(result,fileName , row.names = FALSE)
     }
 
@@ -265,19 +265,19 @@ inferenceAnalysis <- function(inferenceDetails)
     # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
 
     # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
-    # result <- utils::read.csv(file.path(resultFolderInference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
-    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, resultFolderInference =  report.dir, filePrefix ="diff_meth_sites")
+    # result <- utils::read.csv(file.path(ssEnv$resultFolderInference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
+    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, ssEnv$resultFolderInference =  report.dir, filePrefix ="diff_meth_sites")
 
     # case_vs_control_binomial_regression_corrected_result <-
     #   utils::read.csv2(
     #     "/home/lcorsaro/Desktop/experiments_data/DIOSSINA_DESIO/3_semseeker_result/Pivots/case_vs_control_binomial_regression_corrected_result_1.csv"
     #   )
-    # keys <- unique(result[, c("ANOMALY", "FIGURE", "GROUP", "SUBGROUP")])
+    # ssEnv$keys <- unique(result[, c("ANOMALY", "FIGURE", "GROUP", "SUBGROUP")])
     #
-    # for (i in 1:dim(keys)[1])
+    # for (i in 1:dim(ssEnv$keys)[1])
     # {
     #   # i <- 2
-    #   key <- keys[i, ]
+    #   key <- ssEnv$keys[i, ]
     #   diffmeth.p.val <-
     #     subset(result,
     #            ANOMALY == key$ANOMALY)
@@ -295,7 +295,7 @@ inferenceAnalysis <- function(inferenceDetails)
     #
     #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
     #   qqunifPlot(diffmeth.p.val$PVALUE,
-    #               resultFolderInference = resultFolderInference,
+    #               ssEnv$resultFolderInference = ssEnv$resultFolderInference,
     #               filePrefix = file_prefix)
     # }
     #

@@ -21,7 +21,7 @@ pathway_burden_phenolizer <- function(resultFolder, terms)
   anomalies <- c("MUTATIONS")
   # anomalies <- c("MUTATIONS","LESIONS")
   # term <- "spermatogenesis"
-  samples <- utils::read.csv(file_path_build(baseFolder =  resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
+  samples <- utils::read.csv(file_path_build(baseFolder =  ssEnv$resultFolderData,detailsFilename = c("sample","sheet","result"),"csv"), sep=";")
   for (anomaly in anomalies)
   {
     # anomaly <- "MUTATIONS"
@@ -44,6 +44,6 @@ pathway_burden_phenolizer <- function(resultFolder, terms)
         result <- merge(result, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID",all.x=TRUE)
     }
   }
-  fileName <- file_path_build (dir_check_and_create(resultFolderData,c("Pathway","Phenolyzer")), c("mutations","both",term,"burden","pathway"),"csv")
+  fileName <- file_path_build (dir_check_and_create(ssEnv$resultFolderData,c("Pathway","Phenolyzer")), c("mutations","both",term,"burden","pathway"),"csv")
   utils::write.table(result,fileName,row.names = FALSE,col.names = TRUE ,quote = FALSE,sep =";")
 }

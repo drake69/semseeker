@@ -40,49 +40,26 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
   message("WarmedUP AnalyzePopulation", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  summaryFileName <- file.path(resultFolderData, "summary.csv")
+  summaryFileName <- file.path(ssEnv$resultFolderData, "summary.csv")
 
-  summaryPopulation <- foreach::foreach(foreachIndex=1:nrow(sampleSheet), .combine='rbind', .packages=c("dplyr"), .multicombine = FALSE) %dopar% {
-  # summaryPopulation <- foreach::foreach(foreachIndex=1:nrow(sampleSheet), .combine='rbind',.export=ls(envir=globalenv()),  .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = 'remove') %dopar% {
-  # for(foreachIndex in 1:nrow(sampleSheet) ) {
-
-    localSampleDetail <- sampleSheet[foreachIndex,]
-    message("Meth data rows: ", nrow(methylationData))
-    message("Starting sample analysis number: ", localSampleDetail$Sample_ID, " ", Sys.time())
-
+  i <- 0
+  # summaryPopulation <-  foreach::foreach( i =1:nrow(sampleSheet), .combine='rbind', .export = ssEnv$functionToExport) %dopar% {
+  for(i in 1:nrow(sampleSheet) ) {
+    localSampleDetail <- sampleSheet[i,]
     betaValues <- methylationData[, localSampleDetail$Sample_ID]
-    message("####",length(betaValues))
-    message("betas selected - !", length(betaValues))
-
-    message("class sample detail:",class(localSampleDetail))
-
-    deltaResult <- deltaSingleSample(values = betaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
-    message( "Deltas done !")
-
-    hyperResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-    message( "Hyper done !")
-    hypoResult <- analyzeSingleSample(values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-    message( "Hypo done !")
-    bothResult <- analyzeSingleSampleBoth(sampleDetail =  localSampleDetail)
-    message( "Both done !")
+    hyperResult <- analyzeSingleSample(envir=ssEnv, values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+    hypoResult <- analyzeSingleSample(envir=ssEnv, values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
+    bothResult <- analyzeSingleSampleBoth(envir=ssEnv, sampleDetail =  localSampleDetail)
+    deltaResult <- deltaSingleSample (envir = ssEnv, values = betaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
     sampleStatusTemp <- c( "Sample_ID"=localSampleDetail$Sample_ID, deltaResult, hyperResult, hypoResult, bothResult)
-    message( "sampleStatusTemp done !")
-
-
-    message("data frame conversion")
     sampleStatusTemp <- data.frame(sampleStatusTemp)
-    message("data frame transposition")
     sampleStatusTemp <- data.frame(t(sampleStatusTemp))
-    message("data frame rows renaming")
     rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
-
-    message("Iteration: ", foreachIndex)
-    # if(!exists("summaryPopulation"))
-    #   summaryPopulation <- sampleStatusTemp
-    # else
-    #   summaryPopulation <- rbind(sampleStatusTemp, summaryPopulation)
-    message("data frame return")
     as.data.frame(sampleStatusTemp)
+    if(exists("summaryPopulation"))
+      summaryPopulation <- rbind(summaryPopulation, sampleStatusTemp)
+    else
+      summaryPopulation <- sampleStatusTemp
   }
 
   message("Row count result:", nrow(summaryPopulation))
@@ -96,4 +73,5 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
 
   return(summaryPopulation)
 }
+
 

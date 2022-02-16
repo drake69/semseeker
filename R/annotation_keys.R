@@ -4,18 +4,18 @@ annotation_keys <- function( selection_area = c("GENE","ISLAND","DMR"))
   anomalies <- c("MUTATIONS", "LESIONS")
   figures <- c("HYPO", "HYPER", "BOTH")
 
-  keys <- data.frame(
+  ssEnv$keys <- data.frame(
     "ANOMALY" = "",
     "FIGURE" = "",
     "GROUP" = "",
     "SUBGROUP" = ""
   )
-  keys <- keys[-1,]
+  ssEnv$keys <- ssEnv$keys[-1,]
 
   group =  "GENE"
   subGroups <-c("Body","TSS1500","5'UTR","TSS200","1stExon","3'UTR","ExonBnd","Whole")
 
-  keys_gene <-
+  ssEnv$keys_gene <-
     expand.grid(
       "ANOMALY" = anomalies,
       "FIGURE" = figures,
@@ -24,12 +24,12 @@ annotation_keys <- function( selection_area = c("GENE","ISLAND","DMR"))
     )
 
   if("GENE" %in% selection_area)
-    keys <- rbind(keys, keys_gene)
+    ssEnv$keys <- rbind(ssEnv$keys, ssEnv$keys_gene)
 
   group <- "ISLAND"
   subGroups <- c("N_Shore", "S_Shore", "N_Shelf", "S_Shelf", "Island", "Whole")
 
-  keys_island <-
+  ssEnv$keys_island <-
       expand.grid(
         "ANOMALY" = anomalies,
         "FIGURE" = figures,
@@ -38,12 +38,12 @@ annotation_keys <- function( selection_area = c("GENE","ISLAND","DMR"))
       )
 
   if("ISLAND" %in% selection_area)
-    keys <- rbind(keys, keys_island)
+    ssEnv$keys <- rbind(ssEnv$keys, ssEnv$keys_island)
 
   group =  "DMR"
   subGroups <- c("DMR")
 
-  keys_dmr <-
+  ssEnv$keys_dmr <-
       expand.grid(
         "ANOMALY" = anomalies,
         "FIGURE" = figures,
@@ -52,7 +52,7 @@ annotation_keys <- function( selection_area = c("GENE","ISLAND","DMR"))
       )
 
   if("DMR" %in% selection_area)
-    keys <- rbind(keys, keys_island)
+    ssEnv$keys <- rbind(ssEnv$keys, ssEnv$keys_island)
 
-  return (keys)
+  return (ssEnv$keys)
 }

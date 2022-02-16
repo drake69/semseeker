@@ -12,6 +12,7 @@
 #   createExcelPivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 #
 #
+#
 #   probesPrefix <- "PROBES_Island_"
 #   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
 #   mainGroupLabel <- "ISLAND"
@@ -24,7 +25,5 @@
 #   subGroupLabel="GROUP"
 #   createExcelPivot (populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 #
-#   doParallel::stopImplicitCluster()
-#   parallel::stopCluster(computationCluster)
 #
 # })

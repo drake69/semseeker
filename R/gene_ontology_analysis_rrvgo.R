@@ -5,9 +5,9 @@
 #' @import Category GSEABase org.Hs.eg.db
 geneontology_analysis_rrvgo <- function(resultFolder, fileName){
 
-  resultFolderData <- file.path(resultFolderData,"Data")
-  resultFolderDatarrvgo <- dir_check_and_create(resultFolderData,c("Inference","Geneontology","rrvgo",fileName))
-  dataFileName <- file.path(resultFolderData, "Inference", fileName)
+  ssEnv$resultFolderDataLocal <- file.path(resultFolder,"Data")
+  ssEnv$resultFolderDatarrvgo <- dir_check_and_create(ssEnv$resultFolderDataLocal,c("Inference","Geneontology","rrvgo",fileName))
+  dataFileName <- file.path(ssEnv$resultFolderInference, fileName)
 
   geneAnnotatedFile <- utils::read.csv(dataFileName, sep=";", dec=",")
   geneAnnotatedFile <- subset(geneAnnotatedFile, geneAnnotatedFile$GROUP=="GENE" & geneAnnotatedFile$SUBGROUP!="SAMPLE" & geneAnnotatedFile$AREA_OF_TEST !="TOTAL" & geneAnnotatedFile$SUBGROUP!="TOTAL")
@@ -36,14 +36,14 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
       {
         # pval <- "PVALUE"
         # message(pval)
-        keys <- unique(geneAnnotatedFile[, c("ANOMALY","FIGURE","SUBGROUP")] )
+        ssEnv$keys <- unique(geneAnnotatedFile[, c("ANOMALY","FIGURE","SUBGROUP")] )
 
-        if (nrow(keys)>0)
-          for (i in 1:nrow(keys))
+        if (nrow(ssEnv$keys)>0)
+          for (i in 1:nrow(ssEnv$keys))
           {
             # i <- 1
             # message(i)
-            key <- keys[i,]
+            key <- ssEnv$keys[i,]
             anomaly <- key[1,1]
             figure <- key[1,2]
             subgroup <- key[1,3]
@@ -110,7 +110,7 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
                 plotFileName <- paste0(pval,"_",type, "_","scatterplot_", anomaly ,"_",figure ,"_", subgroup ,".png", sep = "")
                 # if(min(enrichResult$FDR)<0.05)
                 #   plotFileName <- paste0("@", plotFileName, sep="")
-                plotFileName <- paste0(resultFolderDatarrvgo,"/", plotFileName, sep="")
+                plotFileName <- paste0(ssEnv$resultFolderDatarrvgo,"/", plotFileName, sep="")
                 sp <- rrvgo::scatterPlot(simMatrix, reducedTerms)
                 sp <- sp + ggplot2::ggtitle(paste0(typeTitle," ", anomaly," ", figureTitle, " ", subgroup ," ", pval, sep = "")) +ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
                 ggplot2::ggsave(plot = sp, filename = plotFileName, width = 10, height = 10, device='png', dpi=600, units = "in", bg="transparent")
@@ -120,7 +120,7 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
                 plotFileName <- paste0(pval,"_",type, "_","heatmap_", anomaly ,"_",figure ,"_", subgroup ," ", pval,".png", sep = "")
                 # if(min(enrichResult$FDR)<0.05)
                 #   plotFileName <- paste0("@", plotFileName, sep="")
-                plotFileName <- paste0(resultFolderDatarrvgo,"/", plotFileName, sep="")
+                plotFileName <- paste0(ssEnv$resultFolderDatarrvgo,"/", plotFileName, sep="")
                 # #Similarity matrix heatmap
                 grDevices::png(file= plotFileName, width=10, height=10, res = 600, units = "in", bg="transparent")
                 rrvgo::heatmapPlot(simMatrix,reducedTerms,annotateParent=TRUE,annotationLabel="parentTerm",fontsize=6)
@@ -134,7 +134,7 @@ geneontology_analysis_rrvgo <- function(resultFolder, fileName){
                 plotFileName <- paste0(pval,"_",type, "_","treemap_", anomaly ,"_",figure ,"_", subgroup ," ", pval,".png", sep = "")
                 # if(min(enrichResult$FDR)<0.05)
                 #   plotFileName <- paste0("@", plotFileName, sep="")
-                plotFileName <- paste0(resultFolderDatarrvgo,"/", plotFileName, sep="")
+                plotFileName <- paste0(ssEnv$resultFolderDatarrvgo,"/", plotFileName, sep="")
                 grDevices::png(file= plotFileName, width=10, height=10 , res = 600, units = "in", bg="transparent")
                 rrvgo::treemapPlot(reducedTerms, title = paste0(typeTitle, " ", anomaly ," ",figureTitle ," ", subgroup ," ", pval, sep = ""))
                 # tp <- tp + ggplot2::ggtitle(paste0(typeTitle, " ", anomaly ," ",figureTitle ," ", subgroup , sep = ""))

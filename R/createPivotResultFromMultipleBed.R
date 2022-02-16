@@ -13,7 +13,7 @@ createPivotResultFromMultipleBed <- function(anomalyLabel, figureLable, probeFea
 
   # TODO: check sample name is a column of the bedfile
 
-  souceFolder <- paste0(resultFolderData, "/", anomalyLabel, "_", figureLable, "/", sep = "")
+  souceFolder <- paste0(ssEnv$resultFolderData, "/", anomalyLabel, "_", figureLable, "/", sep = "")
   fileName <- paste0(souceFolder, "/", "MULTIPLE", ".", figureLable, ".", anomalyLabel, ".bed", sep = "")
   sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = TRUE)
   colnames(sourceData) <- c("CHR", "START", "END", "SAMPLEID")

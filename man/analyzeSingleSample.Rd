@@ -5,6 +5,7 @@
 \title{analyzeSingleSample}
 \usage{
 analyzeSingleSample(
+  envir,
   values,
   slidingWindowSize,
   thresholds,
@@ -15,6 +16,8 @@ analyzeSingleSample(
 )
 }
 \arguments{
+\item{envir}{environment to get globals}
+
 \item{values}{values of methylation}
 
 \item{slidingWindowSize}{size of window sliding to calculate hypergeometric}
