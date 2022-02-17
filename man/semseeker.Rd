@@ -10,7 +10,6 @@ semseeker(
   methylationData,
   resultFolder,
   bonferroniThreshold = 0.05,
-  inferenceDetails = NULL,
   maxResources = 90,
   iqrTimes = 3
 )
@@ -23,8 +22,6 @@ semseeker(
 \item{resultFolder}{wherte the result will be saved}
 
 \item{bonferroniThreshold}{= 0.05 #threshold to define which pValue}
-
-\item{inferenceDetails}{dataframe of details to calculate inferential statistics accept for lesions definition}
 
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 
