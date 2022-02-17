@@ -4,7 +4,6 @@
 #' @param sampleSheet dataframe with at least a column Sample_ID to identify samples
 #' @param methylationData matrix of methylation data
 #' @param bonferroniThreshold = 0.05 #threshold to define which pValue
-#' @param inferenceDetails dataframe of details to calculate inferential statistics accept for lesions definition
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
 #' @param resultFolder wherte the result will be saved
@@ -15,7 +14,6 @@ semseeker <- function(sampleSheet,
                       methylationData,
                       resultFolder,
                       bonferroniThreshold = 0.05,
-                      inferenceDetails = NULL,
                       maxResources = 90,
                       iqrTimes = 3 ) {
 
@@ -50,16 +48,16 @@ semseeker <- function(sampleSheet,
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
 
-  if(!is.null(inferenceDetails))
-  {
-    covariates <- unlist(t(strsplit( gsub(" ","",inferenceDetails$covariates),split = "+", fixed = T)))
-
-    if ( length(covariates)>0 & !( covariates  %in% colnames(sampleSheet)))
-    {
-      message(covariates[!(covariates%in% colnames(sampleSheet))])
-      stop("The covariates value are not available in the sample sheet!")
-    }
-  }
+  # if(!is.null(inferenceDetails))
+  # {
+  #   covariates <- unlist(t(strsplit( gsub(" ","",inferenceDetails$covariates),split = "+", fixed = T)))
+  #
+  #   if ( length(covariates)>0 & !( covariates  %in% colnames(sampleSheet)))
+  #   {
+  #     message(covariates[!(covariates%in% colnames(sampleSheet))])
+  #     stop("The covariates value are not available in the sample sheet!")
+  #   }
+  # }
 
 
   populationCheckResult <- populationCheck(sampleSheet, methylationData)

@@ -2,9 +2,6 @@
 
 export(buildDataSetFromGEO)
 export(semseeker)
-import(Category)
-import(GSEABase)
-import(org.Hs.eg.db)
 importFrom(dplyr,"%>%")
 importFrom(foreach,"%dopar%")
 importFrom(rlang,.data)
