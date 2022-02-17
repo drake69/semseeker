@@ -19,9 +19,9 @@
 #' lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
 
-#' @importFrom foreach %dopar%
 analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, bonferroniThreshold = 0.05, probeFeatures) {
 
+  ##@importFrom foreach %dopar%
   # browser()
   start_time <- Sys.time()
   message("AnalyzePopulation warmingUP ", Sys.time())

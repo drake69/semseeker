@@ -129,7 +129,7 @@ init_env <- function(resultFolder, maxResources = 90)
                             "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions",
                             "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
 
-  options(doFuture.foreach.export = ".export-and-automatic-with-warning")
+  # options(doFuture.foreach.export = ".export-and-automatic-with-warning")
 
   #
   #

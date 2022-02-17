@@ -3,5 +3,4 @@
 export(buildDataSetFromGEO)
 export(semseeker)
 importFrom(dplyr,"%>%")
-importFrom(foreach,"%dopar%")
 importFrom(rlang,.data)
