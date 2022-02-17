@@ -81,14 +81,14 @@ This how to obtain the analyzed data:
             methylationData = normalizedData,
             resultFolder = "~/semseeker_result/")
 
-# Complete Example
-
-Look in to the example folder of the repository to seea complete and
-working example with data from Gene Expression Omnibus (GEO)
-
 # Input requirements
 
 -   the samplesheet dataframe should contain a column called
     Sample_Group, the admitted values are: Case, Control, Reference. if
     you don0t have the Refernce population you can duplicate the Control
     population rows and use Reference in the Sample_Group column.
+
+# Complete Example
+
+Look in to the example folder of the repository to see a complete and
+working example with data from Gene Expression Omnibus (GEO)
