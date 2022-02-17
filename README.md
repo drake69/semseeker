@@ -5,7 +5,10 @@
 
 <!-- badges: start -->
 
-[![](https://img.shields.io/badge/devel%20version-0.3.3-blue.svg)](https://github.com/drake69/semseeker)
+    #> ✓ Setting active project to '/Users/lcorsaro/Documents/Progetti_Sviluppo/
+    #> semseeker'
+
+[![](https://img.shields.io/badge/devel%20version-0.3.4-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
@@ -81,14 +84,14 @@ This how to obtain the analyzed data:
             methylationData = normalizedData,
             resultFolder = "~/semseeker_result/")
 
+# Complete Example
+
+Look in to the example folder of the repository to seea complete and
+working example with data from Gene Expression Omnibus (GEO)
+
 # Input requirements
 
 -   the samplesheet dataframe should contain a column called
     Sample_Group, the admitted values are: Case, Control, Reference. if
     you don0t have the Refernce population you can duplicate the Control
     population rows and use Reference in the Sample_Group column.
-
-# Complete Example
-
-Look in to the example folder of the repository to see a complete and
-working example with data from Gene Expression Omnibus (GEO)
