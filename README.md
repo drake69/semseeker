@@ -4,20 +4,12 @@
 # semseeker
 
 <!-- badges: start -->
-
-    #> ✓ Setting active project to '/Users/lcorsaro/Documents/Progetti_Sviluppo/
-    #> semseeker'
-
-[![](https://img.shields.io/badge/devel%20version-0.3.4-blue.svg)](https://github.com/drake69/semseeker)
+[![](https://img.shields.io/badge/devel%20version-0.3.5-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
 [![R build
 status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
-
-<!-- [![R-CMD-check](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions) -->
-<!-- [![Codecov test coverage](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker?branch=main) -->
-<!-- badges: end -->
 
 The goal of semseeker is to find all methylation localized and enriched
 variants.

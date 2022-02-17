@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 # semseeker
 
 <!-- badges: start -->
-
 ```{r, echo = FALSE, results='asis'}
 library("badger")
 cat(
@@ -29,10 +28,6 @@ cat(
   # badge_repostatus("Active"),
   # badge_codefactor("drake69/semseeker")
 ```
-
-<!-- [![R-CMD-check](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions) -->
-<!-- [![Codecov test coverage](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker?branch=main) -->
-<!-- badges: end -->
 
 The goal of semseeker is to find all methylation localized and enriched variants.
 
