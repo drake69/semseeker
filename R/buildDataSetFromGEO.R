@@ -2,11 +2,13 @@
 #'
 #' @param GEOgse geo accession dataset identification
 #' @param workingFolder where sample sheet and files will be saved
-#' @param downloadFiles true if you wnatr download files from Gene Expression Ombibus (GEO)
+#' @param downloadFiles 0 means download all files from Gene Expression Ombibus (GEO),
+#'  different than zero means how many download
 #'
 #' @return samplesheet, and sample's file saved and samplesheet csv
 #' @export
-buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
+buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = 0) {
+
 
     gse <- GEOquery::getGEO(GEOgse, GSEMatrix = TRUE)
 
@@ -18,6 +20,11 @@ buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
     samplesheet$Sentrix_ID <- ""
     samplesheet$Sentrix_Position <- ""
 
+    dir_check_and_create(workingFolder,"/")
+    if(downloadFiles==0)
+      downloadFiles <- nrow(samplesheet)
+
+    downloadedFiles <- 0
     for(sample in 1:nrow(samplesheet))
     {
       # sample <- 1
@@ -36,7 +43,7 @@ buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
       samplesheet [sample,"Sentrix_ID"] <- Sentrix_ID
       samplesheet [sample,"Sentrix_Position"] <- Sentrix_Position
 
-      if (downloadFiles) {
+      if (- downloadedFiles + downloadFiles > 0 ) {
 
         fileName <-  gsub("_Grn.idat.gz", "_COLOR.idat.gz", fileName)
         fileName <-  gsub("_Red.idat.gz", "_COLOR.idat.gz", fileName)
@@ -63,6 +70,7 @@ buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = FALSE) {
             GEOquery::gunzip(localFileName, overwrite = TRUE)
           }
         }
+        downloadedFiles <- downloadedFiles + 1
       }
     }
 

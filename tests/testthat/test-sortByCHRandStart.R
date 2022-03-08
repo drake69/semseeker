@@ -10,8 +10,6 @@ test_that("sortByCHRandSTART", {
   #order not matching
   second <- sortByCHRandSTART( probeFeatures[order(probeFeatures$START),])
 
-  expect_true( test_match_order( sortByCHRandSTART(probeFeatures)$ABSOLUTE,second$ABSOLUTE)
-                                 )
-
+  expect_true( test_match_order( sortByCHRandSTART(probeFeatures)$ABSOLUTE,second$ABSOLUTE))
 }
 )
