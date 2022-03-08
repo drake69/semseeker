@@ -1,13 +1,8 @@
 test_that("test_match_order", {
 
   library(stringi)
-  # tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  # envir <- init_env(tempFolder)
-  #
-  # nitem <- 5e4
-  # nsamples <- 5
-  # methylationData <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  # methylationData <- as.data.frame(matrix(methylationData,nitem,nsamples))
+
+  nitem <- 5e2
   probeFeatures <- PROBES[!is.na(PROBES$CHR),]
   probeFeatures <- probeFeatures[probeFeatures$PROBE %in% sample(x=probeFeatures[,"PROBE"] , size=nitem),]
   # row.names(methylationData) <- probeFeatures$PROBE
