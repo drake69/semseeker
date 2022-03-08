@@ -4,14 +4,15 @@
 \alias{buildDataSetFromGEO}
 \title{buildDataSetFromGEO}
 \usage{
-buildDataSetFromGEO(GEOgse, workingFolder, downloadFiles = FALSE)
+buildDataSetFromGEO(GEOgse, workingFolder, downloadFiles = 0)
 }
 \arguments{
 \item{GEOgse}{geo accession dataset identification}
 
 \item{workingFolder}{where sample sheet and files will be saved}
 
-\item{downloadFiles}{true if you wnatr download files from Gene Expression Ombibus (GEO)}
+\item{downloadFiles}{0 means download all files from Gene Expression Ombibus (GEO),
+different than zero means how many download}
 }
 \value{
 samplesheet, and sample's file saved and samplesheet csv
