@@ -41,14 +41,14 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
         if(nrow(temp)!=0)
         {
           anomaly <- ssEnv$keys[i,2]
-          tempAnomaly <- subset(temp, finalBed$ANOMALY == as.character(anomaly))
+          tempAnomaly <- subset(temp, temp$ANOMALY == as.character(anomaly))
           if(nrow(tempAnomaly)!=0)
           {
-            figure <- ssEnv$keys[i,3]
-            tempDataFrame <- subset(tempAnomaly, finalBed$FIGURE == figure)
+            figure <- as.character(ssEnv$keys[i,3])
+            tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
             if(nrow(tempDataFrame)!=0)
             {
-              tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum)
+              tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum, drop = TRUE)
               fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
               utils::write.csv2(t(tempDataFrame), fileName)
               tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
@@ -75,21 +75,23 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
 
     for(i in 1:length(sheetList))
     {
-      sheetListNames[[i]] <- sheetList[[i]] [1,1]
+      sheetListNames[[i]] <- gsub(x = sheetList[[i]] [1,1],pattern = "'",replacement = "")
       sheetList [[i]] <- sheetList[[i]][-1,]
     }
 
     fileName <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
     names(sheetList) <- as.vector(sheetListNames)
     try(
-      openxlsx::write.xlsx(
-        x = sheetList,
-        file = fileName,
-        asTable = TRUE,
-        overwrite = TRUE
-      )
+      {
+        openxlsx::write.xlsx(
+          x = sheetList,
+          file = fileName,
+          asTable = TRUE,
+          overwrite = TRUE
+        )
+        message("Saved spreadsheet file:")
+        message(fileName)
+      }
     )
-    message("Saved spreadsheet file:")
-    message(fileName)
 
 }
