@@ -4,7 +4,7 @@ test_that("createHeatmap", {
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   envir <- init_env(tempFolder)
 
-  nitem <- 5e4
+  nitem <- 5e5
   nsamples <- 5
   methylationData <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylationData <- as.data.frame(matrix(methylationData,nitem,nsamples))
