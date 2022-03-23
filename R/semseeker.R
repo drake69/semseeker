@@ -27,23 +27,24 @@ semseeker <- function(sampleSheet,
 
   methylationData <- as.data.frame(methylationData)
   methDataTemp <- data.frame( PROBE= rownames(methylationData), methylationData)
-  methDataTemp <- methDataTemp[with(methDataTemp, order(PROBE)), ]
+  methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
   methylationData <- methDataTemp[, -c(1)]
 
   rm(methDataTemp)
   message("INFO: I will work on:", nrow(methylationData), " PROBES.")
 
-  if(dim(methylationData)[1] == 485512)
+  if(nrow(methylationData) == 485512)
     message("INFO:seems a 450k dataset.")
 
-  if(dim(methylationData)[1] == 27578)
+  if(nrow(methylationData) == 27578)
     message("INFO:seems a 27k dataset.")
 
-  if(dim(methylationData)[1] == 866562)
+  if(nrow(methylationData) == 866562)
     message("INFO:seems an EPIC dataset.")
 
   PROBES <- PROBES[(PROBES$PROBE %in% rownames(methylationData)),]
   methylationData <- methylationData[rownames(methylationData) %in% PROBES$PROBE, ]
+  methylationData <- methylationData[ order(rownames(methylationData)), ]
 
   #PROBES <- sortByCHRandSTART(PROBES)
   if (!test_match_order(row.names(methylationData), PROBES$PROBE)) {
