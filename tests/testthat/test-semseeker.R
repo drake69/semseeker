@@ -18,7 +18,6 @@ test_that("semeeker", {
   Sample_Group <- c(rep("Control",nsamples/3),rep("Reference",nsamples/3),rep("Case",nsamples/3))
   mySampleSheet <- data.frame(Sample_Group, Sample_ID)
 
-
   semseeker( sampleSheet =  mySampleSheet,methylationData =  methylationData, resultFolder = tempFolder)
 
   tempresultFolder <-dir_check_and_create(envir$resultFolderData,c("Control","MUTATIONS_BOTH"))
