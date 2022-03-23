@@ -21,7 +21,7 @@
 
 analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, bonferroniThreshold = 0.05, probeFeatures) {
 
-  ##@importFrom foreach %dopar%
+  #@importFrom foreach %dopar%
   # browser()
   start_time <- Sys.time()
   message("AnalyzePopulation warmingUP ", Sys.time())
@@ -43,7 +43,7 @@ analizePopulation <- function(methylationData, slidingWindowSize, betaSuperiorTh
   summaryFileName <- file.path(ssEnv$resultFolderData, "summary.csv")
 
   i <- 0
-  # summaryPopulation <-  foreach::foreach( i =1:nrow(sampleSheet), .combine='rbind', .export = ssEnv$functionToExport) %dopar% {
+  # summaryPopulation <-  foreach::foreach( i =1:nrow(sampleSheet), .combine='rbind') %dopar% {
   for(i in 1:nrow(sampleSheet) ) {
     localSampleDetail <- sampleSheet[i,]
     betaValues <- methylationData[, localSampleDetail$Sample_ID]

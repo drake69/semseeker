@@ -31,14 +31,16 @@ semseeker <- function(sampleSheet,
   methylationData <- methDataTemp[, -c(1)]
 
   rm(methDataTemp)
-  if(dim(methylationData)[1] <= 485512)
-    message("WARNING: Actually semseeker works with EPIC, with 450K and 27K some probes will be lost.")
+  message("INFO: I will work on:", nrow(methylationData), " PROBES.")
 
-  # if(dim(methylationData)[1] < 485512)
-  #   PROBES <- PROBES[!is.na(PROBES$METH_450K),]
-  #
-  # if(dim(methylationData)[1] < 27578)
-  #   PROBES <- PROBES[!is.na(PROBES$METH_27K),]
+  if(dim(methylationData)[1] == 485512)
+    message("INFO:seems a 450k dataset.")
+
+  if(dim(methylationData)[1] == 27578)
+    message("INFO:seems a 27k dataset.")
+
+  if(dim(methylationData)[1] == 866562)
+    message("INFO:seems an EPIC dataset.")
 
   PROBES <- PROBES[(PROBES$PROBE %in% rownames(methylationData)),]
   methylationData <- methylationData[rownames(methylationData) %in% PROBES$PROBE, ]
