@@ -23,7 +23,8 @@ test_that("readMultipleBed", {
   Sample_Group <- rep("Control",nsamples)
   sampleSheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analizePopulation(methylationData=methylationData,
+  sp <- analizePopulation(envir=envir,
+                          methylationData=methylationData,
                           slidingWindowSize = 11,
                           betaSuperiorThresholds = betaSuperiorThresholds,
                           betaInferiorThresholds = betaInferiorThresholds,
@@ -46,7 +47,7 @@ test_that("readMultipleBed", {
 
   probeFeatures <- get(paste0(probesPrefix,"Whole",sep=""))
 
-  res <-readMultipleBed ("MUTATIONS", "BOTH", probeFeatures, columnLabel, populationName, groupingColumnLabel)
+  res <-readMultipleBed (envir, "MUTATIONS", "BOTH", probeFeatures, columnLabel, populationName, groupingColumnLabel)
 
   expect_true(nrow(res)>0)
 

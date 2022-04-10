@@ -28,5 +28,5 @@
   # probes  <- NULL
   # foreachIndex  <- NULL
 
-ssEnv <- new.env(parent = emptyenv())
+# ssEnv <- new.env(parent = emptyenv())
 

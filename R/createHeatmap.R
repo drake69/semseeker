@@ -1,6 +1,7 @@
 #' createHeatmap load the multiple bed resulting from
 #' analysis organized into files and folders per anomaly and produce a pivot
 #'
+#' @param envir semseekere working infos
 #' @param inputBedDataFrame data frame to chart
 #' @param anomalies vector of anomalies to manage
 #' @param groupLabel main genomic area to char eg: gene
@@ -9,11 +10,11 @@
 #' @return list of pivot by column identified with groupLabel and by Sample
 #'
 createHeatmap <-
-  function(inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
+  function(envir, inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
     # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
 
-    chartFolder <- dir_check_and_create(ssEnv$resultFolderChart,groupLabel)
+    chartFolder <- dir_check_and_create(envir$resultFolderChart,groupLabel)
 
     if (is.null(inputBedDataFrame))
       return()

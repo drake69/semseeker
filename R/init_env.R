@@ -36,6 +36,7 @@ init_env <- function(resultFolder, maxResources = 90)
 
   # assign("ssEnv$resultFolderData", dir_check_and_create(resultFolder, "Data"))
 
+  ssEnv <- list()
   ssEnv$resultFolderData <-  dir_check_and_create(resultFolder, "Data")
   ssEnv$resultFolderChart <-    dir_check_and_create(resultFolder, "Chart")
   ssEnv$resultFolderInference <-    dir_check_and_create(resultFolder, "Inference")
@@ -62,6 +63,7 @@ init_env <- function(resultFolder, maxResources = 90)
   # bootstrap cluster
   outFile <- file.path(ssEnv$logFolder, "cluster_r.out")
 
+  options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   doFuture::registerDoFuture()
   future::plan( future::multisession, workers = nCore)
 
@@ -126,7 +128,7 @@ init_env <- function(resultFolder, maxResources = 90)
   ssEnv$functionToExport <- c( "analyzeSingleSample",
                             "dumpSampleAsBedFile", "deltaSingleSample","dir_check_and_create",
                             "file_path_build","analyzeSingleSampleBoth",
-                            "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions",
+                            "sortByCHRandSTART", "test_match_order", "getLesions",
                             "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
 
   # options(doFuture.foreach.export = ".export-and-automatic-with-warning")

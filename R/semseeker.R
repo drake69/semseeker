@@ -107,6 +107,7 @@ semseeker <- function(sampleSheet,
 
     # browser()
     resultPopulation <- analizePopulation(
+      envir = envir,
       methylationData = methylationData[, populationMatrixColumns] ,
       slidingWindowSize = slidingWindowSize,
       betaSuperiorThresholds = populationControlRangeBetaValues$betaSuperiorThresholds,
@@ -154,33 +155,33 @@ semseeker <- function(sampleSheet,
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
 
-  createExcelPivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  createExcelPivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
-  geneBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnIDs = c(1) )
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnIDs = c(1,3))
+  geneBed <- annotateBed(envir=envir,populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
+  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnIDs = c(1) )
+  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnIDs = c(1,3))
 
 
   probesPrefix <- "PROBES_Island_"
   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
-  createExcelPivot ( populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  createExcelPivot (envir=envir, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
-  islandBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnIDs = 3)
-  createHeatmap(inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnIDs = 1)
-  createHeatmap(inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
+  islandBed <- annotateBed(envir=envir,populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
+  createHeatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnIDs = 3)
+  createHeatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnIDs = 1)
+  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
 
   subGroups <- c("DMR")
   probesPrefix = "PROBES_DMR_"
   mainGroupLabel =  "DMR"
   subGroupLabel="GROUP"
-  createExcelPivot (populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  createExcelPivot (envir=envir,populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
 
-  dmrBed <- annotateBed(populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap(inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
+  dmrBed <- annotateBed(envir=envir,populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
+  createHeatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
 
   if (!is.null(geneBed))
   {
@@ -199,7 +200,7 @@ semseeker <- function(sampleSheet,
 
   totalBed <- rbind(geneBed, dmrBed, islandBed)
   if (!is.null(totalBed) && nrow(totalBed)>0)
-    createHeatmap(inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
+    createHeatmap( envir=envir,inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
 
   rm(populationControlRangeBetaValues)
 

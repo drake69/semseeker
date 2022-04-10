@@ -1,5 +1,6 @@
 #' takes a bed and its location (build with the details of popuationa nd genomic area)
 #' and annoate with detail about genomic area
+#' @param envir semseekere working infos
 #' @param populations vector of population to cycle with to build the folder path
 #' @param figures vector of hyper /hypo to use to build the folder path
 #' @param anomalies vector of lesions/mutations to use to build the folder path
@@ -12,6 +13,7 @@
 #'
 
 annotateBed <- function (
+  envir,
   populations ,
   figures ,
   anomalies ,
@@ -23,7 +25,7 @@ annotateBed <- function (
 
   i <- 0
   finalBed <- NULL
-  bedFileName <- file_path_build( ssEnv$resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build(envir$resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
 
   if(file.exists(bedFileName))
   {
@@ -46,7 +48,7 @@ annotateBed <- function (
   #                                                                                   "PROBES_Island_Whole"))
 
 
-  ssEnv$keysLocal <-
+  envir$keysLocal <-
     expand.grid(
       "POPULATION" = populations,
       "FIGURE" = figures,
@@ -55,17 +57,17 @@ annotateBed <- function (
     )
 
 
-  for(i in 1:nrow(ssEnv$keysLocal))
-  # finalBed <- foreach::foreach(i=1:nrow(ssEnv$keysLocal), .combine = rbind) %dopar%
+  for(i in 1:nrow(envir$keysLocal))
+  # finalBed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind) %dopar%
   {
-    anomal <- ssEnv$keysLocal[i,"ANOMALY"]
-    pop <- ssEnv$keysLocal[i,"POPULATION"]
-    fig <- ssEnv$keysLocal[i,"FIGURE"]
-    grp <- ssEnv$keysLocal[i,"GROUP"]
+    anomal <- envir$keysLocal[i,"ANOMALY"]
+    pop <- envir$keysLocal[i,"POPULATION"]
+    fig <- envir$keysLocal[i,"FIGURE"]
+    grp <- envir$keysLocal[i,"GROUP"]
 
     probes <- get(paste0(probesPrefix, grp,sep=""))
-    resFolder <- dir_check_and_create(ssEnv$resultFolderData,pop)
-    tempFile <- readMultipleBed( anomalyLabel =  anomal, figureLable =  fig, probeFeatures =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
+    resFolder <- dir_check_and_create(envir$resultFolderData,pop)
+    tempFile <- readMultipleBed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probeFeatures =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
     if(exists("finalBed"))
       finalBed <- rbind(finalBed, tempFile)
     else
