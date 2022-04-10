@@ -1,8 +1,8 @@
-test_that("analizePopulation", {
+  test_that("analizePopulation", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder)
+  envir <- init_env(tempFolder)
 
   nitem <- 5e4
   nsamples <- 20
@@ -26,7 +26,9 @@ test_that("analizePopulation", {
   slidingWindowSize <- 11
   bonferroniThreshold <- 0.01
 
-  sp <- analizePopulation(methylationData=methylationData,
+  # browser()
+  sp <- analizePopulation(envir = envir,
+    methylationData=methylationData,
                     slidingWindowSize = slidingWindowSize,
                     betaSuperiorThresholds = betaSuperiorThresholds,
                     betaInferiorThresholds = betaInferiorThresholds,

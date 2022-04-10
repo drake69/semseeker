@@ -13,7 +13,7 @@
 #                           "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
 #                           "probes","foreachIndex"), add = FALSE, package = "semseeker")
 
- ssEnv <- new.env(parent = emptyenv())
+ # ssEnv <- new.env(parent = emptyenv())
 # ssEnv$resultFolderData <- NULL
 # chartFolder  <- NULL
 # ssEnv$logFolder   <- NULL
@@ -28,3 +28,5 @@
 # probes  <- NULL
 # foreachIndex  <- NULL
 #
+
+

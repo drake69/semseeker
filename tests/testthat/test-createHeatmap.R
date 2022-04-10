@@ -23,7 +23,8 @@ test_that("createHeatmap", {
   Sample_Group <- rep("Control",nsamples)
   sampleSheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analizePopulation(methylationData=methylationData,
+  sp <- analizePopulation(envir = envir,
+                          methylationData=methylationData,
                           slidingWindowSize = 11,
                           betaSuperiorThresholds = betaSuperiorThresholds,
                           betaInferiorThresholds = betaInferiorThresholds,
@@ -47,6 +48,7 @@ test_that("createHeatmap", {
 
   # create and read
   finalBed <- annotateBed (
+    envir,
     populations ,
     figures ,
     anomalies ,
@@ -55,7 +57,7 @@ test_that("createHeatmap", {
     columnLabel ,
     groupingColumnLabel)
 
-  createHeatmap(inputBedDataFrame = finalBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  createHeatmap(envir, inputBedDataFrame = finalBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
   expect_true(file.exists(file.path(envir$resultFolderChart,"/GENE_AREA/Control_GENE_AREA_MUTATIONS.png")))
 
   # finalBed <- finalBed [1:2,]

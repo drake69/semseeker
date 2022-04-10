@@ -6,6 +6,7 @@
 report of pivot}
 \usage{
 analizePopulation(
+  envir,
   methylationData,
   slidingWindowSize,
   betaSuperiorThresholds,
@@ -17,6 +18,8 @@ analizePopulation(
 )
 }
 \arguments{
+\item{envir}{semseekere working infos}
+
 \item{methylationData}{whole matrix of data to analyze.}
 
 \item{slidingWindowSize}{size of the sliding widows to compute epilesions

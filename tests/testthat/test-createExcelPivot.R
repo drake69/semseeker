@@ -23,7 +23,8 @@ test_that("createExcelPivot", {
   Sample_Group <- rep("Control",nsamples)
   sampleSheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analizePopulation(methylationData=methylationData,
+  sp <- analizePopulation(envir = envir,
+                          methylationData=methylationData,
                           slidingWindowSize = 11,
                           betaSuperiorThresholds = betaSuperiorThresholds,
                           betaInferiorThresholds = betaInferiorThresholds,
@@ -47,6 +48,7 @@ test_that("createExcelPivot", {
 
   # create and read
   finalBed <- annotateBed (
+    envir,
     populations ,
     figures ,
     anomalies ,
@@ -63,9 +65,9 @@ test_that("createExcelPivot", {
   probesPrefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  createExcelPivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  createExcelPivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
-  expect_true(file.exists(file.path(ssEnv$resultFolderData,"Pivots/GENE.xlsx")))
+  expect_true(file.exists(file.path(envir$resultFolderData,"Pivots/GENE.xlsx")))
   #
 #
 #   probesPrefix <- "PROBES_Island_"

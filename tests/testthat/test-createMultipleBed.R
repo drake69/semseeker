@@ -23,7 +23,8 @@ test_that("createMultipleBed", {
   Sample_Group <- rep("Control",nsamples)
   sampleSheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analizePopulation(methylationData=methylationData,
+  sp <- analizePopulation(envir,
+                          methylationData=methylationData,
                           slidingWindowSize = 11,
                           betaSuperiorThresholds = betaSuperiorThresholds,
                           betaInferiorThresholds = betaInferiorThresholds,

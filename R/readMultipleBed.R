@@ -1,5 +1,6 @@
 #' read multiple bed with annotated data as per input parameter
 #'
+#' @param envir semseekere working infos
 #' @param anomalyLabel anomaly definition used to label folder and files eg MUTATIONS, LESIONS
 #' @param probeFeatures features of probe CHR and START and NAME
 #' @param figureLable figures like hypo/hyper to built the data path
@@ -10,12 +11,12 @@
 #' @return list of pivot by column identified with column Label and by Sample
 
 #'
-readMultipleBed <- function(anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
+readMultipleBed <- function(envir,anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
 {
   POSITION <- NULL
   # browser()
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
-  souceFolder <- dir_check_and_create(ssEnv$resultFolderData, c(as.character(populationName),f))
+  souceFolder <- dir_check_and_create(envir$resultFolderData, c(as.character(populationName),f))
 
 
   # browser()

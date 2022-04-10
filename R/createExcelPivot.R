@@ -1,17 +1,17 @@
-createExcelPivot <-  function(populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel ) {
+createExcelPivot <-  function(envir, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel ) {
 
     HYPO <- NULL
     HYPER <- NULL
     POPULATION <- NULL
 
 
-    finalBed <-  annotateBed(  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
+    finalBed <-  annotateBed( envir=envir,  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
 
     # browser()
     if (is.null(finalBed))
       return()
 
-    reportFolder <- dir_check_and_create(ssEnv$resultFolderData,"Pivots")
+    reportFolder <- dir_check_and_create(envir$resultFolderData,"Pivots")
 
     finalBed <- data.frame(finalBed, "KEY" = finalBed[,mainGroupLabel])
     finalBed[,mainGroupLabel] <- as.factor(finalBed[,mainGroupLabel])
@@ -31,20 +31,20 @@ createExcelPivot <-  function(populations, figures, anomalies, subGroups, probes
     # options(digits = 22)
     # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
 
-    ssEnv$keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    # sheetList <- foreach::foreach(i=1:nrow(ssEnv$keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
-    for(i in 1:nrow(ssEnv$keys))
+    envir$keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
+    # sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+    for(i in 1:nrow(envir$keys))
       {
         # i <- 1
-        grp <- ssEnv$keys[i,1]
+        grp <- envir$keys[i,1]
         temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
         if(nrow(temp)!=0)
         {
-          anomaly <- ssEnv$keys[i,2]
+          anomaly <- envir$keys[i,2]
           tempAnomaly <- subset(temp, temp$ANOMALY == as.character(anomaly))
           if(nrow(tempAnomaly)!=0)
           {
-            figure <- as.character(ssEnv$keys[i,3])
+            figure <- as.character(envir$keys[i,3])
             tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
             if(nrow(tempDataFrame)!=0)
             {

@@ -23,7 +23,8 @@ test_that("annotateBed", {
   Sample_Group <- rep("Control",nsamples)
   sampleSheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analizePopulation(methylationData=methylationData,
+  sp <- analizePopulation(envir,
+                          methylationData=methylationData,
                           slidingWindowSize = 11,
                           betaSuperiorThresholds = betaSuperiorThresholds,
                           betaInferiorThresholds = betaInferiorThresholds,
@@ -47,6 +48,7 @@ test_that("annotateBed", {
 
   # create and read
   finalBed <- annotateBed (
+    envir,
     populations ,
     figures ,
     anomalies ,
@@ -55,7 +57,7 @@ test_that("annotateBed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(ssEnv$resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build(envir$resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
 
   # file extsits
   expect_true(file.exists(bedFileName))
@@ -68,6 +70,7 @@ test_that("annotateBed", {
 
   #read again  existent
   finalBed <- annotateBed (
+    envir,
     populations ,
     figures ,
     anomalies ,

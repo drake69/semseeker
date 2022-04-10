@@ -5,6 +5,7 @@
 \title{read multiple bed with annotated data as per input parameter}
 \usage{
 readMultipleBed(
+  envir,
   anomalyLabel,
   figureLable,
   probeFeatures,
@@ -14,6 +15,8 @@ readMultipleBed(
 )
 }
 \arguments{
+\item{envir}{semseekere working infos}
+
 \item{anomalyLabel}{anomaly definition used to label folder and files eg MUTATIONS, LESIONS}
 
 \item{figureLable}{figures like hypo/hyper to built the data path}
