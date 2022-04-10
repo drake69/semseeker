@@ -11,7 +11,7 @@ github_update()
 workingFolder <- file.path("~/Downloads/GSE139307")
 dir.create(workingFolder)
 
-sampleSheet <- buildDataSetFromGEO("GSE139307",workingFolder, TRUE)
+sampleSheet <- buildDataSetFromGEO("GSE139307",workingFolder, 0)
 
 # ChAMP need the sample name variable as first column
 # so let's move the Sample_ID as first column

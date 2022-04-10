@@ -13,7 +13,7 @@ library("semseeker")
 workingFolder <- file.path(getwd(),"/tmp")
 dir.create(workingFolder)
 
-sampleSheet <- semseeker::buildDataSetFromGEO("GSE186766",workingFolder, TRUE)
+sampleSheet <- semseeker::buildDataSetFromGEO("GSE186766",workingFolder, 0)
 
 # ChAMP need the sample name variable as first column
 # so let's move the Sample_ID as first column
