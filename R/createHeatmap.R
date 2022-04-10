@@ -117,7 +117,7 @@ createHeatmap <-
         next
 
       filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
-      grDevices::png(file= filename, width=2480, height = 2480)
+      grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
       stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
                      # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
                      scale = "column",
