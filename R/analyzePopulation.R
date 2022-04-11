@@ -54,7 +54,7 @@ analizePopulation <- function(envir, methylationData, slidingWindowSize, betaSup
   #                                       .export=c(ls(envir=globalenv()),"methylationData", "slidingWindowSize", "betaSuperiorThresholds", "bonferroniThreshold", "probeFeatures", "betaInferiorThresholds", "betaMedians",
   #                                                 "sampleSheet", "analyzeSingleSample", "envir", "analyzeSingleSampleBoth", "deltaSingleSample"),
   #                                       .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = "remove") %dopar% {
-  summaryPopulation <-  foreach::foreach( i =1:nrow(sampleSheet), .combine="rbind", .export = toExport) %dopar% {
+  summaryPopulation <-  foreach::foreach( i =1:nrow(sampleSheet), .combine='rbind', .export = toExport) %dopar% {
   # for(i in 1:nrow(sampleSheet) ) {
     localSampleDetail <- sampleSheet[i,]
     betaValues <- methylationData[, localSampleDetail$Sample_ID]
