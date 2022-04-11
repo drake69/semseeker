@@ -8,7 +8,7 @@
 #' @param groupColumnIDs positions of the group coplumn id
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
-#'
+#' @importFrom foreach %dopar%
 createHeatmap <-
   function(envir, inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
@@ -42,9 +42,11 @@ createHeatmap <-
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Case"] <- "Cyan"
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Control"] <- "Blue"
 
-    # foreach::foreach(g = 1:length(anomalies)) %dopar%
-    for(g in 1:length(anomalies))
-      # for (anomaly in anomalies)
+    toExport <- c("anomalies", "inputBedDataFrame", "pops", "groupLabel", "chartFolder")
+    g <- 0
+    foreach::foreach(g = 1:length(anomalies), .export = toExport) %dopar%
+    # for(g in 1:length(anomalies))
+    # for (anomaly in anomalies)
     {
 
       anomaly <- anomalies[g]
@@ -87,47 +89,47 @@ createHeatmap <-
       # )
 
       tempDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$ANOMALY == anomaly)
-      if(dim(tempDataFrame)[1]==0)
-        next
-
-      tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "FREQ", sum)
-      row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
-
-      mainTitle <- paste0( paste0( pops, collapse ="_Vs_")," ", groupLabel," ",anomaly, sep="")
-      if(nrow(tempDataFrame)>1000 || ncol(tempDataFrame)>1000)
+      if(nrow(tempDataFrame)>0)
       {
-        #reduce
-        temp2 <- as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]])
-        temp <- apply(temp2,2, sum)
-        temp1 <- sort(temp, decreasing = T)
-        limit <- temp1[1000]
-        if(sum(temp1==limit)>1)
-          limit <- limit + 1
-        tempDataFrame <- data.frame(tempDataFrame[,1:2], temp2[,temp1 > limit])
-        rm(temp)
-        rm(temp1)
-        rm(temp2)
-        mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
+        tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "FREQ", sum)
+        row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+
+        mainTitle <- paste0( paste0( pops, collapse ="_Vs_")," ", groupLabel," ",anomaly, sep="")
+        if(nrow(tempDataFrame)>1000 || ncol(tempDataFrame)>1000)
+        {
+          #reduce
+          temp2 <- as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]])
+          temp <- apply(temp2,2, sum)
+          temp1 <- sort(temp, decreasing = T)
+          limit <- temp1[1000]
+          if(sum(temp1==limit)>1)
+            limit <- limit + 1
+          tempDataFrame <- data.frame(tempDataFrame[,1:2], temp2[,temp1 > limit])
+          rm(temp)
+          rm(temp1)
+          rm(temp2)
+          mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
+        }
+
+        # col<- colorRampPalette(c("violet","white","blue"))(1024)
+
+        # skip heatmap if no enough data are available
+        tt <- tempDataFrame[,3:ncol(tempDataFrame)]
+        if (!is.null(tt))
+          if(!nrow(tt) < 2 & !ncol(tt) < 2)
+          {
+            filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
+            grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
+            stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
+                           # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
+                           scale = "column",
+                           RowSideColors =as.vector(tempDataFrame$POPULATION),
+                           margins = c(25, 25),
+                           main = mainTitle
+            )
+            grDevices::dev.off()
+          }
       }
-
-      # col<- colorRampPalette(c("violet","white","blue"))(1024)
-
-      # skip heatmap if no enough data are available
-      tt <- tempDataFrame[,3:ncol(tempDataFrame)]
-      if(is.null(tt) || is.null(dim(tt)) || dim(tt)[1] < 2 || dim(tt)[2] < 2)
-        next
-
-      filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
-      grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
-      stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
-                     # col= colorRampPalette(RColorBrewer::brewer.pal(8, "Blues")),
-                     scale = "column",
-                     RowSideColors =as.vector(tempDataFrame$POPULATION),
-                     margins = c(25, 25),
-                     main = mainTitle
-      )
-      grDevices::dev.off()
-
     }
     gc()
 }
