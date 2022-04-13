@@ -2,11 +2,13 @@ createMultipleBed <- function(envir, sampleSheet){
 
   #create multiple file bed
   # browser()
+  toExport <- c("localKeys", "sampleSheet", "dir_check_and_create", "envir", "file_path_build")
   i <- 0
   localKeys <- expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"=envir$keys_figures,"ANOMALY"= envir$keys_anomalies,"EXT"="bed")
   localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
-  # foreach::foreach(i = 1:nrow(localKeys)) %dopar% {
-  for (i in 1:nrow(localKeys)) {
+
+  foreach::foreach(i = 1:nrow(localKeys), .export = toExport ) %dopar% {
+  # for (i in 1:nrow(localKeys)) {
     # i <- 20
     key <- localKeys[i,]
     for(j in 1:nrow(sampleSheet))
@@ -23,6 +25,7 @@ createMultipleBed <- function(envir, sampleSheet){
         message("createMultipleBed read file:", fileToRead)
         localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
         localtemp$Sample_ID <- sample$Sample_ID
+        # localtemp
         if(!exists("localFileRes"))
           localFileRes <- localtemp
         else
