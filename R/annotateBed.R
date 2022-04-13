@@ -56,9 +56,10 @@ annotateBed <- function (
       "GROUP" = groups
     )
 
+  toExport <- c("envir", "probesPrefix", "dir_check_and_create", "readMultipleBed", "columnLabel", "groupingColumnLabel")
 
-  for(i in 1:nrow(envir$keysLocal))
-  # finalBed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind) %dopar%
+  # for(i in 1:nrow(envir$keysLocal))
+  finalBed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = toExport) %dopar%
   {
     anomal <- envir$keysLocal[i,"ANOMALY"]
     pop <- envir$keysLocal[i,"POPULATION"]
@@ -68,10 +69,11 @@ annotateBed <- function (
     probes <- get(paste0(probesPrefix, grp,sep=""))
     resFolder <- dir_check_and_create(envir$resultFolderData,pop)
     tempFile <- readMultipleBed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probeFeatures =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
-    if(exists("finalBed"))
-      finalBed <- rbind(finalBed, tempFile)
-    else
-      finalBed <- tempFile
+    tempFile
+    # if(exists("finalBed"))
+    #   finalBed <- rbind(finalBed, tempFile)
+    # else
+    #   finalBed <- tempFile
   }
 
   # message("Annotated bed:")

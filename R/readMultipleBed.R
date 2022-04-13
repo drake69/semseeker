@@ -11,7 +11,7 @@
 #' @return list of pivot by column identified with column Label and by Sample
 
 #'
-readMultipleBed <- function(envir,anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
+readMultipleBed <- function(envir, anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
 {
   POSITION <- NULL
   # browser()
@@ -42,11 +42,13 @@ readMultipleBed <- function(envir,anomalyLabel, figureLable, probeFeatures, colu
   sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
   sourceData[is.na(sourceData)] <- ""
   sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLEID", groupingColumnLabel))
+
   # output with column freq
   message("multiple nrow data", nrow(sourceData))
 
   if(nrow(sourceData)==0)
     return(NULL)
+
   sourceData <- data.frame(sourceData,"FIGURE" = figureLable, "ANOMALY" = anomalyLabel, "POPULATION" = populationName)
   sourceData$POPULATION <- as.factor(sourceData$POPULATION)
   sourceData$ANOMALY <- as.factor(sourceData$ANOMALY)

@@ -47,6 +47,9 @@ test_that("readMultipleBed", {
 
   probeFeatures <- get(paste0(probesPrefix,"Whole",sep=""))
 
+  # (envir, anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
+
+  browser()
   res <-readMultipleBed (envir, "MUTATIONS", "BOTH", probeFeatures, columnLabel, populationName, groupingColumnLabel)
 
   expect_true(nrow(res)>0)
