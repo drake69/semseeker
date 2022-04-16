@@ -1,4 +1,4 @@
-# testthat::test_that("deltaSingleSample",{
+# testthat::test_that("delta_single_sample",{
 #
 #   
 #   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -9,25 +9,25 @@
 #   nitem <- 5e4
 #   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.5, sd=0.7))
 #
-#   probeFeatures <- PROBES[!is.na(PROBES$CHR),]
-#   probeFeatures <- probeFeatures[probeFeatures$PROBE %in% sample(x=probeFeatures[,"PROBE"] , size=nitem),]
+#   probe_features <- PROBES[!is.na(PROBES$CHR),]
+#   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 #
-#   highThresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
-#   lowThresholds <- data.frame(rnorm(nitem, mean=0.2, sd=0.2))
+#   high_thresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
+#   low_thresholds <- data.frame(rnorm(nitem, mean=0.2, sd=0.2))
 #
-#   row.names(values) <- probeFeatures$PROBE
-#   row.names(highThresholds) <- probeFeatures$PROBE
-#   row.names(lowThresholds) <- probeFeatures$PROBE
+#   row.names(values) <- probe_features$PROBE
+#   row.names(high_thresholds) <- probe_features$PROBE
+#   row.names(low_thresholds) <- probe_features$PROBE
 #
-#   betaMedians <- highThresholds - lowThresholds
+#   beta_medians <- high_thresholds - low_thresholds
 #
-#   deltaSingleSample(
+#   delta_single_sample(
 #     values = values,
-#     highThresholds = highThresholds,
-#     lowThresholds = lowThresholds,
-#     sampleDetail = data.frame("Sample_ID"= Sample_ID, "Sample_Group"="Control"),
-#     betaMedians = betaMedians,
-#     probeFeatures = probeFeatures
+#     high_thresholds = high_thresholds,
+#     low_thresholds = low_thresholds,
+#     sample_detail = data.frame("Sample_ID"= Sample_ID, "Sample_Group"="Control"),
+#     beta_medians = beta_medians,
+#     probe_features = probe_features
 #   )
 #
 #   resultFolderData  <-  dir_check_and_create(tempFolder, "Data")

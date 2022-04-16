@@ -6,7 +6,7 @@
 #' @return nothing
 #'
 
-dumpSampleAsBedFile <- function(dataToDump, fileName) {
+dump_sample_as_bed_file <- function(dataToDump, fileName) {
 
 
   if (!plyr::empty(dataToDump) && !startsWith(x = toupper(as.character(dataToDump[1, "CHR"])), prefix = "CHR")) {
@@ -25,8 +25,8 @@ dumpSampleAsBedFile <- function(dataToDump, fileName) {
 
   # save file bed per sample temporary to reuse for aggregated bed file
     # filePath <- paste(fileName,"",".temp")
-    # sampleNames <- rep(sampleName, dim(dataToDump)[1])
-    # dataToDump <- data.frame(dataToDump, sampleNames)
+    # sample_names <- rep(sampleName, dim(dataToDump)[1])
+    # dataToDump <- data.frame(dataToDump, sample_names)
     # colnames(dataToDump) <- multipleFileColNames
     #
     # utils::write.table(dataToDump, file = filePath, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")

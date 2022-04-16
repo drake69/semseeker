@@ -1,55 +1,55 @@
-#' deltaSingleSample
+#' delta_single_sample
 #'
 #' @param values values of methylation
-#' @param highThresholds highest threshold to use for comparison
-#' @param lowThresholds lowest threshold to use for comparison
-#' @param sampleDetail details of sample to analyze
-#' @param betaMedians median to use for calculation
-#' @param probeFeatures genomic position of probes
+#' @param high_thresholds highest threshold to use for comparison
+#' @param low_thresholds lowest threshold to use for comparison
+#' @param sample_detail details of sample to analyze
+#' @param beta_medians median to use for calculation
+#' @param probe_features genomic position of probes
 #' @param envir environment to get globals
 #' @return summary detail about the analysis
 #'
-deltaSingleSample <- function (envir, values, highThresholds, lowThresholds, sampleDetail, betaMedians, probeFeatures) {
+delta_single_sample <- function (envir, values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
 
- message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Sample analysis warmingUP ", Sys.time())
- ### get probeFeatures ################################################################################################
+ message(sample_detail$Sample_ID, " ", "DeltaSingleSample Sample analysis warmingUP ", Sys.time())
+ ### get probe_features ################################################################################################
 
- message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Sample analysis WarmedUP ...", Sys.time())
- message(sampleDetail$Sample_ID, " ", "DeltaSingleSample Start sample analyze ", Sys.time())
+ message(sample_detail$Sample_ID, " ", "DeltaSingleSample Sample analysis WarmedUP ...", Sys.time())
+ message(sample_detail$Sample_ID, " ", "DeltaSingleSample Start sample analyze ", Sys.time())
 
  ### get probesOverThreshold ################################################################################################
- if (!test_match_order(row.names(values), probeFeatures$PROBE)) {
+ if (!test_match_order(row.names(values), probe_features$PROBE)) {
          stop("Wrong order matching Probes and Values!", Sys.time())
  }
 
- if (!test_match_order(row.names(highThresholds), probeFeatures$PROBE)) {
-         stop("Wrong order matching Probes and highThresholds!", Sys.time())
+ if (!test_match_order(row.names(high_thresholds), probe_features$PROBE)) {
+         stop("Wrong order matching Probes and high_thresholds!", Sys.time())
  }
 
- if (!test_match_order(row.names(lowThresholds), probeFeatures$PROBE)) {
-         stop("Wrong order matching Probes and lowThresholds!", Sys.time())
+ if (!test_match_order(row.names(low_thresholds), probe_features$PROBE)) {
+         stop("Wrong order matching Probes and low_thresholds!", Sys.time())
  }
 
- mutationAbove <- values > highThresholds
- mutationBelow <- values < lowThresholds
- mutation <- data.frame("MUTATIONS"= (mutationBelow & mutationAbove), row.names = probeFeatures$PROBE)
+ mutation_above <- values > high_thresholds
+ mutation_below <- values < low_thresholds
+ mutation <- data.frame("MUTATIONS"= (mutation_below & mutation_above), row.names = probe_features$PROBE) # nolint
  colnames(mutation) <- "MUTATIONS"
 
- message(sampleDetail$Sample_ID, " ", "Got outliers ", Sys.time())
+ message(sample_detail$Sample_ID, " ", "Got outliers ", Sys.time())
 
  ### get deltas #########################################################
 
- deltas <- data.frame("DELTA"= round(values - betaMedians,3))
+ deltas <- data.frame("DELTA"= round(values - beta_medians,3))
  colnames(deltas) <- "DELTA"
 
- if (!test_match_order(row.names(mutation), probeFeatures$PROBE)) {
+ if (!test_match_order(row.names(mutation), probe_features$PROBE)) {
  stop("Wrong order matching Probes and Mutation!", Sys.time())
  }
- if (!test_match_order(row.names(deltas), probeFeatures$PROBE)) {
+ if (!test_match_order(row.names(deltas), probe_features$PROBE)) {
  stop("Wrong order matching Probes and Mutation!", Sys.time())
  }
 
- deltasAnnotated <- data.frame(as.data.frame(probeFeatures), deltas, "MUTATIONS" = mutation)
+ deltasAnnotated <- data.frame(as.data.frame(probe_features), deltas, "MUTATIONS" = mutation)
  deltasAnnotatedSorted <- sortByCHRandSTART(deltasAnnotated)
  deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$MUTATIONS == 1)[, c("CHR", "START", "END", "DELTA")]
 
@@ -64,7 +64,7 @@ deltaSingleSample <- function (envir, values, highThresholds, lowThresholds, sam
  message("############# LS",ls())
  # message("############# envir$resultFolderData:", envir$resultFolderData)
 
- folder2Save <- dir_check_and_create(envir$resultFolderData,c(as.character(sampleDetail$Sample_Group),"DELTAS_METHYLATION"))
- dumpSampleAsBedFile(dataToDump = deltasAnnotatedSorted, fileName = file_path_build(folder2Save,c(as.character(sampleDetail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
+ folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),"DELTAS_METHYLATION"))
+ dump_sample_as_bed_file(dataToDump = deltasAnnotatedSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
  return(result)
 }

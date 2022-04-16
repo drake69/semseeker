@@ -1,20 +1,20 @@
-createMultipleBed <- function(envir, sampleSheet){
+createMultipleBed <- function(envir, sample_sheet){
 
   #create multiple file bed
   # browser()
-  toExport <- c("localKeys", "sampleSheet", "dir_check_and_create", "envir", "file_path_build")
+  variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build")
   i <- 0
-  localKeys <- expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"=envir$keys_figures,"ANOMALY"= envir$keys_anomalies,"EXT"="bed")
-  localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sampleSheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
+  localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"=envir$keys_figures,"ANOMALY"= envir$keys_anomalies,"EXT"="bed")
+  localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
-  foreach::foreach(i = 1:nrow(localKeys), .export = toExport ) %dopar% {
+  foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export ) %dopar% {
   # for (i in 1:nrow(localKeys)) {
     # i <- 20
     key <- localKeys[i,]
-    for(j in 1:nrow(sampleSheet))
+    for(j in 1:nrow(sample_sheet))
     {
       # j <- 54
-      sample <- sampleSheet[j,]
+      sample <- sample_sheet[j,]
       # if(sample$Sample_ID=="R07C01_203991450116")
       #    message(j)
       tempresultFolderData <-dir_check_and_create(envir$resultFolderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))

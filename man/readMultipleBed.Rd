@@ -8,7 +8,7 @@ readMultipleBed(
   envir,
   anomalyLabel,
   figureLable,
-  probeFeatures,
+  probe_features,
   columnLabel,
   populationName,
   groupingColumnLabel
@@ -21,7 +21,7 @@ readMultipleBed(
 
 \item{figureLable}{figures like hypo/hyper to built the data path}
 
-\item{probeFeatures}{features of probe CHR and START and NAME}
+\item{probe_features}{features of probe CHR and START and NAME}
 
 \item{columnLabel}{name of column in the annotation dataset to select genomic area (gene, island etc..)}
 

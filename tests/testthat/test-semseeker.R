@@ -7,18 +7,18 @@ test_that("semeeker", {
   nsamples <- 30
 
 
-  methylationData <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  methylationData <- as.data.frame(matrix(methylationData,nitem,nsamples))
-  probeFeatures <- PROBES[!is.na(PROBES$CHR),]
-  probeFeatures <- probeFeatures[probeFeatures$PROBE %in% sample(x=probeFeatures[,"PROBE"] , size=nitem),]
-  row.names(methylationData) <- probeFeatures$PROBE
+  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
+  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
+  probe_features <- PROBES[!is.na(PROBES$CHR),]
+  probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
+  row.names(methylation_data) <- probe_features$PROBE
 
   Sample_ID <- stringi::stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
-  colnames(methylationData) <- Sample_ID
+  colnames(methylation_data) <- Sample_ID
   Sample_Group <- c(rep("Control",nsamples/3),rep("Reference",nsamples/3),rep("Case",nsamples/3))
   mySampleSheet <- data.frame(Sample_Group, Sample_ID)
 
-  semseeker( sampleSheet =  mySampleSheet,methylationData =  methylationData, resultFolder = tempFolder)
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, resultFolder = tempFolder)
 
   tempresultFolder <-dir_check_and_create(envir$resultFolderData,c("Control","MUTATIONS_BOTH"))
   fileToRead <- file_path_build(tempresultFolder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")

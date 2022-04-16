@@ -2,27 +2,27 @@
 #' report of pivot
 #'
 #' @param envir semseekere working infos
-#' @param methylationData whole matrix of data to analyze.
-#' @param slidingWindowSize size of the sliding widows to compute epilesions
+#' @param methylation_data whole matrix of data to analyze.
+#' @param sliding_window_size size of the sliding widows to compute epilesions
 #' default 11 probes.
-#' @param betaSuperiorThresholds  data frame to select, from the sample sheet,
+#' @param beta_superior_thresholds  data frame to select, from the sample sheet,
 #' samples to use as control as study population and as refereces two vectors
 #' within the first vector the names of the selection colum and tha second
 #' vector the study population selector,
-#' @param betaInferiorThresholds name of samplesheet's column to use as control
+#' @param beta_inferior_thresholds name of samplesheet's column to use as control
 #' population selector followed by selection value,
-#' @param sampleSheet name of samplesheet's column to use as control population
+#' @param sample_sheet name of samplesheet's column to use as control population
 #' selector followed by selection value,
-#' @param betaMedians name of samplesheet's column to use as control population
+#' @param beta_medians name of samplesheet's column to use as control population
 #' selector followed by selection value,
 #' @param envir semseekere working infos
-#' @param bonferroniThreshold threshold to define which pValue accept for
-#' @param probeFeatures probes detail from 27 to EPIC illumina dataset
+#' @param bonferroni_threshold threshold to define which pValue accept for
+#' @param probe_features probes detail from 27 to EPIC illumina dataset
 #' lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
 #' @importFrom foreach %dopar%
 
-analizePopulation <- function(envir, methylationData, slidingWindowSize, betaSuperiorThresholds, betaInferiorThresholds, sampleSheet, betaMedians, bonferroniThreshold = 0.05, probeFeatures) {
+analize_population <- function(envir, methylation_data, sliding_window_size, beta_superior_thresholds, beta_inferior_thresholds, sample_sheet, beta_medians, bonferroni_threshold = 0.05, probe_features) {
 
   #@importFrom foreach %dopar%
   # browser()
@@ -30,51 +30,51 @@ analizePopulation <- function(envir, methylationData, slidingWindowSize, betaSup
   message("AnalyzePopulation warmingUP ", Sys.time())
 
   ### get beta_values ########################################################
-  sampleSheet <- sampleSheet[order(sampleSheet[, "Sample_ID"], decreasing = FALSE), ]
-  existentSamples <- colnames(methylationData)
-  sampleNames <- sampleSheet$Sample_ID
-  sampleToSelect <- existentSamples[sampleNames %in% existentSamples]
-  missedSample <- setdiff(setdiff(sampleNames, existentSamples), "PROBE")
+  sample_sheet <- sample_sheet[order(sample_sheet[, "Sample_ID"], decreasing = FALSE), ]
+  existent_samples <- colnames(methylation_data)
+  sample_names <- sample_sheet$Sample_ID
+  # sampleToSelect <- existent_samples[sample_names %in% existent_samples]
+  missed_samples <- setdiff(setdiff(sample_names, existent_samples), "PROBE")
 
-  if (length(missedSample) != 0) {
-    message("These samples data are missed: ", paste0(missedSample, sep = " "), Sys.time())
+  if (length(missed_samples) != 0) {
+    message("These samples data are missed: ", paste0(missed_samples, sep = " "), Sys.time())
   }
 
   message("WarmedUP AnalyzePopulation", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  summaryFileName <- file.path(envir$resultFolderData, "summary.csv")
+  # summaryFileName <- file.path(envir$resultFolderData, "summary.csv")
 
-  toExport <- c("sampleSheet", "methylationData", "analyzeSingleSample", "envir", "slidingWindowSize", "betaSuperiorThresholds",
-                "bonferroniThreshold", "probeFeatures", "betaInferiorThresholds", "analyzeSingleSampleBoth", "deltaSingleSample", "betaMedians")
+  variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "envir", "sliding_window_size", "beta_superior_thresholds",
+                "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "analyze_single_sample_both", "delta_single_sample", "beta_medians")
   # , .errorhandling = 'remove'
   # .packages=c("dplyr","semseeker")
   i <- 0
-  # summaryPopulation <- foreach::foreach(i = 1:nrow(sampleSheet), .combine="rbind",
-  #                                       .export=c(ls(envir=globalenv()),"methylationData", "slidingWindowSize", "betaSuperiorThresholds", "bonferroniThreshold", "probeFeatures", "betaInferiorThresholds", "betaMedians",
-  #                                                 "sampleSheet", "analyzeSingleSample", "envir", "analyzeSingleSampleBoth", "deltaSingleSample"),
+  # summary_population <- foreach::foreach(i = 1:nrow(sample_sheet), .combine="rbind",
+  #                                       .export=c(ls(envir=globalenv()),"methylation_data", "sliding_window_size", "beta_superior_thresholds", "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "beta_medians",
+  #                                                 "sample_sheet", "analyze_single_sample", "envir", "analyze_single_sample_both", "delta_single_sample"),
   #                                       .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = "remove") %dopar% {
-  summaryPopulation <-  foreach::foreach( i =1:nrow(sampleSheet), .combine='rbind', .export = toExport) %dopar% {
-  # for(i in 1:nrow(sampleSheet) ) {
-    localSampleDetail <- sampleSheet[i,]
-    betaValues <- methylationData[, localSampleDetail$Sample_ID]
-    hyperResult <- analyzeSingleSample(envir=envir, values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaSuperiorThresholds, figure="HYPER", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-    hypoResult <- analyzeSingleSample(envir=envir, values = betaValues, slidingWindowSize = slidingWindowSize,  thresholds = betaInferiorThresholds, figure="HYPO", sampleDetail = localSampleDetail, bonferroniThreshold = bonferroniThreshold, probeFeatures = probeFeatures)
-    bothResult <- analyzeSingleSampleBoth(envir=envir, sampleDetail =  localSampleDetail)
-    deltaResult <- deltaSingleSample (envir = envir, values = betaValues, highThresholds = betaSuperiorThresholds, lowThresholds = betaInferiorThresholds, sampleDetail = localSampleDetail, betaMedians = betaMedians, probeFeatures = probeFeatures)
-    sampleStatusTemp <- c( "Sample_ID"=localSampleDetail$Sample_ID, deltaResult, hyperResult, hypoResult, bothResult)
-    sampleStatusTemp <- data.frame(sampleStatusTemp)
-    sampleStatusTemp <- data.frame(t(sampleStatusTemp))
-    rownames(sampleStatusTemp) <- c(localSampleDetail$Sample_ID)
-    as.data.frame(sampleStatusTemp)
-    # if(exists("summaryPopulation"))
-    #   summaryPopulation <- rbind(summaryPopulation, sampleStatusTemp)
+  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine='rbind', .export = variables_to_export) %dopar% {
+  # for(i in 1:nrow(sample_sheet) ) {
+    local_sample_detail <- sample_sheet[i,]
+    beta_values <- methylation_data[, local_sample_detail$Sample_ID]
+    hyper_result <- analyze_single_sample(envir=envir, values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail, bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
+    hypo_result <- analyze_single_sample(envir=envir, values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail, bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
+    both_result <- analyze_single_sample_both(envir=envir, sample_detail =  local_sample_detail)
+    delta_result <- delta_single_sample (envir = envir, values = beta_values, high_thresholds = beta_superior_thresholds, low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail, beta_medians = beta_medians, probe_features = probe_features)
+    sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result, both_result)
+    sample_status_temp <- data.frame(sample_status_temp)
+    sample_status_temp <- data.frame(t(sample_status_temp))
+    rownames(sample_status_temp) <- c(local_sample_detail$Sample_ID)
+    as.data.frame(sample_status_temp)
+    # if(exists("summary_population"))
+    #   summary_population <- rbind(summary_population, sample_status_temp)
     # else
-    #   summaryPopulation <- sampleStatusTemp
+    #   summary_population <- sample_status_temp
   }
 
-  message("Row count result:", nrow(summaryPopulation))
-  rm(methylationData)
+  message("Row count result:", nrow(summary_population))
+  rm(methylation_data)
   gc()
 
   message("Completed population analysis ", Sys.time())
@@ -82,7 +82,7 @@ analizePopulation <- function(envir, methylationData, slidingWindowSize, betaSup
   time_taken <- (end_time - start_time)
   message("Completed population with Excel summary", Sys.time(), " Time taken: ", time_taken)
 
-  return(summaryPopulation)
+  return(summary_population)
 }
 
 

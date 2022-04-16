@@ -1,19 +1,19 @@
 #' Calculate stochastic epi mutations from a methylation dataset as outcome
 #' report of pivot
 #'
-#' @param sampleSheet dataframe with at least a column Sample_ID to identify samples
-#' @param methylationData matrix of methylation data
-#' @param bonferroniThreshold = 0.05 #threshold to define which pValue
+#' @param sample_sheet dataframe with at least a column Sample_ID to identify samples
+#' @param methylation_data matrix of methylation data
+#' @param bonferroni_threshold = 0.05 #threshold to define which pValue
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
 #' @param resultFolder wherte the result will be saved
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
 #'
-semseeker <- function(sampleSheet,
-                      methylationData,
+semseeker <- function(sample_sheet,
+                      methylation_data,
                       resultFolder,
-                      bonferroniThreshold = 0.05,
+                      bonferroni_threshold = 0.05,
                       maxResources = 90,
                       iqrTimes = 3 ) {
 
@@ -22,32 +22,32 @@ semseeker <- function(sampleSheet,
 
   # set digits to 22
   withr::local_options(list(digits = 22))
-  slidingWindowSize <- 11
+  sliding_window_size <- 11
 
 
-  methylationData <- as.data.frame(methylationData)
-  methDataTemp <- data.frame( PROBE= rownames(methylationData), methylationData)
+  methylation_data <- as.data.frame(methylation_data)
+  methDataTemp <- data.frame( PROBE= rownames(methylation_data), methylation_data)
   methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
-  methylationData <- methDataTemp[, -c(1)]
+  methylation_data <- methDataTemp[, -c(1)]
 
   rm(methDataTemp)
-  message("INFO: I will work on:", nrow(methylationData), " PROBES.")
+  message("INFO: I will work on:", nrow(methylation_data), " PROBES.")
 
-  if(nrow(methylationData) == 485512)
+  if(nrow(methylation_data) == 485512)
     message("INFO:seems a 450k dataset.")
 
-  if(nrow(methylationData) == 27578)
+  if(nrow(methylation_data) == 27578)
     message("INFO:seems a 27k dataset.")
 
-  if(nrow(methylationData) == 866562)
+  if(nrow(methylation_data) == 866562)
     message("INFO:seems an EPIC dataset.")
 
-  PROBES <- PROBES[(PROBES$PROBE %in% rownames(methylationData)),]
-  methylationData <- methylationData[rownames(methylationData) %in% PROBES$PROBE, ]
-  methylationData <- methylationData[ order(rownames(methylationData)), ]
+  PROBES <- PROBES[(PROBES$PROBE %in% rownames(methylation_data)),]
+  methylation_data <- methylation_data[rownames(methylation_data) %in% PROBES$PROBE, ]
+  methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
 
   #PROBES <- sortByCHRandSTART(PROBES)
-  if (!test_match_order(row.names(methylationData), PROBES$PROBE)) {
+  if (!test_match_order(row.names(methylation_data), PROBES$PROBE)) {
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
 
@@ -55,32 +55,32 @@ semseeker <- function(sampleSheet,
   # {
   #   covariates <- unlist(t(strsplit( gsub(" ","",inferenceDetails$covariates),split = "+", fixed = T)))
   #
-  #   if ( length(covariates)>0 & !( covariates  %in% colnames(sampleSheet)))
+  #   if ( length(covariates)>0 & !( covariates  %in% colnames(sample_sheet)))
   #   {
-  #     message(covariates[!(covariates%in% colnames(sampleSheet))])
+  #     message(covariates[!(covariates%in% colnames(sample_sheet))])
   #     stop("The covariates value are not available in the sample sheet!")
   #   }
   # }
 
 
-  populationCheckResult <- populationCheck(sampleSheet, methylationData)
+  populationCheckResult <- populationCheck(sample_sheet, methylation_data)
   if(!is.null(populationCheckResult))
   {
     stop(populationCheckResult)
   }
 
   # reference population
-  referencePopulationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == "Reference", ]
-  referencePopulationMatrix <- data.frame(PROBE = row.names(methylationData), methylationData[, referencePopulationSampleSheet$Sample_ID])
+  referencePopulationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == "Reference", ]
+  referencePopulationMatrix <- data.frame(PROBE = row.names(methylation_data), methylation_data[, referencePopulationSampleSheet$Sample_ID])
 
   #
-  # methylationData <- data.frame(PROBE = row.names(methylationData), methylationData[ , which(!(colnames(methylationData)%in%referencePopulationSampleSheet$Sample_ID))]  )
+  # methylation_data <- data.frame(PROBE = row.names(methylation_data), methylation_data[ , which(!(colnames(methylation_data)%in%referencePopulationSampleSheet$Sample_ID))]  )
 
 
   if (plyr::empty(referencePopulationMatrix) |
     dim(referencePopulationMatrix)[2] < 2) {
-    message("Empty methylationData ", Sys.time())
-    stop("Empty methylationData ")
+    message("Empty methylation_data ", Sys.time())
+    stop("Empty methylation_data ")
   }
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes)
@@ -88,17 +88,17 @@ semseeker <- function(sampleSheet,
   utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$resultFolderData ,"beta_thresholds","csv"), sep=";")
 
   # remove duplicated samples due to the reference population
-  referenceSamples <- sampleSheet[sampleSheet$Sample_Group == "Reference",]
-  otherSamples <- sampleSheet[sampleSheet$Sample_Group != "Reference",]
+  referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]
+  otherSamples <- sample_sheet[sample_sheet$Sample_Group != "Reference",]
   referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
-  sampleSheet <- rbind(otherSamples, referenceSamples)
+  sample_sheet <- rbind(otherSamples, referenceSamples)
 
   populations <-  c("Reference","Control","Case")
   for (populationName in populations) {
 
     #
-    populationSampleSheet <- sampleSheet[sampleSheet$Sample_Group == populationName, ]
-    populationMatrixColumns <- colnames(methylationData[, populationSampleSheet$Sample_ID])
+    populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == populationName, ]
+    populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
 
     if (length(populationMatrixColumns)==0) {
       message("WARNING: Population ",populationName, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
@@ -106,16 +106,16 @@ semseeker <- function(sampleSheet,
     }
 
     # browser()
-    resultPopulation <- analizePopulation(
+    resultPopulation <- analize_population(
       envir = envir,
-      methylationData = methylationData[, populationMatrixColumns] ,
-      slidingWindowSize = slidingWindowSize,
-      betaSuperiorThresholds = populationControlRangeBetaValues$betaSuperiorThresholds,
-      betaInferiorThresholds = populationControlRangeBetaValues$betaInferiorThresholds,
-      sampleSheet = populationSampleSheet,
-      betaMedians = populationControlRangeBetaValues$betaMedianValues,
-      bonferroniThreshold = bonferroniThreshold,
-      probeFeatures = PROBES
+      methylation_data = methylation_data[, populationMatrixColumns] ,
+      sliding_window_size = sliding_window_size,
+      beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,
+      beta_inferior_thresholds = populationControlRangeBetaValues$beta_inferior_thresholds,
+      sample_sheet = populationSampleSheet,
+      beta_medians = populationControlRangeBetaValues$betaMedianValues,
+      bonferroni_threshold = bonferroni_threshold,
+      probe_features = PROBES
     )
 
     createMultipleBed(envir, populationSampleSheet)
@@ -133,16 +133,16 @@ semseeker <- function(sampleSheet,
   }
 
   # browser()
-  samplesID <- sampleSheet$Sample_ID
-  sampleSheet <- sampleSheet[, !(colnames(sampleSheet) %in% colnames(resultSampleSheet))]
-  sampleSheet$Sample_ID <- samplesID
+  samplesID <- sample_sheet$Sample_ID
+  sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% colnames(resultSampleSheet))]
+  sample_sheet$Sample_ID <- samplesID
 
-  sampleSheet <- merge(sampleSheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
-  rm(methylationData)
+  sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
+  rm(methylation_data)
   gc()
-  utils::write.csv2(sampleSheet, file.path(envir$resultFolderData , "sample_sheet_result.csv"))
+  utils::write.csv2(sample_sheet, file.path(envir$resultFolderData , "sample_sheet_result.csv"))
 
-  if(length(sampleSheet$Sample_Group=="Reference")>0){
+  if(length(sample_sheet$Sample_Group=="Reference")>0){
     populations <- c("Reference","Control","Case")
   }  else
     populations <- c("Control","Case")

@@ -6,23 +6,23 @@ testthat::test_that("getLesions",{
   nitem <- 5e4
   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
-  probeFeatures <- PROBES[!is.na(PROBES$CHR),]
-  probeFeatures <- probeFeatures[probeFeatures$PROBE %in% sample(x=probeFeatures[,"PROBE"] , size=nitem),]
-  row.names(tresholds) <- probeFeatures$PROBE
+  probe_features <- PROBES[!is.na(PROBES$CHR),]
+  probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
+  row.names(tresholds) <- probe_features$PROBE
   row.names(values) <- row.names(tresholds)
 
   mutations <- getMutations(
     values = values,
     figure = "HYPO",
     thresholds = tresholds,
-    probeFeatures = probeFeatures,
+    probe_features = probe_features,
     sampleName = Sample_ID
   )
 
   lesions <- getLesions(
-    slidingWindowSize = 11,
-    bonferroniThreshold = 0.05,
-    mutationAnnotatedSorted = mutations,
+    sliding_window_size = 11,
+    bonferroni_threshold = 0.05,
+    mutation_annotated_sorted = mutations,
     grouping_column = "CHR"
   )
 

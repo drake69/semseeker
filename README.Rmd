@@ -88,10 +88,10 @@ This how to obtain the analyzed data:
 
     normalizedData <- readRDS("~/normalizedData.rds")
 
-    sampleSheet <- read.csv2("~/sample_sheet.csv")
+    sample_sheet <- read.csv2("~/sample_sheet.csv")
 
-    semseeker (sampleSheet = sampleSheet, 
-            methylationData = normalizedData,
+    semseeker (sample_sheet = sample_sheet, 
+            methylation_data = normalizedData,
             resultFolder = "~/semseeker_result/")
 
 # Complete Example

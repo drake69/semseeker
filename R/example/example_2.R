@@ -11,14 +11,14 @@ github_update()
 workingFolder <- file.path("~/Downloads/GSE139307")
 dir.create(workingFolder)
 
-sampleSheet <- buildDataSetFromGEO("GSE139307",workingFolder, 0)
+sample_sheet <- buildDataSetFromGEO("GSE139307",workingFolder, 0)
 
 # ChAMP need the sample name variable as first column
 # so let's move the Sample_ID as first column
-sampleSheet <- data.frame("Sample_ID"=sampleSheet$Sample_ID, sampleSheet[, colnames(sampleSheet)!="Sample_ID"])
+sample_sheet <- data.frame("Sample_ID"=sample_sheet$Sample_ID, sample_sheet[, colnames(sample_sheet)!="Sample_ID"])
 
 write.table(
-  sampleSheet,
+  sample_sheet,
   paste(workingFolder, "/", "final_samplesheet.csv", sep = ""),
   row.names = FALSE,
   sep=",",
@@ -58,22 +58,22 @@ normalizedData<-champ.norm(beta=myLoadN$beta,
                            cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
 )
 
-sampleSheet <- read.csv("~/Downloads/GSE139307/final_samplesheet.csv")
+sample_sheet <- read.csv("~/Downloads/GSE139307/final_samplesheet.csv")
 normalizedData <- readRDS("~/Downloads/GSE139307/normalizeddata.rds")
 
 
 # we need the Sample_Group, the sample sheet of the example has the column pathology we can use to distinguish Cases vs Controls
-sampleSheet$Sample_Group <- sampleSheet$dioxin.group.ch1
-sampleSheet[sampleSheet$Sample_Group=="CONTROL", "Sample_Group"] <- "Control"
-sampleSheet[sampleSheet$Sample_Group!="Control", "Sample_Group"] <- "Case"
+sample_sheet$Sample_Group <- sample_sheet$dioxin.group.ch1
+sample_sheet[sample_sheet$Sample_Group=="CONTROL", "Sample_Group"] <- "Control"
+sample_sheet[sample_sheet$Sample_Group!="Control", "Sample_Group"] <- "Case"
 
 # we have not the reference Sample_Group so we reuse the Control sample group as reference
-reference <- subset(sampleSheet,Sample_Group=="Control")
+reference <- subset(sample_sheet,Sample_Group=="Control")
 reference$Sample_Group <- "Reference"
-sampleSheet <- rbind(sampleSheet, reference)
+sample_sheet <- rbind(sample_sheet, reference)
 
 
 
-semseeker (sampleSheet = sampleSheet,
-           methylationData = normalizedData,
+semseeker (sample_sheet = sample_sheet,
+           methylation_data = normalizedData,
            resultFolder = file.path(workingFolder,"/semseeker_result/"))
