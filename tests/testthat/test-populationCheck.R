@@ -7,29 +7,29 @@ test_that("populationCheck", {
 
   nitem <- 5
   nsamples <- 30
-  methylationData <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  methylationData <- as.data.frame(matrix(methylationData,nitem,nsamples))
+  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
+  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
   Sample_ID <- stringi::stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
-  colnames(methylationData) <- Sample_ID
+  colnames(methylation_data) <- Sample_ID
   Sample_Group <- c(rep("Control",nsamples/3),rep("Reference",nsamples/3),rep("Case",nsamples/3))
   mySampleSheet <- data.frame(Sample_Group, Sample_ID)
 
 
   # all fine
-  expect_true(is.null(populationCheck(mySampleSheet, methylationData)))
+  expect_true(is.null(populationCheck(mySampleSheet, methylation_data)))
 
   #Sample_ID has NA
   mySampleSheet$Sample_ID[1] <- NA
-  expect_true(!is.null(populationCheck(mySampleSheet, methylationData)))
+  expect_true(!is.null(populationCheck(mySampleSheet, methylation_data)))
 
   #Sample_Group has NA
   mySampleSheet$Sample_Group[1] <- NA
-  expect_true(!is.null(populationCheck(mySampleSheet, methylationData)))
+  expect_true(!is.null(populationCheck(mySampleSheet, methylation_data)))
 
   #Lost Sample_Group Values
   mySampleSheet$Sample_Group <- NA
-  expect_true(!is.null(populationCheck(mySampleSheet, methylationData)))
+  expect_true(!is.null(populationCheck(mySampleSheet, methylation_data)))
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)

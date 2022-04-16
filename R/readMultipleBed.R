@@ -2,7 +2,7 @@
 #'
 #' @param envir semseekere working infos
 #' @param anomalyLabel anomaly definition used to label folder and files eg MUTATIONS, LESIONS
-#' @param probeFeatures features of probe CHR and START and NAME
+#' @param probe_features features of probe CHR and START and NAME
 #' @param figureLable figures like hypo/hyper to built the data path
 #' @param columnLabel name of column in the annotation dataset to select genomic area (gene, island etc..)
 #' @param populationName name of the population used to build the data path
@@ -11,7 +11,7 @@
 #' @return list of pivot by column identified with column Label and by Sample
 
 #'
-readMultipleBed <- function(envir, anomalyLabel, figureLable, probeFeatures, columnLabel, populationName, groupingColumnLabel)
+readMultipleBed <- function(envir, anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
 {
   POSITION <- NULL
   # browser()
@@ -31,14 +31,14 @@ readMultipleBed <- function(envir, anomalyLabel, figureLable, probeFeatures, col
 
   sourceData$CHR <- as.factor(sourceData$CHR)
 
-  # probeFeatures <- subset(probeFeatures, POSITION == 1)
-  probeFeatures$CHR <- as.factor(paste0("chr", probeFeatures$CHR))
+  # probe_features <- subset(probe_features, POSITION == 1)
+  probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
-  probeFeatures <- probeFeatures[(probeFeatures$CHR %in% unique((sourceData$CHR))), ]
-  droplevels(probeFeatures$CHR)
+  probe_features <- probe_features[(probe_features$CHR %in% unique((sourceData$CHR))), ]
+  droplevels(probe_features$CHR)
   droplevels(sourceData$CHR)
 
-  sourceData <- dplyr::inner_join(sourceData, probeFeatures, by = c("CHR", "START"))
+  sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START"))
   sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
   sourceData[is.na(sourceData)] <- ""
   sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLEID", groupingColumnLabel))

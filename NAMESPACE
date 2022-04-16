@@ -2,6 +2,7 @@
 
 export(buildDataSetFromGEO)
 export(semseeker)
+importFrom(doRNG,"%dorng%")
 importFrom(dplyr,"%>%")
 importFrom(foreach,"%dopar%")
 importFrom(rlang,.data)

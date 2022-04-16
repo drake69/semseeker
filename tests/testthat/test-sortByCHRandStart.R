@@ -2,14 +2,14 @@ test_that("sortByCHRandSTART", {
 
   nitem <- 5e2
 
-  probeFeatures <- PROBES[!is.na(PROBES$CHR),]
-  probeFeatures <- probeFeatures[probeFeatures$PROBE %in% sample(x=probeFeatures[,"PROBE"] , size=nitem),]
+  probe_features <- PROBES[!is.na(PROBES$CHR),]
+  probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 
-  probeFeatures$ABSOLUTE <- paste(probeFeatures$CHR, probeFeatures$START, sep="_")
+  probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")
 
   #order not matching
-  second <- sortByCHRandSTART( probeFeatures[order(probeFeatures$START),])
+  second <- sortByCHRandSTART( probe_features[order(probe_features$START),])
 
-  expect_true( test_match_order( sortByCHRandSTART(probeFeatures)$ABSOLUTE,second$ABSOLUTE))
+  expect_true( test_match_order( sortByCHRandSTART(probe_features)$ABSOLUTE,second$ABSOLUTE))
 }
 )

@@ -109,10 +109,10 @@ init_env <- function(resultFolder, maxResources = 90)
   #
   # parallel::clusterExport(envir=environment(),
   #                         cl=computationCluster,
-  #                         varlist = list( "analyzeSingleSample",
-  #                           "dumpSampleAsBedFile", "deltaSingleSample","dir_check_and_create",
-  #                           "file_path_build","analyzeSingleSampleBoth",
-  #                           "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "getLesions",
+  #                         varlist = list( "analyze_single_sample",
+  #                           "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
+  #                           "file_path_build","analyze_single_sample_both",
+  #                           "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "lesions_get",
   #                           "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
   #                           "ssEnv$resultFolderData","ssEnv$logFolder","computationCluster",
   #                           "ssEnv$resultFolderChart","ssEnv$resultFolderInference","ssEnv$resultFolderEuristic",
@@ -125,10 +125,10 @@ init_env <- function(resultFolder, maxResources = 90)
   # "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
   # "probes"
 
-  ssEnv$functionToExport <- c( "analyzeSingleSample",
-                            "dumpSampleAsBedFile", "deltaSingleSample","dir_check_and_create",
-                            "file_path_build","analyzeSingleSampleBoth",
-                            "sortByCHRandSTART", "test_match_order", "getLesions",
+  ssEnv$functionToExport <- c( "analyze_single_sample",
+                            "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
+                            "file_path_build","analyze_single_sample_both",
+                            "sortByCHRandSTART", "test_match_order", "lesions_get",
                             "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
 
   # options(doFuture.foreach.export = ".export-and-automatic-with-warning")

@@ -6,22 +6,22 @@
 report of pivot}
 \usage{
 semseeker(
-  sampleSheet,
-  methylationData,
+  sample_sheet,
+  methylation_data,
   resultFolder,
-  bonferroniThreshold = 0.05,
+  bonferroni_threshold = 0.05,
   maxResources = 90,
   iqrTimes = 3
 )
 }
 \arguments{
-\item{sampleSheet}{dataframe with at least a column Sample_ID to identify samples}
+\item{sample_sheet}{dataframe with at least a column Sample_ID to identify samples}
 
-\item{methylationData}{matrix of methylation data}
+\item{methylation_data}{matrix of methylation data}
 
 \item{resultFolder}{wherte the result will be saved}
 
-\item{bonferroniThreshold}{= 0.05 #threshold to define which pValue}
+\item{bonferroni_threshold}{= 0.05 #threshold to define which pValue}
 
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 

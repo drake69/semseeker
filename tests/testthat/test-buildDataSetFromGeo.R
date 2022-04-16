@@ -2,9 +2,9 @@ test_that("buildDataSetFromGeo", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  sampleSheet <- semseeker::buildDataSetFromGEO("GSE132616",tempFolder, 1)
+  sample_sheet <- semseeker::buildDataSetFromGEO("GSE132616",tempFolder, 1)
 
-  expect_true(nrow(sampleSheet)>0)
+  expect_true(nrow(sample_sheet)>0)
 
   expect_true(file.exists(file.path(tempFolder,"/203048410118_R03C01_Red.idat")))
 
