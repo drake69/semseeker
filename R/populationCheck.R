@@ -1,5 +1,5 @@
 
-populationCheck <- function(sample_sheet, methylation_data)
+population_check <- function(sample_sheet, methylation_data)
 {
   sample_sheet <- as.data.frame(sample_sheet)
   sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", "MUTATIONS_HYPER", "LESIONS_HYPER", "MUTATIONS_HYPO", "LESIONS_HYPO", "MUTATIONS_BOTH", "LESIONS_BOTH"))]

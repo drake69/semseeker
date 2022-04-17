@@ -1,4 +1,4 @@
-test_that("populationCheck", {
+test_that("population_check", {
 
 
   library(stringi)
@@ -17,19 +17,19 @@ test_that("populationCheck", {
 
 
   # all fine
-  expect_true(is.null(populationCheck(mySampleSheet, methylation_data)))
+  expect_true(is.null(population_check(mySampleSheet, methylation_data)))
 
   #Sample_ID has NA
   mySampleSheet$Sample_ID[1] <- NA
-  expect_true(!is.null(populationCheck(mySampleSheet, methylation_data)))
+  expect_true(!is.null(population_check(mySampleSheet, methylation_data)))
 
   #Sample_Group has NA
   mySampleSheet$Sample_Group[1] <- NA
-  expect_true(!is.null(populationCheck(mySampleSheet, methylation_data)))
+  expect_true(!is.null(population_check(mySampleSheet, methylation_data)))
 
   #Lost Sample_Group Values
   mySampleSheet$Sample_Group <- NA
-  expect_true(!is.null(populationCheck(mySampleSheet, methylation_data)))
+  expect_true(!is.null(population_check(mySampleSheet, methylation_data)))
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)

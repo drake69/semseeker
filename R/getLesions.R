@@ -71,7 +71,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
 
   lesionWeighted <- data.frame(as.data.frame(mutationAnnotatedSortedLocal), "LESIONS" = lesionWeighted)
 
-  lesionWeighted <- sortByCHRandSTART(lesionWeighted)
+  lesionWeighted <- sort_by_chr_and_start(lesionWeighted)
   lesionWeighted <- subset(lesionWeighted, lesionWeighted$LESIONS == 1)[, c("CHR", "START", "END")]
 
   if (dim(lesionWeighted)[1] > dim(mutationAnnotatedSortedLocal)[1]) {

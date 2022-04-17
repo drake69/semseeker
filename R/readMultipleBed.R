@@ -11,12 +11,12 @@
 #' @return list of pivot by column identified with column Label and by Sample
 
 #'
-readMultipleBed <- function(envir, anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
+read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
 {
   POSITION <- NULL
   # browser()
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
-  souceFolder <- dir_check_and_create(envir$resultFolderData, c(as.character(populationName),f))
+  souceFolder <- dir_check_and_create(envir$result_folderData, c(as.character(populationName),f))
 
 
   # browser()

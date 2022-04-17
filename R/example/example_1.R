@@ -13,7 +13,7 @@ library("semseeker")
 workingFolder <- file.path(getwd(),"/tmp")
 dir.create(workingFolder)
 
-sample_sheet <- semseeker::buildDataSetFromGEO("GSE186766",workingFolder, 0)
+sample_sheet <- semseeker::build_data_set_from_geo("GSE186766",workingFolder, 0)
 
 # ChAMP need the sample name variable as first column
 # so let's move the Sample_ID as first column
@@ -29,7 +29,7 @@ write.table(
 
 library(ChAMP)
 idat_folder <- workingFolder
-resultFolder = file.path( workingFolder,"/result/")
+result_folder = file.path( workingFolder,"/result/")
 
 myLoadN <- champ.load(directory = idat_folder,
                       method = "minfi",
@@ -53,7 +53,7 @@ myLoadN <- champ.load(directory = idat_folder,
 normalizedData<-champ.norm(beta=myLoadN$beta,
                     rgSet=myLoadN$rgSet,
                     mset=myLoadN$mset,
-                    resultsDir= resultFolder,
+                    resultsDir= result_folder,
                     method="SWAN",
                     plotBMIQ=FALSE,
                     arraytype="EPIC",
@@ -74,5 +74,5 @@ sample_sheet <- rbind(sample_sheet, reference)
 
 semseeker (sample_sheet = sample_sheet,
            methylation_data = normalizedData,
-           resultFolder = file.path(workingFolder,"/semseeker_result/"))
+           result_folder = file.path(workingFolder,"/semseeker_result/"))
 

@@ -1,13 +1,13 @@
 #' init environment
-#' @param resultFolder where result of semseeker will bestored
+#' @param result_folder where result of semseeker will bestored
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @return the working environment
-init_env <- function(resultFolder, maxResources = 90)
+init_env <- function(result_folder, maxResources = 90)
 {
 
 
   # if(getRversion() >= "2.15.1")  utils::globalVariables(c( "chartFolder","ssEnv$logFolder","computationCluster",
-  #                                                          "ssEnv$resultFolderChart","ssEnv$resultFolderInference","ssEnv$resultFolderEuristic",
+  #                                                          "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
   #                                                          "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
   #                                                          "probes","functionToExport"), add = FALSE)
 
@@ -15,8 +15,8 @@ init_env <- function(resultFolder, maxResources = 90)
   #   return()
 
   # if(getRversion() >= "2.15.1")
-  #   utils::globalVariables( names= c( "ssEnv$resultFolderData","chartFolder","ssEnv$logFolder","computationCluster",
-  #                             "ssEnv$resultFolderChart","ssEnv$resultFolderInference","ssEnv$resultFolderEuristic",
+  #   utils::globalVariables( names= c( "ssEnv$result_folderData","chartFolder","ssEnv$logFolder","computationCluster",
+  #                             "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
   #                             "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
   #                             "probes"), add = FALSE, package = "semseeker")
 
@@ -34,13 +34,13 @@ init_env <- function(resultFolder, maxResources = 90)
 
   # e <- new.env()
 
-  # assign("ssEnv$resultFolderData", dir_check_and_create(resultFolder, "Data"))
+  # assign("ssEnv$result_folderData", dir_check_and_create(result_folder, "Data"))
 
   ssEnv <- list()
-  ssEnv$resultFolderData <-  dir_check_and_create(resultFolder, "Data")
-  ssEnv$resultFolderChart <-    dir_check_and_create(resultFolder, "Chart")
-  ssEnv$resultFolderInference <-    dir_check_and_create(resultFolder, "Inference")
-  ssEnv$resultFolderEuristic <-  dir_check_and_create(resultFolder,"Euristic")
+  ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
+  ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
+  ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
+  ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
   ssEnv$logFolder <-  dir_check_and_create("/tmp",c("semseeker","log"))
   foreachIndex <- 0
 
@@ -102,8 +102,8 @@ init_env <- function(resultFolder, maxResources = 90)
   probes <-  rbind( ssEnv$keys_island_probes, ssEnv$keys_gene_probes, ssEnv$keys_dmr_probes )
 
 
-  # parallel::clusterExport(envir=my_env, cl=computationCluster, varlist = list("ssEnv$resultFolderData","ssEnv$logFolder","computationCluster",
-  #                                         "ssEnv$resultFolderChart","ssEnv$resultFolderInference","ssEnv$resultFolderEuristic",
+  # parallel::clusterExport(envir=my_env, cl=computationCluster, varlist = list("ssEnv$result_folderData","ssEnv$logFolder","computationCluster",
+  #                                         "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
   #                                         "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
   #                                         "probes"))
   #
@@ -112,24 +112,24 @@ init_env <- function(resultFolder, maxResources = 90)
   #                         varlist = list( "analyze_single_sample",
   #                           "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
   #                           "file_path_build","analyze_single_sample_both",
-  #                           "createPivotResultFromMultipleBed", "sortByCHRandSTART", "test_match_order", "lesions_get",
-  #                           "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
-  #                           "ssEnv$resultFolderData","ssEnv$logFolder","computationCluster",
-  #                           "ssEnv$resultFolderChart","ssEnv$resultFolderInference","ssEnv$resultFolderEuristic",
+  #                           "createPivotResultFromMultipleBed", "sort_by_chr_and_start", "test_match_order", "lesions_get",
+  #                           "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
+  #                           "ssEnv$result_folderData","ssEnv$logFolder","computationCluster",
+  #                           "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
   #                           "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
   #                           "probes"))
 
   # ,
-  # "ssEnv$resultFolderData","ssEnv$logFolder","computationCluster",
-  # "ssEnv$resultFolderChart","ssEnv$resultFolderInference","ssEnv$resultFolderEuristic",
+  # "ssEnv$result_folderData","ssEnv$logFolder","computationCluster",
+  # "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
   # "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
   # "probes"
 
   ssEnv$functionToExport <- c( "analyze_single_sample",
                             "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
                             "file_path_build","analyze_single_sample_both",
-                            "sortByCHRandSTART", "test_match_order", "lesions_get",
-                            "getMutations","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
+                            "sort_by_chr_and_start", "test_match_order", "lesions_get",
+                            "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
 
   # options(doFuture.foreach.export = ".export-and-automatic-with-warning")
 
@@ -137,8 +137,8 @@ init_env <- function(resultFolder, maxResources = 90)
   #
   # parallel::clusterExport(envir=my_env, cl=computationCluster, varlist = ls(my_env))
 
-  # lockBinding("ssEnv$resultFolderData","chartFolder","ssEnv$logFolder","computationCluster",
-  #             "ssEnv$resultFolderChart","ssEnv$resultFolderInference","ssEnv$resultFolderEuristic",
+  # lockBinding("ssEnv$result_folderData","chartFolder","ssEnv$logFolder","computationCluster",
+  #             "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
   #             "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
   #             "probes", e)
 

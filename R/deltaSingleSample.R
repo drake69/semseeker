@@ -50,7 +50,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
  }
 
  deltasAnnotated <- data.frame(as.data.frame(probe_features), deltas, "MUTATIONS" = mutation)
- deltasAnnotatedSorted <- sortByCHRandSTART(deltasAnnotated)
+ deltasAnnotatedSorted <- sort_by_chr_and_start(deltasAnnotated)
  deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$MUTATIONS == 1)[, c("CHR", "START", "END", "DELTA")]
 
  result <- ""
@@ -62,9 +62,9 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
  message("############# SEARCH")
  message("############# SEARCH",search())
  message("############# LS",ls())
- # message("############# envir$resultFolderData:", envir$resultFolderData)
+ # message("############# envir$result_folderData:", envir$result_folderData)
 
- folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),"DELTAS_METHYLATION"))
+ folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_METHYLATION"))
  dump_sample_as_bed_file(dataToDump = deltasAnnotatedSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
  return(result)
 }

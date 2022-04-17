@@ -4,10 +4,10 @@
 \alias{init_env}
 \title{init environment}
 \usage{
-init_env(resultFolder, maxResources = 90)
+init_env(result_folder, maxResources = 90)
 }
 \arguments{
-\item{resultFolder}{where result of semseeker will bestored}
+\item{result_folder}{where result of semseeker will bestored}
 
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 }

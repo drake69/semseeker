@@ -1,4 +1,4 @@
-#' getMutations
+#' mutations_get
 #'
 #' @param values values of methylation
 #' @param figure figure to get Mutaions of HYPO or HYPER methylation
@@ -9,7 +9,7 @@
 #' @return mutations
 #'
 #'
-getMutations <- function(values, figure,thresholds, probe_features, sampleName)
+mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
 {
   ### get probesOverThreshold ################################################################################################
 
@@ -33,7 +33,7 @@ getMutations <- function(values, figure,thresholds, probe_features, sampleName)
     stop("Wrong order matching Probes and Mutation!", Sys.time())
   }
 
-  mutation_annotated_sorted <- sortByCHRandSTART(mutationAnnotated)
+  mutation_annotated_sorted <- sort_by_chr_and_start(mutationAnnotated)
 
   if (!test_match_order(mutation_annotated_sorted$PROBE, row.names(mutation_annotated_sorted))) {
     stop("Mutation annotation sorted is not coherent with probe informations order!")

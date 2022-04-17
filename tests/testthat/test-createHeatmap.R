@@ -1,4 +1,4 @@
-test_that("createHeatmap", {
+test_that("create_heatmap", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -34,7 +34,7 @@ test_that("createHeatmap", {
                           probe_features = probe_features
   )
 
-  createMultipleBed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed(envir, sample_sheet = sample_sheet)
 
   populations <- c("Control")
 
@@ -42,28 +42,28 @@ test_that("createHeatmap", {
   anomalies <- c("MUTATIONS","LESIONS")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  probesPrefix = "PROBES_Gene_"
+  probes_prefix = "PROBES_Gene_"
   columnLabel =  "GENE"
   groupingColumnLabel="GROUP"
 
   # create and read
-  finalBed <- annotateBed (
+  final_bed <- annotate_bed (
     envir,
     populations ,
     figures ,
     anomalies ,
     groups ,
-    probesPrefix ,
+    probes_prefix ,
     columnLabel ,
     groupingColumnLabel)
 
-  createHeatmap(envir, inputBedDataFrame = finalBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
-  expect_true(file.exists(file.path(envir$resultFolderChart,"/GENE_AREA/Control_GENE_AREA_MUTATIONS.png")))
+  create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_MUTATIONS.png")))
 
-  # finalBed <- finalBed [1:2,]
-  # createHeatmap(inputBedDataFrame = finalBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  # final_bed <- final_bed [1:2,]
+  # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
   #
-  # finalBed <- NULL
-  # createHeatmap(inputBedDataFrame = finalBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  # final_bed <- NULL
+  # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
 
 })

@@ -1,30 +1,30 @@
-createExcelPivot <-  function(envir, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel ) {
+create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
     HYPO <- NULL
     HYPER <- NULL
     POPULATION <- NULL
 
 
-    finalBed <-  annotateBed( envir=envir,  populations,figures ,anomalies,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
+    final_bed <-  annotate_bed( envir=envir,  populations,figures ,anomalies,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
 
     # browser()
-    if (is.null(finalBed))
+    if (is.null(final_bed))
       return()
 
-    reportFolder <- dir_check_and_create(envir$resultFolderData,"Pivots")
+    reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
 
-    finalBed <- data.frame(finalBed, "KEY" = finalBed[,mainGroupLabel])
-    finalBed[,mainGroupLabel] <- as.factor(finalBed[,mainGroupLabel])
-    finalBed[,"KEY"] <- as.factor(finalBed[,"KEY"])
-    finalBed[,"FIGURE"] <- as.factor(finalBed[,"FIGURE"])
-    finalBed[,"POPULATION"] <- as.factor(finalBed[,"POPULATION"])
+    final_bed <- data.frame(final_bed, "KEY" = final_bed[,mainGroupLabel])
+    final_bed[,mainGroupLabel] <- as.factor(final_bed[,mainGroupLabel])
+    final_bed[,"KEY"] <- as.factor(final_bed[,"KEY"])
+    final_bed[,"FIGURE"] <- as.factor(final_bed[,"FIGURE"])
+    final_bed[,"POPULATION"] <- as.factor(final_bed[,"POPULATION"])
 
-    numberOfCase <- length(unique(subset(finalBed, finalBed$POPULATION == "Case" )$SAMPLEID))
-    numberOfControl <- length(unique(subset(finalBed, finalBed$POPULATION == "Control" )$SAMPLEID))
+    numberOfCase <- length(unique(subset(final_bed, final_bed$POPULATION == "Case" )$SAMPLEID))
+    numberOfControl <- length(unique(subset(final_bed, final_bed$POPULATION == "Control" )$SAMPLEID))
 
      # pop <- "Reference"
-     # tempPopData <- subset(finalBed, finalBed[,"POPULATION"] != pop)
-    tempPopData <- subset(finalBed, finalBed$freq >0 )
+     # tempPopData <- subset(final_bed, final_bed[,"POPULATION"] != pop)
+    tempPopData <- subset(final_bed, final_bed$freq >0 )
     sheetList <- vector(mode="list")
     sheetListNames <- vector(mode="list")
 

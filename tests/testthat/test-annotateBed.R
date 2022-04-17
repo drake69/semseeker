@@ -1,4 +1,4 @@
-test_that("annotateBed", {
+test_that("annotate_bed", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -34,7 +34,7 @@ test_that("annotateBed", {
                           probe_features = probe_features
   )
 
-  createMultipleBed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed(envir, sample_sheet = sample_sheet)
 
   populations <- c("Control")
 
@@ -42,44 +42,44 @@ test_that("annotateBed", {
   anomalies <- c("MUTATIONS","LESIONS")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  probesPrefix = "PROBES_Gene_"
+  probes_prefix = "PROBES_Gene_"
   columnLabel =  "GENE"
   groupingColumnLabel="GROUP"
 
   # create and read
-  finalBed <- annotateBed (
+  final_bed <- annotate_bed (
     envir,
     populations ,
     figures ,
     anomalies ,
     groups ,
-    probesPrefix ,
+    probes_prefix ,
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(envir$resultFolderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"csv")
 
   # file extsits
   expect_true(file.exists(bedFileName))
 
   # not empty data set
-  expect_true(nrow(finalBed)>0)
+  expect_true(nrow(final_bed)>0)
 
   # has the correct header
-  expect_true( columnLabel %in% colnames(finalBed))
+  expect_true( columnLabel %in% colnames(final_bed))
 
   #read again  existent
-  finalBed <- annotateBed (
+  final_bed <- annotate_bed (
     envir,
     populations ,
     figures ,
     anomalies ,
     groups ,
-    probesPrefix ,
+    probes_prefix ,
     columnLabel ,
     groupingColumnLabel)
 
-  expect_true( columnLabel %in% colnames(finalBed))
+  expect_true( columnLabel %in% colnames(final_bed))
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)

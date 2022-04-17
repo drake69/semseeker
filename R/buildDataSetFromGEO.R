@@ -1,4 +1,4 @@
-#' buildDataSetFromGEO
+#' build_data_set_from_geo
 #'
 #' @param GEOgse geo accession dataset identification
 #' @param workingFolder where sample sheet and files will be saved
@@ -7,7 +7,7 @@
 #'
 #' @return samplesheet, and sample's file saved and samplesheet csv
 #' @export
-buildDataSetFromGEO <-  function(GEOgse, workingFolder, downloadFiles = 0) {
+build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
 
 
     gse <- GEOquery::getGEO(GEOgse, GSEMatrix = TRUE)

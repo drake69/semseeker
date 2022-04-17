@@ -1,4 +1,4 @@
-test_that("createExcelPivot", {
+test_that("create_excel_pivot", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -34,7 +34,7 @@ test_that("createExcelPivot", {
                           probe_features = probe_features
   )
 
-  createMultipleBed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed(envir, sample_sheet = sample_sheet)
 
   populations <- c("Control")
 
@@ -42,18 +42,18 @@ test_that("createExcelPivot", {
   anomalies <- c("MUTATIONS","LESIONS")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  probesPrefix = "PROBES_Gene_"
+  probes_prefix = "PROBES_Gene_"
   columnLabel =  "GENE"
   groupingColumnLabel="GROUP"
 
   # create and read
-  finalBed <- annotateBed (
+  final_bed <- annotate_bed (
     envir,
     populations ,
     figures ,
     anomalies ,
     groups ,
-    probesPrefix ,
+    probes_prefix ,
     columnLabel ,
     groupingColumnLabel)
 
@@ -62,25 +62,25 @@ test_that("createExcelPivot", {
   anomalies <- c("MUTATIONS","LESIONS")
 
   subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  probesPrefix = "PROBES_Gene_"
+  probes_prefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  createExcelPivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
-  expect_true(file.exists(file.path(envir$resultFolderData,"Pivots/GENE.xlsx")))
+  expect_true(file.exists(file.path(envir$result_folderData,"Pivots/GENE.xlsx")))
   #
 #
-#   probesPrefix <- "PROBES_Island_"
+#   probes_prefix <- "PROBES_Island_"
 #   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
 #   mainGroupLabel <- "ISLAND"
 #   subGroupLabel <- "RELATION_TO_CPGISLAND"
-#   createExcelPivot ( populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+#   create_excel_pivot ( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 #
 #   subGroups <- c("DMR")
-#   probesPrefix = "PROBES_DMR_"
+#   probes_prefix = "PROBES_DMR_"
 #   mainGroupLabel =  "DMR"
 #   subGroupLabel="GROUP"
-#   createExcelPivot (populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+#   create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
 
 })

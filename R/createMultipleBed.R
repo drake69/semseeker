@@ -1,4 +1,4 @@
-createMultipleBed <- function(envir, sample_sheet){
+create_multiple_bed <- function(envir, sample_sheet){
 
   #create multiple file bed
   # browser()
@@ -17,12 +17,12 @@ createMultipleBed <- function(envir, sample_sheet){
       sample <- sample_sheet[j,]
       # if(sample$Sample_ID=="R07C01_203991450116")
       #    message(j)
-      tempresultFolderData <-dir_check_and_create(envir$resultFolderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-      fileToRead <- file_path_build(tempresultFolderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
-      message("createMultipleBed file 2 read:", fileToRead)
+      tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+      fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
+      message("create_multiple_bed file 2 read:", fileToRead)
       if(file.exists(fileToRead))
       {
-        message("createMultipleBed read file:", fileToRead)
+        message("create_multiple_bed read file:", fileToRead)
         localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
         localtemp$Sample_ID <- sample$Sample_ID
         # localtemp
@@ -34,10 +34,10 @@ createMultipleBed <- function(envir, sample_sheet){
     }
     if(exists("localFileRes"))
     {
-      fileToWrite <- file_path_build(tempresultFolderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
+      fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
       utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
       rm(localFileRes)
-      message("createMultipleBed, file saved!")
+      message("create_multiple_bed, file saved!")
     }
   }
   gc()

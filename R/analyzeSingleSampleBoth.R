@@ -12,7 +12,7 @@ analyze_single_sample_both <- function(envir, sample_detail) {
   {
     if(figure=="BOTH")
       next
-    folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+    folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
     if(file.exists(fileName))
     {
@@ -21,7 +21,7 @@ analyze_single_sample_both <- function(envir, sample_detail) {
       mutations <- rbind(mutations, mutationsTemp )
     }
 
-    folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+    folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed")
     if(file.exists(fileName))
     {
@@ -35,7 +35,7 @@ analyze_single_sample_both <- function(envir, sample_detail) {
   lesions <- lesions[-1,]
 
   figure <- "BOTH"
-  folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
   # mutations$SAMPLEID <- mutations$Sample_ID
   dump_sample_as_bed_file(
@@ -44,7 +44,7 @@ analyze_single_sample_both <- function(envir, sample_detail) {
   )
 
   # browser()
-  folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed")
   lesions <- unique(lesions)
   if(nrow(lesions)>0)

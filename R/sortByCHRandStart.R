@@ -6,7 +6,7 @@
 #' @return sorted dataframe
 
 #'
-sortByCHRandSTART <- function(dataframe) {
+sort_by_chr_and_start <- function(dataframe) {
 
   # TODO: verify CHR and START are column of the data frame
   dataframe$CHR <- as.factor(dataframe$CHR)
