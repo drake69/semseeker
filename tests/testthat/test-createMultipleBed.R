@@ -1,4 +1,4 @@
-test_that("createMultipleBed", {
+test_that("create_multiple_bed", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -34,10 +34,10 @@ test_that("createMultipleBed", {
                           probe_features = probe_features
   )
 
-  createMultipleBed(envir, sample_sheet)
+  create_multiple_bed(envir, sample_sheet)
 
-  tempresultFolder <-dir_check_and_create(envir$resultFolderData,c("Control","MUTATIONS_BOTH"))
-  fileToRead <- file_path_build(tempresultFolder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")
+  tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_BOTH"))
+  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")
   localFileRes <- read.table(fileToRead, sep="\t")
 
   expect_true(nrow(localFileRes)>0)

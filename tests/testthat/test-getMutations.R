@@ -1,4 +1,4 @@
-testthat::test_that("getMutations",{
+testthat::test_that("mutations_get",{
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 15, pattern = "[A-Za-z0-9]"),sep="")
@@ -14,7 +14,7 @@ testthat::test_that("getMutations",{
   row.names(tresholds) <- probe_features$PROBE
   row.names(values) <- row.names(tresholds)
 
-  mutations <- getMutations(
+  mutations <- mutations_get(
                values = values,
                figure = "HYPO",
                thresholds = tresholds,

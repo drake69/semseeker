@@ -43,7 +43,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   message("WarmedUP AnalyzePopulation", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  # summaryFileName <- file.path(envir$resultFolderData, "summary.csv")
+  # summaryFileName <- file.path(envir$result_folderData, "summary.csv")
 
   variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "envir", "sliding_window_size", "beta_superior_thresholds",
                 "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "analyze_single_sample_both", "delta_single_sample", "beta_medians")

@@ -24,15 +24,15 @@ analyze_single_sample <- function(envir, values, sliding_window_size, thresholds
   message(sample_detail$Sample_ID, " ", "SingleSample Sample analysis WarmedUP ...", Sys.time())
   message(sample_detail$Sample_ID, " ", "SingleSample Start sample analyze ", Sys.time())
 
-  mutation_annotated_sorted <- getMutations(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
+  mutation_annotated_sorted <- mutations_get(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
   mutation_annoated_sorted_to_save <- subset(mutation_annotated_sorted, mutation_annotated_sorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
 
   message("############# SEARCH")
   message("############# SEARCH",search())
   message("############# LS",ls())
   # browser()
-  message("############# envir$resultFolderData:", envir$resultFolderData)
-  folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+  message("############# envir$result_folderData:", envir$result_folderData)
+  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
     dataToDump = mutation_annoated_sorted_to_save,
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
@@ -40,7 +40,7 @@ analyze_single_sample <- function(envir, values, sliding_window_size, thresholds
   result[paste("MUTATIONS_", figure, sep="")] <- if (!is.null(mutation_annoated_sorted_to_save)) dim(mutation_annoated_sorted_to_save)[1] else 0
 
   lesionWeighted <- lesions_get(bonferroni_threshold = bonferroni_threshold, sliding_window_size = sliding_window_size, grouping_column = "CHR", mutation_annotated_sorted = mutation_annotated_sorted)
-  folder_to_save <- dir_check_and_create(envir$resultFolderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
     dataToDump = lesionWeighted,
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed")

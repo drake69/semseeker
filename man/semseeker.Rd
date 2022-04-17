@@ -8,7 +8,7 @@ report of pivot}
 semseeker(
   sample_sheet,
   methylation_data,
-  resultFolder,
+  result_folder,
   bonferroni_threshold = 0.05,
   maxResources = 90,
   iqrTimes = 3
@@ -19,7 +19,7 @@ semseeker(
 
 \item{methylation_data}{matrix of methylation data}
 
-\item{resultFolder}{wherte the result will be saved}
+\item{result_folder}{wherte the result will be saved}
 
 \item{bonferroni_threshold}{= 0.05 #threshold to define which pValue}
 

@@ -6,18 +6,18 @@
 #' @param bonferroni_threshold = 0.05 #threshold to define which pValue
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
-#' @param resultFolder wherte the result will be saved
+#' @param result_folder wherte the result will be saved
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
 #'
 semseeker <- function(sample_sheet,
                       methylation_data,
-                      resultFolder,
+                      result_folder,
                       bonferroni_threshold = 0.05,
                       maxResources = 90,
                       iqrTimes = 3 ) {
 
-  envir <- init_env(resultFolder, maxResources)
+  envir <- init_env(result_folder, maxResources)
 
 
   # set digits to 22
@@ -46,7 +46,7 @@ semseeker <- function(sample_sheet,
   methylation_data <- methylation_data[rownames(methylation_data) %in% PROBES$PROBE, ]
   methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
 
-  #PROBES <- sortByCHRandSTART(PROBES)
+  #PROBES <- sort_by_chr_and_start(PROBES)
   if (!test_match_order(row.names(methylation_data), PROBES$PROBE)) {
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
@@ -63,10 +63,10 @@ semseeker <- function(sample_sheet,
   # }
 
 
-  populationCheckResult <- populationCheck(sample_sheet, methylation_data)
-  if(!is.null(populationCheckResult))
+  population_checkResult <- population_check(sample_sheet, methylation_data)
+  if(!is.null(population_checkResult))
   {
-    stop(populationCheckResult)
+    stop(population_checkResult)
   }
 
   # reference population
@@ -85,7 +85,7 @@ semseeker <- function(sample_sheet,
 
   populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes)
 
-  utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$resultFolderData ,"beta_thresholds","csv"), sep=";")
+  utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$result_folderData ,"beta_thresholds","csv"), sep=";")
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]
@@ -118,7 +118,7 @@ semseeker <- function(sample_sheet,
       probe_features = PROBES
     )
 
-    createMultipleBed(envir, populationSampleSheet)
+    create_multiple_bed(envir, populationSampleSheet)
 
     resultPopulation <- as.data.frame(resultPopulation)
     # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
@@ -140,7 +140,7 @@ semseeker <- function(sample_sheet,
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(methylation_data)
   gc()
-  utils::write.csv2(sample_sheet, file.path(envir$resultFolderData , "sample_sheet_result.csv"))
+  utils::write.csv2(sample_sheet, file.path(envir$result_folderData , "sample_sheet_result.csv"))
 
   if(length(sample_sheet$Sample_Group=="Reference")>0){
     populations <- c("Reference","Control","Case")
@@ -151,37 +151,37 @@ semseeker <- function(sample_sheet,
   anomalies <- c("MUTATIONS","LESIONS")
 
   subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  probesPrefix = "PROBES_Gene_"
+  probes_prefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
 
-  createExcelPivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probesPrefix =   probesPrefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
-  geneBed <- annotateBed(envir=envir,populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
-  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnIDs = c(1) )
-  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnIDs = c(1,3))
+  geneBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnIDs = c(1) )
+  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnIDs = c(1,3))
 
 
-  probesPrefix <- "PROBES_Island_"
+  probes_prefix <- "PROBES_Island_"
   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
   mainGroupLabel <- "ISLAND"
   subGroupLabel <- "RELATION_TO_CPGISLAND"
-  createExcelPivot (envir=envir, populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  create_excel_pivot (envir=envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
-  islandBed <- annotateBed(envir=envir,populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnIDs = 3)
-  createHeatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnIDs = 1)
-  createHeatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
+  islandBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+  create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnIDs = 3)
+  create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnIDs = 1)
+  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
 
   subGroups <- c("DMR")
-  probesPrefix = "PROBES_DMR_"
+  probes_prefix = "PROBES_DMR_"
   mainGroupLabel =  "DMR"
   subGroupLabel="GROUP"
-  createExcelPivot (envir=envir,populations, figures, anomalies, subGroups, probesPrefix, mainGroupLabel, subGroupLabel)
+  create_excel_pivot (envir=envir,populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
-  dmrBed <- annotateBed(envir=envir,populations ,figures ,anomalies ,subGroups ,probesPrefix ,mainGroupLabel,subGroupLabel)
-  createHeatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
+  dmrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+  create_heatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
 
   if (!is.null(geneBed))
   {
@@ -200,17 +200,17 @@ semseeker <- function(sample_sheet,
 
   totalBed <- rbind(geneBed, dmrBed, islandBed)
   if (!is.null(totalBed) && nrow(totalBed)>0)
-    createHeatmap( envir=envir,inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
+    create_heatmap( envir=envir,inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
 
   rm(populationControlRangeBetaValues)
 
   # message("Starting inference Analysis.")
-  # inferenceAnalysis(envir$resultFolderData = envir$resultFolderData, envir$logFolder= envir$logFolder, inferenceDetails)
+  # inferenceAnalysis(envir$result_folderData = envir$result_folderData, envir$logFolder= envir$logFolder, inferenceDetails)
   # future::autoStopCluster(computationCluster)
   # doFuture::stopImplicitCluster()
   gc()
-  # geneontology_analysis_webgestalt(envir$resultFolderData = envir$resultFolderData, fileName = fileName)
-  # euristic_analysis_webgestalt(envir$resultFolderData = envir$resultFolderData)
+  # geneontology_analysis_webgestalt(envir$result_folderData = envir$result_folderData, fileName = fileName)
+  # euristic_analysis_webgestalt(envir$result_folderData = envir$result_folderData)
   message("Job Completed !")
 
 

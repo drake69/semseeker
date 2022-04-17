@@ -1,4 +1,4 @@
-#' createHeatmap load the multiple bed resulting from
+#' create_heatmap load the multiple bed resulting from
 #' analysis organized into files and folders per anomaly and produce a pivot
 #'
 #' @param envir semseekere working infos
@@ -9,12 +9,12 @@
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
 #' @importFrom doRNG %dorng%
-createHeatmap <-
+create_heatmap <-
   function(envir, inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
     # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
 
-    chartFolder <- dir_check_and_create(envir$resultFolderChart,groupLabel)
+    chartFolder <- dir_check_and_create(envir$result_folderChart,groupLabel)
 
     if (is.null(inputBedDataFrame))
       return()

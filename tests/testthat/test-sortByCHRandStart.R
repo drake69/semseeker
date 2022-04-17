@@ -1,4 +1,4 @@
-test_that("sortByCHRandSTART", {
+test_that("sort_by_chr_and_start", {
 
   nitem <- 5e2
 
@@ -8,8 +8,8 @@ test_that("sortByCHRandSTART", {
   probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")
 
   #order not matching
-  second <- sortByCHRandSTART( probe_features[order(probe_features$START),])
+  second <- sort_by_chr_and_start( probe_features[order(probe_features$START),])
 
-  expect_true( test_match_order( sortByCHRandSTART(probe_features)$ABSOLUTE,second$ABSOLUTE))
+  expect_true( test_match_order( sort_by_chr_and_start(probe_features)$ABSOLUTE,second$ABSOLUTE))
 }
 )

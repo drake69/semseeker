@@ -1,4 +1,4 @@
-testthat::test_that("getLesions",{
+testthat::test_that("lesions_get",{
 
   library(stringi)
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
@@ -11,7 +11,7 @@ testthat::test_that("getLesions",{
   row.names(tresholds) <- probe_features$PROBE
   row.names(values) <- row.names(tresholds)
 
-  mutations <- getMutations(
+  mutations <- mutations_get(
     values = values,
     figure = "HYPO",
     thresholds = tresholds,
@@ -19,7 +19,7 @@ testthat::test_that("getLesions",{
     sampleName = Sample_ID
   )
 
-  lesions <- getLesions(
+  lesions <- lesions_get(
     sliding_window_size = 11,
     bonferroni_threshold = 0.05,
     mutation_annotated_sorted = mutations,

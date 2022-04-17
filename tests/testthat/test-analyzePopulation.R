@@ -44,7 +44,7 @@
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
   # unlink(tempFolder, recursive = TRUE)
-  # outputFolder <- dir_check_and_create(resultFolderData,c("Control","MUTATIONS_HYPO"))
+  # outputFolder <- dir_check_and_create(result_folderData,c("Control","MUTATIONS_HYPO"))
   # fileName <- file_path_build(outputFolder,c("MULTIPLE","MUTATIONS","HYPO"), "bed")
   # expect_equal(2 * 2, 4)
 })
