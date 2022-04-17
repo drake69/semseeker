@@ -36,6 +36,9 @@ init_env <- function(result_folder, maxResources = 90)
 
   # assign("ssEnv$result_folderData", dir_check_and_create(result_folder, "Data"))
 
+  #allow export of object of 8gb with future
+  options(future.globals.maxSize= 4 * 1024^3)
+
   ssEnv <- list()
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
