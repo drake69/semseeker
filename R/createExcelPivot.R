@@ -32,8 +32,8 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
     # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
 
     envir$keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    # sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
-    for(i in 1:nrow(envir$keys))
+    sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+    # for(i in 1:nrow(envir$keys))
       {
         # i <- 1
         grp <- envir$keys[i,1]
@@ -56,11 +56,11 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
               #store in the first row the names of the sheet
               tempDataFrame[1,] <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
-              # list(tempDataFrame)
-              if(exists("sheetList"))
-                sheetList <- append(sheetList, list(tempDataFrame))
-              else
-                sheetList <- list(tempDataFrame)
+              list(tempDataFrame)
+              # if(exists("sheetList"))
+              #   sheetList <- append(sheetList, list(tempDataFrame))
+              # else
+              #   sheetList <- list(tempDataFrame)
             }
           }
         }
