@@ -6,7 +6,6 @@ population_check <- function(sample_sheet, methylation_data)
 
   result <- NULL
 
-
   needColumns <- c("Sample_ID", "Sample_Group")
   missedColumns <- needColumns[!(needColumns %in% colnames(sample_sheet))]
 
@@ -36,7 +35,10 @@ population_check <- function(sample_sheet, methylation_data)
 
   if (sum(colnames(methylation_data) %in% sample_sheet$Sample_ID)!=ncol(methylation_data))
   {
-    result <- paste(result,  (" The methylation data has not the column's names as expected from the sample sheet in column Sample_ID!"))
+    result <- paste(result, "\n", "Have a look: the methylation data first columns:", colnames(methylation_data)[1:4], "... some Sample_ID:", sample_sheet$Sample_ID[1:4], "\n" )
+    lost_column <- colnames(methylation_data)[!(colnames(methylation_data) %in% sample_sheet$Sample_ID)]
+    result <- paste(result, "\n","Lost column:", lost_column, "\n" )
+    result <- paste(result, "\n", (" The methylation data has not the column's names as expected from the sample sheet in column Sample_ID!"))
   }
   populationGroups <- as.factor(sample_sheet$Sample_Group)
   # expected R as reference, S as Study, C as Control
