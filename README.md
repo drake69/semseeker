@@ -4,7 +4,7 @@
 # semseeker
 
 <!-- badges: start -->
-[![](https://img.shields.io/badge/devel%20version-0.3.5-blue.svg)](https://github.com/drake69/semseeker)
+[![](https://img.shields.io/badge/devel%20version-0.4.1-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
@@ -74,7 +74,7 @@ This how to obtain the analyzed data:
 
     semseeker (sample_sheet = sample_sheet, 
             methylation_data = normalizedData,
-            resultFolder = "~/semseeker_result/")
+            result_folder = "~/semseeker_result/")
 
 # Complete Example
 
@@ -85,5 +85,5 @@ working example with data from Gene Expression Omnibus (GEO)
 
 -   the samplesheet dataframe should contain a column called
     Sample_Group, the admitted values are: Case, Control, Reference. if
-    you don0t have the Refernce population you can duplicate the Control
+    you don't have the Refernce population you can duplicate the Control
     population rows and use Reference in the Sample_Group column.
