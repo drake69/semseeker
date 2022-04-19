@@ -83,7 +83,7 @@ semseeker <- function(sample_sheet,
     stop("Empty methylation_data ")
   }
 
-  populationControlRangeBetaValues <- rangeBetaValuePerProbeAsNormalizedDistribution(referencePopulationMatrix, iqrTimes)
+  populationControlRangeBetaValues <- range_beta_values(referencePopulationMatrix, iqrTimes)
 
   utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$result_folderData ,"beta_thresholds","csv"), sep=";")
 
