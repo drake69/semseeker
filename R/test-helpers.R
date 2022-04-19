@@ -30,3 +30,24 @@
 #
 
 
+# if (!require("BiocManager", quietly = TRUE))
+#   install.packages("BiocManager")
+#
+# BiocManager::install("BiocGenerics")
+# BiocManager::install("XVector")
+# BiocManager::install("S4Vectors")
+# BiocManager::install("Biostrings")
+# BiocManager::install("KEGGREST")
+# BiocManager::install("GEOquery")
+# BiocManager::install("limma")
+# BiocManager::install("zlibbioc")
+# BiocManager::install("Biobase")
+# BiocManager::install("igraph")
+# BiocManager::install("RBGL")
+#
+# to develope in windows is needed RTools
+# https://cran.rstudio.com/bin/windows/Rtools/rtools42/rtools.html
+# choco install rtools
+#
+# BiocManager::install("GenomeInfoDbData")
+# or installed by tar
