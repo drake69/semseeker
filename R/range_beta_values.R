@@ -1,12 +1,12 @@
-#--- rangeBetaValuePerProbeAsNormalizedDistribution ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-#' Nrmalize the methyation level distributing as a normalized distribution
+#--- range_beta_values ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#' calculate the range of beta values to define the outlier
 #' @param populationMatrix matrix of methylation for the population under calculation
 #'
 #' @param iqrTimes inter quartile ratio used to normalize
 #'
 #' @return methylation matrix as normalized distribution
 
-rangeBetaValuePerProbeAsNormalizedDistribution <- function(populationMatrix, iqrTimes = 3) {
+range_beta_values <- function(populationMatrix, iqrTimes = 3) {
 
   populationMatrixDim <- dim(populationMatrix)
   beta_values <- populationMatrix[, 2:populationMatrixDim[2]]
