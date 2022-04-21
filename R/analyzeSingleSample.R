@@ -27,11 +27,11 @@ analyze_single_sample <- function(envir, values, sliding_window_size, thresholds
   mutation_annotated_sorted <- mutations_get(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
   mutation_annoated_sorted_to_save <- subset(mutation_annotated_sorted, mutation_annotated_sorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
 
-  message("############# SEARCH")
-  message("############# SEARCH",search())
-  message("############# LS",ls())
-  # browser()
-  message("############# envir$result_folderData:", envir$result_folderData)
+  # message("############# SEARCH")
+  # message("############# SEARCH",search())
+  # message("############# LS",ls())
+  # # browser()
+  # message("############# envir$result_folderData:", envir$result_folderData)
   folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
     dataToDump = mutation_annoated_sorted_to_save,

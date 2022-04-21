@@ -59,9 +59,9 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
  result["DELTA_VAR"] <- round(stats::var(deltas$DELTA),3)
  result["DELTA_MEDIAN"] <- round(stats::median(deltas$DELTA),3)
 
- message("############# SEARCH")
- message("############# SEARCH",search())
- message("############# LS",ls())
+ # message("############# SEARCH")
+ # message("############# SEARCH",search())
+ # message("############# LS",ls())
  # message("############# envir$result_folderData:", envir$result_folderData)
 
  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_METHYLATION"))
