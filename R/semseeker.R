@@ -3,7 +3,7 @@
 #'
 #' @param sample_sheet dataframe with at least a column Sample_ID to identify samples
 #' @param methylation_data matrix of methylation data
-#' @param bonferroni_threshold = 0.05 #threshold to define which pValue
+#' @param bonferroni_threshold = 0.05 #threshold to define which pValue adjusted to define an epilesion
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
 #' @param result_folder wherte the result will be saved

@@ -21,7 +21,7 @@ semseeker(
 
 \item{result_folder}{wherte the result will be saved}
 
-\item{bonferroni_threshold}{= 0.05 #threshold to define which pValue}
+\item{bonferroni_threshold}{= 0.05 #threshold to define which pValue adjusted to define an epilesion}
 
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 
