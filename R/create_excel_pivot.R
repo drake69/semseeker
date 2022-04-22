@@ -1,3 +1,4 @@
+#' @importFrom doRNG %dorng%
 create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
     HYPO <- NULL
@@ -32,7 +33,9 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
     # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
 
     envir$keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-    sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = c("sheetList"), .combine='c', .multicombine=TRUE ) %dopar%
+
+    toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList")
+    sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = toExport, .combine='c', .multicombine=TRUE ) %dorng%
     # for(i in 1:nrow(envir$keys))
       {
         # i <- 1

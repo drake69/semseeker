@@ -3,7 +3,7 @@ test_that("semeeker", {
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   envir <- init_env(tempFolder)
 
-  nitem <- 5^4
+  nitem <- 5^6
   nsamples <- 30
 
 
