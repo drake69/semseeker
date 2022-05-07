@@ -34,7 +34,7 @@ analyze_single_sample <- function(envir, values, sliding_window_size, thresholds
   # message("############# envir$result_folderData:", envir$result_folderData)
   folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
-    dataToDump = mutation_annoated_sorted_to_save,
+    data_to_dump = mutation_annoated_sorted_to_save,
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
   )
   result[paste("MUTATIONS_", figure, sep="")] <- if (!is.null(mutation_annoated_sorted_to_save)) dim(mutation_annoated_sorted_to_save)[1] else 0
@@ -42,7 +42,7 @@ analyze_single_sample <- function(envir, values, sliding_window_size, thresholds
   lesionWeighted <- lesions_get(bonferroni_threshold = bonferroni_threshold, sliding_window_size = sliding_window_size, grouping_column = "CHR", mutation_annotated_sorted = mutation_annotated_sorted)
   folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
-    dataToDump = lesionWeighted,
+    data_to_dump = lesionWeighted,
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed")
   )
 

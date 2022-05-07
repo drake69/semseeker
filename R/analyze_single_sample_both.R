@@ -39,7 +39,7 @@ analyze_single_sample_both <- function(envir, sample_detail) {
   fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
   # mutations$SAMPLEID <- mutations$Sample_ID
   dump_sample_as_bed_file(
-    dataToDump = mutations,
+    data_to_dump = mutations,
     fileName = fileName
   )
 
@@ -51,7 +51,7 @@ analyze_single_sample_both <- function(envir, sample_detail) {
   {
     # lesions$SAMPLEID <- sample_detail$Sample_ID
     dump_sample_as_bed_file(
-      dataToDump = lesions,
+      data_to_dump = lesions,
       fileName = fileName
     )
   }

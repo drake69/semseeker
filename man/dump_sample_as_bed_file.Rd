@@ -4,10 +4,10 @@
 \alias{dump_sample_as_bed_file}
 \title{given data and colnames dump as bed file}
 \usage{
-dump_sample_as_bed_file(dataToDump, fileName)
+dump_sample_as_bed_file(data_to_dump, fileName)
 }
 \arguments{
-\item{dataToDump}{data frame to dump into bed file with CHR, START, END}
+\item{data_to_dump}{data frame to dump into bed file with CHR, START, END}
 
 \item{fileName}{name of the file to save data in}
 }
