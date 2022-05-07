@@ -20,7 +20,7 @@ mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
   )
 
   mutation <- as.numeric(comparison(values, thresholds))
-  message(sampleName, " ", "Got probesOverThreshold ", Sys.time())
+  # message(sampleName, " ", "Got probesOverThreshold ", Sys.time())
 
   ### get mutation_annotated_sorted ################################################################################################
   if (!test_match_order(row.names(mutation), probe_features$PROBE)) {
@@ -41,6 +41,6 @@ mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
 
   result <- c("mutationCount" = sum(mutation_annotated_sorted$MUTATIONS), "lesionCount" = 0, "probesCount" = 0)
 
-  message(sampleName, " ", "Got mutation_annotated_sorted ", Sys.time())
+  # message(sampleName, " ", "Got mutation_annotated_sorted ", Sys.time())
   return(mutation_annotated_sorted)
 }

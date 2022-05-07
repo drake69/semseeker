@@ -11,11 +11,11 @@
 #'
 delta_single_sample <- function (envir, values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
 
- message(sample_detail$Sample_ID, " ", "DeltaSingleSample Sample analysis warmingUP ", Sys.time())
+ # message(sample_detail$Sample_ID, " ", "DeltaSingleSample Sample analysis warmingUP ", Sys.time())
  ### get probe_features ################################################################################################
 
- message(sample_detail$Sample_ID, " ", "DeltaSingleSample Sample analysis WarmedUP ...", Sys.time())
- message(sample_detail$Sample_ID, " ", "DeltaSingleSample Start sample analyze ", Sys.time())
+ # message(sample_detail$Sample_ID, " ", "DeltaSingleSample Sample analysis WarmedUP ...", Sys.time())
+ # message(sample_detail$Sample_ID, " ", "DeltaSingleSample Start sample analyze ", Sys.time())
 
  ### get probesOverThreshold ################################################################################################
  if (!test_match_order(row.names(values), probe_features$PROBE)) {
@@ -35,7 +35,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
  mutation <- data.frame("MUTATIONS"= (mutation_below & mutation_above), row.names = probe_features$PROBE) # nolint
  colnames(mutation) <- "MUTATIONS"
 
- message(sample_detail$Sample_ID, " ", "Got outliers ", Sys.time())
+ # message(sample_detail$Sample_ID, " ", "Got outliers ", Sys.time())
 
  ### get deltas #########################################################
 
