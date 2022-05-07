@@ -15,14 +15,14 @@ analyze_single_sample <- function(envir, values, sliding_window_size, thresholds
 
   # browser()
   start_time_single_sample <- Sys.time()
-  message(sample_detail$Sample_ID, " ", "SingleSample Sample analysis warmingUP ", Sys.time())
+  # message(sample_detail$Sample_ID, " ", "SingleSample Sample analysis warmingUP ", Sys.time())
   result <- ""
   result <- result[-1]
 
   # colnames(values) <- "VALUE"
 
-  message(sample_detail$Sample_ID, " ", "SingleSample Sample analysis WarmedUP ...", Sys.time())
-  message(sample_detail$Sample_ID, " ", "SingleSample Start sample analyze ", Sys.time())
+  # message(sample_detail$Sample_ID, " ", "SingleSample Sample analysis WarmedUP ...", Sys.time())
+  # message(sample_detail$Sample_ID, " ", "SingleSample Start sample analyze ", Sys.time())
 
   mutation_annotated_sorted <- mutations_get(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
   mutation_annoated_sorted_to_save <- subset(mutation_annotated_sorted, mutation_annotated_sorted$MUTATIONS == 1)[, c("CHR", "START", "END")]

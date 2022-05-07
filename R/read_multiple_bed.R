@@ -21,7 +21,7 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
 
   # browser()
   fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(anomalyLabel),as.character(figureLable)),"bed")
-  message("read multiple bed file name", fileName)
+  # message("read multiple bed file name", fileName)
 
   if(!file.exists(fileName))
     return(NULL)
@@ -44,7 +44,7 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLEID", groupingColumnLabel))
 
   # output with column freq
-  message("multiple nrow data", nrow(sourceData))
+  # message("multiple nrow data", nrow(sourceData))
 
   if(nrow(sourceData)==0)
     return(NULL)
@@ -53,7 +53,7 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   sourceData$POPULATION <- as.factor(sourceData$POPULATION)
   sourceData$ANOMALY <- as.factor(sourceData$ANOMALY)
   sourceData$FIGURE <- as.factor(sourceData$FIGURE)
-  message("read multiple nrow data", nrow(sourceData))
+  # message("read multiple nrow data", nrow(sourceData))
   return(sourceData)
 
 }
