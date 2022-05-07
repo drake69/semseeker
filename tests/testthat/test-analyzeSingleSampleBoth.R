@@ -28,7 +28,7 @@
 #   mutations <- subset(mutations, MUTATIONS == 1)[, c("CHR", "START", "END")]
 #   folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", "HYPER", sep = "")))
 #   dump_sample_as_bed_file(
-#     dataToDump = mutations,
+#     data_to_dump = mutations,
 #     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS","HYPER"),"bed")
 #   )
 #

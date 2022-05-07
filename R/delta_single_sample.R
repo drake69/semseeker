@@ -65,6 +65,6 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
  # message("############# envir$result_folderData:", envir$result_folderData)
 
  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_METHYLATION"))
- dump_sample_as_bed_file(dataToDump = deltasAnnotatedSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
+ dump_sample_as_bed_file(data_to_dump = deltasAnnotatedSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","METHYLATION"),"bedgraph"))
  return(result)
 }
