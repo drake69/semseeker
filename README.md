@@ -4,9 +4,13 @@
 # semseeker
 
 <!-- badges: start -->
-[![](https://img.shields.io/badge/devel%20version-0.4.3-blue.svg)](https://github.com/drake69/semseeker)
+
+    #> ✓ Setting active project to '/Users/lcorsaro/Documents/Progetti_Sviluppo/
+    #> semseeker'
+
+[![](https://img.shields.io/badge/devel%20version-0.5.0-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
+[![](https://app.codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
 [![R build
 status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
@@ -74,7 +78,7 @@ This how to obtain the analyzed data:
 
     semseeker (sample_sheet = sample_sheet, 
             methylation_data = normalizedData,
-            result_folder = "~/semseeker_result/")
+            resultFolder = "~/semseeker_result/")
 
 # Complete Example
 
@@ -85,5 +89,5 @@ working example with data from Gene Expression Omnibus (GEO)
 
 -   the samplesheet dataframe should contain a column called
     Sample_Group, the admitted values are: Case, Control, Reference. if
-    you don't have the Refernce population you can duplicate the Control
+    you don0t have the Refernce population you can duplicate the Control
     population rows and use Reference in the Sample_Group column.
