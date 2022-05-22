@@ -41,6 +41,7 @@
   message(nrow(sp))
   message(nrow(sample_sheet))
   expect_true(nrow(sp)==nrow(sample_sheet))
+
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
   # unlink(tempFolder, recursive = TRUE)
