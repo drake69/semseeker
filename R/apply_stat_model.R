@@ -34,7 +34,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     if(depthAnalysis==2)
     {
       # #browser()
-      df_values <- as.numeric(f_values[, colnames(df_values) %in% c( independent_variable, "TOTAL") ])
+      df_values <- as.numeric(df_values[, colnames(df_values) %in% c( independent_variable, "TOTAL") ])
       df_colnames <- c( independent_variable, "TOTAL")
     }
   }
