@@ -15,7 +15,7 @@
 #' 3: genomic area: gene, body, gene tss1550, gene whole, gene tss200,  (includes 1 and 2)
 #' filter_p_value report after adjusting saves only significant nominal p-value
 #' @param result_folder where semseeker's results are stored, the root folder
-#' @param maxResources
+#' @param maxResources percentage of max system's resource to use
 #'
 #' @return
 #' @export
@@ -259,13 +259,13 @@ association_analysis <- function(inference_details,result_folder, maxResources)
 
             g_start <- 2 + length(covariates)
 
-            result_temp <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
+            result_temp_foreach <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
                                             logFolder= envir$logFolder, independent_variable, depth_analysis)
 
             # #browser()
             # n_adj <- iters - g_start
             # result <- rbind(result, result_temp)
-            result_temp
+            result_temp_foreach
           }
         }
       }

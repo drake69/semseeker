@@ -5,9 +5,6 @@
 
 <!-- badges: start -->
 
-    #> ✓ Setting active project to '/Users/lcorsaro/Documents/Progetti_Sviluppo/
-    #> semseeker'
-
 [![](https://img.shields.io/badge/devel%20version-0.5.0-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://app.codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker)
