@@ -50,7 +50,7 @@ methylation matrix to use for calculation using ChAMP:
 
     library(ChAMP)
     idat_folder <- "~/source_idat/"
-    resultFolder = "~/result/"
+    result_folder = "~/result/"
     myLoadN <- champ.load(directory = idat_folder,
                           method = "minfi",
                           methValue="B",
@@ -73,7 +73,7 @@ methylation matrix to use for calculation using ChAMP:
     myNormN<-champ.norm(beta=myLoadN$beta,
                         rgSet=myLoadN$rgSet,
                         mset=myLoadN$mset,
-                        resultsDir= resultFolder,
+                        resultsDir= result_folder,
                         method="SWAN",
                         plotBMIQ=FALSE,
                         arraytype="450K",
@@ -92,7 +92,7 @@ This how to obtain the analyzed data:
 
     semseeker (sample_sheet = sample_sheet, 
             methylation_data = normalizedData,
-            resultFolder = "~/semseeker_result/")
+            result_folder = "~/semseeker_result/")
 
 # Complete Example
 

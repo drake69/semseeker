@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![](https://img.shields.io/badge/devel%20version-0.5.0-blue.svg)](https://github.com/drake69/semseeker)
+[![](https://img.shields.io/badge/devel%20version-0.5.1-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://app.codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
@@ -33,7 +33,7 @@ methylation matrix to use for calculation using ChAMP:
 
     library(ChAMP)
     idat_folder <- "~/source_idat/"
-    resultFolder = "~/result/"
+    result_folder = "~/result/"
     myLoadN <- champ.load(directory = idat_folder,
                           method = "minfi",
                           methValue="B",
@@ -56,7 +56,7 @@ methylation matrix to use for calculation using ChAMP:
     myNormN<-champ.norm(beta=myLoadN$beta,
                         rgSet=myLoadN$rgSet,
                         mset=myLoadN$mset,
-                        resultsDir= resultFolder,
+                        resultsDir= result_folder,
                         method="SWAN",
                         plotBMIQ=FALSE,
                         arraytype="450K",
@@ -75,7 +75,7 @@ This how to obtain the analyzed data:
 
     semseeker (sample_sheet = sample_sheet, 
             methylation_data = normalizedData,
-            resultFolder = "~/semseeker_result/")
+            result_folder = "~/semseeker_result/")
 
 # Complete Example
 
