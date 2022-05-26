@@ -31,7 +31,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
   inference_details <- unique(inference_details)
   for(i in 1:nrow(inference_details))
   {
-    #browser()
+    ##browser()
     inference_detail <- inference_details[i,]
 
     filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
@@ -42,11 +42,11 @@ association_analysis <- function(inference_details,result_folder, maxResources)
     if( is.null(family_test) || length(family_test)==0)
     {
       message("Warning: one test family_test is missed! Skipped.")
-      #browser()
+      ##browser()
       next
     }
-    # browser()
-    transformation <- inference_detail$transformation
+    # #browser()
+    transformation <- as.character(inference_detail$transformation)
     if(is.null(transformation) | length(transformation)==0)
     {
       transformation <- NULL
@@ -56,7 +56,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
     if( is.null(independent_variable) || length(independent_variable)==0)
     {
       message("Warning: one indipendent variable is missed! Skipped.")
-      #browser()
+      ##browser()
       next
     }
 
@@ -83,7 +83,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
     if (!(independent_variable %in% colnames(study_summary)))
     {
       message(" This indipendent variabile:", independent_variable, " is missed! Skipping")
-      #browser()
+      ##browser()
       next
     }
 
@@ -159,7 +159,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
     if(!is.null(covariates) && !length(covariates)==0)
       study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
-    # #browser()
+    # ##browser()
 
     for(i in 1:nrow(keys))
     {
@@ -167,6 +167,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       # family_test <- "poisson"
       # transformation <- NULL
       g_start <- 2 + length(covariates)
+      #browser()
       result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
                                  key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis)
       result <- rbind(result, result_temp)
@@ -174,7 +175,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
 
     result <- result[order(result$PVALUEADJ),]
 
-    # #browser()
+    # ##browser()
     study_summaryToPlot <- study_summary
 
     if(independent_variable=="Sample_Group")
@@ -202,15 +203,15 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       grDevices::dev.off()
     }
 
-    #browser()
+    ##browser()
     if(depth_analysis >1)
     {
 
       keys <- envir$keys
-      # #browser()
+      # ##browser()
       # areas <- rbind(genes, islands, dmrs)
       nkeys <- dim(keys)[1]
-      # #browser()
+      # ##browser()
 
       # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_stat_model","file_path_build"))
       result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind) %dopar%
@@ -237,7 +238,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
             tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
             tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
 
-            # #browser()
+            # ##browser()
             tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
             tempDataFrame$POPULATION <- sample_names[, independent_variable]
             tempDataFrame[is.na(tempDataFrame)] <- 0
@@ -262,7 +263,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
             result_temp <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
                                             logFolder= envir$logFolder, independent_variable, depth_analysis)
 
-            # #browser()
+            # ##browser()
             # n_adj <- iters - g_start
             # result <- rbind(result, result_temp)
             result_temp
@@ -274,7 +275,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
     if(exists("result_temp_foreach"))
       result <- rbind(result, result_temp_foreach)
 
-    # browser()
+    # #browser()
     result <- unique(result)
     result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
 

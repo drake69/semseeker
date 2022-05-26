@@ -1,7 +1,9 @@
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independent_variable, depthAnalysis=3)
 {
-  # browser()
+  # #browser()
   # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
+  transformation <- as.character(transformation)
+  #browser()
 
   if(is.factor(tempDataFrame[, independent_variable]))
   {
@@ -31,13 +33,13 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     df_colnames <- c(df_colnames,"TOTAL")
     if(depthAnalysis==2)
     {
-      # browser()
-      df_values <- df_values[, colnames(df_values) %in% c( independent_variable, "TOTAL") ]
+      # #browser()
+      df_values <- as.numeric(f_values[, colnames(df_values) %in% c( independent_variable, "TOTAL") ])
       df_colnames <- c( independent_variable, "TOTAL")
     }
   }
 
-  # browser()
+  # #browser()
   if(family_test != "poisson")
     df_values <- df_values + 0.001
 
@@ -75,8 +77,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="t.test" & family_test!="poisson")
   {
-    independent_variableValues <- tempDataFrame[, independent_variable]
-    independent_variableValuesOrig <- tempDataFrame[, independent_variable]
+    independent_variableValues <- as.numeric(tempDataFrame[, independent_variable])
+    independent_variableValuesOrig <- as.numeric(tempDataFrame[, independent_variable])
     try(
       {
         independent_variableValues = switch(
@@ -102,13 +104,15 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   }
 
   tempDataFrame <- data.frame(df_head, df_values)
-  # browser()
+  # #browser()
   colnames(tempDataFrame) <- df_colnames
   cols <- colnames(tempDataFrame)
   iters <- length(cols)
 
   g <- 0
-  result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind) %dorng%
+  to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame", "independent_variable1stLevel", "independent_variable2ndLevel",
+                 "key", "transformation")
+  result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
   # for (g in g_start:iters)
   {
     #g <- 2
@@ -162,7 +166,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       sig.formula <- stats::as.formula(paste0(independent_variable,"~", covariates_model, sep=""))
     }
 
-    # browser()
+    # #browser()
     if(family_test=="binomial" | family_test=="poisson" | family_test=="wilcoxon" | family_test=="t.test")
     {
       bartlett_pvalue <- stats::bartlett.test( stats::as.formula(paste0(burdenValue,"~", independent_variable, sep="")), data= as.data.frame(tempDataFrame) )
@@ -185,7 +189,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
     if(grepl("quantreg", family_test))
     {
-      browser()
+      #browser()
       lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
       n_runs=strsplit(family_test,"_")[3]
       tau=strsplit(family_test,"_")[2]
@@ -196,26 +200,26 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
 
-      # ####browser()
+      # #####browser()
       boot_vector <- stats::na.omit(tt[,"independent_variable"])
       # boot.bca <- coxed::bca(boot_vector)
       boot.bca <- bca_pvalue_for_lqm(estimate = beta_full, boot_vector = boot_vector, model = model.x,working_data = tempDataFrame)
-      boot.result <- data.frame("Value"=beta_full,"Bias"="","Std. Error"="","Lower bound"=boot.bca[1],"Upper bound"=boot.bca[2],"Pr(>|t|)"=as.numeric(boot.bca[3]))
+      boot_result <- data.frame("Value"=beta_full,"Bias"="","Std. Error"="","Lower bound"=boot.bca[1],"Upper bound"=boot.bca[2],"Pr(>|t|)"=as.numeric(boot.bca[3]))
 
       # result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
-      pvalue <- boot.result[3]
+      pvalue <- boot_result[3]
     }
 
     if(family_test=="wilcoxon")
     {
-      result.w  <- stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
-      pvalue <- result.w$p.value
+      result_w  <- stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
+      pvalue <- result_w$p.value
     }
 
     if(family_test=="t.test")
     {
-      result.w  <-stats::t.test(sig.formula, data = as.data.frame(tempDataFrame))
-      pvalue <- result.w$p.value
+      result_w  <-stats::t.test(sig.formula, data = as.data.frame(tempDataFrame))
+      pvalue <- result_w$p.value
     }
 
     if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
@@ -227,7 +231,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
 
     pvalueadjusted <- pvalue
-    # browser()
+    # #browser()
     # beta <- exp(summary( result_glm )$coeff[-1, 1][1])
     # result_temp <-
 
@@ -265,7 +269,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       )
     } else
     {
-      # browser()
+      # #browser()
       dependentVariableData <- as.numeric(stats::na.omit(tempDataFrame[!is.na(tempDataFrame[,independent_variable]),burdenValue]))
       independent_variableData <- as.numeric(stats::na.omit(tempDataFrame[  ,independent_variable]))
       local_result <- data.frame (
@@ -305,7 +309,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     # {
     #   result_temp <- local_result
     # }
-    result_temp
+    local_result
   }
 
   result_temp <- unique(result_temp)

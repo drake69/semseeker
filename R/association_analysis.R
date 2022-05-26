@@ -169,6 +169,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       g_start <- 2 + length(covariates)
       result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
                                  key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis)
+      browser()
       result <- rbind(result, result_temp)
     }
 
@@ -259,13 +260,13 @@ association_analysis <- function(inference_details,result_folder, maxResources)
 
             g_start <- 2 + length(covariates)
 
-            result_temp_foreach <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
+            result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
                                             logFolder= envir$logFolder, independent_variable, depth_analysis)
 
             # #browser()
             # n_adj <- iters - g_start
             # result <- rbind(result, result_temp)
-            result_temp_foreach
+            result_temp_local
           }
         }
       }
