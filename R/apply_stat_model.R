@@ -110,8 +110,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   iters <- length(cols)
 
   g <- 0
-  to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame", "independent_variable1stLevel", "independent_variable2ndLevel",
-                 "key", "transformation")
+  to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
+                 "independent_variable1stLevel", "independent_variable2ndLevel",
+                 "key", "transformation","bca_pvalue_for_lqm")
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
   # for (g in g_start:iters)
   {
@@ -169,7 +170,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     # #browser()
     if(family_test=="binomial" | family_test=="poisson" | family_test=="wilcoxon" | family_test=="t.test")
     {
-      bartlett_pvalue <- stats::bartlett.test( stats::as.formula(paste0(burdenValue,"~", independent_variable, sep="")), data= as.data.frame(tempDataFrame) )
+      bartlett_pvalue <- stats::bartlett.test( stats::as.formula(paste0(burdenValue,"~", independent_variable, sep="")),
+                                               data= as.data.frame(tempDataFrame) )
     }
 
     if(family_test=="gaussian" | family_test=="spearman" | family_test=="kendall" | family_test=="pearson")
