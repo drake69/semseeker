@@ -19,7 +19,7 @@ semseeker(
 
 \item{methylation_data}{matrix of methylation data}
 
-\item{result_folder}{wherte the result will be saved}
+\item{result_folder}{where the result will be saved}
 
 \item{bonferroni_threshold}{= 0.05 #threshold to define which pValue adjusted to define an epilesion}
 
