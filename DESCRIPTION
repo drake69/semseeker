@@ -29,6 +29,7 @@ Imports:
     R.utils,
     rlang,
     stats,
+    stringi,
     utils,
     withr,
     zoo
