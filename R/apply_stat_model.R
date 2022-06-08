@@ -66,7 +66,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   if(grepl("quantile", transformation))
   {
-    qq <- strsplit(transformation,"_")[2]
+    qq <- unsplit(strsplit(as.character(transformation),"_"))[2]
     df_values_temp <- as.data.frame(apply( df_values,2,function(x) ggplot2::cut_number(x, n=qq)))
     colnames(df_values_temp) <- colnames(df_values)
   }
@@ -191,25 +191,47 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
     if(grepl("quantreg", family_test))
     {
-      #browser()
+      # browser()
+      if(is.null(covariates) || length(covariates)==0)
+      {
+        covariates_model <- independent_variable
+      } else
+      {
+        covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
+      }
+      sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
       lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
-      n_runs=strsplit(family_test,"_")[3]
-      tau=strsplit(family_test,"_")[2]
+      quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
+      n_permutations <- as.numeric(quantreg_params[3])
+      tau <- as.numeric(quantreg_params[2])
       model.x <-  lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control)
-      model.x.boot <- lqmm::boot(model.x, R = n_runs)
+      if(n_permutations > 1000)
+      {
+        model.x.boot <- lqmm::boot(model.x, R = 1000)
+        beta_full <- summary(model.x.boot)[independent_variable,"Value"]
+        tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
+        colnames(tt) <- colnames(model.x.boot)
+        boot_vector <- stats::na.omit(tt[,independent_variable])
+        boot.bca <- bca_pvalue_for_lqm(estimate = beta_full, boot_vector = boot_vector, model = model.x, n_elements = nrow(tempDataFrame))
+      }
 
-      beta_full <- summary(model.x.boot)["independent_variable","Value"]
-      tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
-      colnames(tt) <- colnames(model.x.boot)
+      if(boot.bca[1]<0 & boot.bca[2]>0)
+      {
+        n_permutations <- 1000
+      }
+      else
+      {
+        model.x.boot <- lqmm::boot(model.x, R = n_permutations)
+        beta_full <- summary(model.x.boot)[independent_variable,"Value"]
+        tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
+        colnames(tt) <- colnames(model.x.boot)
+        boot_vector <- stats::na.omit(tt[,independent_variable])
+        boot.bca <- bca_pvalue_for_lqm(estimate = beta_full, boot_vector = boot_vector, model = model.x, n_elements = nrow(tempDataFrame))
+      }
 
-      # #####browser()
-      boot_vector <- stats::na.omit(tt[,"independent_variable"])
-      # boot.bca <- coxed::bca(boot_vector)
-      boot.bca <- bca_pvalue_for_lqm(estimate = beta_full, boot_vector = boot_vector, model = model.x,working_data = tempDataFrame)
-      boot_result <- data.frame("Value"=beta_full,"Bias"="","Std. Error"="","Lower bound"=boot.bca[1],"Upper bound"=boot.bca[2],"Pr(>|t|)"=as.numeric(boot.bca[3]))
-
-      # result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
-      pvalue <- boot_result[3]
+      ci.lower <- boot.bca[1]
+      ci.upper <- boot.bca[2]
+      pvalue <- boot.bca[3]
     }
 
     if(family_test=="wilcoxon")
@@ -233,11 +255,11 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
 
     pvalueadjusted <- pvalue
-    # #browser()
+    # browser()
     # beta <- exp(summary( result_glm )$coeff[-1, 1][1])
     # result_temp <-
 
-    if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" & family_test!="kendall")
+    if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" & family_test!="kendall" & !grepl("quantreg",family_test))
     {
       independent_variableData1stLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable1stLevel ,burdenValue])
       independent_variableData2ndLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable2ndLevel,burdenValue])
@@ -267,7 +289,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "COUNT.CONTROL"=length(stats::na.omit(independent_variableData2ndLevel)),
         "MEAN.CONTROL"=round(mean(independent_variableData2ndLevel),3),
         "SD.CONTROL"= round(stats::sd(independent_variableData2ndLevel),3),
-        "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA
+        "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
+        "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
+        "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
+        "n.PERMUTATIONS" =  NA
       )
     } else
     {
@@ -300,7 +325,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "COUNT.CONTROL"=length(dependentVariableData),
         "MEAN.CONTROL"=round(mean(dependentVariableData),3),
         "SD.CONTROL"= round(stats::sd(dependentVariableData),3),
-        "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA
+        "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
+        "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
+        "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
+        if(exists("n_permutations")) n_permutations else NA
       )
     }
     # if (exists("result_temp"))
@@ -315,7 +343,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   }
 
   result_temp <- unique(result_temp)
-
 
   result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
   result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
