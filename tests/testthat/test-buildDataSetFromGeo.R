@@ -8,5 +8,4 @@ test_that("build_data_set_from_geo", {
 
   expect_true(file.exists(file.path(tempFolder,"/203048410118_R03C01_Red.idat")))
 
-}
-)
+})
