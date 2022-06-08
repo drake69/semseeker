@@ -70,7 +70,8 @@ association_analysis <- function(inference_details,result_folder, maxResources)
     study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
 
     # transform independent variable as factor
-    study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
+    if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="t.test")
+      study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
 
     result_folderPivot <- dir_check_and_create(envir$result_folderData,"Pivots")
 
@@ -130,7 +131,9 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       "COUNT.CONTROL"="",
       "MEAN.CONTROL"="",
       "SD.CONTROL"="",
-      "RHO"=""
+      "RHO"="",
+      "CI.LOWER"="",
+      "CI.UPPER"=""
     )
     result <- result[-1,]
 
@@ -169,7 +172,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       g_start <- 2 + length(covariates)
       result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
                                  key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis)
-      browser()
+      # browser()
       result <- rbind(result, result_temp)
     }
 
@@ -203,19 +206,21 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       grDevices::dev.off()
     }
 
-    #browser()
+    browser()
     if(depth_analysis >1)
     {
 
-      keys <- envir$keys
+      keys <- envir$keys_anomalies_figures_areas
       # #browser()
       # areas <- rbind(genes, islands, dmrs)
-      nkeys <- dim(keys)[1]
+      nkeys <- nrow(keys)
       # #browser()
 
       # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_stat_model","file_path_build"))
-      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind) %dopar%
-      # for (i in 1:nkeys)
+      to_export <- c("keys", "file_path_build", "result_folderPivot", "sample_names", "independent_variable", "covariates", "apply_stat_model", "family_test", "transformation", "envir", "depth_analysis")
+
+      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = to_export) %dopar%
+      for (i in 1:nkeys)
       {
         # i <- 25
         if(exists("tempDataFrame"))
