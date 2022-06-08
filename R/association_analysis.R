@@ -267,7 +267,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
             g_start <- 2 + length(covariates)
 
             result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
-                                            logFolder= envir$logFolder, independent_variable, depth_analysis)
+                                            logFolder= envir$logFolder, independent_variable =  independent_variable, depth_analysis = depth_analysis)
 
             # #browser()
             # n_adj <- iters - g_start
