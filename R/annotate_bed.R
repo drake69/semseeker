@@ -59,7 +59,7 @@ annotate_bed <- function (
   variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel", "groupingColumnLabel")
 
   # for(i in 1:nrow(envir$keysLocal))
-  final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dopar%
+  final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
   {
     anomal <- envir$keysLocal[i,"ANOMALY"]
     pop <- envir$keysLocal[i,"POPULATION"]
