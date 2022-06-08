@@ -1,4 +1,4 @@
-apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independent_variable, depthAnalysis=3)
+apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independent_variable, depth_analysis=3)
 {
   # #browser()
   # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
@@ -19,47 +19,51 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # }
 
 
-  df_head <- tempDataFrame[,1:(g_start-1)]
-  df_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)
+  independent_variables <- tempDataFrame[,1:(g_start-1)]
+  burden_values <- as.data.frame(sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric))
 
   if( ncol(tempDataFrame) - g_start  > 1) {
-    df_values <- df_values[, colSums(df_values) > 0]
+    burden_values <- burden_values[, colSums(burden_values) > 0]
   }
 
   df_colnames <- colnames(tempDataFrame)
-  if( !is.null(dim(df_values))  & dototal) {
-    sum_area <- apply(df_values, 1, sum)
-    df_values <- data.frame(df_values,"TOTAL"=sum_area)
-    df_colnames <- c(df_colnames,"TOTAL")
-    if(depthAnalysis==2)
+  if( !is.null(dim(burden_values))  & dototal) {
+    browser()
+    sum_area <- apply(burden_values, 1, sum)
+    if(depth_analysis==2)
     {
-      # #browser()
-      df_values <- as.numeric(df_values[, colnames(df_values) %in% c( independent_variable, "TOTAL") ])
-      df_colnames <- c( independent_variable, "TOTAL")
+      #select just column of independent variables, remove columns burden value, preserve only total
+      df_colnames <- c(df_colnames[!(df_colnames %in% colnames(burden_values))],"TOTAL")
+      burden_values <- data.frame("TOTAL"=sum_area)
+    }
+    else
+    {
+      burden_values <- data.frame(burden_values,"TOTAL"=sum_area)
+      df_colnames <- c(df_colnames,"TOTAL")
     }
   }
 
   # #browser()
   if(family_test != "poisson")
-    df_values <- df_values + 0.001
+    burden_values <- burden_values + 0.001
 
   transformation <- as.character(transformation)
   if(is.null(transformation) | length(transformation)==0 | is.na(transformation))
     transformation <- "none"
 
-  df_values_orig <- df_values
+  df_values_orig <- burden_values
   try(
     {
-      df_values = switch(
+      burden_values = switch(
         as.character(transformation),
-        "scale" = scale(df_values),
-        "log" = log(df_values),
-        "log2" = log2(df_values),
-        "log10"= log10(df_values),
-        "exp" = exp(df_values),
-        "johnson" =  Johnson::RE.Johnson(df_values)$transformed,
-        "none" = df_values,
-        df_values
+        "scale" = as.data.frame(apply(burden_values,2,scale)),
+        "log" = log(burden_values),
+        "log2" = log2(burden_values),
+        "log10"= log10(burden_values),
+        "exp" = exp(burden_values),
+        "johnson" =  Johnson::RE.Johnson(burden_values)$transformed,
+        "none" = burden_values,
+        burden_values
       )
     }
   )
@@ -67,23 +71,23 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   if(grepl("quantile", transformation))
   {
     qq <- unsplit(strsplit(as.character(transformation),"_"))[2]
-    df_values_temp <- as.data.frame(apply( df_values,2,function(x) ggplot2::cut_number(x, n=qq)))
-    colnames(df_values_temp) <- colnames(df_values)
+    df_values_temp <- as.data.frame(apply( burden_values,2,function(x) ggplot2::cut_number(x, n=qq)))
+    colnames(df_values_temp) <- colnames(burden_values)
   }
 
-  if(setequal(df_values,df_values_orig) & transformation !="none")
+  if(setequal(burden_values,df_values_orig) & transformation !="none")
     transformation <- paste0("NA_", transformation, sep="")
 
 
   if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="t.test" & family_test!="poisson")
   {
-    independent_variableValues <- as.numeric(tempDataFrame[, independent_variable])
-    independent_variableValuesOrig <- as.numeric(tempDataFrame[, independent_variable])
+    independent_variableValues <- as.data.frame(as.numeric(tempDataFrame[, independent_variable]))
+    independent_variableValuesOrig <- as.data.frame(as.numeric(tempDataFrame[, independent_variable]))
     try(
       {
         independent_variableValues = switch(
           as.character(transformation),
-          "scale" = scale(independent_variableValues),
+          "scale" = as.data.frame(apply(independent_variableValues,2,scale)),
           "log" = log(independent_variableValues),
           "log2" = log2(independent_variableValues),
           "log10"= log10(independent_variableValues),
@@ -95,7 +99,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       }
     )
 
-    if(setequal(df_values,df_values_orig) & transformation !="none")
+    if(setequal(burden_values,df_values_orig) & transformation !="none")
       transformation <- paste0("NA_", transformation, sep="")
     else
     {
@@ -103,8 +107,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       }
   }
 
-  tempDataFrame <- data.frame(df_head, df_values)
-  # #browser()
+  tempDataFrame <- data.frame(independent_variables, burden_values)
+  # browser()
   colnames(tempDataFrame) <- df_colnames
   cols <- colnames(tempDataFrame)
   iters <- length(cols)
@@ -176,6 +180,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
     if(family_test=="gaussian" | family_test=="spearman" | family_test=="kendall" | family_test=="pearson")
     {
+      # browser()
       localDataFrame <- data.frame("depVar"=tempDataFrame[, burdenValue],"indepVar"=1 )
       localDataFrame <- rbind( localDataFrame,  data.frame("depVar"=tempDataFrame[, independent_variable],"indepVar"=2 ))
       bartlett_pvalue <- stats::bartlett.test( stats::as.formula("depVar ~ indepVar"), data= localDataFrame )
@@ -202,12 +207,14 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
       lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
       quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
-      n_permutations <- as.numeric(quantreg_params[3])
+      n_permutations_test <- as.numeric(quantreg_params[3])
+      n_permutations <- as.numeric(quantreg_params[4])
       tau <- as.numeric(quantreg_params[2])
+
       model.x <-  lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control)
-      if(n_permutations > 1000)
+      if(n_permutations > n_permutations_test)
       {
-        model.x.boot <- lqmm::boot(model.x, R = 1000)
+        model.x.boot <- lqmm::boot(model.x, R = n_permutations_test)
         beta_full <- summary(model.x.boot)[independent_variable,"Value"]
         tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
         colnames(tt) <- colnames(model.x.boot)
@@ -217,7 +224,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       if(boot.bca[1]<0 & boot.bca[2]>0)
       {
-        n_permutations <- 1000
+        n_permutations <- n_permutations_test
       }
       else
       {
