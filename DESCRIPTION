@@ -1,10 +1,10 @@
 Package: semseeker
 Type: Package
-Title: Calculate Stochastic Epimutations SEM
-Version: 0.5.2
+Title: Stochastic Epimutations SEM Seeker
+Version: 0.5.3
 Author: Luigi Corsaro, Davide Gentilini, Lucio Calzari, Davide Sacco
 Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
-Description: Find epimutaion and epilesion inside methylation dataset.
+Description: Stochastic epimutationa nd enriched region upstream and downstream tool.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
