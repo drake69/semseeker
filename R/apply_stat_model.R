@@ -292,7 +292,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
         "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
         "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
-        "n.PERMUTATIONS" =  NA
+        "N.PERMUTATIONS" =  NA
       )
     } else
     {
@@ -328,7 +328,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
         "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
         "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
-        if(exists("n_permutations")) n_permutations else NA
+        "N.PERMUTATIONS" = if(exists("n_permutations")) n_permutations else NA
       )
     }
     # if (exists("result_temp"))
