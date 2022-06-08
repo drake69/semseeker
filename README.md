@@ -79,7 +79,7 @@ This how to obtain the analyzed data:
 
 # Complete Example
 
-Look in to the example folder of the repository to seea complete and
+Look in to the example folder of the repository to see a complete and
 working example with data from Gene Expression Omnibus (GEO)
 
 # Input requirements
