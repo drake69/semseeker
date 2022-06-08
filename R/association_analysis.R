@@ -133,7 +133,8 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       "SD.CONTROL"="",
       "RHO"="",
       "CI.LOWER"="",
-      "CI.UPPER"=""
+      "CI.UPPER"="",
+      "N.PERMUTATIONS" =""
     )
     result <- result[-1,]
 
@@ -206,7 +207,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       grDevices::dev.off()
     }
 
-    browser()
+    # browser()
     if(depth_analysis >1)
     {
 
