@@ -1,4 +1,4 @@
-#' @importFrom doRNG %dorng%
+#' @importFrom foreach %dopar%
 create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
     HYPO <- NULL
@@ -35,7 +35,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
     envir$keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
 
     toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList")
-    sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = toExport, .combine='c', .multicombine=TRUE ) %dorng%
+    sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = toExport, .combine='c', .multicombine=TRUE ) %dopar%
     # for(i in 1:nrow(envir$keys))
       {
         # i <- 1
