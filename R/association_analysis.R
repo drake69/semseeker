@@ -218,7 +218,8 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       # #browser()
 
       # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_stat_model","file_path_build"))
-      to_export <- c("keys", "file_path_build", "result_folderPivot", "sample_names", "independent_variable", "covariates", "apply_stat_model", "family_test", "transformation", "envir", "depth_analysis")
+      to_export <- c("keys", "file_path_build", "result_folderPivot", "sample_names", "independent_variable", "covariates", "apply_stat_model", "family_test",
+                     "transformation", "envir", "depth_analysis","BCApval")
 
       result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = to_export) %dorng%
       # for (i in 1:nkeys)

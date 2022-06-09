@@ -44,43 +44,150 @@ bca_pvalue_for_lqm <-
 
 
 
-# BCApval<-function(boot_vector, estimate, working_data){
-#
-#   alpha_seq <- seq(1e-16, 1-1e-16, 5e-6)
-#   #BCA method
-#   #Desired quantiles
-#
-#   u <- cbind(alpha_seq/2, 1-alpha_seq/2)
-#
-#   #Compute constants
-#   z0 <- qnorm(mean(boot_vector <= estimate))
-#   zu <- qnorm(u)
-#
-#   group_all <- working_data$soggetto
-#   group_unique <- unique(group_all)
-#
-#   n<-length(group_unique)
-#   I <- rep(NA, n)
-#   i<-1
-#   for(i in 1:n){
-#     #Remove ith working_data point
-#     xnew <- working_data[-which(working_data$soggetto==group_unique[i]),]
-#
-#     #Estimate beta dal modello
-#     rqrja <- quantreg(modello)
-#
-#     I[i] <- (n-1)*(estimate -  rqrja$beta)
-#   }
-#   #Estimate a
-#   a <- (sum(I^3)/sum(I^2)^1.5)/6
-#
-#   #Adjusted quantiles
-#   u_adjusted <- pnorm(z0 + (z0+zu)/(1-a*(z0+zu)))
-#
-#   #Accelerated Bootstrap CI
-#   Bca1<-quantile(boot_vector, u_adjusted[,1])
-#   Bca2<-quantile(boot_vector, u_adjusted[,2])
-#   Bca<-cbind(Bca1,Bca2)
-#   pval <- alpha_seq[which.min(0 >= Bca[,1] & 0 <= Bca[,2])]
-#   return(pval)
-# }
+BCApval<-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable){
+
+  lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
+  alpha_seq <- seq(1e-16, 1-1e-16, 5e-6)
+  #BCA method
+  #Desired quantiles
+
+  u <- cbind(alpha_seq/2, 1-alpha_seq/2)
+
+  #Compute constants
+  z0 <- qnorm(mean(boot_vector <= estimate))
+  zu <- qnorm(u)
+
+  # browser()
+  n<-nrow(working_data)
+  I <- rep(NA, n)
+  i<-1
+  for(i in 1:n){
+    #Remove ith working_data point
+    xnew <- working_data[-i,]
+
+    #Estimate beta dal modello
+    fit.lqm <- lqmm::lqm( formula = sig.formula, data = xnew, tau = tau, control = lqm_control, fit = TRUE)
+    fit.res <- summary(fit.lqm)$tTable
+
+    I[i] <- (n-1)*(estimate -   fit.res[independent_variable,"Value"])
+  }
+  #Estimate a
+  a <- (sum(I^3)/sum(I^2)^1.5)/6
+
+  #Adjusted quantiles
+  u_adjusted <- pnorm(z0 + (z0+zu)/(1-a*(z0+zu)))
+
+  #Accelerated Bootstrap CI
+  Bca1<-quantile(boot_vector, u_adjusted[,1])
+  Bca2<-quantile(boot_vector, u_adjusted[,2])
+  Bca<-cbind(Bca1,Bca2)
+  pval <- alpha_seq[which.min(0 >= Bca[,1] & 0 <= Bca[,2])]
+  if(pval==0)
+    pval <- 1/( 1 + length(boot_vector))
+
+  boot.bca <- coxed::bca(na.omit(boot_vector))
+  return(c(boot.bca, pval))
+}
+
+
+
+
+semseeker_lqmm<-function(  covariates, independent_variable,burdenValue,family_test,tempDataFrame ){
+
+  # browser()
+  if(is.null(covariates) || length(covariates)==0)
+  {
+    covariates_model <- independent_variable
+  } else
+  {
+    covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
+  }
+  sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+  lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
+  quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
+  n_permutations_test <- as.numeric(quantreg_params[3])
+  n_permutations <- as.numeric(quantreg_params[4])
+  tau <- as.numeric(quantreg_params[2])
+
+####################
+
+  alpha_seq <- seq(1e-16, 1-1e-16, 5e-6)
+  #BCA method
+  #Desired quantiles
+
+  u <- cbind(alpha_seq/2, 1-alpha_seq/2)
+
+  #Compute constants
+  z0 <- qnorm(mean(boot_vector <= estimate))
+  zu <- qnorm(u)
+
+  group_all <- working_data$soggetto
+  group_unique <- unique(group_all)
+
+  n<-length(group_unique)
+  I <- rep(NA, n)
+  i<-1
+  for(i in 1:n){
+    #Remove ith working_data point
+    xnew <- working_data[-which(working_data$soggetto==group_unique[i]),]
+    fit.lqm <- lqmm::lqm(model, data = working_data, tau = tau, control = list(verbose = FALSE, loop_tol_ll = 1e-9), fit = TRUE)
+    I[i] <- (n-1)*(estimate -   summary(fit.lqm)[independent_variable,"Value"])
+  }
+  #Estimate a
+  a <- (sum(I^3)/sum(I^2)^1.5)/6
+
+  #Adjusted quantiles
+  u_adjusted <- pnorm(z0 + (z0+zu)/(1-a*(z0+zu)))
+
+##########################
+
+  model.x <-  lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control)
+  if(n_permutations > n_permutations_test)
+  {
+    model.x.boot <- lqmm::boot(model.x, R = n_permutations_test)
+    beta_full <- summary(model.x.boot)[independent_variable,"Value"]
+    tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
+    colnames(tt) <- colnames(model.x.boot)
+    boot_vector <- stats::na.omit(tt[,independent_variable])
+  }
+
+  #Accelerated Bootstrap CI
+  boot.bca[1]<-quantile(boot_vector, u_adjusted[,1])
+  boot.bca[2]<-quantile(boot_vector, u_adjusted[,2])
+  boot.bca<-cbind(boot.bca[1],boot.bca[2])
+
+  if(boot.bca[1]<0 & boot.bca[2]>0)
+  {
+    n_permutations <- n_permutations_test
+  }
+  else
+  {
+    model.x.boot <- lqmm::boot(model.x, R = n_permutations)
+    beta_full <- summary(model.x.boot)[independent_variable,"Value"]
+    tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
+    colnames(tt) <- colnames(model.x.boot)
+    boot_vector <- stats::na.omit(tt[,independent_variable])
+  }
+
+  #Accelerated Bootstrap CI
+  boot.bca[1]<-quantile(boot_vector, u_adjusted[,1])
+  boot.bca[2]<-quantile(boot_vector, u_adjusted[,2])
+  Bca<-cbind(boot.bca[1],boot.bca[2])
+  pval <- alpha_seq[which.min(0 >= Bca[,1] & 0 <= Bca[,2])]
+  if(pval==0)
+    pval <- 1/( 1 + nrow(tempDataFrame))
+  return(pval)
+
+}
+
+
+
+
+set.seed(123)
+n <- 500
+p <- 1:3/4
+test <- data.frame(x = runif(n,0,1))
+test$y <- 30 + test$x + rnorm(n)
+fit.lqm <- lqmm::lqm(y ~ x, data = test, tau = p,
+               control = list(verbose = FALSE, loop_tol_ll = 1e-9), fit = TRUE)
+summary(fit.lqm)

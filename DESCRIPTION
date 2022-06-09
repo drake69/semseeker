@@ -1,7 +1,7 @@
 Package: semseeker
 Type: Package
 Title: Stochastic Epimutations SEM Seeker
-Version: 0.5.4
+Version: 0.5.5
 Author: Luigi Corsaro, Davide Gentilini, Lucio Calzari, Davide Sacco
 Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
 Description: Stochastic epimutationa nd enriched region upstream and downstream tool.

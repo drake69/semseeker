@@ -28,7 +28,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   df_colnames <- colnames(tempDataFrame)
   if( !is.null(dim(burden_values))  & dototal) {
-    browser()
+    # browser()
     sum_area <- apply(burden_values, 1, sum)
     if(depth_analysis==2)
     {
@@ -116,7 +116,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   g <- 0
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
                  "independent_variable1stLevel", "independent_variable2ndLevel",
-                 "key", "transformation","bca_pvalue_for_lqm")
+                 "key", "transformation","BCApval")
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
   # for (g in g_start:iters)
   {
@@ -219,7 +219,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
         colnames(tt) <- colnames(model.x.boot)
         boot_vector <- stats::na.omit(tt[,independent_variable])
-        boot.bca <- bca_pvalue_for_lqm(estimate = beta_full, boot_vector = boot_vector, model = model.x, n_elements = nrow(tempDataFrame))
+        boot.bca <- BCApval(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable)
       }
 
       if(boot.bca[1]<0 & boot.bca[2]>0)
@@ -233,7 +233,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
         colnames(tt) <- colnames(model.x.boot)
         boot_vector <- stats::na.omit(tt[,independent_variable])
-        boot.bca <- bca_pvalue_for_lqm(estimate = beta_full, boot_vector = boot_vector, model = model.x, n_elements = nrow(tempDataFrame))
+        boot.bca <- BCApval(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable)
       }
 
       ci.lower <- boot.bca[1]
