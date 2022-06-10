@@ -8,7 +8,7 @@
 #' @param groupColumnIDs positions of the group coplumn id
 #'
 #' @return list of pivot by column identified with groupLabel and by Sample
-#' @importFrom foreach %dopar%
+#' @importFrom doRNG %dorng%
 create_heatmap <-
   function(envir, inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
@@ -44,7 +44,7 @@ create_heatmap <-
 
     variables_to_export <- c("anomalies", "inputBedDataFrame", "pops", "groupLabel", "chartFolder")
     g <- 0
-    foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dopar%
+    foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dorng%
       # for(g in 1:length(anomalies))
       # for (anomaly in anomalies)
       {

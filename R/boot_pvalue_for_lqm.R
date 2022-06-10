@@ -10,7 +10,7 @@
 #
 #     if(stats::shapiro.test(na.omit(boot_vector))$p.value > 0.05)
 #     {
-#       #boot vector is a normal distribution
+#       #boot vector is acceleration normal distribution
 #       standard_error <- stats::sd(boot_vector, na.rm = T)
 #       mean_boot_vector <- mean(boot_vector, na.rm = T)
 #       bias <- estimate - mean_boot_vector
@@ -71,26 +71,25 @@ BCApval<-function(boot_vector, estimate, working_data, sig.formula, tau, indepen
 
     I[i] <- (n-1)*(estimate -   fit.res[independent_variable,"Value"])
   }
-  #Estimate a
-  a <- (sum(I^3)/sum(I^2)^1.5)/6
+  #Estimate acceleration
+  acceleration <- (sum(I^3)/sum(I^2)^1.5)/6
 
   #Adjusted quantiles
-  u_adjusted <- stats::pnorm(z0 + (z0+zu)/(1-a*(z0+zu)))
+  u_adjusted <- stats::pnorm(z0 + (z0+zu)/(1-acceleration*(z0+zu)))
 
   #Accelerated Bootstrap CI
   Bca1<-stats::quantile(boot_vector, u_adjusted[,1])
   Bca2<-stats::quantile(boot_vector, u_adjusted[,2])
   Bca<-cbind(Bca1,Bca2)
   selector <- which.min(0 >= Bca[,1] & 0 <= Bca[,2])
-  upper <-Bca2[selector]
-  lower <- Bca1[selector]
   pval <- alpha_seq[selector]
   if(pval==0)
     pval <- 1/( 1 + length(boot_vector))
-  return(c(lower,upper, pval))
+
+  u_adjusted_at_desidered_alpha <- u_adjusted[which(alpha_seq==0.05)]
+  bca_ci <- stats::quantile(boot_vector, u_adjusted_at_desidered_alpha)
+  return(c(bca_ci, pval))
 }
-
-
 
 
 # semseeker_lqmm<-function(  covariates, independent_variable,burdenValue,family_test,tempDataFrame ){
@@ -134,11 +133,11 @@ BCApval<-function(boot_vector, estimate, working_data, sig.formula, tau, indepen
 #     fit.lqm <- lqmm::lqm(model, data = working_data, tau = tau, control = list(verbose = FALSE, loop_tol_ll = 1e-9), fit = TRUE)
 #     I[i] <- (n-1)*(estimate -   summary(fit.lqm)[independent_variable,"Value"])
 #   }
-#   #Estimate a
-#   a <- (sum(I^3)/sum(I^2)^1.5)/6
+#   #Estimate acceleration
+#   acceleration <- (sum(I^3)/sum(I^2)^1.5)/6
 #
 #   #Adjusted quantiles
-#   u_adjusted <- pnorm(z0 + (z0+zu)/(1-a*(z0+zu)))
+#   u_adjusted <- pnorm(z0 + (z0+zu)/(1-acceleration*(z0+zu)))
 #
 # ##########################
 #
