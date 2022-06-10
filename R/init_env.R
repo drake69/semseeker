@@ -44,7 +44,7 @@ init_env <- function(result_folder, maxResources = 90)
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
   ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
-  ssEnv$logFolder <-  dir_check_and_create("/tmp",c("semseeker","log"))
+  ssEnv$logFolder <-  dir_check_and_create("/tmp",c("semseeker", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")))
   foreachIndex <- 0
 
   # print(outFile)
