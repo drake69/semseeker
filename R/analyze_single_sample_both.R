@@ -10,26 +10,26 @@ analyze_single_sample_both <- function(envir, sample_detail) {
 
   for( figure in envir$keys_figures)
   {
-    if(figure=="BOTH")
-      next
-    folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
-    if(file.exists(fileName))
+    if (figure!="BOTH")
     {
-      # browser()
-      mutationsTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
-      mutations <- rbind(mutations, mutationsTemp )
-    }
+      folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+      fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
+      if(file.exists(fileName))
+      {
+        # browser()
+        mutationsTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
+        mutations <- rbind(mutations, mutationsTemp )
+      }
 
-    folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed")
-    if(file.exists(fileName))
-    {
-      # browser()
-      lesionsTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
-      lesions <- rbind(lesions, lesionsTemp )
+      folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+      fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed")
+      if(file.exists(fileName))
+      {
+        # browser()
+        lesionsTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
+        lesions <- rbind(lesions, lesionsTemp )
+      }
     }
-
   }
   mutations <- mutations[-1,]
   lesions <- lesions[-1,]
