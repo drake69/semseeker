@@ -1,45 +1,45 @@
-bca_pvalue_for_lqm <-
-  function(estimate,
-           boot_vector,
-           model,
-           n_elements)
-  {
-    # browser()
-    # boot.bca <- coxed::bca(na.omit(boot_vector))
-    # p_value <- boot.p_value::boot.p_value(na.omit(boot_vector), type = "bca", theta_null = 0)
-
-    if(stats::shapiro.test(na.omit(boot_vector))$p.value > 0.05)
-    {
-      #boot vector is a normal distribution
-      standard_error <- stats::sd(boot_vector, na.rm = T)
-      mean_boot_vector <- mean(boot_vector, na.rm = T)
-      bias <- estimate - mean_boot_vector
-      bias_threshold <- 0.25 * standard_error
-      p_value <- 2 * stats::pt(-abs((estimate) / standard_error), (n_elements - model$edf))
-      ci_lower_limit <- estimate + stats::qt(0.05 / 2, (n_elements - model$edf)) * standard_error
-      ci_upper_limit <- estimate + stats::qt(1 - 0.05 / 2, (n_elements - model$edf)) * standard_error
-
-      #Bias-corrected p-value
-      if (abs(bias) > bias_threshold) {
-        p_value <- 2 * stats::pt(-abs((2 * estimate - mean_boot_vector) / standard_error), (n_elements - model$edf))
-        ci_lower_limit <-  2 * estimate - mean_boot_vector + stats::qt(0.05 / 2, (n_elements - model$edf)) * standard_error
-        ci_upper_limit <- 2 * estimate - mean_boot_vector + stats::qt(1 - 0.05 / 2, (n_elements - model$edf)) * standard_error
-      }
-      return(c(ci_lower_limit,ci_upper_limit,p_value))
-    }
-    else
-    {
-      # DiCiccio, T. J. and boot_vector. Efron. (1996). Bootstrap Confidence Intervals. Statistical Science. 11(3):
-      # 189–212. https://doi.org/10.1214/ss/1032280214
-      boot.bca <- coxed::bca(stats::na.omit(boot_vector))
-      if(boot.bca[1] <0 & boot.bca[2]>0)
-        p_value <-1
-      else
-        p_value<-0
-      return(c(boot.bca,p_value))
-    }
-
-  }
+# bca_pvalue_for_lqm <-
+#   function(estimate,
+#            boot_vector,
+#            model,
+#            n_elements)
+#   {
+#     # browser()
+#     # boot.bca <- coxed::bca(na.omit(boot_vector))
+#     # p_value <- boot.p_value::boot.p_value(na.omit(boot_vector), type = "bca", theta_null = 0)
+#
+#     if(stats::shapiro.test(na.omit(boot_vector))$p.value > 0.05)
+#     {
+#       #boot vector is a normal distribution
+#       standard_error <- stats::sd(boot_vector, na.rm = T)
+#       mean_boot_vector <- mean(boot_vector, na.rm = T)
+#       bias <- estimate - mean_boot_vector
+#       bias_threshold <- 0.25 * standard_error
+#       p_value <- 2 * stats::pt(-abs((estimate) / standard_error), (n_elements - model$edf))
+#       ci_lower_limit <- estimate + stats::qt(0.05 / 2, (n_elements - model$edf)) * standard_error
+#       ci_upper_limit <- estimate + stats::qt(1 - 0.05 / 2, (n_elements - model$edf)) * standard_error
+#
+#       #Bias-corrected p-value
+#       if (abs(bias) > bias_threshold) {
+#         p_value <- 2 * stats::pt(-abs((2 * estimate - mean_boot_vector) / standard_error), (n_elements - model$edf))
+#         ci_lower_limit <-  2 * estimate - mean_boot_vector + stats::qt(0.05 / 2, (n_elements - model$edf)) * standard_error
+#         ci_upper_limit <- 2 * estimate - mean_boot_vector + stats::qt(1 - 0.05 / 2, (n_elements - model$edf)) * standard_error
+#       }
+#       return(c(ci_lower_limit,ci_upper_limit,p_value))
+#     }
+#     else
+#     {
+#       # DiCiccio, T. J. and boot_vector. Efron. (1996). Bootstrap Confidence Intervals. Statistical Science. 11(3):
+#       # 189–212. https://doi.org/10.1214/ss/1032280214
+#       boot.bca <- coxed::bca(stats::na.omit(boot_vector))
+#       if(boot.bca[1] <0 & boot.bca[2]>0)
+#         p_value <-1
+#       else
+#         p_value<-0
+#       return(c(boot.bca,p_value))
+#     }
+#
+#   }
 
 
 

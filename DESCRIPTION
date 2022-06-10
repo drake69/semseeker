@@ -12,7 +12,6 @@ LazyDataCompression: gzip
 URL: http://github.com/drake69/semseeker
 BugReports: https://github.com/drake69/semseeker/issues
 Imports:
-    coxed,
     dplyr,
     doFuture,
     doRNG,
@@ -34,7 +33,7 @@ Imports:
     utils,
     withr,
     zoo
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Suggests: 
     testthat
 Depends: 

@@ -25,9 +25,6 @@ filter_p_value report after adjusting saves only significant nominal p-value}
 
 \item{maxResources}{percentage of max system's resource to use}
 }
-\value{
-
-}
 \description{
 Association analysis of SEMseeker's results
 }
