@@ -55,7 +55,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   #                                       .export=c(ls(envir=globalenv()),"methylation_data", "sliding_window_size", "beta_superior_thresholds", "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "beta_medians",
   #                                                 "sample_sheet", "analyze_single_sample", "envir", "analyze_single_sample_both", "delta_single_sample"),
   #                                       .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = "remove") %dorng% {
-  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine='rbind', .export = variables_to_export) %dopar% {
+  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine='rbind', .export = variables_to_export) %dorng% {
   # for(i in 1:nrow(sample_sheet) ) {
     local_sample_detail <- sample_sheet[i,]
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
@@ -68,7 +68,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
     sample_status_temp <- data.frame(t(sample_status_temp))
     rownames(sample_status_temp) <- c(local_sample_detail$Sample_ID)
     # sample_status_temp
-    # as.data.frame(sample_status_temp)
+    as.data.frame(sample_status_temp)
     # if(exists("summary_population"))
     #   summary_population <- rbind(summary_population, sample_status_temp)
     # else
