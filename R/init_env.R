@@ -21,13 +21,13 @@ init_env <- function(result_folder, maxResources = 90)
   #                             "probes"), add = FALSE, package = "semseeker")
 
 
-  if (.Platform$OS.type == "windows") {
-    withAutoprint({
-      utils::memory.size()
-      utils::memory.size(TRUE)
-      utils::memory.limit(16000)
-    })
-  }
+  # if (.Platform$OS.type == "windows") {
+  #   withAutoprint({
+  #     utils::memory.size()
+  #     utils::memory.size(TRUE)
+  #     utils::memory.limit(16000)
+  #   })
+  # }
 
   # setClass("employee", slots=list(name="character", id="numeric", contact="character"))
   # obj <- new("employee",name="Steven", id=1002, contact="West Avenue")
