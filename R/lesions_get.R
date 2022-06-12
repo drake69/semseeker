@@ -57,7 +57,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 
-  lesionpValue <- stats::dhyper(mutationAnnotatedSortedLocal$ENRICHMENT, mutationAnnotatedSortedLocal$MUTATIONS_COUNT, mutationAnnotatedSortedLocal$PROBES_COUNT, sliding_window_size)
+  lesionpValue <- suppressWarnings(stats::dhyper(mutationAnnotatedSortedLocal$ENRICHMENT, mutationAnnotatedSortedLocal$MUTATIONS_COUNT, mutationAnnotatedSortedLocal$PROBES_COUNT, sliding_window_size))
 
   lesionpValue[is.nan(lesionpValue)] <- 1
   lesionpValue[is.na(lesionpValue)] <- 1

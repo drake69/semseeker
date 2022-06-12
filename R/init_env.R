@@ -1,11 +1,15 @@
 #' init environment
+#'
 #' @param result_folder where result of semseeker will bestored
+#' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
+#'
 #' @return the working environment
-init_env <- function(result_folder, maxResources = 90)
+init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession")
 {
 
 
+  set.seed(7658776)
   # if(getRversion() >= "2.15.1")  utils::globalVariables(c( "chartFolder","ssEnv$logFolder","computationCluster",
   #                                                          "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
   #                                                          "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
@@ -21,13 +25,13 @@ init_env <- function(result_folder, maxResources = 90)
   #                             "probes"), add = FALSE, package = "semseeker")
 
 
-  # if (.Platform$OS.type == "windows") {
-  #   withAutoprint({
-  #     utils::memory.size()
-  #     utils::memory.size(TRUE)
-  #     utils::memory.limit(16000)
-  #   })
-  # }
+  if (.Platform$OS.type == "windows") {
+    withAutoprint({
+      utils::memory.size()
+      utils::memory.size(TRUE)
+      utils::memory.limit(16000)
+    })
+  }
 
   # setClass("employee", slots=list(name="character", id="numeric", contact="character"))
   # obj <- new("employee",name="Steven", id=1002, contact="West Avenue")
@@ -44,7 +48,9 @@ init_env <- function(result_folder, maxResources = 90)
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
   ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
-  ssEnv$logFolder <-  dir_check_and_create("/tmp",c("semseeker", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep=""))
+  random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
+
+  ssEnv$logFolder <-  dir_check_and_create("/tmp",c("semseeker","log",random_file_name))
   foreachIndex <- 0
 
   # print(outFile)
@@ -68,7 +74,10 @@ init_env <- function(result_folder, maxResources = 90)
 
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   doFuture::registerDoFuture()
-  future::plan( future::multisession, workers = nCore)
+
+  future::plan( future::sequential)
+  if(parallel_strategy=="multisession")
+    future::plan( future::multisession, workers = nCore)
 
 
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))

@@ -10,9 +10,8 @@
 #' @param groupingColumnLabel label of the column of the genomic sub area body, tss1500
 #'
 #' @return original bed with genomic area infos
-#'
-#' @importFrom doRNG %dorng%
-#'
+#' @importFrom foreach %dopar%
+
 annotate_bed <- function (
   envir,
   populations ,
@@ -60,7 +59,7 @@ annotate_bed <- function (
   variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel", "groupingColumnLabel")
 
   # for(i in 1:nrow(envir$keysLocal))
-  final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
+  final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dopar%
   {
     anomal <- envir$keysLocal[i,"ANOMALY"]
     pop <- envir$keysLocal[i,"POPULATION"]

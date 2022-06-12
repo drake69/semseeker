@@ -2,7 +2,7 @@ test_that("create_multiple_bed", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder)
+  envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
   nitem <- 5e4
   nsamples <- 5
@@ -24,26 +24,33 @@ test_that("create_multiple_bed", {
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
   sp <- analize_population(envir,
-                          methylation_data=methylation_data,
-                          sliding_window_size = 11,
-                          beta_superior_thresholds = beta_superior_thresholds,
-                          beta_inferior_thresholds = beta_inferior_thresholds,
-                          sample_sheet = sample_sheet,
-                          beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
-                          bonferroni_threshold = 0.01,
-                          probe_features = probe_features
+                           methylation_data=methylation_data,
+                           sliding_window_size = 11,
+                           beta_superior_thresholds = beta_superior_thresholds,
+                           beta_inferior_thresholds = beta_inferior_thresholds,
+                           sample_sheet = sample_sheet,
+                           beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
+                           bonferroni_threshold = 0.01,
+                           probe_features = probe_features
   )
 
   create_multiple_bed(envir, sample_sheet)
 
   tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_BOTH"))
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")
-  localFileRes <- read.table(fileToRead, sep="\t")
+  localFileRes_both <- read.table(fileToRead, sep="\t")
 
-  expect_true(nrow(localFileRes)>0)
+  expect_true(nrow(localFileRes_both)>0)
 
-  # doParallel::stopImplicitCluster()
-  # parallel::stopCluster(computationCluster)
+  # tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPO"))
+  # fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPO" ), "bed")
+  # localFileRes_hypo <- read.table(fileToRead, sep="\t")
+  #
+  # tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPER"))
+  # fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPER" ), "bed")
+  # localFileRes_hyper <- read.table(fileToRead, sep="\t")
+
+  # expect_true(nrow(localFileRes_hyper)>0 | nrow(localFileRes_hypo)>0 | nrow(localFileRes_both)>0)
 
 
 })

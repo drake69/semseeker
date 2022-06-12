@@ -1,10 +1,10 @@
 Package: semseeker
 Type: Package
-Title: Stochastic Epimutations SEM Seeker
+Title: Epigenetic Stochastic mutations SEM Seeker
 Version: 0.5.6
 Author: Luigi Corsaro, Davide Gentilini, Lucio Calzari, Davide Sacco
 Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
-Description: Stochastic epimutationa nd enriched region upstream and downstream tool.
+Description: Stochastic epimutation and enriched region upstream and downstream tool for EWAS.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true
@@ -29,12 +29,12 @@ Imports:
     R.utils,
     rlang,
     stats,
-    stringi,
     utils,
     withr,
     zoo
 RoxygenNote: 7.2.0
 Suggests: 
+    stringi,
     testthat
 Depends: 
     R (>= 2.10)

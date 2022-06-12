@@ -6,7 +6,9 @@
 #' @param bonferroni_threshold = 0.05 #threshold to define which pValue adjusted to define an epilesion
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
+#' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #' @param result_folder where the result will be saved
+#'
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
 #'
@@ -15,11 +17,12 @@ semseeker <- function(sample_sheet,
                       result_folder,
                       bonferroni_threshold = 0.05,
                       maxResources = 90,
-                      iqrTimes = 3 ) {
+                      iqrTimes = 3 ,
+                      parallel_strategy ="multisession") {
 
-  envir <- init_env(result_folder, maxResources)
+  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy)
 
-
+  methylation_data <- stats::na.omit(methylation_data)
   # set digits to 22
   withr::local_options(list(digits = 22))
   sliding_window_size <- 11
@@ -94,9 +97,10 @@ semseeker <- function(sample_sheet,
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   populations <-  c("Reference","Control","Case")
-  for (populationName in populations) {
+  for (i in 1:length(populations)) {
 
     #
+    populationName <- populations[i]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == populationName, ]
     populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
 
@@ -213,6 +217,6 @@ semseeker <- function(sample_sheet,
   # euristic_analysis_webgestalt(envir$result_folderData = envir$result_folderData)
   message("Job Completed !")
 
-
+  future::plan( future::sequential)
 }
 
