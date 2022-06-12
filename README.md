@@ -5,22 +5,6 @@
 
 <!-- badges: start -->
 
-    #> ✔ Setting active project to '/home/lcorsaro/Documents/Progetti_Sviluppo/semseeker'
-    #> ✖ The 'origin' remote is configured, but we can't determine its default branch.
-    #>   Possible reasons:
-    #>   - The remote repo no longer exists, suggesting the local remote should
-    #>     be deleted.
-    #>   - We are offline or that specific Git server is down.
-    #>   - You don't have the necessary permission or something is wrong with
-    #>     your credentials.
-    #> ✖ The 'origin' remote is configured, but we can't determine its default branch.
-    #>   Possible reasons:
-    #>   - The remote repo no longer exists, suggesting the local remote should
-    #>     be deleted.
-    #>   - We are offline or that specific Git server is down.
-    #>   - You don't have the necessary permission or something is wrong with
-    #>     your credentials.
-
 [![](https://img.shields.io/badge/devel%20version-0.5.6-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://app.codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker)
