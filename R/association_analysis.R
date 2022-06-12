@@ -16,16 +16,14 @@
 #' filter_p_value report after adjusting saves only significant nominal p-value
 #' @param result_folder where semseeker's results are stored, the root folder
 #' @param maxResources percentage of max system's resource to use
+#' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #'
-#' @return
+#' @importFrom foreach %dopar%
 #' @export
-#'
-#' @examples
-#' @importFrom doRNG %dorng%
-association_analysis <- function(inference_details,result_folder, maxResources)
+association_analysis <- function(inference_details,result_folder, maxResources=90, parallel_strategy ="multisession")
 {
 
-  envir <- init_env(result_folder, maxResources)
+  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy)
 
   # covariates, family_test, transformation = NULL, independent_variable, depth_analysis=3
   # covariates= covariates, transformation = "log",independent_variable = "Sample_Group", depth_analysis=2
@@ -132,10 +130,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       "COUNT.CONTROL"="",
       "MEAN.CONTROL"="",
       "SD.CONTROL"="",
-      "RHO"="",
-      "CI.LOWER"="",
-      "CI.UPPER"="",
-      "N.PERMUTATIONS" =""
+      "RHO"=""
     )
     result <- result[-1,]
 
@@ -208,7 +203,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       grDevices::dev.off()
     }
 
-    # browser()
+    #browser()
     if(depth_analysis >1)
     {
 
@@ -219,10 +214,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
       # #browser()
 
       # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_stat_model","file_path_build"))
-      to_export <- c("keys", "file_path_build", "result_folderPivot", "sample_names", "independent_variable", "covariates", "apply_stat_model", "family_test",
-                     "transformation", "envir", "depth_analysis","BCApval")
-
-      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = to_export) %dorng%
+      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind) %dopar%
       # for (i in 1:nkeys)
       {
         # i <- 25
@@ -269,7 +261,7 @@ association_analysis <- function(inference_details,result_folder, maxResources)
             g_start <- 2 + length(covariates)
 
             result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
-                                            logFolder= envir$logFolder, independent_variable =  independent_variable, depth_analysis = depth_analysis)
+                                            logFolder= envir$logFolder, independent_variable, depth_analysis)
 
             # #browser()
             # n_adj <- iters - g_start
@@ -353,4 +345,6 @@ association_analysis <- function(inference_details,result_folder, maxResources)
     #
     # qqunif.plot(pvalues)
   }
+
+  future::plan( future::sequential)
 }

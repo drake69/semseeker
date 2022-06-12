@@ -24,14 +24,14 @@ test_that("read_multiple_bed", {
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
   sp <- analize_population(envir=envir,
-                          methylation_data=methylation_data,
-                          sliding_window_size = 11,
-                          beta_superior_thresholds = beta_superior_thresholds,
-                          beta_inferior_thresholds = beta_inferior_thresholds,
-                          sample_sheet = sample_sheet,
-                          beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
-                          bonferroni_threshold = 0.01,
-                          probe_features = probe_features
+                           methylation_data=methylation_data,
+                           sliding_window_size = 11,
+                           beta_superior_thresholds = beta_superior_thresholds,
+                           beta_inferior_thresholds = beta_inferior_thresholds,
+                           sample_sheet = sample_sheet,
+                           beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
+                           bonferroni_threshold = 0.01,
+                           probe_features = probe_features
   )
 
   create_multiple_bed(envir, sample_sheet)
@@ -47,15 +47,8 @@ test_that("read_multiple_bed", {
 
   probe_features <- get(paste0(probes_prefix,"Whole",sep=""))
 
-  # (envir, anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
-
-  browser()
   res <-read_multiple_bed (envir, "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
 
   expect_true(nrow(res)>0)
-
-  # doParallel::stopImplicitCluster()
-  # parallel::stopCluster(computationCluster)
-
 }
 )

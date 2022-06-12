@@ -10,7 +10,10 @@ install_github("drake69/semseeker")
 library("semseeker")
 
 
-workingFolder <- file.path(getwd(),"/tmp")
+workingFolder <- file.path(getwd(),"/tmp/")
+dir.create(workingFolder)
+
+workingFolder <- file.path(getwd(),"/tmp/GSE186766")
 dir.create(workingFolder)
 
 sample_sheet <- semseeker::build_data_set_from_geo("GSE186766",workingFolder, 0)

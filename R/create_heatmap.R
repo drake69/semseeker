@@ -12,8 +12,6 @@
 create_heatmap <-
   function(envir, inputBedDataFrame, anomalies, groupLabel, groupColumnIDs ) {
 
-    # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
-
     chartFolder <- dir_check_and_create(envir$result_folderChart,groupLabel)
 
     if (is.null(inputBedDataFrame))
@@ -27,7 +25,6 @@ create_heatmap <-
     inputBedDataFrame$ANOMALY <- as.factor(inputBedDataFrame$ANOMALY)
     inputBedDataFrame$POPULATION <- as.factor(inputBedDataFrame$POPULATION)
 
-    # inputBedDataFrame <- data.frame(inputBedDataFrame, "KEY" = paste0(inputBedDataFrame[, groupColumnID],"_",inputBedDataFrame$FIGURE,sep=""))
     if(length(groupColumnIDs)==2)
     {
       inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste0(inputBedDataFrame[, groupColumnIDs[1]],"_",inputBedDataFrame[, groupColumnIDs[2]],"_",inputBedDataFrame$FIGURE,sep=""))
@@ -38,6 +35,9 @@ create_heatmap <-
     }
     inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
     inputBedDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$POPULATION != "Reference")
+    if(nrow(inputBedDataFrame) < 10)
+      return()
+
     pops <- unique(inputBedDataFrame$POPULATION)
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Case"] <- "Cyan"
     levels(inputBedDataFrame$POPULATION)[levels(inputBedDataFrame$POPULATION)=="Control"] <- "Blue"
@@ -45,49 +45,8 @@ create_heatmap <-
     variables_to_export <- c("anomalies", "inputBedDataFrame", "pops", "groupLabel", "chartFolder")
     g <- 0
     foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dorng%
-      # for(g in 1:length(anomalies))
-      # for (anomaly in anomalies)
       {
-
         anomaly <- anomalies[g]
-        # tempDataFrame <- subset(inputBedDataFrame, ANOMALY == anomaly)
-        # if(dim(tempDataFrame)[1]==0)
-        #   next
-        # tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID ~ KEY, value.var = "FREQ", sum)
-        # mine.long <- tidyr::pivot_longer(data = tempDataFrame,
-        #                           cols = -c(1),
-        #                           names_to = "KEY",
-        #                           values_to = "FREQ")
-        # # head(mine.long)
-        # fillLable <- paste0("Number of ", anomaly, sep="" )
-        # mine.heatmap <- ggplot2::ggplot(data = mine.long,mapping = ggplot2::aes(x = KEY,y = SAMPLEID, fill = FREQ))
-        # mine.heatmap <- mine.heatmap +  ggplot2::geom_tile()
-        # mine.heatmap <- mine.heatmap + ggplot2::xlab(label = groupLabel)
-        # mine.heatmap <- mine.heatmap + ggplot2::ylab(label = "SAMPLE NAME")
-        # mine.heatmap <- mine.heatmap +  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
-        #
-        # # filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
-        # # grDevices::png(file= filename, width=1200, height=1200)
-        # # mine.heatmap
-        # # grDevices::dev.off()
-        #
-        # filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", groupLabel,"_",anomaly, ".png",sep="")
-        #
-        # try(
-        #   ggplot2::ggsave(
-        #     filename = filename,
-        #     plot = mine.heatmap,
-        #     device = NULL,
-        #     path = NULL,
-        #     scale = 1,
-        #     width = NA,
-        #     height = NA,
-        #     units = c("in", "cm", "mm"),
-        #     dpi = 1200,
-        #     limitsize = TRUE
-        #   )
-        # )
-
         tempDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$ANOMALY == anomaly)
         if(!is.null(tempDataFrame))
           if(nrow(tempDataFrame)>2)
@@ -113,7 +72,6 @@ create_heatmap <-
             }
 
             # col<- colorRampPalette(c("violet","white","blue"))(1024)
-
             # skip heatmap if no enough data are available
             tt <- tempDataFrame[,3:ncol(tempDataFrame)]
             if (!is.null(tt))

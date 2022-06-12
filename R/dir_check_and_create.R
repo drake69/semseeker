@@ -6,8 +6,9 @@ dir_check_and_create <- function  (baseFolder, subFolders)
   subFolders <- as.vector(sapply(subFolders, as.character))
   subFolders <-c(parts[1:length(parts)], subFolders)
 
-  for(subFolder in subFolders)
+  for( y in 1:length(subFolders))
   {
+    subFolder <- subFolders[y]
     browser
     if(!exists("subF"))
       subF <- file.path(subFolder)

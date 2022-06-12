@@ -11,7 +11,8 @@ semseeker(
   result_folder,
   bonferroni_threshold = 0.05,
   maxResources = 90,
-  iqrTimes = 3
+  iqrTimes = 3,
+  parallel_strategy = "multisession"
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ semseeker(
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 
 \item{iqrTimes}{how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier}
+
+\item{parallel_strategy}{which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster}
 }
 \value{
 files into the result folder with pivot table and bedgraph.

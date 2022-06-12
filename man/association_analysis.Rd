@@ -4,7 +4,12 @@
 \alias{association_analysis}
 \title{Association analysis of SEMseeker's results}
 \usage{
-association_analysis(inference_details, result_folder, maxResources)
+association_analysis(
+  inference_details,
+  result_folder,
+  maxResources = 90,
+  parallel_strategy = "multisession"
+)
 }
 \arguments{
 \item{inference_details}{independent variable: deve essere nalla sample sheet passata a semseeker
@@ -24,6 +29,8 @@ filter_p_value report after adjusting saves only significant nominal p-value}
 \item{result_folder}{where semseeker's results are stored, the root folder}
 
 \item{maxResources}{percentage of max system's resource to use}
+
+\item{parallel_strategy}{which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster}
 }
 \description{
 Association analysis of SEMseeker's results

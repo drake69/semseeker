@@ -21,14 +21,15 @@
 #' lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
 #' @importFrom foreach %dopar%
-#' @importFrom doRNG %dorng%
 
 analize_population <- function(envir, methylation_data, sliding_window_size, beta_superior_thresholds, beta_inferior_thresholds, sample_sheet, beta_medians, bonferroni_threshold = 0.05, probe_features) {
 
-
+  #@importFrom foreach %dopar%
   # browser()
   start_time <- Sys.time()
   message("AnalyzePopulation warmingUP ", Sys.time())
+
+  methylation_data <- stats::na.omit(methylation_data)
 
   ### get beta_values ########################################################
   sample_sheet <- sample_sheet[order(sample_sheet[, "Sample_ID"], decreasing = FALSE), ]
@@ -54,20 +55,20 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   # summary_population <- foreach::foreach(i = 1:nrow(sample_sheet), .combine="rbind",
   #                                       .export=c(ls(envir=globalenv()),"methylation_data", "sliding_window_size", "beta_superior_thresholds", "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "beta_medians",
   #                                                 "sample_sheet", "analyze_single_sample", "envir", "analyze_single_sample_both", "delta_single_sample"),
-  #                                       .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = "remove") %dorng% {
-  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine='rbind', .export = variables_to_export) %dorng% {
-  # for(i in 1:nrow(sample_sheet) ) {
+  #                                       .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = "remove") %dopar% {
+  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine='rbind', .export = variables_to_export) %dopar% {
     local_sample_detail <- sample_sheet[i,]
+
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
     hyper_result <- analyze_single_sample(envir=envir, values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail, bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
     hypo_result <- analyze_single_sample(envir=envir, values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail, bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
     both_result <- analyze_single_sample_both(envir=envir, sample_detail =  local_sample_detail)
     delta_result <- delta_single_sample (envir = envir, values = beta_values, high_thresholds = beta_superior_thresholds, low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail, beta_medians = beta_medians, probe_features = probe_features)
+
     sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result, both_result)
     sample_status_temp <- data.frame(sample_status_temp)
     sample_status_temp <- data.frame(t(sample_status_temp))
     rownames(sample_status_temp) <- c(local_sample_detail$Sample_ID)
-    # sample_status_temp
     as.data.frame(sample_status_temp)
     # if(exists("summary_population"))
     #   summary_population <- rbind(summary_population, sample_status_temp)

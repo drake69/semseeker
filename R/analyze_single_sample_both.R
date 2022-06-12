@@ -8,8 +8,11 @@ analyze_single_sample_both <- function(envir, sample_detail) {
   mutations <- data.frame("CHR"="", "START"="", "END"="")
   lesions <- mutations
 
-  for( figure in c("HYPER","HYPO"))
+  for( i in 1:nrow(envir$keys_figures))
   {
+    figure <- envir$keys_figures[i,1]
+    # if(figure=="BOTH")
+    #   next
     folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
     if(file.exists(fileName))
@@ -27,6 +30,7 @@ analyze_single_sample_both <- function(envir, sample_detail) {
       lesionsTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
       lesions <- rbind(lesions, lesionsTemp )
     }
+
   }
   mutations <- mutations[-1,]
   lesions <- lesions[-1,]

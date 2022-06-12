@@ -1,45 +1,34 @@
-#' @importFrom doRNG %dorng%
+#' @importFrom foreach %dopar%
 create_multiple_bed <- function(envir, sample_sheet){
 
   #create multiple file bed
-  # browser()
-  variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build")
+  variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build","%dopar%","getDoPar")
   i <- 0
-  localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"=envir$keys_figures,"ANOMALY"= envir$keys_anomalies,"EXT"="bed")
+  localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"=envir$keys_figures[,1] ,"ANOMALY"= envir$keys_anomalies[,1] ,"EXT"="bed")
   localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"="METHYLATION","ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
-  foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export ) %dorng% {
-  # for (i in 1:nrow(localKeys)) {
-    # i <- 20
-    key <- localKeys[i,]
-    for(j in 1:nrow(sample_sheet))
+  foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export ) %dopar%
     {
-      # j <- 54
-      sample <- sample_sheet[j,]
-      # if(sample$Sample_ID=="R07C01_203991450116")
-      #    message(j)
+      key <- localKeys[i,]
       tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-      fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
-      # message("create_multiple_bed file 2 read:", fileToRead)
-      if(file.exists(fileToRead))
+      variables_to_export_nested <- c("sample_sheet", "file_path_build","key","tempresult_folderData","%dopar%","getDoPar")
+      j <- 0
+      localFileRes <- foreach::foreach(j = 1:nrow(sample_sheet), .export = variables_to_export_nested, .combine = "rbind" ) %dopar%
       {
-        # message("create_multiple_bed read file:", fileToRead)
-        localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
-        localtemp$Sample_ID <- sample$Sample_ID
-        # localtemp
-        if(!exists("localFileRes"))
-          localFileRes <- localtemp
-        else
-          localFileRes <- rbind(localFileRes, localtemp)
+        sample <- sample_sheet[j,]
+        fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
+        if(file.exists(fileToRead))
+        {
+          localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
+          localtemp$Sample_ID <- sample$Sample_ID
+          localtemp
+        }
+      }
+      if(exists("localFileRes"))
+      {
+        fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
+        utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
       }
     }
-    if(exists("localFileRes"))
-    {
-      fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
-      utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
-      rm(localFileRes)
-      # message("create_multiple_bed, file saved!")
-    }
-  }
   gc()
 }

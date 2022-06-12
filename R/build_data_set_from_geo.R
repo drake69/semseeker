@@ -48,8 +48,10 @@ build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
         fileName <-  gsub("_Grn.idat.gz", "_COLOR.idat.gz", fileName)
         fileName <-  gsub("_Red.idat.gz", "_COLOR.idat.gz", fileName)
 
-        for (color in c("_Grn.idat.gz","_Red.idat.gz"))
+        for (i in 1:2)
         {
+
+          color <- c("_Grn.idat.gz","_Red.idat.gz")[i]
           # color <- "_Grn.idat.gz"
           localFileName <- paste(Sentrix_ID,"_", Sentrix_Position, color, sep="")
           localFileName <- paste(workingFolder, "/", localFileName, sep = "")
