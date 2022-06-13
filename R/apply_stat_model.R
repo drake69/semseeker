@@ -10,6 +10,7 @@
 #' @param logFolder where to save log file
 #' @param independent_variable independent variable name
 #' @param depth_analysis depth's analysis
+#' @param envir object environment
 #'
 #' @importFrom doRNG %dorng%
 #'
@@ -142,7 +143,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # after the transformation some data could be missed
   lostDataFrame <-  tempDataFrame[,colSums(apply(tempDataFrame,2,is.nan))!=0]
   if(!is.null(lostDataFrame))
-    write.csv2(lostDataFrame, file.path(envir$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
+    utils::write.csv2(lostDataFrame, file.path(envir$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
 
   #  we want to preserve the NA in the indipendent variables to be removed by the models
   tempDataFrame[apply(tempDataFrame,2,is.nan)] <- 0
