@@ -23,7 +23,8 @@ test_that("association_analysis", {
   mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
   mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="")
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="multisession")
+  inferenceFolder <- file.path(tempFolder,"Inference")
 
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
@@ -36,7 +37,6 @@ test_that("association_analysis", {
 
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
-  inferenceFolder <- file.path(tempFolder,"Inference")
 
   fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -99,14 +99,14 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
 
-  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_log_wilcoxon_test_result", extension = "csv")
+  fileToRead <- file_path_build(inferenceFolder, "1_Group_log_wilcoxon_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   expect_true(nrow(localFileRes)>0)
 
   inference_details <- expand.grid("independent_variable"= "Group",
                                    "covariates"="",
                                    "family_test"=c("wilcoxon"),
-                                   "transformation"="quantile_4",
+                                   "transformation"="quantile_5",
                                    "depth_analysis"=1,
                                    "filter_p_value" = FALSE)
 
@@ -114,7 +114,7 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
 
-  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_quantile_4_wilcoxon_test_result", extension = "csv")
+  fileToRead <- file_path_build(inferenceFolder, "1_Group_quantile_5_wilcoxon_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   expect_true(nrow(localFileRes)>0)
 })
