@@ -1,9 +1,22 @@
-apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independent_variable, depth_analysis=3)
+#' Title
+#'
+#' @param tempDataFrame data frame to apply association
+#' @param g_start index of starting data
+#' @param family_test family of test to run
+#' @param covariates vector of covariates
+#' @param key key to identify file to elaborate
+#' @param transformation transformation to apply to covariates, burden and independent variable
+#' @param dototal do a total per area
+#' @param logFolder where to save log file
+#' @param independent_variable independent variable name
+#' @param depth_analysis depth's analysis
+#'
+#' @importFrom doRNG %dorng%
+#'
+apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independent_variable, depth_analysis=3, envir )
 {
-  # #browser()
-  # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c())
   transformation <- as.character(transformation)
-  #browser()
+  originalDataFrame <- tempDataFrame
 
   if(is.factor(tempDataFrame[, independent_variable]))
   {
@@ -11,20 +24,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     independent_variable2ndLevel <- levels(tempDataFrame[, independent_variable])[2]
   }
 
-  # if(independent_variable=="Sample_Group")
-  # {
-  #   tempDataFrame[, independent_variable][tempDataFrame[, independent_variable]=="Control"] <- FALSE
-  #   tempDataFrame[, independent_variable][tempDataFrame[, independent_variable]=="Case"] <- TRUE
-  #   # tempDataFrame[, independent_variable] <- as.numeric(tempDataFrame[, independent_variable])
-  # }
-
-
   df_head <- tempDataFrame[,1:(g_start-1)]
   burden_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)
 
-  if( ncol(tempDataFrame) - g_start  > 1) {
-    burden_values <- burden_values[, colSums(burden_values) > 0]
-  }
 
   df_colnames <- colnames(tempDataFrame)
   if( !is.null(dim(burden_values))  & dototal) {
@@ -51,15 +53,14 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   if(is.null(transformation) | length(transformation)==0 | is.na(transformation))
     transformation <- "none"
 
-  if(length(unique(burden_values))<2)
-    return(NULL)
 
+  burden_values <- as.data.frame(burden_values)
   df_values_orig <- burden_values
   try(
     {
       burden_values = switch(
         as.character(transformation),
-        "scale" = scale(burden_values),
+        "scale" = if(ncol(burden_values)>1) as.data.frame(apply(burden_values,2,scale)) else scale(burden_values),
         "log" = log(burden_values),
         "log2" = log2(burden_values),
         "log10"= log10(burden_values),
@@ -70,13 +71,17 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       )
     }
   )
-
   if(grepl("quantile", transformation))
   {
-    qq <- unlist(strsplit(transformation,"_")[2])
-    df_values_temp <- as.data.frame(apply( burden_values,2,function(x) ggplot2::cut_number(x, n=qq)))
-    colnames(df_values_temp) <- colnames(burden_values)
+    qq <- as.numeric(unlist(strsplit(transformation,"\\_"))[2])
+    burden_values <- as.data.frame(apply( burden_values,2,function(x){
+      if(length(unique(x))>=qq)
+        as.numeric(ggplot2::cut_number(x, n=qq))
+      else
+        rep(0,length(x))
+      }))
   }
+  burden_values <- as.data.frame(burden_values)
 
   if(setequal(burden_values,df_values_orig) & transformation !="none")
     transformation <- paste0("NA_", transformation, sep="")
@@ -111,33 +116,49 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       }
     )
 
+    # if(grepl("quantile", transformation))
+    # {
+    #   qq <- unlist(strsplit(transformation,"_")[2])
+    #   df_values_temp <- as.data.frame(apply( burden_values,2,function(x) ggplot2::cut_number(x, n=qq)))
+    #   colnames(df_values_temp) <- colnames(burden_values)
+    # }
+
     if(setequal(burden_values,df_values_orig) & transformation !="none")
       transformation <- paste0("NA_", transformation, sep="")
     else
       tempDataFrame[, variable_to_transform] <- independent_variableValues
   }
 
-  # if(grepl("quantile", transformation))
-  # {
-  #   qq <- unlist(strsplit(transformation,"_")[2])
-  #   df_values_temp <- as.data.frame(apply( burden_values,2,function(x) ggplot2::cut_number(x, n=qq)))
-  #   colnames(df_values_temp) <- colnames(burden_values)
-  # }
 
   tempDataFrame <- data.frame(df_head, burden_values)
   # #browser()
+  if(ncol(tempDataFrame)!=length(df_colnames))
+    browser()
   colnames(tempDataFrame) <- df_colnames
   cols <- colnames(tempDataFrame)
   iters <- length(cols)
+
+
+  # after the transformation some data could be missed
+  lostDataFrame <-  tempDataFrame[,colSums(apply(tempDataFrame,2,is.nan))!=0]
+  if(!is.null(lostDataFrame))
+    write.csv2(lostDataFrame, file.path(envir$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
+
+  #  we want to preserve the NA in the indipendent variables to be removed by the models
+  tempDataFrame[apply(tempDataFrame,2,is.nan)] <- 0
 
   g <- 0
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
                  "independent_variable1stLevel", "independent_variable2ndLevel",
                  "key", "transformation","quantreg_summary")
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
-    {
-      #g <- 2
-      burdenValue <- cols[g]
+  # for(g in g_start:iters)
+  {
+    #g <- 2
+    burdenValue <- cols[g]
+
+    if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>2){
+
       if (family_test=="poisson")
       {
         if(is.null(covariates) || length(covariates)==0)
@@ -201,7 +222,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         bartlett_pvalue <- stats::bartlett.test( stats::as.formula("depVar ~ indepVar"), data= localDataFrame )
       }
 
-      shapiro_pvalue <- stats::shapiro.test(tempDataFrame[,burdenValue])
+      shapiro_pvalue <- if(length(tempDataFrame[,burdenValue])>3 & length(unique(tempDataFrame[,burdenValue]))>3) round(stats::shapiro.test(tempDataFrame[,burdenValue])$p.value,3) else NA
 
       if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
       {
@@ -257,7 +278,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       if(family_test=="wilcoxon")
       {
-        result_w  <- stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE)
+        result_w  <- suppressWarnings(stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
         pvalue <- result_w$p.value
       }
 
@@ -300,7 +321,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "FAMILY" = family_test,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
-          "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
+          "SHAPIRO.PVALUE" = shapiro_pvalue,
           "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) round(bartlett_pvalue$p.value,3)  else NA,
           "CASE.LABEL"= if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA,
           "COUNT.CASE"=length(independent_variableData1stLevel),
@@ -336,7 +357,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "FAMILY" = family_test,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
-          "SHAPIRO.PVALUE" = round(shapiro_pvalue$p.value,3),
+          "SHAPIRO.PVALUE" = shapiro_pvalue,
           "BARTLETT.PVALUE" = NA,
           "CASE.LABEL"= as.character(independent_variable),
           "COUNT.CASE"=length(independent_variableData),
@@ -352,15 +373,56 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "N.PERMUTATIONS" = if(exists("n_permutations")) n_permutations else NA
         )
       }
+      # if(exists("result_temp"))
+      #   result_temp <- rbind(result_temp, local_result)
+      # else
+      #   result_temp <- local_result
+
       local_result
     }
-
-  result_temp <- unique(result_temp)
-
-
-  result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
-  result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
+    else
+    {
+      local_result <- data.frame (
+        "INDIPENDENT.VARIABLE"= independent_variable,
+        "ANOMALY" = key$ANOMALY,
+        "FIGURE" = key$FIGURE,
+        "GROUP" = key$GROUP,
+        "SUBGROUP" = key$SUBGROUP,
+        "AREA_OF_TEST" = burdenValue,
+        "PVALUE" = NA,
+        "PVALUEADJ" = NA,
+        "TEST" = "SINGLE_AREA",
+        "BETA" = NA,
+        "AIC" = NA,
+        "RESIDUALS.SUM" = NA,
+        "FAMILY" = family_test,
+        "transformation" = transformation,
+        "COVARIATES" = paste0(covariates,collapse=" "),
+        "SHAPIRO.PVALUE" = NA,
+        "BARTLETT.PVALUE" = NA,
+        "CASE.LABEL"= NA,
+        "COUNT.CASE"=NA,
+        "MEAN.CASE" = NA,
+        "SD.CASE"= NA,
+        "CONTROL.LABEL" = "BURDEN.VALUE",
+        "COUNT.CONTROL"= NA,
+        "MEAN.CONTROL"= NA,
+        "SD.CONTROL"= NA,
+        "RHO"=  NA,
+        "CI.LOWER"=  NA,
+        "CI.UPPER"=  NA,
+        "N.PERMUTATIONS" =  NA
+      )
+    }
+  }
 
   gc()
-  return(result_temp)
+  if(exists("result_temp"))
+  {
+    result_temp <- unique(result_temp)
+    result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
+    result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
+    return(result_temp)
+  }
+  return(NULL)
 }

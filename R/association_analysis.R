@@ -18,19 +18,17 @@
 #' @param maxResources percentage of max system's resource to use
 #' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #'
-#' @importFrom foreach %dopar%
+#' @importFrom doRNG %dorng%
 #' @export
 association_analysis <- function(inference_details,result_folder, maxResources=90, parallel_strategy ="multisession")
 {
 
   envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy)
 
-  # covariates, family_test, transformation = NULL, independent_variable, depth_analysis=3
-  # covariates= covariates, transformation = "log",independent_variable = "Sample_Group", depth_analysis=2
   inference_details <- unique(inference_details)
   for(i in 1:nrow(inference_details))
   {
-    #browser()
+
     inference_detail <- inference_details[i,]
 
     filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
@@ -41,10 +39,10 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     if( is.null(family_test) || length(family_test)==0)
     {
       message("Warning: one test family_test is missed! Skipped.")
-      #browser()
+
       next
     }
-    # browser()
+
     transformation <- inference_detail$transformation
     if(is.null(transformation) | length(transformation)==0)
     {
@@ -55,7 +53,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     if( is.null(independent_variable) || length(independent_variable)==0)
     {
       message("Warning: one indipendent variable is missed! Skipped.")
-      #browser()
+
       next
     }
 
@@ -83,7 +81,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     if (!(independent_variable %in% colnames(study_summary)))
     {
       message(" This indipendent variabile:", independent_variable, " is missed! Skipping")
-      #browser()
+
       next
     }
 
@@ -103,7 +101,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       }
       sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable, covariates)])
     }
-    # sample_names <- data.frame(study_summary)
+
     result = data.frame (
       "INDIPENDENT.VARIABLE"="",
       "ANOMALY" = "",
@@ -130,11 +128,12 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       "COUNT.CONTROL"="",
       "MEAN.CONTROL"="",
       "SD.CONTROL"="",
-      "RHO"=""
+      "RHO"="",
+      "CI.LOWER"= "",
+      "CI.UPPER"= "",
+      "N.PERMUTATIONS" = ""
     )
     result <- result[-1,]
-
-    # resultRun <- result
 
     if(!is.null(covariates) && !length(covariates)==0)
     {
@@ -159,23 +158,16 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     if(!is.null(covariates) && !length(covariates)==0)
       study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
-    # #browser()
-
     for(i in 1:nrow(keys))
     {
-      # i <- 1
-      # family_test <- "poisson"
-      # transformation <- NULL
       g_start <- 2 + length(covariates)
       result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
-                                 key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis)
-      # browser()
+                                 key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
       result <- rbind(result, result_temp)
     }
 
     result <- result[order(result$PVALUEADJ),]
 
-    # #browser()
     study_summaryToPlot <- study_summary
 
     if(independent_variable=="Sample_Group")
@@ -203,27 +195,20 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       grDevices::dev.off()
     }
 
-    #browser()
     if(depth_analysis >1)
     {
 
       keys <- envir$keys_anomalies_figures_areas
-      # #browser()
-      # areas <- rbind(genes, islands, dmrs)
       nkeys <- nrow(keys)
-      # #browser()
 
-      # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist =c("apply_stat_model","file_path_build"))
-      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind) %dopar%
+      variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis")
+      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
       # for (i in 1:nkeys)
       {
-        # i <- 25
         if(exists("tempDataFrame"))
           rm(list = c("tempDataFrame"))
         key <- keys [i,]
-        # print(key)
         fname <-file_path_build( result_folderPivot ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
-        # print(fname)
         if (file.exists(fname))
         {
           tempDataFrame <- utils::read.csv(fname, sep = ";")
@@ -232,40 +217,46 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
           tempDataFrame <- t(tempDataFrame)
           if(nrow(tempDataFrame)>1)
           {
-            message(nrow(tempDataFrame))
-            # tempDataFrame <- tempDataFrame[,-2]
             tempDataFrame <- as.data.frame(tempDataFrame)
             tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
             tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
 
-            # #browser()
             tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
+            tempDataFrame <- as.data.frame(tempDataFrame)
             tempDataFrame$POPULATION <- sample_names[, independent_variable]
             tempDataFrame[is.na(tempDataFrame)] <- 0
-            #  we want to preserve the NA in the indipendent variables to be removed by the models
+
+
             tempDataFrame[, independent_variable] <- sample_names[, independent_variable]
             tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
 
-            cols <- (gsub(" ", "_", colnames(tempDataFrame[])))
+            cols <- (gsub(" ", "_", colnames(tempDataFrame)))
             cols <- (gsub("-", "_", cols))
             cols <- (gsub(":", "_", cols))
             cols <- (gsub("/", "_", cols))
             cols <- (gsub("'", "_", cols))
 
-            colnames(tempDataFrame) <- cols
 
             tempDataFrame <- as.data.frame(tempDataFrame)
-            # tempDataFrame$Sample_Group <- as.factor(tempDataFrame$Sample_Group)
-            # tempDataFrame$Sample_Group  <- stats::relevel(tempDataFrame$Sample_Group, "Control")
+
+            if(length(colnames(tempDataFrame))!=length(cols))
+              browser()
+
+            colnames(tempDataFrame) <- cols
 
             g_start <- 2 + length(covariates)
 
-            result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates, key = key, transformation= transformation, dototal = TRUE,
-                                            logFolder= envir$logFolder, independent_variable, depth_analysis)
+            result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates,
+                                                  key = key, transformation= transformation, dototal = TRUE,
+                                            logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
 
-            # #browser()
-            # n_adj <- iters - g_start
-            # result <- rbind(result, result_temp)
+            # message("Exited form apply model")
+
+            # if(!exists("result_temp_foreach"))
+            #   result_temp_foreach <- result_temp_local
+            # else
+            #   result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
+
             result_temp_local
           }
         }
@@ -275,7 +266,6 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     if(exists("result_temp_foreach"))
       result <- rbind(result, result_temp_foreach)
 
-    # browser()
     result <- unique(result)
     result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
 
@@ -299,51 +289,6 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       utils::write.csv2(result,fileName , row.names = FALSE)
     }
 
-    # fileName <- file_path_build(result_folder_inference,"20220326","csv")
-    # write.csv2(resultRun,fileName , row.names = FALSE)
-
-    # res.pvalue <- subset(result, PVALUE < 0.05)
-    # res.pvalue$beta_gt1 <- res.pvalue$BETA>1
-    # res.pvalue$beta_gt1 <- as.numeric(res.pvalue$beta_gt1)
-
-    # source("/home/lcorsaro/Desktop/Progetti/r-studio/smarties/R/microarray/epigenetics/epimutation_analysis/qqplot_inferential.R")
-    # result <- utils::read_csv(file.path(result_folder_inference,paste0(file_result_prefix , "binomial_regression_corrected_result.csv", sep = "")))
-    # qqunif.plot(diffMethTable_site_cmp1$diffmeth.p.val, result_folder_inference =  report.dir, filePrefix ="diff_meth_sites")
-
-    # case_vs_control_binomial_regression_corrected_result <-
-    #   read.csv2(
-    #     "/home/lcorsaro/Desktop/experiments_data/DIOSSINA_DESIO/3_semseeker_result/Pivots/case_vs_control_binomial_regression_corrected_result_1.csv"
-    #   )
-    # keys <- unique(result[, c("ANOMALY", "FIGURE", "GROUP", "SUBGROUP")])
-    #
-    # for (i in 1:dim(keys)[1])
-    # {
-    #   # i <- 2
-    #   key <- keys[i, ]
-    #   diffmeth.p.val <-
-    #     subset(result,
-    #            ANOMALY == key$ANOMALY)
-    #   diffmeth.p.val <-
-    #     subset(diffmeth.p.val, FIGURE == key$FIGURE)
-    #   diffmeth.p.val <- subset(diffmeth.p.val, GROUP == key$GROUP)
-    #
-    #   diffmeth.p.val <-
-    #     subset(diffmeth.p.val, SUBGROUP == key$SUBGROUP)
-    #
-    #   diffmeth.p.val <- subset(diffmeth.p.val,PVALUE !=0 )
-    #   if (dim(diffmeth.p.val)[1] <= 1)
-    #     return
-    #   #######inserisco nella funzione i pvalues ottenuti dalla differential (non aggiustati)
-    #
-    #   file_prefix <- paste0("case_vs_control_binomial_regression_corrected_result","_", key$ANOMALY,"_", key$FIGURE,"_", key$GROUP,"_", key$SUBGROUP,"_", sep="")
-    #   qqunifPlot(diffmeth.p.val$PVALUE,
-    #               result_folder_inference = result_folder_inference,
-    #               filePrefix = file_prefix)
-    # }
-    #
-    #
-    #
-    # qqunif.plot(pvalues)
   }
 
   future::plan( future::sequential)
