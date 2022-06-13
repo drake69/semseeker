@@ -50,7 +50,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
 
-  ssEnv$logFolder <-  dir_check_and_create("/tmp",c("semseeker","log",random_file_name))
+  ssEnv$logFolder <-  dir_check_and_create(result_folder,c("log"))
   foreachIndex <- 0
 
   # print(outFile)
