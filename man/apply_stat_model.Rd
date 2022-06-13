@@ -38,6 +38,8 @@ apply_stat_model(
 \item{independent_variable}{independent variable name}
 
 \item{depth_analysis}{depth's analysis}
+
+\item{envir}{object environment}
 }
 \description{
 Title
