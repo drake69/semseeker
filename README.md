@@ -17,7 +17,7 @@ variants.
 
 ## Installation
 
-You can install semseeker using devtools, future relese will be
+You can install semseeker using devtools, future release will be
 available through CRAN.
 
 Install the latest release:
