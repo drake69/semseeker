@@ -29,6 +29,9 @@ quantreg_summary(
 
 \item{lqm_control}{controls of lqmm packages}
 }
+\value{
+ci and pvalue with BCA method
+}
 \description{
 Quantile regression result value, confidence interval and pvalue
 }
