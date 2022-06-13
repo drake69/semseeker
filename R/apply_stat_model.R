@@ -243,6 +243,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
         lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
         quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
+        if(length(quantreg_params)<4)
+        {
+          message("Quantreg has not all the required parameters!")
+          }
         n_permutations_test <- as.numeric(quantreg_params[3])
         n_permutations <- as.numeric(quantreg_params[4])
         tau <- as.numeric(quantreg_params[2])
