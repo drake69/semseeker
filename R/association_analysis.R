@@ -201,7 +201,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       keys <- envir$keys_anomalies_figures_areas
       nkeys <- nrow(keys)
 
-      variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis")
+      variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis","file_path_build", "apply_stat_model")
       result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
       # for (i in 1:nkeys)
       {
