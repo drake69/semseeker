@@ -18,16 +18,26 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
   souceFolder <- dir_check_and_create(envir$result_folderData, c(as.character(populationName),f))
 
+  if(anomalyLabel=="DELTAS")
+  {
+    file_extension <- "bedgraph"
+    col_names <- c("CHR", "START", "END","DELTAS","SAMPLEID")
+  }
+  else
+  {
+    file_extension <- "bed"
+    col_names <- c("CHR", "START", "END", "SAMPLEID")
+  }
+
 
   # browser()
-  fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(anomalyLabel),as.character(figureLable)),"bed")
-  # message("read multiple bed file name", fileName)
+  fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(anomalyLabel),as.character(figureLable)),file_extension)
 
   if(!file.exists(fileName))
     return(NULL)
 
-  sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = c("CHR", "START", "END", "SAMPLEID"), header = FALSE)
-  colnames(sourceData) <- c("CHR", "START", "END", "SAMPLEID")
+  sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = col_names, header = FALSE)
+  colnames(sourceData) <- col_names
 
   sourceData$CHR <- as.factor(sourceData$CHR)
 
@@ -41,7 +51,13 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START"))
   sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
   sourceData[is.na(sourceData)] <- ""
-  sourceData <- plyr::count(df = sourceData, vars = c(columnLabel, "SAMPLEID", groupingColumnLabel))
+
+  if(anomalyLabel!="DELTAS")
+    sourceData <- data.frame(sourceData, "DELTAS"=1)
+
+  sourceData <- sourceData[,c("CHR", "START", "END","DELTAS","SAMPLEID")]
+
+  colnames(sourceData) <- c("CHR", "START", "END","VALUE","SAMPLEID")
 
   # output with column freq
   # message("multiple nrow data", nrow(sourceData))
