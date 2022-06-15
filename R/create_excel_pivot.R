@@ -25,7 +25,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
      # pop <- "Reference"
      # tempPopData <- subset(final_bed, final_bed[,"POPULATION"] != pop)
-    tempPopData <- subset(final_bed, final_bed$freq >0 )
+    tempPopData <- subset(final_bed, final_bed$VALUE != 0 )
     sheetList <- vector(mode="list")
     sheetListNames <- vector(mode="list")
 

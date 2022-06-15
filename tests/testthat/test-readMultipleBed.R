@@ -40,7 +40,7 @@ test_that("read_multiple_bed", {
   create_multiple_bed(envir, sample_sheet)
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS")
+  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -54,7 +54,8 @@ test_that("read_multiple_bed", {
   res <-read_multiple_bed (envir, "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
   expect_true(nrow(res)>0)
 
-  # res <-read_multiple_bed (envir, "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  res <-read_multiple_bed (envir, "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  expect_true(nrow(res)>0)
   # res <-read_multiple_bed (envir, "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
   # res <-read_multiple_bed (envir, "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
   # expect_true(nrow(res)>0)

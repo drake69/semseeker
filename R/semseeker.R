@@ -136,6 +136,7 @@ semseeker <- function(sample_sheet,
     rm(populationSampleSheet)
   }
 
+  populationSampleSheet <- as.data.frame(populationSampleSheet)
   # browser()
   samplesID <- sample_sheet$Sample_ID
   sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% colnames(resultSampleSheet))]
@@ -152,7 +153,7 @@ semseeker <- function(sample_sheet,
     populations <- c("Control","Case")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS")
+  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
 
   subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
