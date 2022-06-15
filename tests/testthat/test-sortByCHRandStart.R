@@ -2,7 +2,9 @@ test_that("sort_by_chr_and_start", {
 
   nitem <- 5e2
 
-  probe_features <- PROBES[!is.na(PROBES$CHR),]
+  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probe_features <- unique(probe_features)
+  probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 
   probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")

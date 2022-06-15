@@ -2,13 +2,16 @@ test_that("read_multiple_bed", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder)
+  envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
   nitem <- 5e4
   nsamples <- 5
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
-  probe_features <- PROBES[!is.na(PROBES$CHR),]
+
+  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probe_features <- unique(probe_features)
+  probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 
   beta_superior_thresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
@@ -47,8 +50,14 @@ test_that("read_multiple_bed", {
 
   probe_features <- get(paste0(probes_prefix,"Whole",sep=""))
 
-  res <-read_multiple_bed (envir, "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
 
+  res <-read_multiple_bed (envir, "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
   expect_true(nrow(res)>0)
+
+  # res <-read_multiple_bed (envir, "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # res <-read_multiple_bed (envir, "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # res <-read_multiple_bed (envir, "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # expect_true(nrow(res)>0)
+
 }
 )

@@ -12,8 +12,10 @@
 #   nitem <- 8e3
 #   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
 #   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
-#   probe_features <- PROBES[!is.na(PROBES$CHR),]
-#   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
+# probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+# probe_features <- unique(probe_features)
+# probe_features$END <- probe_features$START
+# probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 #   row.names(tresholds) <- probe_features$PROBE
 #   row.names(values) <- row.names(tresholds)
 #

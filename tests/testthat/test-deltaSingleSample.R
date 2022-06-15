@@ -10,7 +10,9 @@ testthat::test_that("delta_single_sample",{
   nitem <- 5e4
   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.5, sd=0.7))
 
-  probe_features <- PROBES[!is.na(PROBES$CHR),]
+  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probe_features <- unique(probe_features)
+  probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 
   high_thresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
@@ -33,8 +35,8 @@ testthat::test_that("delta_single_sample",{
   )
 
   result_folderData  <-  dir_check_and_create(tempFolder, "Data")
-  outputFolder <- dir_check_and_create(result_folderData,c("Control","DELTAS_METHYLATION"))
-  fileName <- file_path_build(outputFolder,c(Sample_ID,"DELTAS","METHYLATION"), "bedgraph")
+  outputFolder <- dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
+  fileName <- file_path_build(outputFolder,c(Sample_ID,"DELTAS","BOTH"), "bedgraph")
   expect_true(file.exists(fileName))
 
 
