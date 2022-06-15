@@ -18,10 +18,10 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
   souceFolder <- dir_check_and_create(envir$result_folderData, c(as.character(populationName),f))
 
-  if(anomalyLabel=="DELTAS")
+  if(as.character(anomalyLabel)=="DELTAS")
   {
     file_extension <- "bedgraph"
-    col_names <- c("CHR", "START", "END","DELTAS","SAMPLEID")
+    col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
   }
   else
   {
@@ -50,20 +50,17 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
 
   sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START"))
   sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
-  sourceData[is.na(sourceData)] <- ""
+  sourceData[is.na(sourceData)] <- 0
 
-  if(anomalyLabel!="DELTAS")
-    sourceData <- data.frame(sourceData, "DELTAS"=1)
+  if(plyr::empty(sourceData))
+    return(NULL)
 
-  sourceData <- sourceData[,c("CHR", "START", "END","DELTAS","SAMPLEID")]
+  if(anomalyLabel!="DELTA" & !plyr::empty(sourceData))
+    sourceData$VALUE <- 1
 
-  colnames(sourceData) <- c("CHR", "START", "END","VALUE","SAMPLEID")
-
-  # output with column freq
+  # output with column VALUE
   # message("multiple nrow data", nrow(sourceData))
 
-  if(nrow(sourceData)==0)
-    return(NULL)
 
   sourceData <- data.frame(sourceData,"FIGURE" = figureLable, "ANOMALY" = anomalyLabel, "POPULATION" = populationName)
   sourceData$POPULATION <- as.factor(sourceData$POPULATION)

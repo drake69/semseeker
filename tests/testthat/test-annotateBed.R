@@ -2,10 +2,11 @@ test_that("annotate_bed", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder)
+  envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
   nitem <- 5e4
   nsamples <- 5
+
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
@@ -42,7 +43,7 @@ test_that("annotate_bed", {
   populations <- c("Control")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS")
+  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"

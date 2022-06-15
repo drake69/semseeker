@@ -4,13 +4,17 @@ testthat::test_that("lesions_get",{
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 
   nitem <- 5e4
-  tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
-  values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
+
+  nitem <- min(nitem, nrow(probe_features))
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
+
+
+  tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
+  values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
 
   row.names(tresholds) <- probe_features$PROBE
   row.names(values) <- row.names(tresholds)
@@ -30,6 +34,6 @@ testthat::test_that("lesions_get",{
     grouping_column = "CHR"
   )
 
-  expect_false(length(lesions)==0)
+  expect_false(nrow(lesions)==0)
 
 })

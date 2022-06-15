@@ -6,13 +6,16 @@ test_that("create_heatmap", {
 
   nitem <- 5e5
   nsamples <- 5
-  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
+
+
+  nitem <- min(nitem, nrow(probe_features))
+  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
+  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
   beta_superior_thresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
   beta_inferior_thresholds <- data.frame(rnorm(nitem, mean=0.2, sd=0.2))

@@ -2,10 +2,10 @@ test_that("create_excel_pivot", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder)
+  envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
   nitem <- 5e4
-  nsamples <- 5
+  nsamples <- 10
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
@@ -23,7 +23,7 @@ test_that("create_excel_pivot", {
 
   Sample_ID <- stringi::stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
   colnames(methylation_data) <- Sample_ID
-  Sample_Group <- rep("Control",nsamples)
+  Sample_Group <- c(rep("Control",nsamples/2), rep("Case",nsamples/2))
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
   sp <- analize_population(envir = envir,
@@ -39,10 +39,10 @@ test_that("create_excel_pivot", {
 
   create_multiple_bed(envir, sample_sheet = sample_sheet)
 
-  populations <- c("Control")
+  populations <- c("Control","Case")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS")
+  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -60,9 +60,9 @@ test_that("create_excel_pivot", {
     columnLabel ,
     groupingColumnLabel)
 
-  populations <- c("Reference","Control","Case")
+  populations <- c("Control","Case")
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS")
+  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
 
   subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -71,7 +71,7 @@ test_that("create_excel_pivot", {
   create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   expect_true(file.exists(file.path(envir$result_folderData,"Pivots/GENE.xlsx")))
-  #
+
 #
 #   probes_prefix <- "PROBES_Island_"
 #   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")

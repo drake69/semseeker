@@ -23,30 +23,41 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
          stop("Wrong order matching Probes and low_thresholds!", Sys.time())
  }
 
- ### get deltas HYPER #########################################################
- deltas <- data.frame("DELTA"= round(values - high_thresholds,5))
- colnames(deltas) <- "DELTA"
+ # annotated_data <-   as.data.frame(probe_features)
+ #
+ # annotated_data$values <- values
+ # annotated_data$high_thresholds <- high_thresholds
+ # annotated_data$low_thresholds <- low_thresholds
+ #
+ # annotated_data <- subset(annotated_data, annotated_data$values > annotated_data$high_thresholds)
+ # annotated_data$DELTA <- annotated_data$high_thresholds - annotated_data$values
 
- if (!test_match_order(row.names(deltas), probe_features$PROBE)) {
+ ### get deltas HYPER #########################################################
+ deltas_hyper <- data.frame("DELTA"= values - high_thresholds)
+ colnames(deltas_hyper) <- "DELTA"
+
+ if (!test_match_order(row.names(deltas_hyper), probe_features$PROBE)) {
  stop("Wrong order matching Probes and Mutation!", Sys.time())
  }
 
- deltasAnnotated_hyper <- data.frame(as.data.frame(probe_features), deltas)
+ deltasAnnotated_hyper <- data.frame(as.data.frame(probe_features), deltas_hyper)
+ # deltasAnnotated_hyperSorted <- deltasAnnotated_hyper
  deltasAnnotated_hyperSorted <- sort_by_chr_and_start(deltasAnnotated_hyper)
  deltasAnnotated_hyperSorted <- subset(deltasAnnotated_hyperSorted, deltasAnnotated_hyperSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPER"))
  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hyperSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPER"),"bedgraph"))
 
- ### get deltas HYPER #########################################################
- deltas <- data.frame("DELTA"= round( - values + low_thresholds,5))
- colnames(deltas) <- "DELTA"
+ ### get deltas_hypo HYPER #########################################################
+ deltas_hypo <- data.frame("DELTA"=  low_thresholds - values )
+ colnames(deltas_hypo) <- "DELTA"
 
- if (!test_match_order(row.names(deltas), probe_features$PROBE)) {
+ if (!test_match_order(row.names(deltas_hypo), probe_features$PROBE)) {
    stop("Wrong order matching Probes and Mutation!", Sys.time())
  }
 
- deltasAnnotated_hypo <- data.frame(as.data.frame(probe_features), deltas)
+ deltasAnnotated_hypo <- data.frame(as.data.frame(probe_features), deltas_hypo)
+ # deltasAnnotated_hypoSorted <- deltasAnnotated_hypo
  deltasAnnotated_hypoSorted <- sort_by_chr_and_start(deltasAnnotated_hypo)
  deltasAnnotated_hypoSorted <- subset(deltasAnnotated_hypoSorted, deltasAnnotated_hypoSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
@@ -55,7 +66,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
 
 
  ### get deltas BOTH #########################################################
- deltasAnnotated_both <- rbind(deltasAnnotated_hyper, deltasAnnotated_hypo)
+ deltasAnnotated_both <- rbind(deltasAnnotated_hypoSorted, deltasAnnotated_hyperSorted)
  deltasAnnotated_bothSorted <- sort_by_chr_and_start(deltasAnnotated_both)
  deltasAnnotated_bothSorted <- subset(deltasAnnotated_bothSorted, deltasAnnotated_bothSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
@@ -73,6 +84,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
  }
 
  deltasAnnotated <- data.frame(as.data.frame(probe_features), deltas)
+ # deltasAnnotatedSorted <- deltasAnnotated
  deltasAnnotatedSorted <- sort_by_chr_and_start(deltasAnnotated)
  deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$DELTA != 0)[, c("CHR", "START", "END", "DELTA")]
 
