@@ -82,7 +82,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))
   ssEnv$keys_figures <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  ssEnv$keys_anomalies <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS"))
+  ssEnv$keys_anomalies <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS"))
   ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND","SUBGROUP"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
   ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE","SUBGROUP"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
   ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR","SUBGROUP"="DMR")

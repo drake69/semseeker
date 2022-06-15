@@ -16,13 +16,13 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   alpha<-0.05
   alpha_seq <- seq(1e-16, 1-1e-16, 5e-6)
 
-  u <- c(alpha/2, 1-alpha/2)
-  u_seq <- cbind(alpha_seq/2, 1-alpha_seq/2)
+  alpha_interval <- c(alpha/2, 1-alpha/2)
+  alpha_interval_seq <- cbind(alpha_seq/2, 1-alpha_seq/2)
 
   #Compute constants
-  z0 <- stats::qnorm(mean(boot_vector <= estimate))
-  zu <- stats::qnorm(u)
-  zu_seq <- stats::qnorm(u_seq)
+  inverse_cumulative_normal_standard_alpha_of_mean_difference <- stats::qnorm(mean(boot_vector <= estimate), mean = 0, sd = 1)
+  inverse_cumulative_normal_standard_alpha <- stats::qnorm(alpha_interval)
+  inverse_cumulative_normal_standard_alpha_seq <- stats::qnorm(alpha_interval_seq)
 
   n<-length(working_data)
   I <- rep(NA, n)
@@ -36,8 +36,8 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
     fit.lqm <- suppressMessages(lqmm::lqm( formula = sig.formula, data = working_data_new, tau = tau, control = lqm_control, fit = TRUE))
     fit.res <- suppressMessages(summary(fit.lqm)$tTable)
 
-    jack[i] <-  fit.res[independent_variable,"Value"]
-    I[i] <- (n-1)*(estimate -  jack[i] )
+    # jack[i] <-  fit.res[independent_variable,"Value"]
+    I[i] <- (n-1)*(estimate -  fit.res[independent_variable,"Value"] )
   }
 
   #Estimate acceleration
@@ -45,7 +45,7 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
 
 
   #Adjusted quantiles
-  u_adjusted_seq <- stats::pnorm(z0 + (z0+zu_seq)/(1-acceleration*(z0+zu)))
+  u_adjusted_seq <- stats::pnorm(inverse_cumulative_normal_standard_alpha_of_mean_difference + (inverse_cumulative_normal_standard_alpha_of_mean_difference+inverse_cumulative_normal_standard_alpha_seq)/(1-acceleration*(inverse_cumulative_normal_standard_alpha_of_mean_difference+inverse_cumulative_normal_standard_alpha_seq)))
 
   #Accelerated Bootstrap CI
   Bca1<-stats::quantile(boot_vector, u_adjusted_seq[,1])
@@ -56,20 +56,16 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   if(p.value==0)
     p.value <- 1/( 1 + length(boot_vector))
 
-  #Estimate acceleration
-  acceleration <- (sum(I^3)/sum(I^2)^1.5)/6
-
-  acc.num <- sum((mean(jack)-jack)^3)
-  acc.denom <- sum((mean(jack)-jack)^2)
-  accelerate <- acc.num/(6*acc.denom^1.5)
-
   #Adjusted quantiles
-  u_adjusted <- stats::pnorm(z0 + (z0+zu)/(1-acceleration*(z0+zu)))
+  u_adjusted <- stats::pnorm(inverse_cumulative_normal_standard_alpha_of_mean_difference + (inverse_cumulative_normal_standard_alpha_of_mean_difference+inverse_cumulative_normal_standard_alpha)/(1-acceleration*(inverse_cumulative_normal_standard_alpha_of_mean_difference+inverse_cumulative_normal_standard_alpha)))
 
   #Accelerated Bootstrap CI
   Bca<-stats::quantile(boot_vector, u_adjusted)
 
+  # Bca <- coxed::bca(boot_vector)
+  # p.value <- 0
+  # if(Bca[1]<0 & Bca[2]>0)
+  #   p.value<- 1
+
   return(c(Bca, p.value))
-
-
 }
