@@ -40,6 +40,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
       {
         # i <- 1
         grp <- envir$keys[i,1]
+        anomaly <- envir$keys[i,2]
         temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
         if(nrow(temp)!=0)
         {
@@ -51,7 +52,11 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
             tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
             if(nrow(tempDataFrame)!=0)
             {
-              tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "freq", sum, drop = TRUE)
+              if(anomaly=="DELTAS")
+                tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "VALUE", mean, drop = TRUE)
+              else
+                tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "VALUE", sum, drop = TRUE)
+
               fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
               utils::write.csv2(t(tempDataFrame), fileName)
               tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
