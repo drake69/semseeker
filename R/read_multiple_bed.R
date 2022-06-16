@@ -55,7 +55,7 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   if(plyr::empty(sourceData))
     return(NULL)
 
-  if(anomalyLabel!="DELTA" & !plyr::empty(sourceData))
+  if(anomalyLabel!="DELTAS" & !plyr::empty(sourceData))
     sourceData$VALUE <- 1
 
   # output with column VALUE

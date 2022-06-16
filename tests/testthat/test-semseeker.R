@@ -2,9 +2,9 @@ test_that("semeeker", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "multisession")
+  # envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
-  nitem <- 5e5
+  nitem <- 5e2
   nsamples <- 21
 
 
@@ -27,11 +27,13 @@ test_that("semeeker", {
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder, parallel_strategy = "multisession")
 
+  tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")
   localFileRes <- read.table(fileToRead, sep="\t")
 
   expect_true(nrow(localFileRes)>0)
 
+  tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAS_BOTH")
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAS" ,"BOTH" ), "bedgraph")
   localFileRes <- read.table(fileToRead, sep="\t")
 

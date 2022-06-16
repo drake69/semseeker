@@ -27,20 +27,20 @@ annotate_bed <- function (
   final_bed <- NULL
   bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"csv")
 
-  # if(file.exists(bedFileName))
-  # {
-  #   if(file.info(bedFileName)$size < 10)
-  #     {
-  #       final_bed <- NULL
-  #       message("Given up file:", final_bed, " is empty!")
-  #     }
-  #   else
-  #     {
-  #       final_bed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
-  #       final_bed$VALUE = as.numeric(final_bed$VALUE)
-  #     }
-  #   return(final_bed)
-  # }
+  if(file.exists(bedFileName))
+  {
+    if(file.info(bedFileName)$size < 10)
+      {
+        final_bed <- NULL
+        message("Given up file:", final_bed, " is empty!")
+      }
+    else
+      {
+        final_bed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
+        final_bed$VALUE = as.numeric(final_bed$VALUE)
+      }
+    return(final_bed)
+  }
 
   envir$keysLocal <-
     expand.grid(

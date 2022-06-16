@@ -16,7 +16,7 @@ dump_sample_as_bed_file <- function(data_to_dump, fileName) {
   }
 
   # bed coordinate must start from zero!
-  data_to_dump$START <- as.numeric(data_to_dump$START) - 1
+  data_to_dump$START <- as.numeric(data_to_dump$START)
   data_to_dump$END <- as.numeric(data_to_dump$END)
   if (!plyr::empty(data_to_dump)) {
 

@@ -57,7 +57,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   #                                                 "sample_sheet", "analyze_single_sample", "envir", "analyze_single_sample_both", "delta_single_sample"),
   #                                       .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = "remove") %dopar% {
   # for(i in 1:nrow(sample_sheet)) {
-  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= rbind, .export = variables_to_export) %dopar% {
+  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dopar% {
     local_sample_detail <- sample_sheet[i,]
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
@@ -74,6 +74,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   }
 
 
+  summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)
   colnames(summary_population) <- c("Sample_ID","DELTA_AVG","DELTA_VAR","DELTA_MEDIAN","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO","LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH")
   rownames(summary_population) <- summary_population$Sample_ID
