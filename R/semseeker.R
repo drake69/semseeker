@@ -136,8 +136,8 @@ semseeker <- function(sample_sheet,
     rm(populationSampleSheet)
   }
 
-  populationSampleSheet <- as.data.frame(populationSampleSheet)
-  # browser()
+  sample_sheet <- as.data.frame(sample_sheet)
+  resultSampleSheet <- as.data.frame(resultSampleSheet)
   samplesID <- sample_sheet$Sample_ID
   sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% colnames(resultSampleSheet))]
   sample_sheet$Sample_ID <- samplesID
@@ -188,26 +188,26 @@ semseeker <- function(sample_sheet,
   dmrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
   create_heatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
 
-  if (!is.null(geneBed))
-  {
-    colnames(geneBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  }
-
-  if (!is.null(dmrBed))
-  {
-    colnames(dmrBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  }
-
-  if (!is.null(islandBed))
-  {
-    colnames(islandBed) <- c("MAINGROUP","SAMPLEID","SUBGROUP","FREQ","FIGURE","ANOMALY","POPULATION")
-  }
-
-  totalBed <- rbind(geneBed, dmrBed, islandBed)
-  if (!is.null(totalBed) && nrow(totalBed)>0)
-    create_heatmap( envir=envir,inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
-
-  rm(populationControlRangeBetaValues)
+  # if (!is.null(geneBed))
+  # {
+  #    geneBed <- geneBed[,c("MAINGROUP","SAMPLEID","SUBGROUP","VALUE","FIGURE","ANOMALY","POPULATION")]
+  # }
+  #
+  # if (!is.null(dmrBed))
+  # {
+  #   dmrBed <- dmrBed[,c("MAINGROUP","SAMPLEID","SUBGROUP","VALUE","FIGURE","ANOMALY","POPULATION")]
+  # }
+  #
+  # if (!is.null(islandBed))
+  # {
+  #   islandBed <- islandBed[,c("MAINGROUP","SAMPLEID","SUBGROUP","VALUE","FIGURE","ANOMALY","POPULATION")]
+  # }
+  #
+  # totalBed <- rbind(geneBed, dmrBed, islandBed)
+  # if (!is.null(totalBed) && nrow(totalBed)>0)
+  #   create_heatmap( envir=envir,inputBedDataFrame =  totalBed,anomalies = anomalies, groupLabel = "GENOMIC_AREA", groupColumnIDs = 3)
+  #
+  # rm(populationControlRangeBetaValues)
 
   # message("Starting inference Analysis.")
   # inferenceAnalysis(envir$result_folderData = envir$result_folderData, envir$logFolder= envir$logFolder, inferenceDetails)
