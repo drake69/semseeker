@@ -18,9 +18,10 @@ semseeker <- function(sample_sheet,
                       bonferroni_threshold = 0.05,
                       maxResources = 90,
                       iqrTimes = 3 ,
-                      parallel_strategy ="multisession") {
+                      parallel_strategy ="multisession",
+                      ... ) {
 
-  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy)
+  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, ...)
 
   methylation_data <- stats::na.omit(methylation_data)
   # set digits to 22
@@ -81,7 +82,7 @@ semseeker <- function(sample_sheet,
 
 
   if (plyr::empty(referencePopulationMatrix) |
-    dim(referencePopulationMatrix)[2] < 2) {
+      dim(referencePopulationMatrix)[2] < 2) {
     message("Empty methylation_data ", Sys.time())
     stop("Empty methylation_data ")
   }
@@ -147,46 +148,67 @@ semseeker <- function(sample_sheet,
   gc()
   utils::write.csv2(sample_sheet, file.path(envir$result_folderData , "sample_sheet_result.csv"))
 
-  if(length(sample_sheet$Sample_Group=="Reference")>0){
+  if(length(sample_sheet$Sample_Group=="Reference")>0)
     populations <- c("Reference","Control","Case")
-  }  else
+  else
     populations <- c("Control","Case")
 
-  figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  figures <- envir$keys_figures
+  anomalies <- envir$keys_anomalies
 
-  subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  probes_prefix = "PROBES_Gene_"
-  mainGroupLabel =  "GENE"
-  subGroupLabel="GROUP"
+  if(sum(envir$keys_metaareas=="CHR")==1)
+  {
+    subGroups <- c("")
+    probes_prefix = "PROBES"
+    mainGroupLabel =  "CHR"
+    subGroupLabel= "GROUP"
 
-  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+    chrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+    create_heatmap( envir=envir,inputBedDataFrame =  chrBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = 1)
+  }
 
-  geneBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
-  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnIDs = c(1) )
-  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnIDs = c(1,3))
+  if(sum(envir$keys_metaareas=="GENE")==1)
+  {
+    subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+    probes_prefix = "PROBES_Gene_"
+    mainGroupLabel =  "GENE"
+    subGroupLabel="GROUP"
+
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+
+    geneBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+    create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+    create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE", groupColumnIDs = c(1))
+    create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "GENE_PARTS", groupColumnIDs = c(1,3))
+  }
 
 
-  probes_prefix <- "PROBES_Island_"
-  subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
-  mainGroupLabel <- "ISLAND"
-  subGroupLabel <- "RELATION_TO_CPGISLAND"
-  create_excel_pivot (envir=envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+  if(sum(envir$keys_metaareas=="ISLAND")==1)
+  {
+    probes_prefix <- "PROBES_Island_"
+    subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
+    mainGroupLabel <- "ISLAND"
+    subGroupLabel <- "RELATION_TO_CPGISLAND"
+    create_excel_pivot (envir=envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
-  islandBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-  create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnIDs = 3)
-  create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnIDs = 1)
-  create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
+    islandBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+    create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "RELATION_TO_CPGISLAND", groupColumnIDs = 3)
+    create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, groupLabel = "ISLAND", groupColumnIDs = 1)
+    create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
+  }
 
-  subGroups <- c("DMR")
-  probes_prefix = "PROBES_DMR_"
-  mainGroupLabel =  "DMR"
-  subGroupLabel="GROUP"
-  create_excel_pivot (envir=envir,populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+  if(sum(envir$keys_metaareas=="DMR")==1)
+  {
+    subGroups <- c("DMR")
+    probes_prefix = "PROBES_DMR_"
+    mainGroupLabel =  "DMR"
+    subGroupLabel="GROUP"
+    create_excel_pivot (envir=envir,populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
-  dmrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-  create_heatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
+    dmrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+    create_heatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, groupLabel = mainGroupLabel, groupColumnIDs = 1 )
+  }
 
   # if (!is.null(geneBed))
   # {

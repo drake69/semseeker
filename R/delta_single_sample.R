@@ -83,16 +83,16 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
    stop("Wrong order matching Probes and Mutation!", Sys.time())
  }
 
- deltasAnnotated <- data.frame(as.data.frame(probe_features), deltas)
- # deltasAnnotatedSorted <- deltasAnnotated
- deltasAnnotatedSorted <- sort_by_chr_and_start(deltasAnnotated)
- deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$DELTA != 0)[, c("CHR", "START", "END", "DELTA")]
+ # deltasAnnotated <- data.frame(as.data.frame(probe_features), deltas)
+ # # deltasAnnotatedSorted <- deltasAnnotated
+ # deltasAnnotatedSorted <- sort_by_chr_and_start(deltasAnnotated)
+ # deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$DELTA != 0)[, c("CHR", "START", "END", "DELTA")]
 
  result <- ""
  result <- result[-1]
- result["DELTA_AVG"] <- round(mean(deltasAnnotatedSorted$DELTA),5)
- result["DELTA_VAR"] <- round(stats::var(deltasAnnotatedSorted$DELTA),5)
- result["DELTA_MEDIAN"] <- round(stats::median(deltasAnnotatedSorted$DELTA),5)
+ result["DELTAS_HYPO"] <- round(mean(deltasAnnotated_hypoSorted$DELTA),5)
+ result["DELTAS_HYPER"] <- round(mean(deltasAnnotated_hyperSorted$DELTA),5)
+ result["DELTAS_BOTH"] <- round(mean(deltasAnnotated_bothSorted$DELTA),5)
 
 
  return(result)

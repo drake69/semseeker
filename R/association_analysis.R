@@ -20,7 +20,7 @@
 #'
 #' @importFrom doRNG %dorng%
 #' @export
-association_analysis <- function(inference_details,result_folder, maxResources=90, parallel_strategy ="multisession")
+association_analysis <- function(inference_details,result_folder, maxResources=90, parallel_strategy ="multisession", ...)
 {
 
   envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy)
@@ -149,7 +149,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     # binomiale che si vuole usare per la regressione logistica
 
 
-    keys <- expand.grid("ANOMALY"=c("LESIONS","MUTATIONS"), "FIGURE"=c("HYPER","HYPO","BOTH"))
+    keys <- expand.grid("ANOMALY"= envir$keys_anomalies[,1], "FIGURE"= envir$keys_figures[,1])
     cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep="")
     keys$GROUP = "POPULATION"
     keys$SUBGROUP = "SAMPLE"
@@ -193,6 +193,14 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       graphics::boxplot(LESIONS_BOTH~study_summaryToPlot[,independent_variable], main="Both Type of Lesions", data = study_summaryToPlot, cex=2)
       graphics::boxplot(LESIONS_HYPER~study_summaryToPlot[,independent_variable],main="Hyper Lesions", data = study_summaryToPlot, cex=2)
       grDevices::dev.off()
+
+      filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAS"),"png")
+      grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
+      graphics::par(mfrow=c(1,3))
+      graphics::boxplot(DELTAS_HYPO~study_summaryToPlot[,independent_variable],main="Hypo DELTAS Mean", data = study_summaryToPlot, cex=2)
+      graphics::boxplot(DELTAS_BOTH~study_summaryToPlot[,independent_variable], main="Both Type of DELTAS", data = study_summaryToPlot, cex=2)
+      graphics::boxplot(DELTAS_HYPER~study_summaryToPlot[,independent_variable],main="Hyper DELTAS Mean", data = study_summaryToPlot, cex=2)
+      grDevices::dev.off()
     }
 
     if(depth_analysis >1)
@@ -208,7 +216,8 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
         if(exists("tempDataFrame"))
           rm(list = c("tempDataFrame"))
         key <- keys [i,]
-        fname <-file_path_build( result_folderPivot ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+        pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
+        fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
         if (file.exists(fname))
         {
           tempDataFrame <- utils::read.csv(fname, sep = ";")

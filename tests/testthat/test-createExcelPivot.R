@@ -72,6 +72,12 @@ test_that("create_excel_pivot", {
 
   expect_true(file.exists(file.path(envir$result_folderData,"Pivots/GENE.xlsx")))
 
+  subGroups <- c("")
+  probes_prefix = "PROBES"
+  mainGroupLabel =  "CHR"
+  subGroupLabel="GROUP"
+  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+
 #
 #   probes_prefix <- "PROBES_Island_"
 #   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")

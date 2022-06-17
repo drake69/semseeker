@@ -4,7 +4,12 @@
 \alias{init_env}
 \title{init environment}
 \usage{
-init_env(result_folder, maxResources = 90, parallel_strategy = "multisession")
+init_env(
+  result_folder,
+  maxResources = 90,
+  parallel_strategy = "multisession",
+  ...
+)
 }
 \arguments{
 \item{result_folder}{where result of semseeker will bestored}
