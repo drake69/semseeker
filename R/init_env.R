@@ -53,30 +53,41 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   anomalies <- if(!exists("anomalies")) c("MUTATIONS","LESIONS","DELTAS") else anomalies
   metaareas <- if(!exists("metaareas")) c("GENE","ISLAND","DMR","CHR") else metaareas
 
+  ssEnv$gene_subareas <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  ssEnv$island_subareas <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
+
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))
   ssEnv$keys_figures <-  data.frame("FIGURE"=figures)
   ssEnv$keys_anomalies <-  data.frame("ANOMALY"=anomalies)
   ssEnv$keys_metaareas <- data.frame("METAAREA"=metaareas)
 
-  ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND","SUBGROUP"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
-  ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE","SUBGROUP"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
-  ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR","SUBGROUP"="DMR")
+  ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND",
+                                          "SUBGROUP"=island_subareas
+  )
+  ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE",
+                                       "SUBGROUP"=gene_subareas
+  )
+  ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR",
+                                      "SUBGROUP"="DMR")
 
   ssEnv$keys_anomalies_figures_areas <- rbind(
-    expand.grid("GROUP"="DMR","SUBGROUP"="DMR",
+    expand.grid("GROUP"="DMR",
+                "SUBGROUP"="DMR",
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies),
-    expand.grid("GROUP"="GENE","SUBGROUP"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"),
+    expand.grid("GROUP"="GENE",
+                "SUBGROUP"= gene_subareas,
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies),
-    expand.grid("GROUP"="ISLAND","SUBGROUP"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"),
+    expand.grid("GROUP"="ISLAND",
+                "SUBGROUP"= island_subareas,
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies)
   )
 
   ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures[,1],"anomalies"=ssEnv$keys_anomalies[,1])
 
-  probes_subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  probes_subGroups <- gene_subareas
   probes_Prefix <- "PROBES_Gene_"
   probes_MainGroupLabel <-  "GENE"
   probes_SubGroupLabel <- "GROUP"
@@ -89,7 +100,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # probes.850k
 
   probes_Prefix <- "PROBES_Island_"
-  probes_subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
+  probes_subGroups <- island_subareas
   probes_MainGroupLabel <- "ISLAND"
   probes_SubGroupLabel <- "RELATION_TO_CPGISLAND"
   ssEnv$keys_island_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
@@ -104,10 +115,10 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # probes <-  rbind( ssEnv$keys_island_probes, ssEnv$keys_gene_probes, ssEnv$keys_dmr_probes )
 
   ssEnv$functionToExport <- c( "analyze_single_sample",
-                            "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
-                            "file_path_build","analyze_single_sample_both",
-                            "sort_by_chr_and_start", "test_match_order", "lesions_get",
-                            "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
+                               "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
+                               "file_path_build","analyze_single_sample_both",
+                               "sort_by_chr_and_start", "test_match_order", "lesions_get",
+                               "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
 
   return(ssEnv)
 }
