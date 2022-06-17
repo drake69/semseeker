@@ -169,7 +169,7 @@ semseeker <- function(sample_sheet,
 
   if(sum(envir$keys_metaareas[,1]=="GENE")==1)
   {
-    subGroups <- envir$gene_subareas
+    subGroups <- envir$gene_subareas[,1]
     probes_prefix = "PROBES_Gene_"
     mainGroupLabel =  "GENE"
     subGroupLabel="GROUP"
@@ -186,7 +186,7 @@ semseeker <- function(sample_sheet,
   if(sum(envir$keys_metaareas[,1]=="ISLAND")==1)
   {
     probes_prefix <- "PROBES_Island_"
-    subGroups <- envir$island_subareas
+    subGroups <- envir$island_subareas[,1]
     mainGroupLabel <- "ISLAND"
     subGroupLabel <- "RELATION_TO_CPGISLAND"
     create_excel_pivot (envir=envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)

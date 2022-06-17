@@ -53,8 +53,8 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   anomalies <- if(!exists("anomalies")) c("MUTATIONS","LESIONS","DELTAS") else anomalies
   metaareas <- if(!exists("metaareas")) c("GENE","ISLAND","DMR","CHR") else metaareas
 
-  ssEnv$gene_subareas <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  ssEnv$island_subareas <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
+  ssEnv$gene_subareas <- data.frame(c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
+  ssEnv$island_subareas <- data.frame(c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
 
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))
   ssEnv$keys_figures <-  data.frame("FIGURE"=figures)
@@ -62,10 +62,10 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_metaareas <- data.frame("METAAREA"=metaareas)
 
   ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND",
-                                          "SUBGROUP"=island_subareas
+                                          "SUBGROUP"=ssEnv$island_subareas[,1]
   )
   ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE",
-                                       "SUBGROUP"=gene_subareas
+                                       "SUBGROUP"=ssEnv$gene_subareas[,1]
   )
   ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR",
                                       "SUBGROUP"="DMR")
@@ -76,18 +76,18 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies),
     expand.grid("GROUP"="GENE",
-                "SUBGROUP"= gene_subareas,
+                "SUBGROUP"= ssEnv$gene_subareas[,1],
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies),
     expand.grid("GROUP"="ISLAND",
-                "SUBGROUP"= island_subareas,
+                "SUBGROUP"= ssEnv$island_subareas[,1],
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies)
   )
 
   ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures[,1],"anomalies"=ssEnv$keys_anomalies[,1])
 
-  probes_subGroups <- gene_subareas
+  probes_subGroups <- ssEnv$gene_subareas[,1]
   probes_Prefix <- "PROBES_Gene_"
   probes_MainGroupLabel <-  "GENE"
   probes_SubGroupLabel <- "GROUP"
@@ -100,7 +100,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # probes.850k
 
   probes_Prefix <- "PROBES_Island_"
-  probes_subGroups <- island_subareas
+  probes_subGroups <- ssEnv$island_subareas[,1]
   probes_MainGroupLabel <- "ISLAND"
   probes_SubGroupLabel <- "RELATION_TO_CPGISLAND"
   ssEnv$keys_island_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
