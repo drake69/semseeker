@@ -14,7 +14,8 @@
 #'
 #' @importFrom doRNG %dorng%
 #'
-apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder, independent_variable, depth_analysis=3, envir )
+apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder,
+                             independent_variable, depth_analysis=3, envir )
 {
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame

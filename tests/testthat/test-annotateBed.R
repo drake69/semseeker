@@ -2,7 +2,12 @@ test_that("annotate_bed", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "multisession")
+
+  figures <- c( "BOTH")
+  anomalies <- c("DELTAS")
+  metaareas <- c("GENE")
+
+  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "", maxResources = 90, figures, anomalies, metaareas)
 
   nitem <- 5e4
   nsamples <- 5
@@ -88,5 +93,23 @@ test_that("annotate_bed", {
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
 
+
+  groups <- c("")
+  probes_prefix = "PROBES"
+  columnLabel =  "CHR"
+  groupingColumnLabel="GROUP"
+
+  # create and read
+  final_bed <- annotate_bed (
+    envir,
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
+  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"csv")
 
 })

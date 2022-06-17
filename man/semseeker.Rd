@@ -12,7 +12,8 @@ semseeker(
   bonferroni_threshold = 0.05,
   maxResources = 90,
   iqrTimes = 3,
-  parallel_strategy = "multisession"
+  parallel_strategy = "multisession",
+  ...
 )
 }
 \arguments{

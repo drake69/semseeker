@@ -24,7 +24,6 @@
 
 analize_population <- function(envir, methylation_data, sliding_window_size, beta_superior_thresholds, beta_inferior_thresholds, sample_sheet, beta_medians, bonferroni_threshold = 0.05, probe_features) {
 
-  #@importFrom foreach %dopar%
   # browser()
   start_time <- Sys.time()
   message("AnalyzePopulation warmingUP ", Sys.time())
@@ -35,7 +34,6 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   sample_sheet <- sample_sheet[order(sample_sheet[, "Sample_ID"], decreasing = FALSE), ]
   existent_samples <- colnames(methylation_data)
   sample_names <- sample_sheet$Sample_ID
-  # sampleToSelect <- existent_samples[sample_names %in% existent_samples]
   missed_samples <- setdiff(setdiff(sample_names, existent_samples), "PROBE")
 
   if (length(missed_samples) != 0) {
@@ -45,17 +43,11 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   message("WarmedUP AnalyzePopulation", Sys.time())
   message("Start population analyze ", Sys.time())
 
-  # summaryFileName <- file.path(envir$result_folderData, "summary.csv")
 
   variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "envir", "sliding_window_size", "beta_superior_thresholds",
                            "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "analyze_single_sample_both", "delta_single_sample", "beta_medians")
-  # , .errorhandling = 'remove'
-  # .packages=c("dplyr","semseeker")
   i <- 0
-  # summary_population <- foreach::foreach(i = 1:nrow(sample_sheet), .combine="rbind",
-  #                                       .export=c(ls(envir=globalenv()),"methylation_data", "sliding_window_size", "beta_superior_thresholds", "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "beta_medians",
-  #                                                 "sample_sheet", "analyze_single_sample", "envir", "analyze_single_sample_both", "delta_single_sample"),
-  #                                       .packages=c("dplyr"), .multicombine = FALSE, .errorhandling = "remove") %dopar% {
+
   # for(i in 1:nrow(sample_sheet)) {
   summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dopar% {
     local_sample_detail <- sample_sheet[i,]
@@ -76,7 +68,8 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
 
   summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)
-  colnames(summary_population) <- c("Sample_ID","DELTA_AVG","DELTA_VAR","DELTA_MEDIAN","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO","LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH")
+  colnames(summary_population) <- c("Sample_ID","DELTAS_HYPO","DELTAS_HYPER","DELTAS_BOTH","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO",
+                                    "LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH")
   rownames(summary_population) <- summary_population$Sample_ID
   message("Row count result:", nrow(summary_population))
   rm(methylation_data)

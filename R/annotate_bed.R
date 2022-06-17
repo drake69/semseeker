@@ -62,10 +62,13 @@ annotate_bed <- function (
 
     probes <- get(paste0(probes_prefix, grp,sep=""))
     resFolder <- dir_check_and_create(envir$result_folderData,pop)
-    tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes, columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
+    tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
+                                  columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
     tempFile
   }
 
+  colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
+  final_bed <- final_bed[, colname_to_preserve]
   utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
   gc()

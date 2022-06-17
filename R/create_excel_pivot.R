@@ -59,7 +59,8 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
                 tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
                                                  fun.aggregate = sum, drop = TRUE)
 
-              fileName <- paste0(reportFolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
+              pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
+              fileName <- paste0(pivot_subfolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
               utils::write.csv2(t(tempDataFrame), fileName)
               tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
               colnames(tempDataFrame) <- tempDataFrame[1,]

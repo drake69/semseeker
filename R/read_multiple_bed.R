@@ -48,12 +48,17 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   droplevels(probe_features$CHR)
   droplevels(sourceData$CHR)
 
-  sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START"))
+  if(plyr::empty(sourceData))
+    return(NULL)
+
+  if(sum(grepl("END", colnames(probe_features)))>0)
+    sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START","END"))
+  else
+    sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START"))
+
   sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
   sourceData[is.na(sourceData)] <- 0
 
-  if(plyr::empty(sourceData))
-    return(NULL)
 
   if(anomalyLabel!="DELTAS" & !plyr::empty(sourceData))
     sourceData$VALUE <- 1

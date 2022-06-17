@@ -5,40 +5,9 @@
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #'
 #' @return the working environment
-init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession")
+init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession", ...)
 {
-
-
   set.seed(7658776)
-  # if(getRversion() >= "2.15.1")  utils::globalVariables(c( "chartFolder","ssEnv$logFolder","computationCluster",
-  #                                                          "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
-  #                                                          "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
-  #                                                          "probes","functionToExport"), add = FALSE)
-
-  # if(length(utils::globalVariables())!=0)
-  #   return()
-
-  # if(getRversion() >= "2.15.1")
-  #   utils::globalVariables( names= c( "ssEnv$result_folderData","chartFolder","ssEnv$logFolder","computationCluster",
-  #                             "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
-  #                             "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
-  #                             "probes"), add = FALSE, package = "semseeker")
-
-
-  if (.Platform$OS.type == "windows") {
-    withAutoprint({
-      utils::memory.size()
-      utils::memory.size(TRUE)
-      utils::memory.limit(16000)
-    })
-  }
-
-  # setClass("employee", slots=list(name="character", id="numeric", contact="character"))
-  # obj <- new("employee",name="Steven", id=1002, contact="West Avenue")
-
-  # e <- new.env()
-
-  # assign("ssEnv$result_folderData", dir_check_and_create(result_folder, "Data"))
 
   #allow export of object of 8gb with future
   options(future.globals.maxSize= 4 * 1024^3)
@@ -80,20 +49,32 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     future::plan( future::multisession, workers = nCore)
 
 
+  figures <- if(!exists("figures")) c("HYPO", "HYPER", "BOTH") else figures
+  anomalies <- if(!exists("anomalies")) c("MUTATIONS","LESIONS","DELTAS") else anomalies
+  metaareas <- if(!exists("areas")) c("GENE","ISLAND","DMR","CHR") else metaareas
+
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))
-  ssEnv$keys_figures <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  ssEnv$keys_anomalies <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS"))
+  ssEnv$keys_figures <-  data.frame("FIGURE"=figures)
+  ssEnv$keys_anomalies <-  data.frame("ANOMALY"=anomalies)
+  ssEnv$keys_metaareas <- data.frame("METAAREA"=metaareas)
+
   ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND","SUBGROUP"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
   ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE","SUBGROUP"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
   ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR","SUBGROUP"="DMR")
 
   ssEnv$keys_anomalies_figures_areas <- rbind(
-    expand.grid("GROUP"="DMR","SUBGROUP"="DMR", "FIGURE"=c("HYPO", "HYPER", "BOTH"), "ANOMALY"=c("MUTATIONS","LESIONS")),
-    expand.grid("GROUP"="GENE","SUBGROUP"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"), "FIGURE"=c("HYPO", "HYPER", "BOTH"), "ANOMALY"=c("MUTATIONS","LESIONS")),
-    expand.grid("GROUP"="ISLAND","SUBGROUP"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"), "FIGURE"=c("HYPO", "HYPER", "BOTH"), "ANOMALY"=c("MUTATIONS","LESIONS"))
+    expand.grid("GROUP"="DMR","SUBGROUP"="DMR",
+                "FIGURE"=figures,
+                "ANOMALY"=anomalies),
+    expand.grid("GROUP"="GENE","SUBGROUP"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"),
+                "FIGURE"=figures,
+                "ANOMALY"=anomalies),
+    expand.grid("GROUP"="ISLAND","SUBGROUP"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"),
+                "FIGURE"=figures,
+                "ANOMALY"=anomalies)
   )
 
-  ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures,"anomalies"=ssEnv$keys_anomalies)
+  ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures[,1],"anomalies"=ssEnv$keys_anomalies[,1])
 
   probes_subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_Prefix <- "PROBES_Gene_"
@@ -120,48 +101,13 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   probes_SubGroupLabel <- "GROUP"
   ssEnv$keys_dmr_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
 
-  probes <-  rbind( ssEnv$keys_island_probes, ssEnv$keys_gene_probes, ssEnv$keys_dmr_probes )
-
-
-  # parallel::clusterExport(envir=my_env, cl=computationCluster, varlist = list("ssEnv$result_folderData","ssEnv$logFolder","computationCluster",
-  #                                         "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
-  #                                         "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
-  #                                         "probes"))
-  #
-  # parallel::clusterExport(envir=environment(),
-  #                         cl=computationCluster,
-  #                         varlist = list( "analyze_single_sample",
-  #                           "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
-  #                           "file_path_build","analyze_single_sample_both",
-  #                           "createPivotResultFromMultipleBed", "sort_by_chr_and_start", "test_match_order", "lesions_get",
-  #                           "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body",
-  #                           "ssEnv$result_folderData","ssEnv$logFolder","computationCluster",
-  #                           "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
-  #                           "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
-  #                           "probes"))
-
-  # ,
-  # "ssEnv$result_folderData","ssEnv$logFolder","computationCluster",
-  # "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
-  # "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
-  # "probes"
+  # probes <-  rbind( ssEnv$keys_island_probes, ssEnv$keys_gene_probes, ssEnv$keys_dmr_probes )
 
   ssEnv$functionToExport <- c( "analyze_single_sample",
                             "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
                             "file_path_build","analyze_single_sample_both",
                             "sort_by_chr_and_start", "test_match_order", "lesions_get",
                             "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
-
-  # options(doFuture.foreach.export = ".export-and-automatic-with-warning")
-
-  #
-  #
-  # parallel::clusterExport(envir=my_env, cl=computationCluster, varlist = ls(my_env))
-
-  # lockBinding("ssEnv$result_folderData","chartFolder","ssEnv$logFolder","computationCluster",
-  #             "ssEnv$result_folderChart","ssEnv$result_folderInference","ssEnv$result_folderEuristic",
-  #             "ssEnv$keys_anomalies","ssEnv$keys_figures","ssEnv$keys_populations","ssEnv$keys",
-  #             "probes", e)
 
   return(ssEnv)
 }
