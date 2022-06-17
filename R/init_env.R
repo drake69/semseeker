@@ -51,7 +51,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   figures <- if(!exists("figures")) c("HYPO", "HYPER", "BOTH") else figures
   anomalies <- if(!exists("anomalies")) c("MUTATIONS","LESIONS","DELTAS") else anomalies
-  metaareas <- if(!exists("areas")) c("GENE","ISLAND","DMR","CHR") else metaareas
+  metaareas <- if(!exists("metaareas")) c("GENE","ISLAND","DMR","CHR") else metaareas
 
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))
   ssEnv$keys_figures <-  data.frame("FIGURE"=figures)

@@ -156,7 +156,7 @@ semseeker <- function(sample_sheet,
   figures <- envir$keys_figures
   anomalies <- envir$keys_anomalies
 
-  if(sum(envir$keys_metaareas=="CHR")==1)
+  if(sum(envir$keys_metaareas[,1]=="CHR")==1)
   {
     subGroups <- c("")
     probes_prefix = "PROBES"
@@ -168,7 +168,7 @@ semseeker <- function(sample_sheet,
     create_heatmap( envir=envir,inputBedDataFrame =  chrBed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = 1)
   }
 
-  if(sum(envir$keys_metaareas=="GENE")==1)
+  if(sum(envir$keys_metaareas[,1]=="GENE")==1)
   {
     subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
     probes_prefix = "PROBES_Gene_"
@@ -184,7 +184,7 @@ semseeker <- function(sample_sheet,
   }
 
 
-  if(sum(envir$keys_metaareas=="ISLAND")==1)
+  if(sum(envir$keys_metaareas[,1]=="ISLAND")==1)
   {
     probes_prefix <- "PROBES_Island_"
     subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
@@ -198,7 +198,7 @@ semseeker <- function(sample_sheet,
     create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, groupLabel = "ISLAND_PARTS", groupColumnIDs = c(1,3))
   }
 
-  if(sum(envir$keys_metaareas=="DMR")==1)
+  if(sum(envir$keys_metaareas[,1]=="DMR")==1)
   {
     subGroups <- c("DMR")
     probes_prefix = "PROBES_DMR_"
