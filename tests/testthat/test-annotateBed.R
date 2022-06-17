@@ -7,7 +7,7 @@ test_that("annotate_bed", {
   anomalies <- c("DELTAS")
   metaareas <- c("GENE")
 
-  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "", maxResources = 90, figures, anomalies, metaareas)
+  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "multisession", maxResources = 90, figures, anomalies, metaareas)
 
   nitem <- 5e4
   nsamples <- 5
