@@ -67,7 +67,7 @@ semseeker <- function(sample_sheet,
   # }
 
 
-  population_checkResult <- population_check(sample_sheet, methylation_data)
+  population_checkResult <- population_check(sample_sheet, methylation_data, envir)
   if(!is.null(population_checkResult))
   {
     stop(population_checkResult)
@@ -97,11 +97,10 @@ semseeker <- function(sample_sheet,
   referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
-  populations <-  c("Reference","Control","Case")
-  for (i in 1:length(populations)) {
+  for (i in 1:length(envir$keys_populations[,1])) {
 
     #
-    populationName <- populations[i]
+    populationName <- envir$keys_populations[i,1]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == populationName, ]
     populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
 
