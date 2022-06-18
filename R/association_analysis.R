@@ -23,7 +23,7 @@
 association_analysis <- function(inference_details,result_folder, maxResources=90, parallel_strategy ="multisession", ...)
 {
 
-  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, ... )
+  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, if(exists("figures")) figures,  if(exists("anomalies"))  anomalies,if(exists("metaareas"))  metaareas )
 
   # if(exists("figures")) figures,  if(exists("anomalies"))  anomalies,if(exists("metaareas"))  metaareas
 
