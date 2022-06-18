@@ -39,7 +39,10 @@ annotate_bed <- function (
         final_bed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
         final_bed$VALUE = as.numeric(final_bed$VALUE)
       }
-    return(final_bed)
+
+    final_bed <- final_bed[final_bed$ANOMALY %in% anomalies & final_bed$FIGURE %in% figures,]
+    if(!plyr::empty(final_bed))
+      return(final_bed)
   }
 
   envir$keysLocal <-

@@ -5,7 +5,13 @@
 \title{create_heatmap load the multiple bed resulting from
 analysis organized into files and folders per anomaly and produce a pivot}
 \usage{
-create_heatmap(envir, inputBedDataFrame, anomalies, groupLabel, groupColumnIDs)
+create_heatmap(
+  envir,
+  inputBedDataFrame,
+  anomalies,
+  file_prefix,
+  groupColumnLabels
+)
 }
 \arguments{
 \item{envir}{semseekere working infos}
@@ -14,12 +20,12 @@ create_heatmap(envir, inputBedDataFrame, anomalies, groupLabel, groupColumnIDs)
 
 \item{anomalies}{vector of anomalies to manage}
 
-\item{groupLabel}{main genomic area to char eg: gene}
+\item{file_prefix}{main genomic area to char eg: gene}
 
-\item{groupColumnIDs}{positions of the group coplumn id}
+\item{groupColumnLabels}{positions of the group coplumn id}
 }
 \value{
-list of pivot by column identified with groupLabel and by Sample
+list of pivot by column identified with file_prefix and by Sample
 }
 \description{
 create_heatmap load the multiple bed resulting from

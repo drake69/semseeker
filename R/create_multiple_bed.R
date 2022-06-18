@@ -4,9 +4,12 @@ create_multiple_bed <- function(envir, sample_sheet){
   #create multiple file bed
   variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build","%dopar%","getDoPar")
   i <- 0
-  localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"=envir$keys_figures[,1] ,"ANOMALY"= envir$keys_anomalies[,1] ,"EXT"="bed")
+
+
+
+  localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"=envir$keys_figures_default[,1] ,"ANOMALY"= envir$keys_anomalies_default[,1] ,"EXT"="bed")
   localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),
-                                            "FIGURE"=envir$keys_figures[,1],
+                                            "FIGURE"=envir$keys_figures_default[,1],
                                             "ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
   foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export ) %dopar%
