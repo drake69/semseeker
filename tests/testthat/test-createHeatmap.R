@@ -2,7 +2,12 @@ test_that("create_heatmap", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder)
+
+  figures <- c( "BOTH")
+  anomalies <- c("DELTAS")
+  metaareas <- c("GENE")
+
+  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "no_multisession", maxResources = 90, figures, anomalies, metaareas)
 
   nitem <- 5e5
   nsamples <- 5
@@ -42,10 +47,20 @@ test_that("create_heatmap", {
 
   create_multiple_bed(envir, sample_sheet = sample_sheet)
 
-  populations <- c("Control")
 
-  figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS")
+  populations <- c("Control")
+  figures <- c("BOTH")
+  anomalies <- c("MUTATIONS")
+
+  subGroups <- c("")
+  probes_prefix = "PROBES"
+  mainGroupLabel =  "CHR"
+  subGroupLabel= "GROUP"
+
+  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  chrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+  create_heatmap( envir=envir,inputBedDataFrame =  chrBed,anomalies = anomalies, file_prefix = "CHR", groupColumnLabels = c("CHR"))
+
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -63,13 +78,40 @@ test_that("create_heatmap", {
     columnLabel ,
     groupingColumnLabel)
 
-  create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GENE"))
   expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_MUTATIONS.png")))
 
+  figures <- c("BOTH")
+  anomalies <- c("DELTAS")
+
+  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  probes_prefix = "PROBES_Gene_"
+  columnLabel =  "GENE"
+  groupingColumnLabel="GROUP"
+
+  # create and read
+  final_bed <- annotate_bed (
+    envir,
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
+  create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GROUP"))
+  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_DELTAS.png")))
+
+
+  create_heatmap( envir=envir,inputBedDataFrame =  final_bed,anomalies = anomalies, file_prefix = "GENE", groupColumnLabels = c("GENE"))
+  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE/Control_GENE_DELTAS.png")))
+
+
   # final_bed <- final_bed [1:2,]
-  # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
   #
   # final_bed <- NULL
-  # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, groupLabel = "GENE_AREA", groupColumnIDs = c(3))
+  # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
 
 })
