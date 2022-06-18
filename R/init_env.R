@@ -49,9 +49,14 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     future::plan( future::multisession, workers = nCore)
 
 
-  figures <- if(!exists("figures")) c("HYPO", "HYPER", "BOTH") else figures
-  anomalies <- if(!exists("anomalies")) c("MUTATIONS","LESIONS","DELTAS") else anomalies
-  metaareas <- if(!exists("metaareas")) c("GENE","ISLAND","DMR","CHR") else metaareas
+  ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
+  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS"))
+  ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR"))
+
+
+  figures <- if(!exists("figures")) ssEnv$keys_figures_default[,1] else figures
+  anomalies <- if(!exists("anomalies"))  ssEnv$keys_anomalies_default[,1] else anomalies
+  metaareas <- if(!exists("metaareas"))  ssEnv$keys_metaareas_default[,1] else metaareas
 
   ssEnv$gene_subareas <- data.frame(c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
   ssEnv$island_subareas <- data.frame(c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
