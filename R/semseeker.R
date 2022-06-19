@@ -122,7 +122,7 @@ semseeker <- function(sample_sheet,
       probe_features = PROBES
     )
 
-    create_multiple_bed(envir, populationSampleSheet)
+    resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
 
     resultPopulation <- as.data.frame(resultPopulation)
     # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
