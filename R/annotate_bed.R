@@ -40,9 +40,11 @@ annotate_bed <- function (
         final_bed$VALUE = as.numeric(final_bed$VALUE)
       }
 
-    final_bed <- final_bed[final_bed$ANOMALY %in% anomalies & final_bed$FIGURE %in% figures,]
-    if(!plyr::empty(final_bed))
-      return(final_bed)
+    final_bed_temp <- final_bed[final_bed$ANOMALY %in% anomalies & final_bed$FIGURE %in% figures,]
+    if(!plyr::empty(final_bed_temp))
+      return(final_bed_temp)
+    else
+      final_bed_temp <- final_bed
   }
 
   envir$keysLocal <-
@@ -72,6 +74,11 @@ annotate_bed <- function (
 
   colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
   final_bed <- final_bed[, colname_to_preserve]
+
+  if(exists("final_bed_temp"))
+    if(!plyr::empty(final_bed_temp))
+      final_bed <- rbind(final_bed, final_bed_temp)
+
   utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
   gc()

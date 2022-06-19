@@ -78,6 +78,8 @@ test_that("create_excel_pivot", {
   subGroupLabel="GROUP"
   create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
+  #TODO: test incremental pivot
+
 #
 #   probes_prefix <- "PROBES_Island_"
 #   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
