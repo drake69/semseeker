@@ -22,12 +22,6 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$logFolder <-  dir_check_and_create(result_folder,c("log"))
   foreachIndex <- 0
 
-  # print(outFile)
-  # computationCluster <- parallel::makeCluster(nCore, type = "PSOCK", outfile = outFile)
-
-  # doFuture::registerDoFuture()
-  # computationCluster <- doFuture::makeCluster(nCore, outFile = outfile)
-  # plan(cluster, workers = computationCluster)
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
 
   if (nzchar(chk) && chk == "TRUE") {
@@ -44,15 +38,6 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   doFuture::registerDoFuture()
 
-  future::plan( future::sequential)
-  if(parallel_strategy=="multisession")
-    future::plan( future::multisession, workers = nCore)
-
-
-  ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS"))
-  ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR"))
-
 
   tryCatch(
     {
@@ -64,9 +49,26 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
       stop()
     }
   )
-
-
   arguments <- list(...)
+
+  # TODO: improve planning parallel management using also cluster
+  future::plan( future::sequential)
+  if(parallel_strategy=="multisession")
+    future::plan( future::multisession, workers = nCore)
+  if(parallel_strategy=="multicore")
+    future::plan( future::multicore, workers = nCore)
+  if(parallel_strategy=="cluster")
+    {
+    message ("Cluster feature not implemented!")
+    stop()
+    future::plan( future::cluster, workers = nCore)
+  }
+
+  ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
+  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS"))
+  ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR"))
+
+
 
   figures <- if(is.null(arguments[["figures"]])) ssEnv$keys_figures_default[,1] else arguments$figures
   anomalies <- if(is.null(arguments[["anomalies"]]))  ssEnv$keys_anomalies_default[,1] else arguments$anomalies
@@ -75,14 +77,17 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(sum(figures %in% ssEnv$keys_figures_default[,1])==0)
   {
     message("The only allowed figures values are:", ssEnv$keys_figures_default)
+    stop()
   }
   if(sum(anomalies %in% ssEnv$keys_anomalies_default[,1])==0)
   {
     message("The only allowed anomalies values are:", ssEnv$keys_anomalies_default)
+    stop()
   }
   if(sum(metaareas %in% ssEnv$keys_metaareas_default[,1])==0)
   {
     message("The only allowed areas values are:", ssEnv$keys_metaareas_default)
+    stop()
   }
 
   message("I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
