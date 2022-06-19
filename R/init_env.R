@@ -54,9 +54,22 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR"))
 
 
+  tryCatch(
+    {
+      test_it <- list(...)
+    },
+    error = function(cond)  {
+      message ("Function's arguments must be passed explicitily !")
+      message(cond)
+      stop()
+    }
+  )
+
   figures <- if(!exists("figures")) ssEnv$keys_figures_default[,1] else figures
   anomalies <- if(!exists("anomalies"))  ssEnv$keys_anomalies_default[,1] else anomalies
   metaareas <- if(!exists("metaareas"))  ssEnv$keys_metaareas_default[,1] else metaareas
+
+  message("I will focus on:", anomalies, " due to ", anomalies, " of ", metaareas)
 
   ssEnv$gene_subareas <- data.frame(c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
   ssEnv$island_subareas <- data.frame(c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
