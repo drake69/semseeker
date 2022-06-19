@@ -23,7 +23,7 @@
 association_analysis <- function(inference_details,result_folder, maxResources=90, parallel_strategy ="multisession", ...)
 {
 
-  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, if(exists("figures")) figures,  if(exists("anomalies"))  anomalies,if(exists("metaareas"))  metaareas )
+  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, ... )
 
   # if(exists("figures")) figures,  if(exists("anomalies"))  anomalies,if(exists("metaareas"))  metaareas
 
@@ -160,11 +160,31 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     if(!is.null(covariates) && !length(covariates)==0)
       study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
+
+    # define file results filename
+    if(is.null(covariates) || length(covariates)==0)
+    {
+      file_suffix <- "_test_result"
+    } else
+    {
+      file_suffix <- "_test_corrected_result"
+    }
+    fileNameResults <- file_path_build(envir$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
+
+    # clean keys from already done association
+    if(file.exists(fileNameResults))
+    {
+      old_results < utils::read.csv2(fileNameResults, header = T)
+      keys_anomalies_figures_areas_done <- unique(old_results$ANOMALY, old_results$FIGURE, old_results$GROUP)
+      filter_cond <- keys$ANOMALY %in%  keys_anomalies_figures_areas_done$ANOMALY & keys$FIGURE %in%  keys_anomalies_figures_areas_done$FIGURE & keys$GROUP %in%  keys_anomalies_figures_areas_done$GROUP
+      keys <- keys[!filter_cond, ]
+    }
+
     for(i in 1:nrow(keys))
     {
       g_start <- 2 + length(covariates)
       result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
-                                 key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
+                                      key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
       result <- rbind(result, result_temp)
     }
 
@@ -173,7 +193,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     study_summaryToPlot <- study_summary
 
     if(independent_variable=="Sample_Group")
-       study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
+      study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
 
     if(family_test=="binomial")
     {
@@ -205,12 +225,22 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       grDevices::dev.off()
     }
 
+
     if(depth_analysis >1)
     {
 
       keys <- envir$keys_anomalies_figures_areas
-      nkeys <- nrow(keys)
 
+      # clean keys from already done association
+      if(file.exists(fileNameResults))
+      {
+        old_results < utils::read.csv2(fileNameResults, header = T)
+        keys_anomalies_figures_areas_done <- unique(old_results$ANOMALY, old_results$FIGURE, old_results$GROUP)
+        filter_cond <- keys$ANOMALY %in%  keys_anomalies_figures_areas_done$ANOMALY & keys$FIGURE %in%  keys_anomalies_figures_areas_done$FIGURE & keys$GROUP %in%  keys_anomalies_figures_areas_done$GROUP
+        keys <- keys[!filter_cond, ]
+      }
+
+      nkeys <- nrow(keys)
       variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis","file_path_build", "apply_stat_model")
       result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
       # for (i in 1:nkeys)
@@ -279,7 +309,6 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
 
     result <- unique(result)
     result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
-
     result <- result[order(result$PVALUEADJ),]
 
     if(filter_p_value)
@@ -287,17 +316,14 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
 
     if(nrow(result)>0)
     {
-      if(is.null(covariates) || length(covariates)==0)
+      if(file.exists(fileNameResults))
       {
-        file_suffix <- "_test_result"
-      } else
-      {
-        file_suffix <- "_test_corrected_result"
+        old_results < utils::read.csv2(fileNameResults, header = T)
+        result <- rbind(result, old_results)
       }
-
-      # resultRun <- rbind(result, resultRun)
-      fileName <- file_path_build(envir$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
-      utils::write.csv2(result,fileName , row.names = FALSE)
+      result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
+      result <- result[order(result$PVALUEADJ),]
+      utils::write.csv2(result,fileNameResults , row.names = FALSE)
     }
 
   }

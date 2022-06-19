@@ -32,7 +32,7 @@ create_heatmap <-
     }
     if(length(groupColumnLabels)==1)
     {
-      inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = paste0(inputBedDataFrame[, groupColumnLabels[1]],sep=""))
+      inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = inputBedDataFrame[, groupColumnLabels[1]])
     }
     inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
     inputBedDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$POPULATION != "Reference")
