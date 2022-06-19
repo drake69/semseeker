@@ -25,6 +25,48 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
 
   envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, ... )
 
+  figures <- envir$keys_figures[,1]
+  anomalies <- envir$keys_anomalies[,1]
+  populations <- c("Reference","Control","Case")
+
+  if(sum(envir$keys_metaareas[,1]=="CHR")==1)
+  {
+    subGroups <- c("")
+    probes_prefix = "PROBES"
+    mainGroupLabel =  "CHR"
+    subGroupLabel= "GROUP"
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  }
+
+  if(sum(envir$keys_metaareas[,1]=="GENE")==1)
+  {
+    subGroups <- envir$gene_subareas[,1]
+    probes_prefix = "PROBES_Gene_"
+    mainGroupLabel =  "GENE"
+    subGroupLabel="GROUP"
+
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  }
+
+
+  if(sum(envir$keys_metaareas[,1]=="ISLAND")==1)
+  {
+    probes_prefix <- "PROBES_Island_"
+    subGroups <- envir$island_subareas[,1]
+    mainGroupLabel <- "ISLAND"
+    subGroupLabel <- "RELATION_TO_CPGISLAND"
+    create_excel_pivot (envir=envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+  }
+
+  if(sum(envir$keys_metaareas[,1]=="DMR")==1)
+  {
+    subGroups <- c("DMR")
+    probes_prefix = "PROBES_DMR_"
+    mainGroupLabel =  "DMR"
+    subGroupLabel="GROUP"
+    create_excel_pivot (envir=envir,populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+  }
+
   # if(exists("figures")) figures,  if(exists("anomalies"))  anomalies,if(exists("metaareas"))  metaareas
 
   inference_details <- unique(inference_details)
@@ -174,19 +216,20 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     # clean keys from already done association
     if(file.exists(fileNameResults))
     {
-      old_results < utils::read.csv2(fileNameResults, header = T)
-      keys_anomalies_figures_areas_done <- unique(old_results$ANOMALY, old_results$FIGURE, old_results$GROUP)
-      filter_cond <- keys$ANOMALY %in%  keys_anomalies_figures_areas_done$ANOMALY & keys$FIGURE %in%  keys_anomalies_figures_areas_done$FIGURE & keys$GROUP %in%  keys_anomalies_figures_areas_done$GROUP
-      keys <- keys[!filter_cond, ]
+      old_results <- utils::read.csv2(fileNameResults, header = T)
+      keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse = "_", sep = "")))
+      keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse = "_", sep = "")))
+      keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
     }
 
-    for(i in 1:nrow(keys))
-    {
-      g_start <- 2 + length(covariates)
-      result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
-                                      key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
-      result <- rbind(result, result_temp)
-    }
+    if(nrow(keys)>0)
+      for(i in 1:nrow(keys))
+      {
+        g_start <- 2 + length(covariates)
+        result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[i])], g_start = g_start , family_test = family_test, covariates = covariates,
+                                        key = keys[i,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
+        result <- rbind(result, result_temp)
+      }
 
     result <- result[order(result$PVALUEADJ),]
 
@@ -234,74 +277,75 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       # clean keys from already done association
       if(file.exists(fileNameResults))
       {
-        old_results < utils::read.csv2(fileNameResults, header = T)
-        keys_anomalies_figures_areas_done <- unique(old_results$ANOMALY, old_results$FIGURE, old_results$GROUP)
-        filter_cond <- keys$ANOMALY %in%  keys_anomalies_figures_areas_done$ANOMALY & keys$FIGURE %in%  keys_anomalies_figures_areas_done$FIGURE & keys$GROUP %in%  keys_anomalies_figures_areas_done$GROUP
-        keys <- keys[!filter_cond, ]
+        old_results <- utils::read.csv2(fileNameResults, header = T)
+        keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse = "_", sep = "")))
+        keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse = "_", sep = "")))
+        keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
       }
 
       nkeys <- nrow(keys)
       variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis","file_path_build", "apply_stat_model")
-      result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
-      # for (i in 1:nkeys)
-      {
-        if(exists("tempDataFrame"))
-          rm(list = c("tempDataFrame"))
-        key <- keys [i,]
-        pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
-        fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
-        if (file.exists(fname))
+      if(nrow(keys)>0)
+        result_temp_foreach <- foreach::foreach(i = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
+        # for (i in 1:nkeys)
         {
-          tempDataFrame <- utils::read.csv(fname, sep = ";")
-          row.names(tempDataFrame) <- tempDataFrame$X
-          tempDataFrame <- tempDataFrame[,-1]
-          tempDataFrame <- t(tempDataFrame)
-          if(nrow(tempDataFrame)>1)
+          if(exists("tempDataFrame"))
+            rm(list = c("tempDataFrame"))
+          key <- keys [i,]
+          pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
+          fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+          if (file.exists(fname))
           {
-            tempDataFrame <- as.data.frame(tempDataFrame)
-            tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
-            tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
+            tempDataFrame <- utils::read.csv(fname, sep = ";")
+            row.names(tempDataFrame) <- tempDataFrame$X
+            tempDataFrame <- tempDataFrame[,-1]
+            tempDataFrame <- t(tempDataFrame)
+            if(nrow(tempDataFrame)>1)
+            {
+              tempDataFrame <- as.data.frame(tempDataFrame)
+              tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
+              tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
 
-            tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
-            tempDataFrame <- as.data.frame(tempDataFrame)
-            tempDataFrame$POPULATION <- sample_names[, independent_variable]
-            tempDataFrame[is.na(tempDataFrame)] <- 0
-
-
-            tempDataFrame[, independent_variable] <- sample_names[, independent_variable]
-            tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
-
-            cols <- (gsub(" ", "_", colnames(tempDataFrame)))
-            cols <- (gsub("-", "_", cols))
-            cols <- (gsub(":", "_", cols))
-            cols <- (gsub("/", "_", cols))
-            cols <- (gsub("'", "_", cols))
+              tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
+              tempDataFrame <- as.data.frame(tempDataFrame)
+              tempDataFrame$POPULATION <- sample_names[, independent_variable]
+              tempDataFrame[is.na(tempDataFrame)] <- 0
 
 
-            tempDataFrame <- as.data.frame(tempDataFrame)
+              tempDataFrame[, independent_variable] <- sample_names[, independent_variable]
+              tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
 
-            if(length(colnames(tempDataFrame))!=length(cols))
-              browser()
+              cols <- (gsub(" ", "_", colnames(tempDataFrame)))
+              cols <- (gsub("-", "_", cols))
+              cols <- (gsub(":", "_", cols))
+              cols <- (gsub("/", "_", cols))
+              cols <- (gsub("'", "_", cols))
 
-            colnames(tempDataFrame) <- cols
 
-            g_start <- 2 + length(covariates)
+              tempDataFrame <- as.data.frame(tempDataFrame)
 
-            result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates,
-                                                  key = key, transformation= transformation, dototal = TRUE,
-                                            logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
+              if(length(colnames(tempDataFrame))!=length(cols))
+                browser()
 
-            # message("Exited form apply model")
+              colnames(tempDataFrame) <- cols
 
-            # if(!exists("result_temp_foreach"))
-            #   result_temp_foreach <- result_temp_local
-            # else
-            #   result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
+              g_start <- 2 + length(covariates)
 
-            result_temp_local
+              result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates,
+                                                    key = key, transformation= transformation, dototal = TRUE,
+                                                    logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
+
+              # message("Exited form apply model")
+
+              # if(!exists("result_temp_foreach"))
+              #   result_temp_foreach <- result_temp_local
+              # else
+              #   result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
+
+              result_temp_local
+            }
           }
         }
-      }
     }
 
     if(exists("result_temp_foreach"))
@@ -312,13 +356,13 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
     result <- result[order(result$PVALUEADJ),]
 
     if(filter_p_value)
-        result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
+      result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
 
     if(nrow(result)>0)
     {
       if(file.exists(fileNameResults))
       {
-        old_results < utils::read.csv2(fileNameResults, header = T)
+        old_results <- utils::read.csv2(fileNameResults, header = T)
         result <- rbind(result, old_results)
       }
       result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)

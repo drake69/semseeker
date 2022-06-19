@@ -109,7 +109,14 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR",
                                       "SUBGROUP"="DMR")
 
+  ssEnv$keys_areas_chr <- expand.grid("GROUP"="CHR",
+                                      "SUBGROUP"="CHR")
+
   ssEnv$keys_anomalies_figures_areas <- rbind(
+    expand.grid("GROUP"="CHR",
+                "SUBGROUP"="CHR",
+                "FIGURE"=figures,
+                "ANOMALY"=anomalies),
     expand.grid("GROUP"="DMR",
                 "SUBGROUP"="DMR",
                 "FIGURE"=figures,
@@ -123,6 +130,8 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies)
   )
+
+  ssEnv$keys_anomalies_figures_areas <- ssEnv$keys_anomalies_figures_areas[ ssEnv$keys_anomalies_figures_areas$GROUP %in% metaareas, ]
 
   ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures[,1],"anomalies"=ssEnv$keys_anomalies[,1])
 
