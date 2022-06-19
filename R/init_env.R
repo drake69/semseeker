@@ -65,11 +65,27 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     }
   )
 
-  figures <- if(!exists("figures")) ssEnv$keys_figures_default[,1] else figures
-  anomalies <- if(!exists("anomalies"))  ssEnv$keys_anomalies_default[,1] else anomalies
-  metaareas <- if(!exists("metaareas"))  ssEnv$keys_metaareas_default[,1] else metaareas
 
-  message("I will focus on:", anomalies, " due to ", anomalies, " of ", metaareas)
+  arguments <- list(...)
+
+  figures <- if(is.null(arguments[["figures"]])) ssEnv$keys_figures_default[,1] else arguments$figures
+  anomalies <- if(is.null(arguments[["anomalies"]]))  ssEnv$keys_anomalies_default[,1] else arguments$anomalies
+  metaareas <- if(is.null(arguments[["metaareas"]]))  ssEnv$keys_metaareas_default[,1] else arguments$metaareas
+
+  if(sum(figures %in% ssEnv$keys_figures_default[,1])==0)
+  {
+    message("The only allowed figures values are:", ssEnv$keys_figures_default)
+  }
+  if(sum(anomalies %in% ssEnv$keys_anomalies_default[,1])==0)
+  {
+    message("The only allowed anomalies values are:", ssEnv$keys_anomalies_default)
+  }
+  if(sum(metaareas %in% ssEnv$keys_metaareas_default[,1])==0)
+  {
+    message("The only allowed areas values are:", ssEnv$keys_metaareas_default)
+  }
+
+  message("I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
 
   ssEnv$gene_subareas <- data.frame(c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
   ssEnv$island_subareas <- data.frame(c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
