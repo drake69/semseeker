@@ -32,6 +32,8 @@ test_that("association_analysis", {
   inferenceFolder <- file.path(tempFolder,"Inference")
 
 
+  #todo: test incremental association analysis
+
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
                                    "family_test"=c("quantreg_0.5_1000_15000"),

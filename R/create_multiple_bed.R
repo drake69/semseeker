@@ -12,7 +12,8 @@ create_multiple_bed <- function(envir, sample_sheet){
                                             "FIGURE"=envir$keys_figures_default[,1],
                                             "ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
-  foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export ) %dopar%
+  # foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export ) %dopar%
+  for(i in 1:nrow(localKeys))
     {
       key <- localKeys[i,]
       tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
@@ -29,11 +30,22 @@ create_multiple_bed <- function(envir, sample_sheet){
             localtemp
           }
         }
+
       if(exists("localFileRes"))
-        if(!plyr::empty(localFileRes)>0)
+        if(!plyr::empty(localFileRes))
         {
           fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
           utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+          #create quantilized deltas
+          if(key$ANOMALY=="DELTAS")
+          {
+            #value is in the 4th position
+            # give to each quantile an even weight
+            localFileRes[,4] <- as.numeric(ggplot2::cut_number(as.numeric(localFileRes[,4]) , n=4)) * 2
+            tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
+            fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)), key$EXT)
+            utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+          }
         }
     }
   gc()
