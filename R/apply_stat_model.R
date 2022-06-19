@@ -263,7 +263,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
         }
 
-        if(boot.bca[1]<0 & boot.bca[2]>0)
+        if(boot.bca[3] > 0.05 )
         {
           n_permutations <- n_permutations_test
         }

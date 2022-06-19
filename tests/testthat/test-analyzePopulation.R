@@ -2,7 +2,7 @@
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "multicore")
+  envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
   nitem <- 5e4
   nsamples <- 20
@@ -48,6 +48,6 @@
   message(nrow(sample_sheet))
   expect_true(nrow(sp)==nrow(sample_sheet))
 
-  future::plan( future::multicore)
+  future::plan( future::multisession)
 })
 

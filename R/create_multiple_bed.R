@@ -1,5 +1,5 @@
 #' @importFrom foreach %dopar%
-create_multiple_bed <- function(envir, sample_sheet){
+create_multiple_bed <- function(envir, sample_sheet, resultPopulation){
 
   #create multiple file bed
   variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build","%dopar%","getDoPar")
@@ -12,8 +12,8 @@ create_multiple_bed <- function(envir, sample_sheet){
                                             "FIGURE"=envir$keys_figures_default[,1],
                                             "ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
-  # foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export ) %dopar%
-  for(i in 1:nrow(localKeys))
+  deltaq_summary <- foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export, .combine = rbind ) %dopar%
+  # for(i in 1:nrow(localKeys))
     {
       key <- localKeys[i,]
       tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
@@ -45,8 +45,25 @@ create_multiple_bed <- function(envir, sample_sheet){
             tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
             fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)), key$EXT)
             utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+            colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
+            tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",
+                                             fun.aggregate = sum, drop = TRUE)
+            colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
+            lbl <- rep(paste("DELTAQ_",as.character(key$FIGURE),sep=""), nrow(tempDataFrame))
+            data.frame("LABEL"=lbl, tempDataFrame)
           }
         }
     }
+
+  #update sample sheet
+  # study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
+
+  tempDataFrame <- reshape2::dcast(data = deltaq_summary, formula = SAMPLEID  ~ LABEL, value.var = "VALUE", fun.aggregate = sum, drop = TRUE)
+
+  # study_summary <- study_summary[, !(colnames(study_summary) %in% colnames(tempDataFrame))]
+  resultPopulation <- merge(resultPopulation, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID")
+
   gc()
+  return(resultPopulation)
+
 }
