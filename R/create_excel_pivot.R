@@ -1,7 +1,8 @@
 #' @importFrom doRNG %dorng%
 create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
-  final_bed <-  annotate_bed( envir=envir,  populations,figures ,anomalies,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+  final_bed <-  annotate_bed( envir=envir, populations =   populations,figures =  figures ,anomalies =  anomalies,
+                            groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel,groupingColumnLabel =   subGroupLabel)
   i <- 0
   k <- 0
   if (is.null(final_bed))

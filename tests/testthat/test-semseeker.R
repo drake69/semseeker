@@ -26,7 +26,7 @@ test_that("semeeker", {
   mySampleSheet <- data.frame(Sample_Group, Sample_ID)
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
-             parallel_strategy = "multisession")
+             parallel_strategy = "")
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")

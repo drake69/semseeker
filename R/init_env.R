@@ -53,7 +53,6 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   arguments <- list(...)
 
   # TODO: improve planning parallel management using also cluster
-  future::plan( future::sequential)
   if(parallel_strategy=="multisession")
   {
     future::plan( future::multisession, workers = nCore)
@@ -73,7 +72,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
      & parallel_strategy!="cluster")
   {
-    future::plan( future::multisession, workers = nCore)
+    future::plan( future::sequential)
     message("I will work in sequential mode")
   }
 

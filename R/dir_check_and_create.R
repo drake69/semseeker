@@ -1,3 +1,11 @@
+#' Title
+#'
+#' @param baseFolder
+#' @param subFolders
+#'
+#' @return
+#'
+#' @examples
 dir_check_and_create <- function  (baseFolder, subFolders)
 {
   folderSep <- as.character(.Platform$file.sep)
