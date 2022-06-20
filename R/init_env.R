@@ -11,7 +11,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   set.seed(7658776)
 
   #allow export of object of 8gb with future
-  options(future.globals.maxSize= 4 * 1024^3)
+  options(future.globals.maxSize= 16 * 1024^3)
 
   ssEnv <- list()
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
@@ -31,7 +31,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   } else {
     # use all cores in devtools::test()
     nCore <- future::availableCores() - 1
-    nCore <- floor(nCore * maxResources/100 )
+    nCore <- if(floor(future::availableCores() * maxResources/100 ) > nCore ) nCore else floor(future::availableCores() * maxResources/100 )
   }
   # bootstrap cluster
   outFile <- file.path(ssEnv$logFolder, "cluster_r.out")
