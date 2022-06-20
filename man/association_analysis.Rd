@@ -20,7 +20,7 @@ tipi di test: wilcoxon, stats::t.test,
 tipi di correlazioni: pearson, kendall, spearman
 MUTATIONS_* ~ tcdd_mother + exam_age
 transformation to be applied to dependent variable
-(mutations and lesions): scale, log, log2, log10, exp, johnson, none, quantile_quantiles(as number) eg quantile_3
+(mutations and lesions): scale, log, log2, log10, exp, none, quantile_quantiles(as number) eg quantile_3
 depth analysis:
 1: sample level
 2: type level (gene, DMR, cpgisland) (includes 1)
