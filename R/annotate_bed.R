@@ -71,6 +71,10 @@ annotate_bed <- function (
     tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
                                   columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
     tempFile
+    # if(exists("final_bed"))
+    #   final_bed <- rbind(final_bed, tempFile)
+    # else
+    #   final_bed <- tempFile
   }
 
   colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))

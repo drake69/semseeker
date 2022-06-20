@@ -16,7 +16,7 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
   souceFolder <- dir_check_and_create(envir$result_folderData, c(as.character(populationName),f))
 
-  if(as.character(anomalyLabel)=="DELTAS")
+  if(as.character(anomalyLabel)=="DELTAS" | as.character(anomalyLabel)=="DELTAQ")
   {
     file_extension <- "bedgraph"
     col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
@@ -55,19 +55,21 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
       sourceData[is.na(sourceData)] <- 0
 
 
-      if(anomalyLabel!="DELTAS" & !plyr::empty(sourceData))
+      if(anomalyLabel!="DELTAS" & anomalyLabel!="DELTAQ" & !plyr::empty(sourceData))
         sourceData$VALUE <- 1
 
       # output with column VALUE
       # message("multiple nrow data", nrow(sourceData))
 
-
-      sourceData <- data.frame(sourceData,"FIGURE" = figureLable, "ANOMALY" = anomalyLabel, "POPULATION" = populationName)
-      sourceData$POPULATION <- as.factor(sourceData$POPULATION)
-      sourceData$ANOMALY <- as.factor(sourceData$ANOMALY)
-      sourceData$FIGURE <- as.factor(sourceData$FIGURE)
-      # message("read multiple nrow data", nrow(sourceData))
-      return(sourceData)
+      if(!plyr::empty(sourceData))
+      {
+        sourceData <- data.frame(sourceData,"FIGURE" = as.character(figureLable), "ANOMALY" = as.character(anomalyLabel), "POPULATION" = as.character(populationName))
+        sourceData$POPULATION <- as.factor(sourceData$POPULATION)
+        sourceData$ANOMALY <- as.factor(sourceData$ANOMALY)
+        sourceData$FIGURE <- as.factor(sourceData$FIGURE)
+        # message("read multiple nrow data", nrow(sourceData))
+        return(sourceData)
+      }
     }
   }
 }
