@@ -129,18 +129,20 @@ semseeker <- function(sample_sheet,
 
       resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
       resultPopulation <- as.data.frame(resultPopulation)
-      resultPopulation
+
+      # resultPopulation
+      # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
+      # #   browser()
+      #
+
+      if(!exists("resultSampleSheet"))
+        resultSampleSheet <- resultPopulation
+      else
+        resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
+
+      rm(populationSampleSheet)
     }
 
-    # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
-    # #   browser()
-    #
-    if(!exists("resultSampleSheet"))
-      resultSampleSheet <- resultPopulation
-    else
-      resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
-
-    rm(populationSampleSheet)
   }
 
   sample_sheet <- as.data.frame(sample_sheet)

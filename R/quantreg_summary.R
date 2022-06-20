@@ -30,19 +30,19 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   # jack <- I
   i<- 0
   to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable")
-  I <- foreach::foreach(i = 1:n, .combine = c, .export = to_export) %dorng%
-    # for(i in 1:n)
-    {
-      #Remove ith working_data point
-      working_data_new <- working_data[-i,]
+  # I <- foreach::foreach(i = 1:n, .combine = c, .export = to_export) %dorng%
+  for(i in 1:n)
+  {
+    #Remove ith working_data point
+    working_data_new <- working_data[-i,]
 
-      #Estimate beta dal modello
-      fit.lqm <- suppressMessages(lqmm::lqm( formula = sig.formula, data = working_data_new, tau = tau, control = lqm_control, fit = TRUE))
-      fit.res <- suppressMessages(summary(fit.lqm)$tTable)
+    #Estimate beta dal modello
+    fit.lqm <- suppressMessages(lqmm::lqm( formula = sig.formula, data = working_data_new, tau = tau, control = lqm_control, fit = TRUE))
+    fit.res <- suppressMessages(summary(fit.lqm)$tTable)
 
-      # jack[i] <-  fit.res[independent_variable,"Value"]
-      (n-1)*(estimate -  fit.res[independent_variable,"Value"] )
-    }
+    # jack[i] <-  fit.res[independent_variable,"Value"]
+    I[i]<-(n-1)*(estimate -  fit.res[independent_variable,"Value"] )
+  }
 
   #Estimate acceleration
   acceleration <- (sum(I^3)/sum(I^2)^1.5)/6
