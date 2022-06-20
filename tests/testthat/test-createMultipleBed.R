@@ -37,7 +37,7 @@ test_that("create_multiple_bed", {
                            probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet)
+  create_multiple_bed(envir, sample_sheet, sp)
 
   tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_BOTH"))
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")

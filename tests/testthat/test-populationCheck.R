@@ -3,7 +3,7 @@ test_that("population_check", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder)
+  envir <- init_env(tempFolder)
 
   nitem <- 5
   nsamples <- 30
@@ -17,19 +17,19 @@ test_that("population_check", {
 
 
   # all fine
-  expect_true(is.null(population_check(mySampleSheet, methylation_data)))
+  expect_true(is.null(population_check(mySampleSheet, methylation_data, envir)))
 
   #Sample_ID has NA
   mySampleSheet$Sample_ID[1] <- NA
-  expect_true(!is.null(population_check(mySampleSheet, methylation_data)))
+  expect_true(!is.null(population_check(mySampleSheet, methylation_data, envir)))
 
   #Sample_Group has NA
   mySampleSheet$Sample_Group[1] <- NA
-  expect_true(!is.null(population_check(mySampleSheet, methylation_data)))
+  expect_true(!is.null(population_check(mySampleSheet, methylation_data, envir)))
 
   #Lost Sample_Group Values
   mySampleSheet$Sample_Group <- NA
-  expect_true(!is.null(population_check(mySampleSheet, methylation_data)))
+  expect_true(!is.null(population_check(mySampleSheet, methylation_data, envir)))
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)

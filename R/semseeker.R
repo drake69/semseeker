@@ -8,9 +8,11 @@
 #' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
 #' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #' @param result_folder where the result will be saved
+#' @param ... other options to filter elaborations
 #'
 #' @return files into the result folder with pivot table and bedgraph.
 #' @export
+#' @importFrom doRNG %dorng%
 #'
 semseeker <- function(sample_sheet,
                       methylation_data,
@@ -97,7 +99,10 @@ semseeker <- function(sample_sheet,
   referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
-  for (i in 1:length(envir$keys_populations[,1])) {
+  variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
+  resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  # for (i in 1:length(envir$keys_populations[,1]))
+    {
 
     #
     populationName <- envir$keys_populations[i,1]
@@ -106,34 +111,36 @@ semseeker <- function(sample_sheet,
 
     if (length(populationMatrixColumns)==0) {
       message("WARNING: Population ",populationName, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
-      next
+    }
+    else
+    {
+      # browser()
+      resultPopulation <- analize_population(
+        envir = envir,
+        methylation_data = methylation_data[, populationMatrixColumns] ,
+        sliding_window_size = sliding_window_size,
+        beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,
+        beta_inferior_thresholds = populationControlRangeBetaValues$beta_inferior_thresholds,
+        sample_sheet = populationSampleSheet,
+        beta_medians = populationControlRangeBetaValues$betaMedianValues,
+        bonferroni_threshold = bonferroni_threshold,
+        probe_features = PROBES
+      )
+
+      resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
+      resultPopulation <- as.data.frame(resultPopulation)
+      resultPopulation
     }
 
-    # browser()
-    resultPopulation <- analize_population(
-      envir = envir,
-      methylation_data = methylation_data[, populationMatrixColumns] ,
-      sliding_window_size = sliding_window_size,
-      beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,
-      beta_inferior_thresholds = populationControlRangeBetaValues$beta_inferior_thresholds,
-      sample_sheet = populationSampleSheet,
-      beta_medians = populationControlRangeBetaValues$betaMedianValues,
-      bonferroni_threshold = bonferroni_threshold,
-      probe_features = PROBES
-    )
-
-    resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
-
-    resultPopulation <- as.data.frame(resultPopulation)
-    # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
-    #   browser()
-
-    if(!exists("resultSampleSheet"))
-      resultSampleSheet <- resultPopulation
-    else
-      resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
-
-    rm(populationSampleSheet)
+    # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
+    # #   browser()
+    #
+    # if(!exists("resultSampleSheet"))
+    #   resultSampleSheet <- resultPopulation
+    # else
+    #   resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
+    #
+    # rm(populationSampleSheet)
   }
 
   sample_sheet <- as.data.frame(sample_sheet)
@@ -194,7 +201,7 @@ semseeker <- function(sample_sheet,
     islandBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
     create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, file_prefix = "RELATION_TO_CPGISLAND", groupColumnLabels = "RELATION_TO_CPGISLAND")
     create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, file_prefix = "ISLAND", groupColumnLabels = "ISLAND")
-    create_heatmap( envir=envir,inputBedDataFrame =  geneBed,anomalies = anomalies, file_prefix = "ISLAND_PARTS", groupColumnLabels = c("ISLAND","RELATION_TO_CPGISLAND"))
+    create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, file_prefix = "ISLAND_PARTS", groupColumnLabels = c("ISLAND","RELATION_TO_CPGISLAND"))
   }
 
   if(sum(envir$keys_metaareas[,1]=="DMR")==1)

@@ -20,6 +20,7 @@
 #' @param probe_features probes detail from 27 to EPIC illumina dataset
 #' lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
+#' @importFrom doRNG %dorng%
 #' @importFrom foreach %dopar%
 
 analize_population <- function(envir, methylation_data, sliding_window_size, beta_superior_thresholds, beta_inferior_thresholds, sample_sheet, beta_medians, bonferroni_threshold = 0.05, probe_features) {
@@ -49,7 +50,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   i <- 0
 
   # for(i in 1:nrow(sample_sheet)) {
-  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dopar% {
+  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
     local_sample_detail <- sample_sheet[i,]
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]

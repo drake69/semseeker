@@ -1,8 +1,10 @@
-#' @importFrom foreach %dopar%
+#' @importFrom doRNG %dorng%
 create_multiple_bed <- function(envir, sample_sheet, resultPopulation){
 
   #create multiple file bed
-  variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build","%dopar%","getDoPar")
+  variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
+                           ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
+                           ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider", ".RNGkind_length", "tail", "RNGstr")
   i <- 0
 
 
@@ -12,14 +14,14 @@ create_multiple_bed <- function(envir, sample_sheet, resultPopulation){
                                             "FIGURE"=envir$keys_figures_default[,1],
                                             "ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
-  deltaq_summary <- foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export, .combine = rbind ) %dopar%
+  deltaq_summary <- foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export, .combine = rbind ) %dorng%
   # for(i in 1:nrow(localKeys))
     {
       key <- localKeys[i,]
       tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-      variables_to_export_nested <- c("sample_sheet", "file_path_build","key","tempresult_folderData","%dopar%","getDoPar")
+      variables_to_export_nested <- c("sample_sheet", "file_path_build","key","tempresult_folderData","%dorng%","getdorng")
       j <- 0
-      localFileRes <- foreach::foreach(j = 1:nrow(sample_sheet), .export = variables_to_export_nested, .combine = "rbind" ) %dopar%
+      localFileRes <- foreach::foreach(j = 1:nrow(sample_sheet), .export = variables_to_export_nested, .combine = "rbind" ) %dorng%
         {
           sample <- sample_sheet[j,]
           fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)

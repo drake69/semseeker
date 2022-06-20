@@ -45,8 +45,13 @@ create_heatmap <-
 
     figures <- unique(inputBedDataFrame$FIGURE)
 
-    variables_to_export <- c("anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","figures")
+    variables_to_export <- c("anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","figures",
+                             "%dorng%", "j", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName",
+                             "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion", ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG",
+                             ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider", ".RNGkind_length", "tail", "RNGstr")
     g <- 0
+    i <- 0
+    j <- 0
     foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dorng%
       {
         variables_to_export_nested <- c("anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","g","figures")
@@ -87,7 +92,7 @@ create_heatmap <-
                     filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", file_prefix,"_",anomaly,"_",figure, ".png",sep="")
                     grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
                     stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
-                                   col = cm.colors(256),
+                                   col = grDevices::cm.colors(256),
                                    scale = "column",
                                    RowSideColors =as.vector(tempDataFrame$POPULATION),
                                    margins = c(25, 25),

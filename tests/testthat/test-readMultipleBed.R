@@ -37,7 +37,7 @@ test_that("read_multiple_bed", {
                            probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet)
+  create_multiple_bed(envir, sample_sheet, sp)
 
   figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("MUTATIONS","LESIONS","DELTAS")
