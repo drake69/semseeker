@@ -2,7 +2,7 @@ testthat::test_that("analyze_single_sample",{
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <-  init_env(tempFolder, parallel_strategy = "sequential")
+  envir <-  init_env(tempFolder, parallel_strategy = "multisession")
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
   Sample_Group <- "Control"
 
