@@ -45,7 +45,7 @@ test_that("create_heatmap", {
                           probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed(envir, sample_sheet = sample_sheet, sp)
 
 
   populations <- c("Control")
@@ -61,6 +61,7 @@ test_that("create_heatmap", {
   chrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
   create_heatmap( envir=envir,inputBedDataFrame =  chrBed,anomalies = anomalies, file_prefix = "CHR", groupColumnLabels = c("CHR"))
 
+  expect_true(file.exists(file.path(envir$result_folderChart,"/CHR/Control_CHR_MUTATIONS_BOTH.png")))
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -79,7 +80,7 @@ test_that("create_heatmap", {
     groupingColumnLabel)
 
   create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GENE"))
-  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_MUTATIONS.png")))
+  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_MUTATIONS_BOTH.png")))
 
   figures <- c("BOTH")
   anomalies <- c("DELTAS")
@@ -101,11 +102,11 @@ test_that("create_heatmap", {
     groupingColumnLabel)
 
   create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GROUP"))
-  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_DELTAS.png")))
+  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_DELTAS_BOTH.png")))
 
 
   create_heatmap( envir=envir,inputBedDataFrame =  final_bed,anomalies = anomalies, file_prefix = "GENE", groupColumnLabels = c("GENE"))
-  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE/Control_GENE_DELTAS.png")))
+  expect_true(file.exists(file.path(envir$result_folderChart,"/GENE/Control_GENE_DELTAS_BOTH.png")))
 
 
   # final_bed <- final_bed [1:2,]

@@ -37,7 +37,7 @@ test_that("create_excel_pivot", {
                           probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed(envir, sample_sheet = sample_sheet, sp)
 
   populations <- c("Control","Case")
 

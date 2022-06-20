@@ -3,6 +3,7 @@
 #' @param result_folder where result of semseeker will bestored
 #' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
+#' @param ... other options to filter elaborations
 #'
 #' @return the working environment
 init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession", ...)
@@ -29,7 +30,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     nCore <- 2L
   } else {
     # use all cores in devtools::test()
-    nCore <- future::availableCores()
+    nCore <- future::availableCores() - 1
     nCore <- floor(nCore * maxResources/100 )
   }
   # bootstrap cluster
@@ -54,18 +55,24 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # TODO: improve planning parallel management using also cluster
   future::plan( future::sequential)
   if(parallel_strategy=="multisession")
+  {
     future::plan( future::multisession, workers = nCore)
+    message("I will work in multisession with:", nCore)
+  }
   if(parallel_strategy=="multicore")
+  {
     future::plan( future::multicore, workers = nCore)
+    message("I will work in muticore with:", nCore)
+  }
   if(parallel_strategy=="cluster")
-    {
+  {
     message ("Cluster feature not implemented!")
     stop()
     future::plan( future::cluster, workers = nCore)
   }
 
   ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS"))
+  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ"))
   ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR"))
 
 

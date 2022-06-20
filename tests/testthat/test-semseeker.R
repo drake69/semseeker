@@ -4,7 +4,7 @@ test_that("semeeker", {
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   # envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
-  nitem <- 5e2
+  nitem <- 5e4
   nsamples <- 21
 
 

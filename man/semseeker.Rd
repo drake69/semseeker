@@ -30,6 +30,8 @@ semseeker(
 \item{iqrTimes}{how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier}
 
 \item{parallel_strategy}{which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster}
+
+\item{...}{other options to filter elaborations}
 }
 \value{
 files into the result folder with pivot table and bedgraph.

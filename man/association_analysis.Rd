@@ -32,6 +32,8 @@ filter_p_value report after adjusting saves only significant nominal p-value}
 \item{maxResources}{percentage of max system's resource to use}
 
 \item{parallel_strategy}{which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster}
+
+\item{...}{other options to filter elaborations}
 }
 \description{
 Association analysis of SEMseeker's results

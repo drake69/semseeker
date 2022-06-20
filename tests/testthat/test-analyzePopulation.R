@@ -48,6 +48,6 @@
   message(nrow(sample_sheet))
   expect_true(nrow(sp)==nrow(sample_sheet))
 
-  future::plan( future::multisession)
+  future::plan( future::sequential)
 })
 

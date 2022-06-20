@@ -1,97 +1,71 @@
 #' @importFrom doRNG %dorng%
 create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
-    HYPO <- NULL
-    HYPER <- NULL
-    POPULATION <- NULL
+  final_bed <-  annotate_bed( envir=envir,  populations,figures ,anomalies,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
 
+  if (is.null(final_bed))
+    return()
 
-    final_bed <-  annotate_bed( envir=envir,  populations,figures ,anomalies,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+  reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
 
-    # browser()
-    if (is.null(final_bed))
-      return()
+  final_bed <- data.frame(final_bed, "KEY" = final_bed[,mainGroupLabel])
+  final_bed[,mainGroupLabel] <- as.factor(final_bed[,mainGroupLabel])
+  final_bed[,"KEY"] <- as.factor(final_bed[,"KEY"])
+  final_bed[,"FIGURE"] <- as.factor(final_bed[,"FIGURE"])
+  final_bed[,"POPULATION"] <- as.factor(final_bed[,"POPULATION"])
 
-    reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
+  numberOfCase <- length(unique(subset(final_bed, final_bed$POPULATION == "Case" )$SAMPLEID))
+  numberOfControl <- length(unique(subset(final_bed, final_bed$POPULATION == "Control" )$SAMPLEID))
 
-    final_bed <- data.frame(final_bed, "KEY" = final_bed[,mainGroupLabel])
-    final_bed[,mainGroupLabel] <- as.factor(final_bed[,mainGroupLabel])
-    final_bed[,"KEY"] <- as.factor(final_bed[,"KEY"])
-    final_bed[,"FIGURE"] <- as.factor(final_bed[,"FIGURE"])
-    final_bed[,"POPULATION"] <- as.factor(final_bed[,"POPULATION"])
+  tempPopData <- subset(final_bed, final_bed$VALUE != 0 )
+  sheetList <- vector(mode="list")
+  sheetListNames <- vector(mode="list")
 
-    numberOfCase <- length(unique(subset(final_bed, final_bed$POPULATION == "Case" )$SAMPLEID))
-    numberOfControl <- length(unique(subset(final_bed, final_bed$POPULATION == "Control" )$SAMPLEID))
+  envir$keys <- expand.grid("groups"= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
 
-     # pop <- "Reference"
-     # tempPopData <- subset(final_bed, final_bed[,"POPULATION"] != pop)
-    tempPopData <- subset(final_bed, final_bed$VALUE != 0 )
-    sheetList <- vector(mode="list")
-    sheetListNames <- vector(mode="list")
-
-    # options(digits = 22)
-    # parallel::clusterExport(envir=environment(), cl = computationCluster, varlist = list(  "sheetList", "sheetListNames"))
-
-    envir$keys <- expand.grid(groups= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-
-    toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList")
-    sheetList <- foreach::foreach(i=1:nrow(envir$keys), .export = toExport, .combine='c', .multicombine=TRUE ) %dorng%
-    # for(i in 1:nrow(envir$keys))
+  toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
+  sheetList <- foreach::foreach(k=1:nrow(envir$keys), .export = toExport, .combine= c , .multicombine=TRUE ) %dorng%
+    # for(k in 1:nrow(envir$keys))
+    {
+      # k <- 1
+      grp <- envir$keys[k,"groups"]
+      anomaly <- envir$keys[k,"anomalies"]
+      temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
+      if(!plyr::empty(temp))
       {
-        # i <- 1
-        grp <- envir$keys[i,1]
-        anomaly <- envir$keys[i,2]
-        temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
-        if(nrow(temp)!=0)
+        anomaly <- envir$keys[k,"anomalies"]
+        tempAnomaly <- subset(temp, temp$ANOMALY == as.character(anomaly))
+        if(!plyr::empty(tempAnomaly))
         {
-          anomaly <- envir$keys[i,2]
-          tempAnomaly <- subset(temp, temp$ANOMALY == as.character(anomaly))
-          if(nrow(tempAnomaly)!=0)
+          figure <- as.character(envir$keys[k,"figures"])
+          tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
+          if(!plyr::empty(tempDataFrame))
           {
-            figure <- as.character(envir$keys[i,3])
-            tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
-            if(nrow(tempDataFrame)!=0)
-            {
-              if(anomaly=="DELTAS")
-                tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
-                                                 fun.aggregate = mean, drop = TRUE)
-              else
-                tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
-                                                 fun.aggregate = sum, drop = TRUE)
+            if(anomaly=="DELTAS")
+              tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
+                                               fun.aggregate = mean, drop = TRUE)
+            else
+              tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
+                                               fun.aggregate = sum, drop = TRUE)
 
-              pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
-              fileName <- paste0(pivot_subfolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
-              utils::write.csv2(t(tempDataFrame), fileName)
-              tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
-              colnames(tempDataFrame) <- tempDataFrame[1,]
+            pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
+            fileName <- paste0(pivot_subfolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
+            utils::write.csv2(t(tempDataFrame), fileName)
+            tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
+            colnames(tempDataFrame) <- tempDataFrame[1,]
 
-              #store in the first row the names of the sheet
-              tempDataFrame[1,] <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
-              list(tempDataFrame)
-              # if(exists("sheetList"))
-              #   sheetList <- append(sheetList, list(tempDataFrame))
-              # else
-              #   sheetList <- list(tempDataFrame)
-            }
+            sheet_name <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
+            temp_list <- list(tempDataFrame)
+            setNames(temp_list, sheet_name)
           }
         }
       }
-
-    # browser()
-    if(length(sheetList)==0)
-    {
-        message("No pivot tables to save.")
-        return()
     }
 
-    for(i in 1:length(sheetList))
-    {
-      sheetListNames[[i]] <- gsub(x = sheetList[[i]] [1,1],pattern = "'",replacement = "")
-      sheetList [[i]] <- sheetList[[i]][-1,]
-    }
+  if(length(sheetList)!=0)
+  {
 
     fileName <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
-    names(sheetList) <- as.vector(sheetListNames)
     try(
       {
         openxlsx::write.xlsx(
@@ -104,5 +78,10 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
         message(fileName)
       }
     )
+  }
+  else
+  {
+    message("No pivot tables to save.")
+  }
 
 }

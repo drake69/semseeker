@@ -27,13 +27,28 @@ testthat::test_that("lesions_get",{
     sampleName = Sample_ID
   )
 
-  lesions <- lesions_get(
+  lesions_hypo <- lesions_get(
     sliding_window_size = 11,
-    bonferroni_threshold = 0.05,
+    bonferroni_threshold = 5,
     mutation_annotated_sorted = mutations,
     grouping_column = "CHR"
   )
 
-  expect_false(nrow(lesions)==0)
+  mutations <- mutations_get(
+    values = values,
+    figure = "HYPER",
+    thresholds = tresholds,
+    probe_features = probe_features,
+    sampleName = Sample_ID
+  )
+
+  lesions_hyper <- lesions_get(
+    sliding_window_size = 11,
+    bonferroni_threshold = 5,
+    mutation_annotated_sorted = mutations,
+    grouping_column = "CHR"
+  )
+
+  expect_true(nrow(lesions_hyper)!=0 | nrow(lesions_hypo)!=0)
 
 })

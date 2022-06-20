@@ -17,6 +17,8 @@ init_env(
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 
 \item{parallel_strategy}{which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster}
+
+\item{...}{other options to filter elaborations}
 }
 \value{
 the working environment
