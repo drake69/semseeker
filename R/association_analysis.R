@@ -27,7 +27,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
   j <- 0
   k <- 0
   z <- 0
-  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, ... )
+  envir <- init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
 
   figures <- envir$keys_figures[,1]
   anomalies <- envir$keys_anomalies[,1]

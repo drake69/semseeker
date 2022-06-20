@@ -23,7 +23,7 @@ semseeker <- function(sample_sheet,
                       parallel_strategy ="multisession",
                       ... ) {
 
-  envir <- init_env(result_folder, maxResources, parallel_strategy = parallel_strategy, ...)
+  envir <- init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
 
   methylation_data <- stats::na.omit(methylation_data)
   # set digits to 22

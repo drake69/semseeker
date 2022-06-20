@@ -57,11 +57,11 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(parallel_strategy=="multisession")
   {
     future::plan( future::multisession, workers = nCore)
-    message("I will work in multisession with:", nCore)
+    message("I will work in multisession with:", nCore, " Cores")
   }
   if(parallel_strategy=="multicore")
   {
-    future::plan( future::multicore, workers = nCore)
+    future::plan( future::multicore, workers = nCore," Cores")
     message("I will work in muticore with:", nCore)
   }
   if(parallel_strategy=="cluster")
@@ -69,6 +69,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     message ("Cluster feature not implemented!")
     stop()
     future::plan( future::cluster, workers = nCore)
+  }
+  if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
+     & parallel_strategy!="cluster")
+  {
+    future::plan( future::multisession, workers = nCore)
+    message("I will work in sequential mode")
   }
 
   ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
