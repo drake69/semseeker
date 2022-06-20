@@ -78,8 +78,8 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                            "getRNG", "%||%", ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", ".getRNGattribute", "isNumber", "isReal", "isInteger", ".foreachGlobals", "RNGprovider", ".RNGkind_length", "tail",
                            "file_path_build", "dir_check_and_create", "apply_stat_model", "doRNGversion", ".getRNG", "hasRNG", "nextRNG", "RNGkind", "setRNG", "RNGstr")
 
-  foreach::foreach(z = 1:nrow(inference_details), .export = variables_to_export) %dorng%
-    # for(z in 1:nrow(inference_details))
+  # foreach::foreach(z = 1:nrow(inference_details), .export = variables_to_export) %dorng%
+    for(z in 1:nrow(inference_details))
     {
       inference_detail <- inference_details[z,]
 
@@ -293,8 +293,8 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
               nkeys <- nrow(keys)
               variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis","file_path_build", "apply_stat_model")
               if(nrow(keys)>0)
-                result_temp_foreach <- foreach::foreach(k = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
-                # for (k in 1:nkeys)
+                # result_temp_foreach <- foreach::foreach(k = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
+                for (k in 1:nkeys)
                 {
                   if(exists("tempDataFrame"))
                     rm(list = c("tempDataFrame"))
@@ -344,12 +344,12 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
 
                       # message("Exited form apply model")
 
-                      # if(!exists("result_temp_foreach"))
-                      #   result_temp_foreach <- result_temp_local
-                      # else
-                      #   result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
+                      if(!exists("result_temp_foreach"))
+                        result_temp_foreach <- result_temp_local
+                      else
+                        result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
 
-                      result_temp_local
+                      # result_temp_local
                     }
                   }
                 }
