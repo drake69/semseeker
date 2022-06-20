@@ -75,7 +75,9 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
 
   inference_details <- unique(inference_details)
   variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "envir", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
-                           "getRNG", "%||%", ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", ".getRNGattribute", "isNumber", "isReal", "isInteger", ".foreachGlobals", "RNGprovider", ".RNGkind_length", "tail")
+                           "getRNG", "%||%", ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", ".getRNGattribute", "isNumber", "isReal", "isInteger", ".foreachGlobals", "RNGprovider", ".RNGkind_length", "tail",
+                           "file_path_build", "dir_check_and_create", "apply_stat_model", "doRNGversion", ".getRNG", "hasRNG", "nextRNG", "RNGkind", "setRNG", "RNGstr")
+
   foreach::foreach(z = 1:nrow(inference_details), .export = variables_to_export) %dorng%
     # for(z in 1:nrow(inference_details))
     {
