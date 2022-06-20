@@ -67,7 +67,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "log2" = log2(burden_values),
         "log10"= log10(burden_values),
         "exp" = exp(burden_values),
-        "johnson" =  Johnson::RE.Johnson(burden_values)$transformed,
         "none" = burden_values,
         burden_values
       )
@@ -111,7 +110,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "log2" = log2(independent_variableValues),
           "log10"= log10(independent_variableValues),
           "exp" = exp(independent_variableValues),
-          "johnson" =  Johnson::RE.Johnson(independent_variableValues)$transformed,
           "none" = independent_variableValues,
           independent_variableValues
         )
