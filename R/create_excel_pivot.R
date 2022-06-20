@@ -2,7 +2,8 @@
 create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
   final_bed <-  annotate_bed( envir=envir,  populations,figures ,anomalies,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-
+  i <- 0
+  k <- 0
   if (is.null(final_bed))
     return()
 
@@ -56,7 +57,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
             sheet_name <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
             temp_list <- list(tempDataFrame)
-            setNames(temp_list, sheet_name)
+            stats::setNames(temp_list, sheet_name)
           }
         }
       }
@@ -74,8 +75,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
           asTable = TRUE,
           overwrite = TRUE
         )
-        message("Saved spreadsheet file:")
-        message(fileName)
+        message("Saved spreadsheet file:", fileName)
       }
     )
   }

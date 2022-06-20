@@ -196,7 +196,7 @@ semseeker <- function(sample_sheet,
     subGroups <- envir$island_subareas[,1]
     mainGroupLabel <- "ISLAND"
     subGroupLabel <- "RELATION_TO_CPGISLAND"
-    create_excel_pivot (envir=envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
     islandBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
     create_heatmap( envir=envir,inputBedDataFrame =  islandBed,anomalies = anomalies, file_prefix = "RELATION_TO_CPGISLAND", groupColumnLabels = "RELATION_TO_CPGISLAND")
@@ -210,7 +210,7 @@ semseeker <- function(sample_sheet,
     probes_prefix = "PROBES_DMR_"
     mainGroupLabel =  "DMR"
     subGroupLabel="GROUP"
-    create_excel_pivot (envir=envir,populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
     dmrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
     create_heatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, file_prefix = mainGroupLabel, groupColumnLabels = c("DMR") )

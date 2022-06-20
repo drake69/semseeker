@@ -10,7 +10,7 @@
 #' @param envir environment to get globals
 #' @return list of lesion count  and probes count
 #'
-#'
+#' @importFrom doRNG %dorng%
 analyze_single_sample <- function(envir, values, sliding_window_size, thresholds, figure, sample_detail, bonferroni_threshold = 0.05, probe_features) {
 
   # browser()

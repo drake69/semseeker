@@ -55,7 +55,8 @@ annotate_bed <- function (
       "GROUP" = groups
     )
 
-  variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel", "groupingColumnLabel")
+  variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel",
+                           "groupingColumnLabel")
 
   # for(i in 1:nrow(envir$keysLocal))
   final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%

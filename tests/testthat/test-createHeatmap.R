@@ -7,7 +7,7 @@ test_that("create_heatmap", {
   anomalies <- c("DELTAS")
   metaareas <- c("GENE")
 
-  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "multisession", maxResources = 90, figures, anomalies, metaareas)
+  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures, anomalies, metaareas)
 
   nitem <- 5e5
   nsamples <- 5
