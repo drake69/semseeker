@@ -77,14 +77,6 @@
         "xml2"
       ]
     },
-    "Johnson": {
-      "Package": "Johnson",
-      "Version": "1.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "ba6ea0ebdde4f83958e03cd30cb61b88",
-      "Requirements": []
-    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-57",
