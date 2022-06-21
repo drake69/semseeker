@@ -152,7 +152,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
                  "independent_variable1stLevel", "independent_variable2ndLevel",
                  "key", "transformation","quantreg_summary")
 
-  message("Starting foreach withh: ", iters, " items")
+  # message("Starting foreach withh: ", iters, " items")
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
   # for(g in g_start:iters)
   {

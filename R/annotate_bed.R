@@ -25,7 +25,7 @@ annotate_bed <- function (
 
   i <- 0
   final_bed <- NULL
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
 
   if(file.exists(bedFileName))
   {
@@ -36,7 +36,8 @@ annotate_bed <- function (
       }
     else
       {
-        final_bed <-    utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
+        # final_bed <- utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
+        final_bed <- fst::fst(bedFileName)
         final_bed$VALUE = as.numeric(final_bed$VALUE)
       }
 
@@ -84,7 +85,9 @@ annotate_bed <- function (
     if(!plyr::empty(final_bed_temp))
       final_bed <- rbind(final_bed, final_bed_temp)
 
-  utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
+  fst::write_fst(final_bed, bedFileName)
+
+  # utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
   gc()
   return(final_bed)

@@ -2,7 +2,7 @@
 create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
   final_bed <-  annotate_bed( envir=envir, populations =   populations,figures =  figures ,anomalies =  anomalies,
-                            groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel,groupingColumnLabel =   subGroupLabel)
+                              groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel,groupingColumnLabel =   subGroupLabel)
   i <- 0
   k <- 0
   if (is.null(final_bed))
@@ -16,6 +16,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
   final_bed[,"FIGURE"] <- as.factor(final_bed[,"FIGURE"])
   final_bed[,"POPULATION"] <- as.factor(final_bed[,"POPULATION"])
 
+
   numberOfCase <- length(unique(subset(final_bed, final_bed$POPULATION == "Case" )$SAMPLEID))
   numberOfControl <- length(unique(subset(final_bed, final_bed$POPULATION == "Control" )$SAMPLEID))
 
@@ -23,7 +24,16 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
   sheetList <- vector(mode="list")
   sheetListNames <- vector(mode="list")
 
+  fileNameXLS <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
   envir$keys <- expand.grid("groups"= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
+  envir$keys$future_shee_list <-  paste(envir$keys$anomalies,"_",envir$keys$figures,"_",  mainGroupLabel,"_",envir$keys$groups, sep="")
+
+  if(file.exists(fileNameXLS))
+  {
+    old_workbook <- openxlsx::loadWorkbook(fileNameXLS)
+    old_sheet_list <- old_workbook$sheet_names
+    envir$keys <- envir$keys[!(envir$keys$future_shee_list %in% old_sheet_list), ]
+  }
 
   toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
   sheetList <- foreach::foreach(k=1:nrow(envir$keys), .export = toExport, .combine= c , .multicombine=TRUE ) %dorng%
@@ -32,6 +42,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
       # k <- 1
       grp <- envir$keys[k,"groups"]
       anomaly <- envir$keys[k,"anomalies"]
+      pivot_file_name <- envir$keys$future_shee_list[k]
       temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
       if(!plyr::empty(temp))
       {
@@ -51,7 +62,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
                                                fun.aggregate = sum, drop = TRUE)
 
             pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
-            fileName <- paste0(pivot_subfolder,"/",anomaly,"_",figure, "_", mainGroupLabel,"_", grp,".csv" , sep="")
+            fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
             utils::write.csv2(t(tempDataFrame), fileName)
             tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
             colnames(tempDataFrame) <- tempDataFrame[1,]
@@ -64,15 +75,21 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
       }
     }
 
-  if(length(sheetList)!=0)
+  if(exists("old_sheet_list") & length(sheetList)!=0)
   {
-
-    fileName <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
+    for(t in 1:length(sheetList))
+    {
+      openxlsx::addWorksheet(old_workbook,names(sheetList[t]))
+      openxlsx::writeData(old_workbook,names(sheetList[t]),sheetList[t])
+    }
+    saveWorkbook(old_workbook,fileNameXLS,overwrite = TRUE)
+  } else if(length(sheetList)!=0)
+  {
     try(
       {
         openxlsx::write.xlsx(
           x = sheetList,
-          file = fileName,
+          file = fileNameXLS,
           asTable = TRUE,
           overwrite = TRUE
         )
@@ -82,7 +99,8 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
   }
   else
   {
-    message("No pivot tables to save.")
+    if(!exists("old_sheet_list"))
+      message("No pivot tables to save.")
   }
 
 }
