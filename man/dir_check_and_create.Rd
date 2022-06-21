@@ -2,13 +2,18 @@
 % Please edit documentation in R/dir_check_and_create.R
 \name{dir_check_and_create}
 \alias{dir_check_and_create}
-\title{Title}
+\title{dir_check_and_create}
 \usage{
 dir_check_and_create(baseFolder, subFolders)
 }
 \arguments{
-\item{subFolders}{}
+\item{baseFolder}{folder to look in}
+
+\item{subFolders}{sub folders to create, complete tree}
+}
+\value{
+full path
 }
 \description{
-Title
+dir_check_and_create
 }

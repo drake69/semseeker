@@ -1,11 +1,10 @@
-#' Title
+#' dir_check_and_create
 #'
-#' @param baseFolder
-#' @param subFolders
+#' @param baseFolder folder to look in
+#' @param subFolders sub folders to create, complete tree
 #'
-#' @return
+#' @return full path
 #'
-#' @examples
 dir_check_and_create <- function  (baseFolder, subFolders)
 {
   folderSep <- as.character(.Platform$file.sep)
