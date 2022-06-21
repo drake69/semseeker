@@ -52,17 +52,16 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
         sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START"))
 
       sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
-      sourceData[is.na(sourceData)] <- 0
-
-
-      if(anomalyLabel!="DELTAS" & anomalyLabel!="DELTAQ" & !plyr::empty(sourceData))
-        sourceData$VALUE <- 1
 
       # output with column VALUE
       # message("multiple nrow data", nrow(sourceData))
 
       if(!plyr::empty(sourceData))
       {
+        sourceData[is.na(sourceData)] <- 0
+        if(anomalyLabel!="DELTAS" & anomalyLabel!="DELTAQ" & !plyr::empty(sourceData))
+          sourceData$VALUE <- 1
+
         sourceData <- data.frame(sourceData,"FIGURE" = as.character(figureLable), "ANOMALY" = as.character(anomalyLabel), "POPULATION" = as.character(populationName))
         sourceData$POPULATION <- as.factor(sourceData$POPULATION)
         sourceData$ANOMALY <- as.factor(sourceData$ANOMALY)
