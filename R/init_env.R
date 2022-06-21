@@ -55,12 +55,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # TODO: improve planning parallel management using also cluster
   if(parallel_strategy=="multisession")
   {
-    future::plan( future::multisession)
+    future::plan( future::multisession, workers = nCore)
     message("I will work in multisession with:", nCore, " Cores")
   }
   if(parallel_strategy=="multicore")
   {
-    future::plan( future::multicore)
+    future::plan( future::multicore, workers = nCore)
     message("I will work in muticore with:", nCore," Cores")
   }
   if(parallel_strategy=="cluster")
