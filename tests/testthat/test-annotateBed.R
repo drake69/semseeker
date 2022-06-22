@@ -48,7 +48,7 @@ test_that("annotate_bed", {
   populations <- c("Control")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  anomalies <- c("DELTAS")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -66,7 +66,21 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+
+
+  anomalies <- c("DELTAQ")
+  # create and read
+  final_bed <- annotate_bed (
+    envir,
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
 
   # file extsits
   expect_true(file.exists(bedFileName))
@@ -110,6 +124,6 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"csv")
+  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
 
 })
