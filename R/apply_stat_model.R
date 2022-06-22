@@ -224,7 +224,25 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         bartlett_pvalue <- stats::bartlett.test( stats::as.formula("depVar ~ indepVar"), data= localDataFrame )
       }
 
-      shapiro_pvalue <- if(length(tempDataFrame[,burdenValue])>3 & length(unique(tempDataFrame[,burdenValue]))>3) round(stats::shapiro.test(tempDataFrame[,burdenValue])$p.value,3) else NA
+      Breusch_Pagan_pvalue <- NA
+      if(family_test=="gaussian" | family_test=="poisson" | grepl("quantreg", family_test))
+      {
+
+        if(is.null(covariates) || length(covariates)==0)
+        {
+          covariates_model <- independent_variable
+        } else
+        {
+          covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
+        }
+        sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+        model <- lm(formula = sig.formula, data = as.data.frame(tempDataFrame))
+        residuals <-  model$residuals
+        shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) round(stats::shapiro.test(residuals)$p.value,3) else NA
+        Breusch_Pagan_pvalue <- lmtest::bptest(model)$p.value
+      }
+      else
+        shapiro_pvalue <- if(length(tempDataFrame[,burdenValue])>3 & length(unique(tempDataFrame[,burdenValue]))>3) round(stats::shapiro.test(tempDataFrame[,burdenValue])$p.value,3) else NA
 
       if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
       {
@@ -328,6 +346,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
           "SHAPIRO.PVALUE" = shapiro_pvalue,
+          "BREUSCH-PAGAN.PVALUE" = Breusch_Pagan_pvalue,
           "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) round(bartlett_pvalue$p.value,3)  else NA,
           "CASE.LABEL"= if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA,
           "COUNT.CASE"=length(independent_variableData1stLevel),
@@ -364,6 +383,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
           "SHAPIRO.PVALUE" = shapiro_pvalue,
+          "BREUSCH-PAGAN.PVALUE" = Breusch_Pagan_pvalue,
           "BARTLETT.PVALUE" = NA,
           "CASE.LABEL"= as.character(independent_variable),
           "COUNT.CASE"=length(independent_variableData),
@@ -405,6 +425,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "transformation" = transformation,
         "COVARIATES" = paste0(covariates,collapse=" "),
         "SHAPIRO.PVALUE" = NA,
+        "BREUSCH-PAGAN.PVALUE" = NA,
         "BARTLETT.PVALUE" = NA,
         "CASE.LABEL"= NA,
         "COUNT.CASE"=NA,

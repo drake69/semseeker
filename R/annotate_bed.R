@@ -37,7 +37,7 @@ annotate_bed <- function (
     else
       {
         # final_bed <- utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
-        final_bed <- fst::fst(bedFileName)
+        final_bed <- fst::fst(path = bedFileName)
         final_bed$VALUE = as.numeric(final_bed$VALUE)
       }
 
@@ -45,7 +45,7 @@ annotate_bed <- function (
     if(!plyr::empty(final_bed_temp))
       return(final_bed_temp)
     else
-      final_bed_temp <- final_bed
+      final_bed_temp <- as.data.frame(final_bed)
   }
 
   envir$keysLocal <-
@@ -72,10 +72,6 @@ annotate_bed <- function (
     tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
                                   columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
     tempFile
-    # if(exists("final_bed"))
-    #   final_bed <- rbind(final_bed, tempFile)
-    # else
-    #   final_bed <- tempFile
   }
 
   colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
@@ -85,7 +81,7 @@ annotate_bed <- function (
     if(!plyr::empty(final_bed_temp))
       final_bed <- rbind(final_bed, final_bed_temp)
 
-  fst::write_fst(final_bed, bedFileName)
+  fst::write_fst( x =  final_bed,path =  bedFileName, compress = T )
 
   # utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 

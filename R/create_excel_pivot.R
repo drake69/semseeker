@@ -82,7 +82,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
       openxlsx::addWorksheet(old_workbook,names(sheetList[t]))
       openxlsx::writeData(old_workbook,names(sheetList[t]),sheetList[t])
     }
-    saveWorkbook(old_workbook,fileNameXLS,overwrite = TRUE)
+    openxlsx::saveWorkbook(old_workbook,fileNameXLS,overwrite = TRUE)
   } else if(length(sheetList)!=0)
   {
     try(
@@ -93,7 +93,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
           asTable = TRUE,
           overwrite = TRUE
         )
-        message("Saved spreadsheet file:", fileName)
+        message("Saved spreadsheet file:", fileNameXLS)
       }
     )
   }

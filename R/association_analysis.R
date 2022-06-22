@@ -169,6 +169,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
               "TRANSFORMATION" = "",
               "COVARIATES" = "",
               "SHAPIRO.PVALUE" = "",
+              "BREUSCH-PAGAN.PVALUE"="",
               "BARTLETT.PVALUE" = "",
               "CASE.LABEL"="",
               "COUNT.CASE","",
