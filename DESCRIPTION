@@ -1,7 +1,7 @@
 Package: semseeker
 Type: Package
 Title: Stochastic Epigenetic Mutations SEM Seeker
-Version: 0.6.17
+Version: 0.6.18
 Author: Luigi Corsaro, Davide Gentilini, Lucio Calzari, Davide Sacco
 Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
 Description: Stochastic epimutation and enriched region upstream and downstream tool for EWAS.
@@ -12,6 +12,7 @@ LazyDataCompression: gzip
 URL: http://github.com/drake69/semseeker
 BugReports: https://github.com/drake69/semseeker/issues
 Imports:
+    coxed,
     dplyr,
     doFuture,
     doRNG,
