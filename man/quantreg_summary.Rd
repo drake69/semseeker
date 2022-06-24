@@ -11,7 +11,8 @@ quantreg_summary(
   sig.formula,
   tau,
   independent_variable,
-  lqm_control
+  lqm_control,
+  conf.level = 0.95
 )
 }
 \arguments{

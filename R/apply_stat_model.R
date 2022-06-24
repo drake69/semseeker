@@ -280,6 +280,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           boot_vector <- stats::na.omit(tt[,independent_variable])
           boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
         }
+        ci.lower.adjusted <- NA
+        ci.upper.adjusted <- NA
 
         if(boot.bca[3] > 0.05 )
         {
@@ -293,6 +295,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           colnames(tt) <- colnames(model.x.boot)
           boot_vector <- stats::na.omit(tt[,independent_variable])
           boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
+          boot.bca.adjusted <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control, conf.level = (1 - 0.05/iters))
+          ci.lower.adjusted <-  boot.bca.adjusted[1]
+          ci.upper.adjusted <- boot.bca.adjusted[2]
         }
 
         ci.lower <- boot.bca[1]
@@ -359,6 +364,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
+          "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
+          "CI.UPPER.ADJUSTED"=  if(exists("ci.upper.adjusted")) ci.upper.adjusted else NA,
           "N.PERMUTATIONS" =  NA
         )
       } else
@@ -396,6 +403,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
+          "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
+          "CI.UPPER.ADJUSTED"=  if(exists("ci.upper.adjusted")) ci.upper.adjusted else NA,
           "N.PERMUTATIONS" = if(exists("n_permutations")) n_permutations else NA
         )
       }
@@ -438,6 +447,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "RHO"=  NA,
         "CI.LOWER"=  NA,
         "CI.UPPER"=  NA,
+        "CI.LOWER.ADJUSTED"=  NA,
+        "CI.UPPER.ADJUSTED"=  NA,
         "N.PERMUTATIONS" =  NA
       )
     }
