@@ -150,7 +150,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   g <- 0
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
                  "independent_variable1stLevel", "independent_variable2ndLevel",
-                 "key", "transformation","quantreg_summary")
+                 "key", "transformation","quantreg_summary","iters")
 
   # message("Starting foreach withh: ", iters, " items")
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
@@ -283,7 +283,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         ci.lower.adjusted <- NA
         ci.upper.adjusted <- NA
 
-        if(boot.bca[3] > 0.05 )
+        if(boot.bca[1] <0 & boot.bca[2]>0 )
         {
           n_permutations <- n_permutations_test
         }
