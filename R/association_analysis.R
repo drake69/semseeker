@@ -182,6 +182,8 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
               "RHO"="",
               "CI.LOWER"= "",
               "CI.UPPER"= "",
+              "CI.LOWER.ADJUSTED"=  NA,
+              "CI.UPPER.ADJUSTED"=  NA,
               "N.PERMUTATIONS" = ""
             )
             result <- result[-1,]

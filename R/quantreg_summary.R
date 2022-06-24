@@ -10,7 +10,7 @@
 #'
 #' @return ci and pvalue with BCA method
 #' @importFrom doRNG %dorng%
-quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control){
+quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control, conf.level = 0.95){
 
   # #BCA method
   # #Desired quantiles
@@ -66,10 +66,10 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   # #Accelerated Bootstrap CI
   # Bca<-stats::quantile(boot_vector, u_adjusted)
 
-  Bca <- coxed::bca(boot_vector)
+  Bca <- coxed::bca(boot_vector, conf.level = conf.level)
   p.value <- 0
   if(Bca[1]<0 & Bca[2]>0)
     p.value<- 1
 
-  return(c(Bca, p.value))
+  return(c(Bca, NA))
 }
