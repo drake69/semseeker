@@ -28,7 +28,7 @@ test_that("association_analysis", {
   mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
   mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="multisession", figures="BOTH", anomalies="DELTAS", metaareas="CHR")
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="CHR")
   inferenceFolder <- file.path(tempFolder,"Inference")
 
 
@@ -43,7 +43,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="CHR")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="CHR")
 
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_1000_15000_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -51,7 +51,7 @@ test_that("association_analysis", {
   expect_true(nrow(localFileRes)>0)
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession", figures="HYPER", anomalies="DELTAS", metaareas="CHR")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="CHR")
 
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_1000_15000_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -67,7 +67,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
 
   fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -84,7 +84,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
 
   fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -100,7 +100,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
 
   fileToRead <- file_path_build(inferenceFolder, "2_Phenotest_log10_gaussian_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -115,7 +115,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
 
   fileToRead <- file_path_build(inferenceFolder, "1_Group_log_wilcoxon_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -130,7 +130,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
 
   fileToRead <- file_path_build(inferenceFolder, "1_Group_quantile_5_wilcoxon_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")

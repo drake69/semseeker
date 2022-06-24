@@ -71,5 +71,5 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   if(Bca[1]<0 & Bca[2]>0)
     p.value<- 1
 
-  return(c(Bca, NA))
+  return(c(Bca, p.value))
 }
