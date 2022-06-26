@@ -12,7 +12,8 @@ quantreg_summary(
   tau,
   independent_variable,
   lqm_control,
-  conf.level = 0.95
+  conf.level = 0.95,
+  boot_success = 0
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ quantreg_summary(
 \item{independent_variable}{name of indenpendent variable}
 
 \item{lqm_control}{controls of lqmm packages}
+
+\item{conf.level}{confidence intervals alpha level}
+
+\item{boot_success}{number of success respecting the null hypothesis}
 }
 \value{
 ci and pvalue with BCA method

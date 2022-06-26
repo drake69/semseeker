@@ -2,9 +2,9 @@
 create_excel_pivot_big <-  function(envir ) {
 
   reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
-  sample_sheet <- read.csv2(file.path(envir$result_folderData,"sample_sheet_result.csv"))
+  sample_sheet <- utils::read.csv2(file.path(envir$result_folderData,"sample_sheet_result.csv"))
   sample_names <- sample_sheet$Sample_ID
-  toExport <- c("envir","dir_check_and_create","sample_names")
+  toExport <- c("envir","dir_check_and_create","sample_names","k")
   pivot <- foreach::foreach(k=1:nrow(envir$keys_anomalies_figures_areas), .export = toExport, .combine= rbind , .multicombine=TRUE ) %dorng%
   # for(k in 1:nrow(envir$keys_anomalies_figures_areas))
   {

@@ -29,6 +29,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
   z <- 0
   envir <- init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
 
+
   figures <- envir$keys_figures[,1]
   anomalies <- envir$keys_anomalies[,1]
   populations <- c("Reference","Control","Case")
@@ -238,7 +239,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
               {
                 g_start <- 2 + length(covariates)
                 result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[j])], g_start = g_start , family_test = family_test, covariates = covariates,
-                                                key = keys[j,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
+                                                key = keys[j,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
                 result <- rbind(result, result_temp)
               }
 
@@ -343,7 +344,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
 
                       result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates,
                                                             key = key, transformation= transformation, dototal = TRUE,
-                                                            logFolder= envir$logFolder, independent_variable, depth_analysis, envir)
+                                                            logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
 
                       # message("Exited form apply model")
 
