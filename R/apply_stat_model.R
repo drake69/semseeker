@@ -11,12 +11,16 @@
 #' @param independent_variable independent variable name
 #' @param depth_analysis depth's analysis
 #' @param envir object environment
+#' @param ... extra parameters
 #'
 #' @importFrom doRNG %dorng%
 #'
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder,
-                             independent_variable, depth_analysis=3, envir )
+                             independent_variable, depth_analysis=3, envir , ...)
 {
+  arguments <- list(...)
+  boot_success <- if(is.null(arguments[["boot_success"]])) 0 else arguments$boot_success
+
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame
 
@@ -236,7 +240,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
         }
         sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
-        model <- lm(formula = sig.formula, data = as.data.frame(tempDataFrame))
+        model <- stats::lm(formula = sig.formula, data = as.data.frame(tempDataFrame))
         residuals <-  model$residuals
         shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) round(stats::shapiro.test(residuals)$p.value,3) else NA
         Breusch_Pagan_pvalue <- lmtest::bptest(model)$p.value
@@ -278,7 +282,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
           colnames(tt) <- colnames(model.x.boot)
           boot_vector <- stats::na.omit(tt[,independent_variable])
-          boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
+          boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control, boot_success)
         }
         ci.lower.adjusted <- NA
         ci.upper.adjusted <- NA
@@ -295,7 +299,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           colnames(tt) <- colnames(model.x.boot)
           boot_vector <- stats::na.omit(tt[,independent_variable])
           boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
-          boot.bca.adjusted <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control, conf.level = (1 - 0.05/iters))
+          boot.bca.adjusted <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control,  boot_success = boot_success)
           ci.lower.adjusted <-  boot.bca.adjusted[1]
           ci.upper.adjusted <- boot.bca.adjusted[2]
         }

@@ -7,10 +7,13 @@
 #' @param tau quantile to regress at
 #' @param independent_variable name of indenpendent variable
 #' @param lqm_control controls of lqmm packages
+#' @param conf.level confidence intervals alpha level
+#' @param boot_success number of success respecting the null hypothesis
 #'
 #' @return ci and pvalue with BCA method
 #' @importFrom doRNG %dorng%
-quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control, conf.level = 0.95){
+quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control, conf.level = 0.95, boot_success = 0){
+
 
   # #BCA method
   # #Desired quantiles
@@ -66,10 +69,13 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   # #Accelerated Bootstrap CI
   # Bca<-stats::quantile(boot_vector, u_adjusted)
 
+
   Bca <- coxed::bca(boot_vector, conf.level = conf.level)
   p.value <- 0
   if(Bca[1]<0 & Bca[2]>0)
     p.value<- 1
+
+  cl = 1 - (1 - boot_success) * (1 - conf.level)
 
   return(c(Bca, p.value))
 }
