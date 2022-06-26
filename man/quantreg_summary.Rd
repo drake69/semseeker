@@ -13,7 +13,8 @@ quantreg_summary(
   independent_variable,
   lqm_control,
   conf.level = 0.95,
-  boot_success = 0
+  boot_success = 0,
+  tests_count = 1
 )
 }
 \arguments{
