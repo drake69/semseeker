@@ -69,13 +69,13 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   # #Accelerated Bootstrap CI
   # Bca<-stats::quantile(boot_vector, u_adjusted)
 
+  conf.level = 1 - (1 - boot_success/tests_count) * (1 - conf.level)
 
   Bca <- coxed::bca(boot_vector, conf.level = conf.level)
   p.value <- 0
   if(Bca[1]<0 & Bca[2]>0)
     p.value<- 1
 
-  cl = 1 - (1 - boot_success/tests_count) * (1 - conf.level)
 
   return(c(Bca, p.value))
 }
