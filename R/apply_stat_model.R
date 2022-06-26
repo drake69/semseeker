@@ -20,6 +20,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 {
   arguments <- list(...)
   boot_success <- if(is.null(arguments[["boot_success"]])) 0 else arguments$boot_success
+  tests_count <- if(is.null(arguments[["tests_count"]])) 1 else arguments$tests_count
 
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame
@@ -282,7 +283,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
           colnames(tt) <- colnames(model.x.boot)
           boot_vector <- stats::na.omit(tt[,independent_variable])
-          boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control, boot_success)
+          boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
         }
         ci.lower.adjusted <- NA
         ci.upper.adjusted <- NA
@@ -299,7 +300,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           colnames(tt) <- colnames(model.x.boot)
           boot_vector <- stats::na.omit(tt[,independent_variable])
           boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
-          boot.bca.adjusted <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control,  boot_success = boot_success)
+          boot.bca.adjusted <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control,  boot_success = boot_success, tests_count=tests_count)
           ci.lower.adjusted <-  boot.bca.adjusted[1]
           ci.upper.adjusted <- boot.bca.adjusted[2]
         }

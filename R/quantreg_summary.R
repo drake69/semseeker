@@ -12,7 +12,7 @@
 #'
 #' @return ci and pvalue with BCA method
 #' @importFrom doRNG %dorng%
-quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control, conf.level = 0.95, boot_success = 0){
+quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control, conf.level = 0.95, boot_success = 0, tests_count=1 ){
 
 
   # #BCA method
@@ -75,7 +75,7 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
   if(Bca[1]<0 & Bca[2]>0)
     p.value<- 1
 
-  cl = 1 - (1 - boot_success) * (1 - conf.level)
+  cl = 1 - (1 - boot_success/tests_count) * (1 - conf.level)
 
   return(c(Bca, p.value))
 }
