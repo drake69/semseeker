@@ -1,6 +1,7 @@
 #' @importFrom doRNG %dorng%
 create_excel_pivot_big <-  function(envir ) {
 
+  k <- 0
   reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
   sample_sheet <- utils::read.csv2(file.path(envir$result_folderData,"sample_sheet_result.csv"))
   sample_names <- sample_sheet$Sample_ID
