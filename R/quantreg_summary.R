@@ -9,6 +9,7 @@
 #' @param lqm_control controls of lqmm packages
 #' @param conf.level confidence intervals alpha level
 #' @param boot_success number of success respecting the null hypothesis
+#' @param tests_count how many tests were done
 #'
 #' @return ci and pvalue with BCA method
 #' @importFrom doRNG %dorng%
