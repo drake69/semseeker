@@ -35,6 +35,8 @@ quantreg_summary(
 \item{conf.level}{confidence intervals alpha level}
 
 \item{boot_success}{number of success respecting the null hypothesis}
+
+\item{tests_count}{how many tests were done}
 }
 \value{
 ci and pvalue with BCA method
