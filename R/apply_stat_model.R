@@ -80,9 +80,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   if(grepl("quantile", transformation))
   {
     qq <- as.numeric(unlist(strsplit(transformation,"\\_"))[2])
-    burden_values <- as.data.frame(apply( burden_values,2,function(x){
+    burden_values <- as.data.frame(apply(burden_values,2,function(x){
       if(length(unique(x))>=qq)
-        as.numeric(ggplot2::cut_number(x, n=qq))
+        as.numeric(dplyr::ntile(x, n=qq))
       else
         rep(0,length(x))
       }))
@@ -124,7 +124,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     # if(grepl("quantile", transformation))
     # {
     #   qq <- unlist(strsplit(transformation,"_")[2])
-    #   df_values_temp <- as.data.frame(apply( burden_values,2,function(x) ggplot2::cut_number(x, n=qq)))
+    #   df_values_temp <- as.data.frame(apply( burden_values,2,function(x) dplyr::ntile(x, n=qq)))
     #   colnames(df_values_temp) <- colnames(burden_values)
     # }
 
