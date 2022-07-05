@@ -40,7 +40,7 @@ create_multiple_bed <- function(envir, sample_sheet, resultPopulation){
           fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
           utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
           #create quantilized deltas
-          if(key$ANOMALY=="DELTAS" & sum("DELTAQ" %in% envir$keys_anomalies)>0)
+          if(key$ANOMALY=="DELTAS")
           {
             #value is in the 4th position
             # give to each quantile an even weight
@@ -61,10 +61,12 @@ create_multiple_bed <- function(envir, sample_sheet, resultPopulation){
   #update sample sheet
   # study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
 
-  tempDataFrame <- reshape2::dcast(data = deltaq_summary, formula = SAMPLEID  ~ LABEL, value.var = "VALUE", fun.aggregate = sum, drop = TRUE)
-
-  # study_summary <- study_summary[, !(colnames(study_summary) %in% colnames(tempDataFrame))]
-  resultPopulation <- merge(resultPopulation, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID")
+  if(!plyr::empty(deltaq_summary))
+  {
+    tempDataFrame <- reshape2::dcast(data = deltaq_summary, formula = SAMPLEID  ~ LABEL, value.var = "VALUE", fun.aggregate = sum, drop = TRUE)
+    # study_summary <- study_summary[, !(colnames(study_summary) %in% colnames(tempDataFrame))]
+    resultPopulation <- merge(resultPopulation, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID")
+  }
 
   gc()
   return(resultPopulation)
