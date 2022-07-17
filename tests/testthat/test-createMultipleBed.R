@@ -40,17 +40,18 @@ test_that("create_multiple_bed", {
   create_multiple_bed(envir, sample_sheet, sp)
 
   tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_BOTH"))
-  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")
-  localFileRes_both <- read.table(fileToRead, sep="\t")
+  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "fst")
+  # localFileRes_both <- read.table(fileToRead, sep="\t")
+  localFileRes_both <- fst::read_fst(fileToRead)
 
   expect_true(nrow(localFileRes_both)>0)
 
   # tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPO"))
-  # fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPO" ), "bed")
+  # fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPO" ), "fst")
   # localFileRes_hypo <- read.table(fileToRead, sep="\t")
   #
   # tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPER"))
-  # fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPER" ), "bed")
+  # fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPER" ), "fst")
   # localFileRes_hyper <- read.table(fileToRead, sep="\t")
 
   # expect_true(nrow(localFileRes_hyper)>0 | nrow(localFileRes_hypo)>0 | nrow(localFileRes_both)>0)
