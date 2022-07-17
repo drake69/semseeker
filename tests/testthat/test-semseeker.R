@@ -29,14 +29,16 @@ test_that("semeeker", {
              parallel_strategy = "")
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")
-  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "bed")
-  localFileRes <- read.table(fileToRead, sep="\t")
+  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "fst")
+  localFileRes_both <- fst::read_fst(fileToRead)
+  # localFileRes <- read.table(fileToRead, sep="\t")
 
   expect_true(nrow(localFileRes)>0)
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAS_BOTH")
-  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAS" ,"BOTH" ), "bedgraph")
-  localFileRes <- read.table(fileToRead, sep="\t")
+  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAS" ,"BOTH" ), "fst")
+  localFileRes_both <- fst::read_fst(fileToRead)
+  # localFileRes <- read.table(fileToRead, sep="\t")
 
   expect_true(nrow(localFileRes)>0)
 
