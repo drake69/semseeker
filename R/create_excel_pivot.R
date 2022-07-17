@@ -22,7 +22,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
   tempPopData <- subset(final_bed, final_bed$VALUE != 0 )
   sheetList <- vector(mode="list")
-  sheetListNames <- vector(mode="list")
+  # sheetListNames <- vector(mode="list")
 
   fileNameXLS <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
   envir$keys <- expand.grid("groups"= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
@@ -63,7 +63,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
             pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
             fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
-            utils::write.csv2(t(tempDataFrame), fileName)
+            utils::write.csv2(t(tempDataFrame), fileName, row.names = F)
             tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
             colnames(tempDataFrame) <- tempDataFrame[1,]
 

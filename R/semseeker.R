@@ -25,135 +25,49 @@ semseeker <- function(sample_sheet,
 
   envir <- init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
 
-  methylation_data <- stats::na.omit(methylation_data)
   # set digits to 22
   withr::local_options(list(digits = 22))
   sliding_window_size <- 11
 
-
-  methylation_data <- as.data.frame(methylation_data)
-  methDataTemp <- data.frame( PROBE= rownames(methylation_data), methylation_data)
-  methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
-  methylation_data <- methDataTemp[, -c(1)]
-
-  rm(methDataTemp)
-  message("INFO: I will work on:", nrow(methylation_data), " PROBES.")
-
-  if(nrow(methylation_data) == 485512)
-    message("INFO:seems a 450k dataset.")
-
-  if(nrow(methylation_data) == 27578)
-    message("INFO:seems a 27k dataset.")
-
-  if(nrow(methylation_data) == 866562)
-    message("INFO:seems an EPIC dataset.")
-
-  PROBES <- PROBES[(PROBES$PROBE %in% rownames(methylation_data)),]
-  methylation_data <- methylation_data[rownames(methylation_data) %in% PROBES$PROBE, ]
-  methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
-
-  #PROBES <- sort_by_chr_and_start(PROBES)
-  if (!test_match_order(row.names(methylation_data), PROBES$PROBE)) {
-    stop("Wrong order matching Probes and Methylation data!", Sys.time())
-  }
-
-  # if(!is.null(inferenceDetails))
-  # {
-  #   covariates <- unlist(t(strsplit( gsub(" ","",inferenceDetails$covariates),split = "+", fixed = T)))
-  #
-  #   if ( length(covariates)>0 & !( covariates  %in% colnames(sample_sheet)))
-  #   {
-  #     message(covariates[!(covariates%in% colnames(sample_sheet))])
-  #     stop("The covariates value are not available in the sample sheet!")
-  #   }
-  # }
-
-
-  population_checkResult <- population_check(sample_sheet, methylation_data, envir)
-  if(!is.null(population_checkResult))
+  if(is.data.frame(sample_sheet) & is.data.frame(methylation_data))
   {
-    stop(population_checkResult)
+    sample_sheet <-list(sample_sheet)
+    methylation_data <- list(methylation_data)
+  } else
+  {
+    if(is.data.frame(sample_sheet) | is.data.frame(methylation_data))
+      stop("both sample_sheet and methylation_data should be the same type!")
+    if(length(sample_sheet)!=length(methylation_data))
+      stop("both sample_sheet and methylation_data should have been list with the same length!")
   }
 
-  # reference population
-  referencePopulationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == "Reference", ]
-  referencePopulationMatrix <- data.frame(PROBE = row.names(methylation_data), methylation_data[, referencePopulationSampleSheet$Sample_ID])
-
-  #
-  # methylation_data <- data.frame(PROBE = row.names(methylation_data), methylation_data[ , which(!(colnames(methylation_data)%in%referencePopulationSampleSheet$Sample_ID))]  )
-
-
-  if (plyr::empty(referencePopulationMatrix) |
-      dim(referencePopulationMatrix)[2] < 2) {
-    message("Empty methylation_data ", Sys.time())
-    stop("Empty methylation_data ")
+  if(length(methylation_data)>1)
+  {
+    pp <- vector(mode="list")
+    d <- 1
+    pp <- foreach::foreach(d = 1:length(methylation_data), .combine = rbind, .export = c("methylation_data")) %dorng%
+      {
+        row.names(stats::na.omit(methylation_data[[d]]))
+      }
+    probes_to_preserve <- Reduce(intersect, pp)
   }
+  else
+    probes_to_preserve <- row.names(methylation_data[[1]])
 
-  populationControlRangeBetaValues <- range_beta_values(referencePopulationMatrix, iqrTimes)
-
-  utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$result_folderData ,"beta_thresholds","csv"), sep=";")
-
-  # remove duplicated samples due to the reference population
-  referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]
-  otherSamples <- sample_sheet[sample_sheet$Sample_Group != "Reference",]
-  referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
-  sample_sheet <- rbind(otherSamples, referenceSamples)
-
-  variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
-  # resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  for (i in 1:length(envir$keys_populations[,1]))
-    {
-
-    #
-    populationName <- envir$keys_populations[i,1]
-    populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == populationName, ]
-    populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
-
-    if (length(populationMatrixColumns)==0) {
-      message("WARNING: Population ",populationName, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
-    }
+  for(batch_id in 1:length(sample_sheet))
+  {
+    message("Working on batch:",batch_id)
+    sample_sheet_local <- sample_sheet[[batch_id]]
+    methylation_data_local <- stats::na.omit(methylation_data[[batch_id]])
+    methylation_data_local <- methylation_data_local[rownames(methylation_data_local)%in%probes_to_preserve,]
+    sample_sheet_local <- analyze_batch(envir, methylation_data_local, sample_sheet_local, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
+    if(exists("sample_sheet_result"))
+      sample_sheet_result <- plyr::rbind.fill(sample_sheet_result, sample_sheet_local)
     else
-    {
-      # browser()
-      resultPopulation <- analize_population(
-        envir = envir,
-        methylation_data = methylation_data[, populationMatrixColumns] ,
-        sliding_window_size = sliding_window_size,
-        beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,
-        beta_inferior_thresholds = populationControlRangeBetaValues$beta_inferior_thresholds,
-        sample_sheet = populationSampleSheet,
-        beta_medians = populationControlRangeBetaValues$betaMedianValues,
-        bonferroni_threshold = bonferroni_threshold,
-        probe_features = PROBES
-      )
-
-      resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
-      resultPopulation <- as.data.frame(resultPopulation)
-
-      # resultPopulation
-      # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
-      # #   browser()
-      #
-
-      if(!exists("resultSampleSheet"))
-        resultSampleSheet <- resultPopulation
-      else
-        resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
-
-      rm(populationSampleSheet)
-    }
-
+      sample_sheet_result <- sample_sheet_local
   }
 
-  sample_sheet <- as.data.frame(sample_sheet)
-  resultSampleSheet <- as.data.frame(resultSampleSheet)
-  samplesID <- sample_sheet$Sample_ID
-  sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% colnames(resultSampleSheet))]
-  sample_sheet$Sample_ID <- samplesID
-
-  sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
-  rm(methylation_data)
-  gc()
+  sample_sheet <- sample_sheet_result
   utils::write.csv2(sample_sheet, file.path(envir$result_folderData , "sample_sheet_result.csv"))
 
   if(length(sample_sheet$Sample_Group=="Reference")>0)

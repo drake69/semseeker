@@ -5,7 +5,7 @@
 
 install.packages("devtools")
 library("devtools")
-install_github("drake69/semseeker")
+install_github("drake69/semseeker", force=TRUE)
 
 library("semseeker")
 
