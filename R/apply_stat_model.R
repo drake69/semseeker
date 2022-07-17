@@ -145,7 +145,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
 
   # after the transformation some data could be missed
-  lostDataFrame <-  tempDataFrame[,colSums(apply(tempDataFrame,2,is.nan))!=0]
+  lost_cols <- colSums(apply(tempDataFrame,2,is.nan))!=0
+  lostDataFrame <-  colnames(tempDataFrame)[lost_cols]
   if(!is.null(lostDataFrame))
     utils::write.csv2(lostDataFrame, file.path(envir$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
 
@@ -155,7 +156,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   g <- 0
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
                  "independent_variable1stLevel", "independent_variable2ndLevel",
-                 "key", "transformation","quantreg_summary","iters")
+                 "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count")
 
   # message("Starting foreach withh: ", iters, " items")
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%

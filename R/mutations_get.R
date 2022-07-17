@@ -18,20 +18,26 @@ mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
     "HYPO"=`<`,
     "HYPER"=`>`
   )
+  # if (!test_match_order(row.names(values), probe_features$PROBE)) {
+  #   stop("Wrong order matching Probes and Values!", Sys.time())
+  # }
+  # if (!test_match_order(row.names(thresholds), probe_features$PROBE)) {
+  #   stop("Wrong order matching Probes and Thresholds!", Sys.time())
+  # }
 
   mutation <- as.numeric(comparison(values, thresholds))
+
+  rownames(mutation) <- rownames(values)
+
   # message(sampleName, " ", "Got probesOverThreshold ", Sys.time())
 
   ### get mutation_annotated_sorted ################################################################################################
-  if (!test_match_order(row.names(mutation), probe_features$PROBE)) {
-    stop("Wrong order matching Probes and Mutation!", Sys.time())
-  }
 
   mutationAnnotated <- data.frame(as.data.frame(probe_features), "MUTATIONS" = mutation, row.names = probe_features$PROBE)
 
-  if (!test_match_order(row.names(mutationAnnotated), probe_features$PROBE)) {
-    stop("Wrong order matching Probes and Mutation!", Sys.time())
-  }
+  # if (!test_match_order(row.names(mutationAnnotated), probe_features$PROBE)) {
+  #   stop("Wrong order matching Probes and Mutation!", Sys.time())
+  # }
 
   mutation_annotated_sorted <- sort_by_chr_and_start(mutationAnnotated)
 

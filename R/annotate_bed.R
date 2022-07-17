@@ -13,15 +13,15 @@
 #' @importFrom doRNG %dorng%
 
 annotate_bed <- function (
-  envir,
-  populations ,
-  figures ,
-  anomalies ,
-  groups ,
-  probes_prefix ,
-  columnLabel ,
-  groupingColumnLabel)
-  {
+    envir,
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+{
 
   i <- 0
   final_bed <- NULL
@@ -30,16 +30,16 @@ annotate_bed <- function (
   if(file.exists(bedFileName))
   {
     if(file.info(bedFileName)$size < 10)
-      {
-        final_bed <- NULL
-        message("Given up file:", final_bed, " is empty!")
-      }
+    {
+      final_bed <- NULL
+      message("Given up file:", final_bed, " is empty!")
+    }
     else
-      {
-        # final_bed <- utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
-        final_bed <- fst::fst(path = bedFileName)
-        final_bed$VALUE = as.numeric(final_bed$VALUE)
-      }
+    {
+      # final_bed <- utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
+      final_bed <- fst::fst(path = bedFileName)
+      final_bed$VALUE = as.numeric(final_bed$VALUE)
+    }
 
     final_bed_temp <- final_bed[final_bed$ANOMALY %in% anomalies & final_bed$FIGURE %in% figures,]
     if(!plyr::empty(final_bed_temp))
@@ -61,18 +61,18 @@ annotate_bed <- function (
 
   # for(i in 1:nrow(envir$keysLocal))
   final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
-  {
-    anomal <- envir$keysLocal[i,"ANOMALY"]
-    pop <- envir$keysLocal[i,"POPULATION"]
-    fig <- envir$keysLocal[i,"FIGURE"]
-    grp <- envir$keysLocal[i,"GROUP"]
+    {
+      anomal <- envir$keysLocal[i,"ANOMALY"]
+      pop <- envir$keysLocal[i,"POPULATION"]
+      fig <- envir$keysLocal[i,"FIGURE"]
+      grp <- envir$keysLocal[i,"GROUP"]
 
-    probes <- get(paste0(probes_prefix, grp,sep=""))
-    resFolder <- dir_check_and_create(envir$result_folderData,pop)
-    tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
-                                  columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
-    tempFile
-  }
+      probes <- get(paste0(probes_prefix, grp,sep=""))
+      resFolder <- dir_check_and_create(envir$result_folderData,pop)
+      tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
+                                    columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
+      tempFile
+    }
 
   colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
   final_bed <- final_bed[, colname_to_preserve]
@@ -81,7 +81,12 @@ annotate_bed <- function (
     if(!plyr::empty(final_bed_temp))
       final_bed <- rbind(final_bed, final_bed_temp)
 
-  fst::write_fst( x =  final_bed,path =  bedFileName, compress = T )
+  if(exists("final_bed"))
+  {
+    final_bed <- as.data.frame(final_bed)
+    if(!plyr::empty(final_bed))
+      fst::write_fst( x = final_bed,path =  bedFileName, compress = T )
+  }
 
   # utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 

@@ -80,181 +80,183 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                            "file_path_build", "dir_check_and_create", "apply_stat_model", "doRNGversion", ".getRNG", "hasRNG", "nextRNG", "RNGkind", "setRNG", "RNGstr")
 
   # foreach::foreach(z = 1:nrow(inference_details), .export = variables_to_export) %dorng%
-    for(z in 1:nrow(inference_details))
+  for(z in 1:nrow(inference_details))
+  {
+    inference_detail <- inference_details[z,]
+
+    filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
+
+    covariates <- inference_detail$covariates
+    covariates <- if(length(covariates)!=0 & !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split = "+", fixed = T)))
+    family_test <- inference_detail$family_test
+    if( is.null(family_test) || length(family_test)==0)
     {
-      inference_detail <- inference_details[z,]
-
-      filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
-
-      covariates <- inference_detail$covariates
-      covariates <- if(length(covariates)!=0 & !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split = "+", fixed = T)))
-      family_test <- inference_detail$family_test
-      if( is.null(family_test) || length(family_test)==0)
+      message("Warning: one test family_test is missed! Skipped.")
+    }
+    else
+    {
+      transformation <- inference_detail$transformation
+      if(is.null(transformation) | length(transformation)==0)
       {
-        message("Warning: one test family_test is missed! Skipped.")
+        transformation <- NULL
+      }
+
+      independent_variable <- gsub(" ","", inference_detail$independent_variable)
+      if( is.null(independent_variable) || length(independent_variable)==0)
+      {
+        message("Warning: one indipendent variable is missed! Skipped.")
       }
       else
       {
-        transformation <- inference_detail$transformation
-        if(is.null(transformation) | length(transformation)==0)
+        depth_analysis <- inference_detail$depth_analysis
+        if( is.null(depth_analysis) || length(depth_analysis)==0)
         {
-          transformation <- NULL
+          depth_analysis <- 1
+          message("Warning: missed depth analysis inference forced to 1.")
         }
 
-        independent_variable <- gsub(" ","", inference_detail$independent_variable)
-        if( is.null(independent_variable) || length(independent_variable)==0)
+        study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
+
+        # transform independent variable as factor
+        if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="t.test")
+          study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
+
+        result_folderPivot <- dir_check_and_create(envir$result_folderData,"Pivots")
+
+        file_result_prefix <- paste0( depth_analysis,"_", as.character(independent_variable),"_",sep="")
+
+        study_summary <- subset(study_summary, study_summary$Sample_Group!="Reference")
+        #########################################################################################################
+        #########################################################################################################
+
+        if (!(independent_variable %in% colnames(study_summary)))
         {
-          message("Warning: one indipendent variable is missed! Skipped.")
+          message(" This indipendent variabile:", independent_variable, " is missed! Skipping")
         }
         else
         {
-          depth_analysis <- inference_detail$depth_analysis
-          if( is.null(depth_analysis) || length(depth_analysis)==0)
+          if(is.null(covariates) || length(covariates)==0)
           {
-            depth_analysis <- 1
-            message("Warning: missed depth analysis inference forced to 1.")
-          }
-
-          study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
-
-          # transform independent variable as factor
-          if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="t.test")
-            study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
-
-          result_folderPivot <- dir_check_and_create(envir$result_folderData,"Pivots")
-
-          file_result_prefix <- paste0( depth_analysis,"_", as.character(independent_variable),"_",sep="")
-
-          study_summary <- subset(study_summary, study_summary$Sample_Group!="Reference")
-          #########################################################################################################
-          #########################################################################################################
-
-          if (!(independent_variable %in% colnames(study_summary)))
-          {
-            message(" This indipendent variabile:", independent_variable, " is missed! Skipping")
+            sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable)])
           }
           else
           {
-            if(is.null(covariates) || length(covariates)==0)
+            #tramsform in factor not numeric covariate
+            for(cc in 1:length(covariates))
             {
-              sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable)])
-            }
-            else
-            {
-              #tramsform in factor not numeric covariate
-              for(cc in 1:length(covariates))
+              cname <- covariates[cc]
+              if(!is.numeric(stats::na.omit(study_summary[,cname])))
               {
-                cname <- covariates[cc]
-                if(!is.numeric(stats::na.omit(study_summary[,cname])))
-                {
-                  study_summary[,cname] <- as.factor(study_summary[,cname])
-                }
+                study_summary[,cname] <- as.factor(study_summary[,cname])
               }
-              sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable, covariates)])
+            }
+            sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable, covariates)])
+          }
+
+          result = data.frame (
+            "INDIPENDENT.VARIABLE"="",
+            "ANOMALY" = "",
+            "FIGURE" = "",
+            "GROUP" = "",
+            "SUBGROUP" = "",
+            "AREA_OF_TEST" = "",
+            "PVALUE" = "",
+            "PVALUEADJ" = "",
+            "TEST" = "",
+            "BETA" = "",
+            "AIC" = "",
+            "RESIDUALS.SUM" = "",
+            "FAMILY" = "",
+            "TRANSFORMATION" = "",
+            "COVARIATES" = "",
+            "SHAPIRO.PVALUE" = "",
+            "BREUSCH-PAGAN.PVALUE"="",
+            "BARTLETT.PVALUE" = "",
+            "CASE.LABEL"="",
+            "COUNT.CASE","",
+            "MEAN.CASE" ="",
+            "SD.CASE"="",
+            "CONTROL.LABEL"="",
+            "COUNT.CONTROL"="",
+            "MEAN.CONTROL"="",
+            "SD.CONTROL"="",
+            "RHO"="",
+            "CI.LOWER"= "",
+            "CI.UPPER"= "",
+            "CI.LOWER.ADJUSTED"=  NA,
+            "CI.UPPER.ADJUSTED"=  NA,
+            "N.PERMUTATIONS" = ""
+          )
+          result <- result[-1,]
+
+          if(!is.null(covariates) && !length(covariates)==0)
+          {
+            sample_names <-   sample_names[, c("Sample_ID", independent_variable, covariates)]
+            colnames(sample_names) <- c("Sample_ID", independent_variable, covariates)
+          }
+          else
+          {
+            sample_names <-   sample_names[, c("Sample_ID", independent_variable)]
+            colnames(sample_names) <- c("Sample_ID", independent_variable)
+          }
+          ######################################################################################################
+          # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
+          # binomiale che si vuole usare per la regressione logistica
+
+
+          keys <- expand.grid("ANOMALY"= envir$keys_anomalies[,1], "FIGURE"= envir$keys_figures[,1])
+          cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep="")
+          keys$GROUP = "POPULATION"
+          keys$SUBGROUP = "SAMPLE"
+          iters <- length(cols)
+
+          if(!is.null(covariates) && !length(covariates)==0)
+            study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
+
+
+          # define file results filename
+          if(is.null(covariates) || length(covariates)==0)
+          {
+            file_suffix <- "_test_result"
+          }
+          else
+          {
+            file_suffix <- "_test_corrected_result"
+          }
+          fileNameResults <- file_path_build(envir$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
+
+          # clean keys from already done association
+          if(file.exists(fileNameResults))
+          {
+            old_results <- utils::read.csv2(fileNameResults, header = T)
+            keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse = "_", sep = "")))
+            keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse = "_", sep = "")))
+            keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
+          }
+
+          if(nrow(keys)>0)
+            for(j in 1:nrow(keys))
+            {
+              g_start <- 2 + length(covariates)
+              result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[j])], g_start = g_start , family_test = family_test, covariates = covariates,
+                                              key = keys[j,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
+              result <- rbind(result, result_temp)
             }
 
-            result = data.frame (
-              "INDIPENDENT.VARIABLE"="",
-              "ANOMALY" = "",
-              "FIGURE" = "",
-              "GROUP" = "",
-              "SUBGROUP" = "",
-              "AREA_OF_TEST" = "",
-              "PVALUE" = "",
-              "PVALUEADJ" = "",
-              "TEST" = "",
-              "BETA" = "",
-              "AIC" = "",
-              "RESIDUALS.SUM" = "",
-              "FAMILY" = "",
-              "TRANSFORMATION" = "",
-              "COVARIATES" = "",
-              "SHAPIRO.PVALUE" = "",
-              "BREUSCH-PAGAN.PVALUE"="",
-              "BARTLETT.PVALUE" = "",
-              "CASE.LABEL"="",
-              "COUNT.CASE","",
-              "MEAN.CASE" ="",
-              "SD.CASE"="",
-              "CONTROL.LABEL"="",
-              "COUNT.CONTROL"="",
-              "MEAN.CONTROL"="",
-              "SD.CONTROL"="",
-              "RHO"="",
-              "CI.LOWER"= "",
-              "CI.UPPER"= "",
-              "CI.LOWER.ADJUSTED"=  NA,
-              "CI.UPPER.ADJUSTED"=  NA,
-              "N.PERMUTATIONS" = ""
-            )
-            result <- result[-1,]
+          result <- result[order(result$PVALUEADJ),]
 
-            if(!is.null(covariates) && !length(covariates)==0)
+          study_summaryToPlot <- study_summary
+
+          if(independent_variable=="Sample_Group")
+            study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
+
+          if(family_test=="binomial")
+          {
+
+            chartFolder <- dir_check_and_create(envir$result_folderChart,"POPULATION_COMPARISON")
+
+            if(sum(grepl(pattern="MUTATIONS",x = envir$keys_figures))>0)
             {
-              sample_names <-   sample_names[, c("Sample_ID", independent_variable, covariates)]
-              colnames(sample_names) <- c("Sample_ID", independent_variable, covariates)
-            }
-            else
-            {
-              sample_names <-   sample_names[, c("Sample_ID", independent_variable)]
-              colnames(sample_names) <- c("Sample_ID", independent_variable)
-            }
-            ######################################################################################################
-            # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
-            # binomiale che si vuole usare per la regressione logistica
-
-
-            keys <- expand.grid("ANOMALY"= envir$keys_anomalies[,1], "FIGURE"= envir$keys_figures[,1])
-            cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep="")
-            keys$GROUP = "POPULATION"
-            keys$SUBGROUP = "SAMPLE"
-            iters <- length(cols)
-
-            if(!is.null(covariates) && !length(covariates)==0)
-              study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
-
-
-            # define file results filename
-            if(is.null(covariates) || length(covariates)==0)
-            {
-              file_suffix <- "_test_result"
-            }
-            else
-            {
-              file_suffix <- "_test_corrected_result"
-            }
-            fileNameResults <- file_path_build(envir$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
-
-            # clean keys from already done association
-            if(file.exists(fileNameResults))
-            {
-              old_results <- utils::read.csv2(fileNameResults, header = T)
-              keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse = "_", sep = "")))
-              keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse = "_", sep = "")))
-              keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
-            }
-
-            if(nrow(keys)>0)
-              for(j in 1:nrow(keys))
-              {
-                g_start <- 2 + length(covariates)
-                result_temp <- apply_stat_model(tempDataFrame = study_summary[, c(independent_variable, covariates, cols[j])], g_start = g_start , family_test = family_test, covariates = covariates,
-                                                key = keys[j,], transformation = transformation, dototal = FALSE, logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
-                result <- rbind(result, result_temp)
-              }
-
-            result <- result[order(result$PVALUEADJ),]
-
-            study_summaryToPlot <- study_summary
-
-            if(independent_variable=="Sample_Group")
-              study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
-
-            if(family_test=="binomial")
-            {
-
-              chartFolder <- dir_check_and_create(envir$result_folderChart,"POPULATION_COMPARISON")
-
               filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
               grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
               graphics::par(mfrow=c(1,3))
@@ -262,7 +264,10 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
               graphics::boxplot(MUTATIONS_BOTH~study_summaryToPlot[,independent_variable], main="Both Type of Mutations", data = study_summaryToPlot, cex=2)
               graphics::boxplot(MUTATIONS_HYPER~study_summaryToPlot[,independent_variable],main="Hyper Mutations", data = study_summaryToPlot, cex=2)
               grDevices::dev.off()
+            }
 
+            if(sum(grepl(pattern="LESIONS",x = envir$keys_figures))>0)
+            {
               filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
               grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
               graphics::par(mfrow=c(1,3))
@@ -270,7 +275,10 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
               graphics::boxplot(LESIONS_BOTH~study_summaryToPlot[,independent_variable], main="Both Type of Lesions", data = study_summaryToPlot, cex=2)
               graphics::boxplot(LESIONS_HYPER~study_summaryToPlot[,independent_variable],main="Hyper Lesions", data = study_summaryToPlot, cex=2)
               grDevices::dev.off()
+            }
 
+            if(sum(grepl(pattern="DELTAS",x = envir$keys_figures))>0)
+            {
               filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAS"),"png")
               grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
               graphics::par(mfrow=c(1,3))
@@ -280,111 +288,123 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
               grDevices::dev.off()
             }
 
-
-            if(depth_analysis >1)
+            if(sum(grepl(pattern="DELTAQ",x = envir$keys_figures))>0)
             {
+              filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
+              grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
+              graphics::par(mfrow=c(1,3))
+              graphics::boxplot(DELTAQ_HYPO~study_summaryToPlot[,independent_variable],main="Hypo DELTAQ Mean", data = study_summaryToPlot, cex=2)
+              graphics::boxplot(DELTAQ_BOTH~study_summaryToPlot[,independent_variable], main="Both Type of DELTAQ", data = study_summaryToPlot, cex=2)
+              graphics::boxplot(DELTAQ_HYPER~study_summaryToPlot[,independent_variable],main="Hyper DELTAQ Mean", data = study_summaryToPlot, cex=2)
+              grDevices::dev.off()
+            }
+          }
 
-              keys <- envir$keys_anomalies_figures_areas
-              # clean keys from already done association
-              if(file.exists(fileNameResults))
+
+          if(depth_analysis >1)
+          {
+
+            keys <- envir$keys_anomalies_figures_areas
+            # clean keys from already done association
+            if(file.exists(fileNameResults))
+            {
+              old_results <- utils::read.csv2(fileNameResults, header = T)
+              keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse = "_", sep = "")))
+              keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse = "_", sep = "")))
+              keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
+            }
+
+            nkeys <- nrow(keys)
+            variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis","file_path_build", "apply_stat_model")
+            if(nrow(keys)>0)
+              # result_temp_foreach <- foreach::foreach(k = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
+              for (k in 1:nkeys)
               {
-                old_results <- utils::read.csv2(fileNameResults, header = T)
-                keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse = "_", sep = "")))
-                keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse = "_", sep = "")))
-                keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
-              }
-
-              nkeys <- nrow(keys)
-              variables_to_export <- c("keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis","file_path_build", "apply_stat_model")
-              if(nrow(keys)>0)
-                # result_temp_foreach <- foreach::foreach(k = 1:nkeys, .combine = rbind, .export = variables_to_export) %dorng%
-                for (k in 1:nkeys)
+                if(exists("tempDataFrame"))
+                  rm(list = c("tempDataFrame"))
+                key <- keys [k,]
+                pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
+                fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+                if (file.exists(fname))
                 {
-                  if(exists("tempDataFrame"))
-                    rm(list = c("tempDataFrame"))
-                  key <- keys [k,]
-                  pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
-                  fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
-                  if (file.exists(fname))
+                  tempDataFrame <- utils::read.csv(fname, sep = ";")
+                  row.names(tempDataFrame) <- tempDataFrame$X
+                  tempDataFrame <- tempDataFrame[,-1]
+                  tempDataFrame <- t(tempDataFrame)
+                  if(nrow(tempDataFrame)>1)
                   {
-                    tempDataFrame <- utils::read.csv(fname, sep = ";")
-                    row.names(tempDataFrame) <- tempDataFrame$X
-                    tempDataFrame <- tempDataFrame[,-1]
-                    tempDataFrame <- t(tempDataFrame)
-                    if(nrow(tempDataFrame)>1)
-                    {
-                      tempDataFrame <- as.data.frame(tempDataFrame)
-                      tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
-                      tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
+                    tempDataFrame <- as.data.frame(tempDataFrame)
+                    tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
+                    tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
 
-                      tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
-                      tempDataFrame <- as.data.frame(tempDataFrame)
-                      tempDataFrame$POPULATION <- sample_names[, independent_variable]
-                      tempDataFrame[is.na(tempDataFrame)] <- 0
+                    tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
+                    tempDataFrame <- as.data.frame(tempDataFrame)
+                    tempDataFrame$POPULATION <- sample_names[, independent_variable]
+                    tempDataFrame[is.na(tempDataFrame)] <- 0
 
 
-                      tempDataFrame[, independent_variable] <- sample_names[, independent_variable]
-                      tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
+                    tempDataFrame[, independent_variable] <- sample_names[, independent_variable]
+                    tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
 
-                      cols <- (gsub(" ", "_", colnames(tempDataFrame)))
-                      cols <- (gsub("-", "_", cols))
-                      cols <- (gsub(":", "_", cols))
-                      cols <- (gsub("/", "_", cols))
-                      cols <- (gsub("'", "_", cols))
+                    cols <- (gsub(" ", "_", colnames(tempDataFrame)))
+                    cols <- (gsub("-", "_", cols))
+                    cols <- (gsub(":", "_", cols))
+                    cols <- (gsub("/", "_", cols))
+                    cols <- (gsub("'", "_", cols))
 
 
-                      tempDataFrame <- as.data.frame(tempDataFrame)
+                    tempDataFrame <- as.data.frame(tempDataFrame)
 
-                      if(length(colnames(tempDataFrame))!=length(cols))
-                        browser()
+                    if(length(colnames(tempDataFrame))!=length(cols))
+                      browser()
 
-                      colnames(tempDataFrame) <- cols
+                    colnames(tempDataFrame) <- cols
 
-                      g_start <- 2 + length(covariates)
+                    g_start <- 2 + length(covariates)
 
-                      result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates,
-                                                            key = key, transformation= transformation, dototal = TRUE,
-                                                            logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
+                    result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates,
+                                                          key = key, transformation= transformation, dototal = TRUE,
+                                                          logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
 
-                      # message("Exited form apply model")
+                    # message("Exited form apply model")
 
-                      if(!exists("result_temp_foreach"))
-                        result_temp_foreach <- result_temp_local
-                      else
-                        result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
+                    if(!exists("result_temp_foreach"))
+                      result_temp_foreach <- result_temp_local
+                    else
+                      result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
 
-                      # result_temp_local
-                    }
+                    # result_temp_local
                   }
                 }
-            }
+              }
           }
         }
       }
+    }
 
-      if(exists("result_temp_foreach"))
-        result <- rbind(result, result_temp_foreach)
+    if(exists("result_temp_foreach"))
+      result <- rbind(result, result_temp_foreach)
 
-      result <- unique(result)
+    result <- unique(result)
+    result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
+    result <- result[order(result$PVALUEADJ),]
+
+    if(filter_p_value)
+      result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
+
+    if(nrow(result)>0)
+    {
+      if(file.exists(fileNameResults))
+      {
+        old_results <- utils::read.csv2(fileNameResults, header = T)
+        result <- rbind(result, old_results)
+      }
       result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
       result <- result[order(result$PVALUEADJ),]
-
-      if(filter_p_value)
-        result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
-
-      if(nrow(result)>0)
-      {
-        if(file.exists(fileNameResults))
-        {
-          old_results <- utils::read.csv2(fileNameResults, header = T)
-          result <- rbind(result, old_results)
-        }
-        result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
-        result <- result[order(result$PVALUEADJ),]
-        utils::write.csv2(result,fileNameResults , row.names = FALSE)
-      }
-
+      utils::write.csv2(result,fileNameResults , row.names = FALSE)
     }
+
+  }
 
   future::plan( future::sequential)
 }

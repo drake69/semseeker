@@ -29,12 +29,12 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
 
 
   # browser()
-  fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(anomalyLabel),as.character(figureLable)),file_extension)
+  fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(anomalyLabel),as.character(figureLable)),"fst")
 
   if(file.exists(fileName))
   {
-
-    sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = col_names, header = FALSE)
+    # sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = col_names, header = FALSE)
+    sourceData <- fst::read_fst(fileName)
     colnames(sourceData) <- col_names
 
     sourceData$CHR <- as.factor(sourceData$CHR)

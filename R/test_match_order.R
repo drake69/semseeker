@@ -7,6 +7,11 @@
 
 #'
 test_match_order <- function(x, y) {
+
+
+  if(is.null(x) | is.null(y))
+    return(FALSE)
+
   if (all(x == y)) {
     return(TRUE)
   }

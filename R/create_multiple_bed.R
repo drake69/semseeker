@@ -37,18 +37,25 @@ create_multiple_bed <- function(envir, sample_sheet, resultPopulation){
       if(exists("localFileRes"))
         if(!plyr::empty(localFileRes))
         {
-          fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
-          utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+          if(ncol(localFileRes)==4)
+            colnames(localFileRes) <- c("CHR","START","END","SAMPLEID")
+          else
+            colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
+          fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
+          # utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+          update_multiple_bed( fileToWrite, localFileRes)
           #create quantilized deltas
           if(key$ANOMALY=="DELTAS")
           {
             #value is in the 4th position
             # give to each quantile an even weight
             localFileRes[,4] <- as.numeric(dplyr::ntile(x=as.numeric(localFileRes[,4]) , n=4)) * 2
+
             tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
-            fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)), key$EXT)
-            utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
-            colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
+            fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)), "fst")
+            update_multiple_bed( fileToWrite, localFileRes)
+
+            # utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
             tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",
                                              fun.aggregate = sum, drop = TRUE)
             colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
