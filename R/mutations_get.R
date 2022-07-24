@@ -27,7 +27,8 @@ mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
 
   mutation <- as.numeric(comparison(values, thresholds))
 
-  rownames(mutation) <- rownames(values)
+
+  # names(mutation) <- rownames(values)
 
   # message(sampleName, " ", "Got probesOverThreshold ", Sys.time())
 

@@ -64,7 +64,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
 
   # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
-  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(envir$result_folderData ,c(batch_id, "beta_thresholds"),"csv"))
+  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(envir$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]

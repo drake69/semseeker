@@ -25,6 +25,7 @@ create_heatmap <-
     inputBedDataFrame$FIGURE <- as.factor(inputBedDataFrame$FIGURE)
     inputBedDataFrame$ANOMALY <- as.factor(inputBedDataFrame$ANOMALY)
     inputBedDataFrame$POPULATION <- as.factor(inputBedDataFrame$POPULATION)
+    inputBedDataFrame$VALUE <- as.numeric(inputBedDataFrame$VALUE)
 
     if(length(groupColumnLabels)==2)
     {
@@ -35,6 +36,7 @@ create_heatmap <-
       inputBedDataFrame <- data.frame(inputBedDataFrame,"KEY" = inputBedDataFrame[, groupColumnLabels[1]])
     }
     inputBedDataFrame$KEY <- as.factor(inputBedDataFrame$KEY)
+
     inputBedDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$POPULATION != "Reference")
     if(nrow(inputBedDataFrame) < 10)
       return()
@@ -64,6 +66,7 @@ create_heatmap <-
           figure <- as.character(keys[j,"figures"])
           anomaly <- as.character(keys[j, "anomalies"])
           tempDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$ANOMALY == anomaly & inputBedDataFrame$FIGURE == figure)
+          tempDataFrame$VALUE <- as.numeric(tempDataFrame$VALUE)
           if(!plyr::empty(tempDataFrame))
             if(nrow(tempDataFrame)>2)
             {

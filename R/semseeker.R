@@ -43,13 +43,14 @@ semseeker <- function(sample_sheet,
 
   if(length(methylation_data)>1)
   {
-    pp <- vector(mode="list")
     d <- 1
-    pp <- foreach::foreach(d = 1:length(methylation_data), .combine = rbind, .export = c("methylation_data")) %dorng%
-      {
-        row.names(stats::na.omit(methylation_data[[d]]))
-      }
-    probes_to_preserve <- Reduce(intersect, pp)
+    for(d in 1:length(methylation_data))
+    {
+      if(exists("probes_to_preserve"))
+        probes_to_preserve <- probes_to_preserve[ probes_to_preserve %in% row.names(stats::na.omit(methylation_data[[d]]))]
+      else
+        probes_to_preserve <- row.names(stats::na.omit(methylation_data[[d]]))
+    }
   }
   else
     probes_to_preserve <- row.names(methylation_data[[1]])
