@@ -34,7 +34,7 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
   if(file.exists(fileName))
   {
     # sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = col_names, header = FALSE)
-    sourceData <- fst::read_fst(fileName)
+    sourceData <- fst::read_fst(fileName, as.data.table = T)
     colnames(sourceData) <- col_names
 
     sourceData$CHR <- as.factor(sourceData$CHR)

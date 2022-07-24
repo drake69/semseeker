@@ -15,7 +15,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
   final_bed[,"KEY"] <- as.factor(final_bed[,"KEY"])
   final_bed[,"FIGURE"] <- as.factor(final_bed[,"FIGURE"])
   final_bed[,"POPULATION"] <- as.factor(final_bed[,"POPULATION"])
-
+  final_bed[,"VALUE"] <- as.numeric(final_bed[,"POPULATION"])
 
   numberOfCase <- length(unique(subset(final_bed, final_bed$POPULATION == "Case" )$SAMPLEID))
   numberOfControl <- length(unique(subset(final_bed, final_bed$POPULATION == "Control" )$SAMPLEID))
@@ -63,7 +63,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
             pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
             fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
-            utils::write.csv2(t(tempDataFrame), fileName, row.names = F)
+            utils::write.table(t(tempDataFrame), fileName, row.names = F, col.names = F)
             tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
             colnames(tempDataFrame) <- tempDataFrame[1,]
 
