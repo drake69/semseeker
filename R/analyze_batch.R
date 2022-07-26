@@ -102,6 +102,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
 
       resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
       resultPopulation <- as.data.frame(resultPopulation)
+      resultPopulation$Sample_Group <- populationName
 
       # resultPopulation
       # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
@@ -123,6 +124,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   samplesID <- sample_sheet$Sample_ID
   sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% colnames(resultSampleSheet))]
   sample_sheet$Sample_ID <- samplesID
+  sample_sheet$Batch_ID <- batch_id
 
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(methylation_data)
