@@ -47,5 +47,6 @@ create_excel_pivot_big <-  function(envir ) {
   }
 
   pivot [is.na(pivot)] <- 0
-  fst::write_fst( x =  pivot ,path =  fileName <- paste0(reportFolder,"/PIVOT.fst" , sep="")  , compress = T )
+  fileName <- paste0(reportFolder,"/PIVOT.fst" , sep="")
+  fst::write_fst( x =  pivot ,path =  fileName  , compress = T )
 }
