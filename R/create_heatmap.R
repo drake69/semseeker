@@ -74,20 +74,9 @@ create_heatmap <-
               row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
 
               mainTitle <- paste0( paste0( pops, collapse ="_Vs_")," ", file_prefix," ",anomaly, sep="")
-              if(nrow(tempDataFrame)>1000 || ncol(tempDataFrame)>1000)
+              if(ncol(tempDataFrame)>1000)
               {
-                #reduce
-                temp2 <- as.matrix(tempDataFrame[,3:dim(tempDataFrame)[2]])
-                temp <- apply(temp2,2, sum)
-                temp1 <- sort(temp, decreasing = T)
-                limit <- temp1[1000]
-                if(sum(temp1==limit)>1)
-                  limit <- limit + 1
-                tempDataFrame <- data.frame(tempDataFrame[,1:2], temp2[,temp1 > limit])
-                rm(temp)
-                rm(temp1)
-                rm(temp2)
-                gc()
+                tempDataFrame <- tempDataFrame[,1:min(ncol(tempDataFrame),1005)]
                 mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
               }
 
