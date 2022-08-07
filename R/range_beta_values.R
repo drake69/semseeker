@@ -5,6 +5,7 @@
 #' @param iqrTimes inter quartile ratio used to normalize
 #'
 #' @return methylation matrix as normalized distribution
+#' @importFrom doRNG %dorng%
 
 range_beta_values <- function(populationMatrix, iqrTimes = 3) {
 
@@ -12,32 +13,32 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   beta_values <- as.data.frame(populationMatrix[, 2:populationMatrixDim[2]])
   row.names(beta_values) <- populationMatrix[, 1]
 
-  betaQ1Values <- as.data.frame(future.apply::future_apply( beta_values, 1, stats::quantile, 0.25))
-  betaQ3Values <- as.data.frame(future.apply::future_apply( beta_values, 1, stats::quantile, 0.75))
+  # nrow(beta_values)
+  # for(r in 1:1000)
+  result <- foreach::foreach(r = 1:nrow(beta_values), .combine = "rbind", .export = c("beta_values","iqrTimes")) %dorng%
+    {
+      b_values <- beta_values[r,]
+      betaQ1Values <-  stats::quantile(b_values, 0.25)
+      betaQ3Values <- stats::quantile(b_values, 0.75)
+      beta_median_values <- stats::quantile(b_values, 0.5)
+      betaValuesIQR <- stats::IQR(b_values )
 
-  beta_median_values <- as.data.frame(future.apply::future_apply( beta_values, 1, stats::median))
-  colnames(beta_median_values) <- c("beta_median_values")
+      beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
+      beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
 
-  betaValuesIQR <- as.data.frame(future.apply::future_apply( beta_values, 1, stats::IQR))
+      temp_result <- data.frame(beta_inferior_thresholds,beta_superior_thresholds, beta_median_values)
+      row.names(temp_result) <- row.names(b_values)
+      colnames(temp_result) <- c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values")
+      temp_result
+    }
 
-  if (!test_match_order(row.names(beta_values), row.names(beta_median_values))) {
-    stop("Wrong order matching Probes and BetaMedianvalues!", Sys.time())
-  }
+  # colnames(values) <- c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values")
+  # row.names(values) <- row.names(beta_median_values)
 
-  if (!test_match_order(row.names(beta_values), row.names(betaValuesIQR))) {
-    stop("Wrong order matching Probes and BetaMedianvalues IQR!", Sys.time())
-  }
 
-  beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
-  beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
-
-  row.names(beta_inferior_thresholds) <- row.names(beta_median_values)
-  colnames(beta_inferior_thresholds) <- c("beta_inferior_thresholds")
-
-  row.names(beta_superior_thresholds) <- row.names(beta_median_values)
-  colnames(beta_superior_thresholds) <- c("beta_superior_thresholds")
-
-  result <- list(beta_inferior_thresholds = beta_inferior_thresholds, beta_superior_thresholds = beta_superior_thresholds, beta_median_values = beta_median_values)
+  # result <- list(beta_inferior_thresholds = beta_inferior_thresholds,
+  #                beta_superior_thresholds = beta_superior_thresholds,
+  #                beta_median_values = beta_median_values)
 
   gc()
   return(result)
