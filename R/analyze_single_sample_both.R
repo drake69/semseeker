@@ -17,7 +17,7 @@ analyze_single_sample_both <- function(envir, sample_detail, anomaly) {
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,anomaly,figure),"bed")
     if(file.exists(fileName))
     {
-      data_to_saveTemp <- utils::read.csv(fileName, sep="\t", col.names =c("CHR", "START", "END") )
+      data_to_saveTemp <- utils::read.table(fileName, sep="\t", col.names =c("CHR", "START", "END") )
       data_to_save <- rbind(data_to_save, data_to_saveTemp )
     }
   }

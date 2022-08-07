@@ -255,7 +255,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
 
               chartFolder <- dir_check_and_create(envir$result_folderChart,"POPULATION_COMPARISON")
 
-              if(sum(grepl(pattern="MUTATIONS",x = envir$keys_figures))>0)
+              if(sum(grepl(pattern="MUTATIONS",x = envir$keys_anomalies))>0)
               {
                 filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
                 grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
@@ -266,7 +266,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                 grDevices::dev.off()
               }
 
-              if(sum(grepl(pattern="LESIONS",x = envir$keys_figures))>0)
+              if(sum(grepl(pattern="LESIONS",x = envir$keys_anomalies))>0)
               {
                 filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
                 grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
@@ -277,7 +277,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                 grDevices::dev.off()
               }
 
-              if(sum(grepl(pattern="DELTAS",x = envir$keys_figures))>0)
+              if(sum(grepl(pattern="DELTAS",x = envir$keys_anomalies))>0)
               {
                 filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAS"),"png")
                 grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
@@ -288,7 +288,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                 grDevices::dev.off()
               }
 
-              if(sum(grepl(pattern="DELTAQ",x = envir$keys_figures))>0)
+              if(sum(grepl(pattern="DELTAQ",x = envir$keys_anomalies))>0)
               {
                 filename = file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
                 grDevices::png(file= filename, width=2480,height=2480, pointsize = 15, res = 144)
@@ -328,16 +328,17 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                   if (file.exists(fname))
                   {
                     tempDataFrame <- utils::read.csv(fname, sep = ";")
-                    row.names(tempDataFrame) <- tempDataFrame$X
+                    row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
                     tempDataFrame <- tempDataFrame[,-1]
                     tempDataFrame <- t(tempDataFrame)
+                    tempDataFrame$Sample_ID <- rownames(tempDataFrame)
+                    tempDataFrame <- as.data.frame(tempDataFrame)
                     if(nrow(tempDataFrame)>1)
                     {
-                      tempDataFrame <- as.data.frame(tempDataFrame)
                       tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
                       tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
 
-                      tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "SAMPLEID" , all.x = TRUE)
+                      tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "Sample_ID" , all.x = TRUE)
                       tempDataFrame <- as.data.frame(tempDataFrame)
                       tempDataFrame$POPULATION <- sample_names[, independent_variable]
                       tempDataFrame[is.na(tempDataFrame)] <- 0
@@ -367,7 +368,6 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                                                             logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
 
                       # message("Exited form apply model")
-
                       # if(!exists("result_temp_foreach"))
                       #   result_temp_foreach <- result_temp_local
                       # else
