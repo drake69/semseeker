@@ -55,6 +55,7 @@ semseeker <- function(sample_sheet,
   else
     probes_to_preserve <- row.names(methylation_data[[1]])
 
+  batch_id <- 1
   for(batch_id in 1:length(sample_sheet))
   {
     message("Working on batch:",batch_id)
