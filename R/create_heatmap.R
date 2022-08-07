@@ -55,51 +55,51 @@ create_heatmap <-
     i <- 0
     j <- 0
 
-    keys <- expand.grid("anomalies"= anomalies,"figures"= figures)
-    # foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dorng%
-    {
-      # variables_to_export_nested <- c("anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","g","figures")
-      # foreach::foreach(j = 1:nrow(keys), .export = variables_to_export) %dorng%
-        for(j in 1:nrow(keys))
-        {
+    # keys <- expand.grid("anomalies"= anomalies,"figures"= figures)
+    foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dorng%
+      {
+        # variables_to_export_nested <- c("anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","g","figures")
+        foreach::foreach(j = 1:nrow(keys), .export = variables_to_export) %dorng%
+          # for(j in 1:nrow(keys))
+          {
 
-          figure <- as.character(keys[j,"figures"])
-          anomaly <- as.character(keys[j, "anomalies"])
-          tempDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$ANOMALY == anomaly & inputBedDataFrame$FIGURE == figure)
-          tempDataFrame$VALUE <- as.numeric(tempDataFrame$VALUE)
-          if(!plyr::empty(tempDataFrame))
-            if(nrow(tempDataFrame)>2)
-            {
-              tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "VALUE", sum)
-              row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
-
-              mainTitle <- paste0( paste0( pops, collapse ="_Vs_")," ", file_prefix," ",anomaly, sep="")
-              if(ncol(tempDataFrame)>1000)
+            figure <- as.character(keys[j,"figures"])
+            anomaly <- as.character(keys[j, "anomalies"])
+            tempDataFrame <- subset(inputBedDataFrame, inputBedDataFrame$ANOMALY == anomaly & inputBedDataFrame$FIGURE == figure)
+            tempDataFrame$VALUE <- as.numeric(tempDataFrame$VALUE)
+            if(!plyr::empty(tempDataFrame))
+              if(nrow(tempDataFrame)>2)
               {
-                tempDataFrame <- tempDataFrame[,1:min(ncol(tempDataFrame),1005)]
-                mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
-              }
+                tempDataFrame <- reshape2::dcast(data = tempDataFrame, SAMPLEID + POPULATION ~ KEY, value.var = "VALUE", sum)
+                row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
 
-              # col<- colorRampPalette(c("violet","white","blue"))(1024)
-              # skip heatmap if no enough data are available
-              tt <- as.data.frame(tempDataFrame[,3:ncol(tempDataFrame)])
-              if (!plyr::empty(tt))
-                if(nrow(tt) > 2 & ncol(tt) > 2)
+                mainTitle <- paste0( paste0( pops, collapse ="_Vs_")," ", file_prefix," ",anomaly, sep="")
+                if(ncol(tempDataFrame)>1000)
                 {
-                  filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", file_prefix,"_",anomaly,"_",figure, ".png",sep="")
-                  grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
-                  stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
-                                 col = grDevices::cm.colors(256),
-                                 scale = "column",
-                                 RowSideColors =as.vector(tempDataFrame$POPULATION),
-                                 margins = c(25, 25),
-                                 main = mainTitle
-                  )
-                  grDevices::dev.off()
+                  tempDataFrame <- tempDataFrame[,1:min(ncol(tempDataFrame),1005)]
+                  mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
                 }
-            }
-        }
-    }
+
+                # col<- colorRampPalette(c("violet","white","blue"))(1024)
+                # skip heatmap if no enough data are available
+                tt <- as.data.frame(tempDataFrame[,3:ncol(tempDataFrame)])
+                if (!plyr::empty(tt))
+                  if(nrow(tt) > 2 & ncol(tt) > 2)
+                  {
+                    filename = paste0( chartFolder,"/",paste0( pops, collapse ="_Vs_"),"_", file_prefix,"_",anomaly,"_",figure, ".png",sep="")
+                    grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
+                    stats::heatmap(as.matrix(tempDataFrame[,3:ncol(tempDataFrame)]),
+                                   col = grDevices::cm.colors(256),
+                                   scale = "column",
+                                   RowSideColors =as.vector(tempDataFrame$POPULATION),
+                                   margins = c(25, 25),
+                                   main = mainTitle
+                    )
+                    grDevices::dev.off()
+                  }
+              }
+          }
+      }
 
     gc()
   }
