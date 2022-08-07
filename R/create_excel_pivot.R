@@ -30,10 +30,12 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
   if(file.exists(fileNameXLS))
   {
-    old_workbook <- openxlsx::loadWorkbook(fileNameXLS)
-    old_sheet_list <- old_workbook$sheet_names
+    old_sheet_list <- readxl::excel_sheets(fileNameXLS)
+    # old_workbook <- openxlsx::loadWorkbook(fileNameXLS)
+    # old_sheet_list <- old_workbook$sheet_names
     envir$keys <- envir$keys[!(envir$keys$future_shee_list %in% old_sheet_list), ]
   }
+
 
   toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
   sheetList <- foreach::foreach(k=1:nrow(envir$keys), .export = toExport, .combine= c , .multicombine=TRUE ) %dorng%
@@ -63,7 +65,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
             pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
             fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
-            utils::write.table(t(tempDataFrame), fileName, row.names = F, col.names = F)
+            utils::write.table(t(tempDataFrame), fileName, row.names = T, col.names = F, sep=";")
             tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
             colnames(tempDataFrame) <- tempDataFrame[1,]
 
@@ -77,6 +79,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
   if(exists("old_sheet_list") & length(sheetList)!=0)
   {
+    old_workbook <- openxlsx::loadWorkbook(old_sheet_list)
     for(t in 1:length(sheetList))
     {
       openxlsx::addWorksheet(old_workbook,names(sheetList[t]))
