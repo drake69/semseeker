@@ -367,7 +367,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                                                             key = key, transformation= transformation, dototal = TRUE,
                                                             logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
 
-                      # message("Exited form apply model")
+                      # message("Exited from apply model")
                       # if(!exists("result_temp_foreach"))
                       #   result_temp_foreach <- result_temp_local
                       # else
