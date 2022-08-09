@@ -328,53 +328,49 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
                   if (file.exists(fname))
                   {
                     tempDataFrame <- utils::read.csv(fname, sep = ";")
+                    #assign the area name (eg gene...) to the rows
                     row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+                    #removes area name (eg. gene...)
                     tempDataFrame <- tempDataFrame[,-1]
-                    tempDataFrame <- t(tempDataFrame)
-                    tempDataFrame$Sample_ID <- rownames(tempDataFrame)
-                    tempDataFrame <- as.data.frame(tempDataFrame)
-                    if(nrow(tempDataFrame)>1)
+                    max_row_count <- ceiling(10^6/ncol(tempDataFrame))
+                    batch_count <- ceiling(nrow(tempDataFrame)/max_row_count)
+                    for(h in 0:batch_count)
                     {
-                      tempDataFrame <- subset(tempDataFrame, "POPULATION" != "Reference")
-                      tempDataFrame <- subset(tempDataFrame, "POPULATION" != 0)
+                      tt <- tempDataFrame[ (1+h*max_row_count):min((h+1)*max_row_count,nrow(tempDataFrame)), ]
+                      tt <- t(tt)
+                      tt <- as.data.frame(tt)
+                      tt$Sample_ID <- rownames(tt)
+                      if(nrow(tt)>1)
+                      {
+                        tt <- subset(tt, "POPULATION" != "Reference")
+                        tt <- subset(tt, "POPULATION" != 0)
+                        tt <-  merge( x =  sample_names, y =  tt,  by.x = "Sample_ID",  by.y = "Sample_ID" , all.x = TRUE)
+                        tt <- as.data.frame(tt)
+                        tt$POPULATION <- sample_names[, independent_variable]
+                        tt[is.na(tt)] <- 0
+                        tt[, independent_variable] <- sample_names[, independent_variable]
+                        tt <- tt[, !(names(tt) %in% c("POPULATION","Sample_ID"))]
+                        cols <- (gsub(" ", "_", colnames(tt)))
+                        cols <- (gsub("-", "_", cols))
+                        cols <- (gsub(":", "_", cols))
+                        cols <- (gsub("/", "_", cols))
+                        cols <- (gsub("'", "_", cols))
+                        tt <- as.data.frame(tt)
+                        if(length(colnames(tt))!=length(cols))
+                          browser()
+                        colnames(tt) <- cols
+                        g_start <- 2 + length(covariates)
+                        result_temp_local_batch <- apply_stat_model(tempDataFrame = tt, g_start = g_start, family_test = family_test, covariates = covariates,
+                                                                    key = key, transformation= transformation, dototal = TRUE,
+                                                                    logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
 
-                      tempDataFrame <-  merge( x =  sample_names, y =  tempDataFrame,  by.x = "Sample_ID",  by.y = "Sample_ID" , all.x = TRUE)
-                      tempDataFrame <- as.data.frame(tempDataFrame)
-                      tempDataFrame$POPULATION <- sample_names[, independent_variable]
-                      tempDataFrame[is.na(tempDataFrame)] <- 0
-
-
-                      tempDataFrame[, independent_variable] <- sample_names[, independent_variable]
-                      tempDataFrame <- tempDataFrame[, !(names(tempDataFrame) %in% c("POPULATION","Sample_ID"))]
-
-                      cols <- (gsub(" ", "_", colnames(tempDataFrame)))
-                      cols <- (gsub("-", "_", cols))
-                      cols <- (gsub(":", "_", cols))
-                      cols <- (gsub("/", "_", cols))
-                      cols <- (gsub("'", "_", cols))
-
-
-                      tempDataFrame <- as.data.frame(tempDataFrame)
-
-                      if(length(colnames(tempDataFrame))!=length(cols))
-                        browser()
-
-                      colnames(tempDataFrame) <- cols
-
-                      g_start <- 2 + length(covariates)
-
-                      result_temp_local <- apply_stat_model(tempDataFrame = tempDataFrame, g_start = g_start, family_test = family_test, covariates = covariates,
-                                                            key = key, transformation= transformation, dototal = TRUE,
-                                                            logFolder= envir$logFolder, independent_variable, depth_analysis, envir, ...)
-
-                      # message("Exited from apply model")
-                      # if(!exists("result_temp_foreach"))
-                      #   result_temp_foreach <- result_temp_local
-                      # else
-                      #   result_temp_foreach <- rbind(result_temp_foreach, result_temp_local)
-
-                      result_temp_local
+                        if(!exists("result_temp_local"))
+                          result_temp_local <- result_temp_local_batch
+                        else
+                          result_temp_local <- rbind(result_temp_local_batch, result_temp_local)
+                      }
                     }
+                    result_temp_local
                   }
                 }
             }
