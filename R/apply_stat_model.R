@@ -147,7 +147,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # after the transformation some data could be missed
   lost_cols <- colSums(apply(tempDataFrame,2,is.nan))!=0
   lostDataFrame <-  colnames(tempDataFrame)[lost_cols]
-  if(!plyr::empty(lostDataFrame))
+  if(sum(lost_cols)==0)
     utils::write.csv2(lostDataFrame, file.path(envir$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
 
   #  we want to preserve the NA in the indipendent variables to be removed by the models

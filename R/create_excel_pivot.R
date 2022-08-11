@@ -38,7 +38,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
 
   toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
-  sheetList <- foreach::foreach(k=1:nrow(envir$keys), .export = toExport, .combine= c , .multicombine=TRUE ) %dorng%
+  sheetList <- foreach::foreach(k=1:nrow(envir$keys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
     # for(k in 1:nrow(envir$keys))
     {
       # k <- 1
@@ -71,6 +71,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
             sheet_name <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
             temp_list <- list(tempDataFrame)
+            gc()
             stats::setNames(temp_list, sheet_name)
           }
         }
@@ -105,5 +106,5 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
     if(!exists("old_sheet_list"))
       message("No pivot tables to save.")
   }
-
+  gc()
 }
