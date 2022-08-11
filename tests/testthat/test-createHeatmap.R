@@ -9,7 +9,7 @@ test_that("create_heatmap", {
 
   envir <- init_env(result_folder =  tempFolder, parallel_strategy = "multisession", maxResources = 90, figures, anomalies, metaareas)
 
-  nitem <- 5e5
+  nitem <- 5e3
   nsamples <- 5
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]

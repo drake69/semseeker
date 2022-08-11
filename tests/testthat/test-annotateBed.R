@@ -9,7 +9,7 @@ test_that("annotate_bed", {
 
   envir <- init_env(result_folder =  tempFolder, parallel_strategy = "multisession", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  nitem <- 5e4
+  nitem <- 5e3
   nsamples <- 5
 
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)

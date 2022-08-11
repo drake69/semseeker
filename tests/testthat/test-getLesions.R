@@ -3,7 +3,7 @@ testthat::test_that("lesions_get",{
   library(stringi)
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 
-  nitem <- 5e4
+  nitem <- 5e3
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)

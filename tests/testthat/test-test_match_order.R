@@ -2,7 +2,7 @@ test_that("test_match_order", {
 
   library(stringi)
 
-  nitem <- 5e2
+  nitem <- 5e3
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)

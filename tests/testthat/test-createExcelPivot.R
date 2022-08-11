@@ -4,7 +4,7 @@ test_that("create_excel_pivot", {
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   envir <- init_env(tempFolder, parallel_strategy = "multisession")
 
-  nitem <- 5e4
+  nitem <- 5e3
   nsamples <- 10
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
