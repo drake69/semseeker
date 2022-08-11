@@ -73,8 +73,8 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
-  # resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  for (i in 1:length(envir$keys_populations[,1]))
+  resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  # for (i in 1:length(envir$keys_populations[,1]))
   {
 
     #
@@ -103,18 +103,19 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
       resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- populationName
+      resultPopulation
 
       # resultPopulation
       # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
       # #   browser()
       #
 
-      if(!exists("resultSampleSheet"))
-        resultSampleSheet <- resultPopulation
-      else
-        resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
-
-      rm(populationSampleSheet)
+      # if(!exists("resultSampleSheet"))
+      #   resultSampleSheet <- resultPopulation
+      # else
+      #   resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
+      #
+      # rm(populationSampleSheet)
     }
 
   }

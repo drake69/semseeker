@@ -6,7 +6,7 @@ testthat::test_that("analyze_single_sample",{
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
   Sample_Group <- "Control"
 
-  nitem <- 6e5
+  nitem <- 5e3
 
   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
