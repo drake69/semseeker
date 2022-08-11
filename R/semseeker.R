@@ -170,4 +170,3 @@ semseeker <- function(sample_sheet,
 
   future::plan( future::sequential)
 }
-

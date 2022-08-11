@@ -13,6 +13,7 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   beta_values <- as.data.frame(populationMatrix[, 2:populationMatrixDim[2]])
   row.names(beta_values) <- populationMatrix[, 1]
 
+  r <- 0
   # nrow(beta_values)
   # for(r in 1:1000)
   result <- foreach::foreach(r = 1:nrow(beta_values), .combine = "rbind", .export = c("beta_values","iqrTimes")) %dorng%
