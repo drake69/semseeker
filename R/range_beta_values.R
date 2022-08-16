@@ -13,12 +13,12 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   beta_values <- as.data.frame(populationMatrix[, 2:populationMatrixDim[2]])
   row.names(beta_values) <- populationMatrix[, 1]
 
-  r <- 0
+  r <- 1
   # nrow(beta_values)
   # for(r in 1:1000)
   result <- foreach::foreach(r = 1:nrow(beta_values), .combine = "rbind", .export = c("beta_values","iqrTimes")) %dorng%
     {
-      b_values <- beta_values[r,]
+      b_values <- beta_values[r,1]
       betaQ1Values <-  stats::quantile(b_values, 0.25)
       betaQ3Values <- stats::quantile(b_values, 0.75)
       beta_median_values <- stats::quantile(b_values, 0.5)
@@ -27,9 +27,11 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
       beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
       beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
 
-      temp_result <- data.frame(beta_inferior_thresholds,beta_superior_thresholds, beta_median_values)
+      temp_result <- data.frame("beta_inferior_thresholds"= beta_inferior_thresholds,
+                                "beta_superior_thresholds"= beta_superior_thresholds,
+                                "beta_median_values"= beta_median_values)
       row.names(temp_result) <- row.names(b_values)
-      colnames(temp_result) <- c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values")
+      # colnames(temp_result) <- c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values")
       temp_result
     }
 
@@ -41,6 +43,5 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   #                beta_superior_thresholds = beta_superior_thresholds,
   #                beta_median_values = beta_median_values)
 
-  gc()
   return(result)
 }

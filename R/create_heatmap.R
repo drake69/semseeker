@@ -58,8 +58,8 @@ create_heatmap <-
     keys <- expand.grid("anomalies"= anomalies,"figures"= figures)
     foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dorng%
       {
-        # variables_to_export_nested <- c("anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","g","figures")
-        foreach::foreach(j = 1:nrow(keys), .export = variables_to_export) %dorng%
+        variables_to_export_nested <- c(variables_to_export, "anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","g","figures","variables_to_export")
+        foreach::foreach(j = 1:nrow(keys), .export = variables_to_export_nested) %dorng%
           # for(j in 1:nrow(keys))
           {
 
@@ -101,5 +101,5 @@ create_heatmap <-
           }
       }
 
-    gc()
+    
   }

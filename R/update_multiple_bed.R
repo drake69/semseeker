@@ -3,7 +3,7 @@ update_multiple_bed <- function (path_file_name, data_to_add)
   if(file.exists(path_file_name))
   {
     data <- fst::read.fst(path_file_name, as.data.table = T)
-    data <- unique(rbind(data, data_to_add))
+    data <- rbind(data, data_to_add)
   } else
     data <- data_to_add
 

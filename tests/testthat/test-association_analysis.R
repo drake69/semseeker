@@ -48,14 +48,14 @@ test_that("association_analysis", {
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_1000_15000_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   test_both <- nrow(localFileRes)
-  expect_true(nrow(localFileRes)>0)
+  testthat::expect_true(nrow(localFileRes)>0)
 
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession", figures="HYPER", anomalies="DELTAS", metaareas="CHR")
 
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_1000_15000_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
-  expect_true(nrow(localFileRes)>0)
+  testthat::expect_true(nrow(localFileRes)>0)
   test_hyper <- nrow(localFileRes)
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
@@ -71,7 +71,7 @@ test_that("association_analysis", {
 
   fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
-  expect_true(nrow(localFileRes)>0)
+  testthat::expect_true(nrow(localFileRes)>0)
 
 
 
@@ -88,7 +88,7 @@ test_that("association_analysis", {
 
   fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
-  expect_true(nrow(localFileRes)>0)
+  testthat::expect_true(nrow(localFileRes)>0)
 
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
@@ -104,7 +104,7 @@ test_that("association_analysis", {
 
   fileToRead <- file_path_build(inferenceFolder, "2_Phenotest_log10_gaussian_test_corrected_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
-  expect_true(nrow(localFileRes)>0)
+  testthat::expect_true(nrow(localFileRes)>0)
 
   inference_details <- expand.grid("independent_variable"= "Group",
                                    "covariates"="",
@@ -119,7 +119,7 @@ test_that("association_analysis", {
 
   fileToRead <- file_path_build(inferenceFolder, "1_Group_log_wilcoxon_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
-  expect_true(nrow(localFileRes)>0)
+  testthat::expect_true(nrow(localFileRes)>0)
 
   inference_details <- expand.grid("independent_variable"= "Group",
                                    "covariates"="",
@@ -134,6 +134,6 @@ test_that("association_analysis", {
 
   fileToRead <- file_path_build(inferenceFolder, "1_Group_quantile_5_wilcoxon_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
-  expect_true(nrow(localFileRes)>0)
+  testthat::expect_true(nrow(localFileRes)>0)
 })
 

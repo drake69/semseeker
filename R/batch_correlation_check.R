@@ -19,30 +19,31 @@ batch_correlation_check <- function(envir) {
   {
     key <- localKeys[i,]
     populations <- unique(sample_sheet$Sample_Group)
-    sub_export <- c("populations", "envir","key")
+    sub_export <- c(to_export,"populations", "envir","key")
     total_data_for <- foreach::foreach(g = 1:length(populations), .combine = rbind, .export = sub_export ) %dorng%
     # for(g in 1:length(populations))
     {
       pop <- populations[g]
       tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(pop) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
       file_to_read <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
-      if(!file.exists(file_to_read))
-        NULL
-      temp <- fst::read_fst(file_to_read, as.data.table = T)
-      if(key$ANOMALY=="MUTATIONS" | key$ANOMALY=="LESIONS")
-        temp$VALUE <- 1
-      # if(exists("total_data_for"))
-      #   total_data_for <- rbind(total_data_for,temp)
-      # else
-      #   total_data_for <- temp
-      temp
+      if(file.exists(file_to_read))
+      {
+        temp <- fst::read_fst(file_to_read, as.data.table = T)
+        if(key$ANOMALY=="MUTATIONS" | key$ANOMALY=="LESIONS")
+          temp$VALUE <- 1
+        # if(exists("total_data_for"))
+        #   total_data_for <- rbind(total_data_for,temp)
+        # else
+        #   total_data_for <- temp
+        temp
+      }
     }
 
     total_data <- total_data_for
     rm(total_data_for)
 
     if(plyr::empty(total_data))
-      NULL
+      return(NULL)
 
     total_data$KEY <- paste(total_data$CHR, total_data$START, total_data$END, sep="_")
     total_data$VALUE <- as.numeric(total_data$VALUE)
@@ -58,14 +59,24 @@ batch_correlation_check <- function(envir) {
       tempDataFrame <- t(tempDataFrame[,-1])
       tempDataFrame <- as.data.frame(tempDataFrame)
       # calculate FAMD
-      res.famd <- FactoMineR::FAMD(tempDataFrame, graph = FALSE, ncp=100)
-      res.famd$var$contrib
-      pca_contrib <- as.data.frame(res.famd$var$contrib)
-      pca_contrib$Sample_ID <- rownames(pca_contrib)
-      pca_contrib <- merge(pca_contrib, sample_sheet[,c("Sample_ID","Batch_ID")], by="Sample_ID")
-      pca_summary <- as.data.frame(res.famd$eig)
-      pca_summary$dim <- gsub("comp ","Dim.",rownames(pca_summary))
-      pca_summary <- pca_summary[,c("dim","cumulative percentage of variance")]
+      if(length(unique(t(unique(tempDataFrame))))!=1 & !plyr::empty(tempDataFrame))
+      {
+        res.famd <- FactoMineR::FAMD(tempDataFrame, graph = FALSE)
+        # res.famd$var$contrib
+        pca_contrib <- as.data.frame(res.famd$var$contrib)
+        pca_contrib$Sample_ID <- rownames(pca_contrib)
+        pca_contrib <- merge(pca_contrib, sample_sheet[,c("Sample_ID","Batch_ID")], by="Sample_ID")
+        pca_contrib$Batch_ID <- as.factor(pca_contrib$Batch_ID)
+        pca_summary <- as.data.frame(res.famd$eig)
+        pca_summary$dim <- gsub("comp ","Dim.",rownames(pca_summary))
+        pca_summary <- pca_summary[,c("dim","cumulative percentage of variance")]
+      }
+      else
+      {
+        return(NULL)
+        # pca_contrib <- NULL
+        # pca_summary <- data.frame("dim"="NA","cumulative percentage of variance"="NA")
+      }
     }
     else
     {
@@ -83,6 +94,7 @@ batch_correlation_check <- function(envir) {
       pca_contrib <- as.data.frame(res.var$contrib)
       pca_contrib$Sample_ID <- rownames(pca_contrib)
       pca_contrib <- merge(pca_contrib, sample_sheet[,c("Sample_ID","Batch_ID")], by="Sample_ID")
+      pca_contrib$Batch_ID <- as.factor(pca_contrib$Batch_ID)
     }
     result_file <- file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$ANOMALY), as.character(key$FIGURE)), "csv")
     utils::write.csv2(pca_contrib,result_file,row.names = F)
@@ -93,8 +105,8 @@ batch_correlation_check <- function(envir) {
     filename = paste0( chartFolder ,"/","scatterplot_",key$ANOMALY,"_",key$FIGURE, ".png",sep="")
     # print(filename)
     # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
-    ggplot2::qplot(pca_contrib_to_plot$Dim.1, pca_contrib_to_plot$Dim.2, data= as.data.frame(pca_contrib_to_plot),
-                   col = pca_contrib_to_plot$Batch_ID, xlab="Dimension 1", ylab="Dimension 2",
+    ggplot2::qplot("Dim.1", "Dim.2", data= as.data.frame(pca_contrib_to_plot),
+                   col = "Batch_ID", xlab="Dimension 1", ylab="Dimension 2",
                    main = paste(key$ANOMALY, " ", key$FIGURE, sep="") ) + ggplot2::labs( colour= "Batch_ID") + ggplot2::theme(legend.position = "bottom")
     # grDevices::dev.off()
     ggplot2::ggsave(
@@ -121,7 +133,7 @@ batch_correlation_check <- function(envir) {
     #calculate association with dunn test
 
     kk <- colnames(pca_contrib[,-(which(colnames(pca_contrib)=="Batch_ID" | colnames(pca_contrib)=="Sample_ID"))])
-    dunn.results <- foreach::foreach(y = 1: length(kk), .combine= "rbind") %dorng%
+    dunn.results <- foreach::foreach(y = 1: length(kk), .combine= "rbind", .export = c("kk","pca_contrib")) %dorng%
       # for( y in 1: length(kk))
       {
         k.formula <- stats::as.formula(paste(kk[y], "Batch_ID", sep = "~"))

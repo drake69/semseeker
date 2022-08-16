@@ -1,81 +1,46 @@
 #' @importFrom doRNG %dorng%
-create_multiple_bed <- function(envir, sample_sheet, resultPopulation){
+create_multiple_bed <- function(envir, sample_sheet){
 
   #create multiple file bed
-  variables_to_export <- c("localKeys", "sample_sheet", "dir_check_and_create", "envir", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
-                           ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
-                           ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-                           ".RNGkind_length", "tail", "RNGstr","update_multiple_bed")
   i <- 0
-
-
-
-  localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),"FIGURE"=envir$keys_figures_default[,1] ,"ANOMALY"= envir$keys_anomalies_default[,1] ,"EXT"="bed")
+  localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),
+                           "FIGURE"=envir$keys_figures_default[,1] ,
+                           "ANOMALY"= c("MUTATIONS","LESIONS") ,"EXT"="bed")
   localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),
                                             "FIGURE"=envir$keys_figures_default[,1],
                                             "ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
-  deltaq_summary <- foreach::foreach(i = 1:nrow(localKeys), .export = variables_to_export, .combine = rbind ) %dorng%
-  # for(i in 1:nrow(localKeys))
+  # to_export <- c("localKeys", "dir_check_and_create", "envir", "file_path_build", "sample_sheet")
+
+  # foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
+    for(i in 1:nrow(localKeys))
     {
       key <- localKeys[i,]
       tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-      variables_to_export_nested <- c("sample_sheet", "file_path_build","key","tempresult_folderData","%dorng%","getdorng")
+      temp_file <- paste("/tmp/", stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),sep="")
+      fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
       j <- 0
-      localFileRes <- foreach::foreach(j = 1:nrow(sample_sheet), .export = variables_to_export_nested, .combine = "rbind" ) %dorng%
+      for ( j in 1:nrow(sample_sheet))
+      {
+        sample <- sample_sheet[j,]
+        fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
+        if(file.exists(fileToRead))
         {
-          sample <- sample_sheet[j,]
-          fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(key$ANOMALY), as.character(key$FIGURE)), key$EXT)
-          if(file.exists(fileToRead))
+          localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
+          localtemp$Sample_ID <- sample$Sample_ID
+          if(!plyr::empty(localtemp))
           {
-            localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
-            localtemp$Sample_ID <- sample$Sample_ID
-            localtemp
+            utils::write.table(localtemp, temp_file, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE, append = TRUE)
           }
         }
+      }
 
-      if(exists("localFileRes"))
-        if(!plyr::empty(localFileRes))
-        {
-          if(ncol(localFileRes)==4)
-            colnames(localFileRes) <- c("CHR","START","END","SAMPLEID")
-          else
-            colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
-          fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
-          # utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
-          update_multiple_bed( fileToWrite, localFileRes)
-          #create quantilized deltas
-          if(key$ANOMALY=="DELTAS")
-          {
-            #value is in the 4th position
-            # give to each quantile an even weight
-            localFileRes[,4] <- as.numeric(dplyr::ntile(x=as.numeric(localFileRes[,4]) , n=4)) * 2
-
-            tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
-            fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)), "fst")
-            update_multiple_bed( fileToWrite, localFileRes)
-
-            # utils::write.table(localFileRes, fileToWrite, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
-            tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",
-                                             fun.aggregate = sum, drop = TRUE)
-            colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
-            lbl <- rep(paste("DELTAQ_",as.character(key$FIGURE),sep=""), nrow(tempDataFrame))
-            data.frame("LABEL"=lbl, tempDataFrame)
-          }
-        }
+      if(file.exists(temp_file))
+      {
+        fst::write.fst(x = utils::read.table(temp_file, sep = "\t"),path = fileToWrite)
+        file.remove(temp_file)
+        message(Sys.time(), " Created multiple annotated file!", fileToWrite)
+      }
     }
-
-  #update sample sheet
-  # study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
-
-  if(!plyr::empty(deltaq_summary))
-  {
-    tempDataFrame <- reshape2::dcast(data = deltaq_summary, formula = SAMPLEID  ~ LABEL, value.var = "VALUE", fun.aggregate = sum, drop = TRUE)
-    # study_summary <- study_summary[, !(colnames(study_summary) %in% colnames(tempDataFrame))]
-    resultPopulation <- merge(resultPopulation, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID")
-  }
-
-  gc()
-  return(resultPopulation)
 
 }

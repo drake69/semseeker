@@ -90,7 +90,7 @@ annotate_bed <- function (
 
   # utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
-  gc()
+  
   return(final_bed)
 
 }

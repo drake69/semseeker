@@ -71,6 +71,9 @@ test_that("semeeker", {
   mySampleSheet_3 <- data.frame(Sample_Group, Sample_ID)
 
 
+  row.names(methylation_data_2) <- row.names(methylation_data_1)
+  row.names(methylation_data_3) <- row.names(methylation_data_1)
+
   mySampleSheet <- list(mySampleSheet_1, mySampleSheet_2, mySampleSheet_3)
   methylation_data <- list(methylation_data_1, methylation_data_2, methylation_data_3)
 
@@ -82,15 +85,15 @@ test_that("semeeker", {
   localFileRes_both <- fst::read_fst(fileToRead)
   # localFileRes <- read.table(fileToRead, sep="\t")
 
-  expect_true(nrow(localFileRes_both)>0)
+  testthat::expect_true(nrow(localFileRes_both)>0)
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAS_BOTH")
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAS" ,"BOTH" ), "fst")
   localFileRes_both <- fst::read_fst(fileToRead)
   # localFileRes <- read.table(fileToRead, sep="\t")
 
-  expect_true(nrow(localFileRes_both)>0)
+  testthat::expect_true(nrow(localFileRes_both)>0)
 
-  batch_correlation_check(envir)
+  # batch_correlation_check(envir)
 })
 

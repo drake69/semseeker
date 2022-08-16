@@ -58,10 +58,8 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
     hypo_result <- analyze_single_sample(envir=envir, values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail, bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
     both_result_mutations <- analyze_single_sample_both(envir=envir, sample_detail =  local_sample_detail, "MUTATIONS")
     both_result_lesions <- analyze_single_sample_both(envir=envir, sample_detail =  local_sample_detail, "LESIONS")
-
     delta_result <- delta_single_sample (envir = envir, values = beta_values, high_thresholds = beta_superior_thresholds, low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail,
                                          beta_medians = beta_medians, probe_features = probe_features)
-
     sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result, "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions)
     sample_status_temp
   }
@@ -74,12 +72,12 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   rownames(summary_population) <- summary_population$Sample_ID
   message("Row count result:", nrow(summary_population))
   rm(methylation_data)
-  gc()
+
 
   message("Completed population analysis ", Sys.time())
   end_time <- Sys.time()
   time_taken <- (end_time - start_time)
-  message("Completed population with Excel summary", Sys.time(), " Time taken: ", time_taken)
+  # message("Completed population with summary", Sys.time(), " Time taken: ", time_taken)
 
   return(summary_population)
 }
