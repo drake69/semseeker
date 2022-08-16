@@ -2,7 +2,7 @@ test_that("create_multiple_bed", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "multisession")
+  envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
   nitem <- 5e3
   nsamples <- 5
@@ -37,7 +37,7 @@ test_that("create_multiple_bed", {
                            probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet, sp)
+  create_multiple_bed(envir, sample_sheet)
 
   tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_BOTH"))
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "fst")

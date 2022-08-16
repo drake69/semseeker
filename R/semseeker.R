@@ -69,10 +69,9 @@ semseeker <- function(sample_sheet,
       sample_sheet_result <- sample_sheet_local
   }
 
-
   sample_sheet <- sample_sheet_result
   utils::write.csv2(sample_sheet, file.path(envir$result_folderData , "sample_sheet_result.csv"), row.names = F)
-
+  message("Saving Sample Sheet with Results! ", Sys.time())
   if(length(methylation_data)>1)
     batch_correlation_check(envir)
 
@@ -163,7 +162,7 @@ semseeker <- function(sample_sheet,
   # inferenceAnalysis(envir$result_folderData = envir$result_folderData, envir$logFolder= envir$logFolder, inferenceDetails)
   # future::autoStopCluster(computationCluster)
   # doFuture::stopImplicitCluster()
-  gc()
+
   # geneontology_analysis_webgestalt(envir$result_folderData = envir$result_folderData, fileName = fileName)
   # euristic_analysis_webgestalt(envir$result_folderData = envir$result_folderData)
   message("Job Completed !")

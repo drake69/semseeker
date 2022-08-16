@@ -56,7 +56,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
 
 
   if (plyr::empty(referencePopulationMatrix) |
-      dim(referencePopulationMatrix)[2] < 2) {
+      ncol(referencePopulationMatrix) < 2) {
     message("Empty methylation_data ", Sys.time())
     stop("Empty methylation_data ")
   }
@@ -72,9 +72,10 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
+  i <- 0
   variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
-  resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  # for (i in 1:length(envir$keys_populations[,1]))
+  # resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  for (i in 1:length(envir$keys_populations[,1]))
   {
 
     #
@@ -100,7 +101,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
         probe_features = PROBES
       )
 
-      resultPopulation <- create_multiple_bed(envir, populationSampleSheet, resultPopulation)
+      create_multiple_bed(envir, populationSampleSheet)
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- populationName
       resultPopulation
@@ -110,15 +111,17 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
       # #   browser()
       #
 
-      # if(!exists("resultSampleSheet"))
-      #   resultSampleSheet <- resultPopulation
-      # else
-      #   resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
+      if(!exists("resultSampleSheet"))
+        resultSampleSheet <- resultPopulation
+      else
+        resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
       #
       # rm(populationSampleSheet)
     }
 
   }
+
+  resultSampleSheet <- create_deltaq(envir, resultSampleSheet)
 
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)
@@ -129,7 +132,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
 
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(methylation_data)
-  gc()
+
 
   return((sample_sheet))
 }

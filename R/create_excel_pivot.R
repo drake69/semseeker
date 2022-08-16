@@ -71,7 +71,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
             sheet_name <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
             temp_list <- list(tempDataFrame)
-            gc()
+            
             stats::setNames(temp_list, sheet_name)
           }
         }
@@ -80,7 +80,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
   if(exists("old_sheet_list") & length(sheetList)!=0)
   {
-    old_workbook <- openxlsx::loadWorkbook(old_sheet_list)
+    old_workbook <- openxlsx::loadWorkbook(fileNameXLS)
     for(t in 1:length(sheetList))
     {
       openxlsx::addWorksheet(old_workbook,names(sheetList[t]))
@@ -106,5 +106,5 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
     if(!exists("old_sheet_list"))
       message("No pivot tables to save.")
   }
-  gc()
+  
 }
