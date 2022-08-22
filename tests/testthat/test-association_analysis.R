@@ -128,7 +128,6 @@ test_that("association_analysis", {
                                    "depth_analysis"=1,
                                    "filter_p_value" = FALSE)
 
-
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="multisession")
 

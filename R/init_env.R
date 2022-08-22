@@ -14,6 +14,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   options(future.globals.maxSize= 16 * 1024^3)
 
   ssEnv <- list()
+  ssEnv$parallel_strategy <- parallel_strategy
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")

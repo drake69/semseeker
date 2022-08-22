@@ -100,25 +100,24 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
         bonferroni_threshold = bonferroni_threshold,
         probe_features = PROBES
       )
-
-      create_multiple_bed(envir, populationSampleSheet)
+      create_multiple_bed(envir, resultPopulation)
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- populationName
-      resultPopulation
 
+      # resultPopulation
       # resultPopulation
       # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
       # #   browser()
-      #
 
       if(!exists("resultSampleSheet"))
         resultSampleSheet <- resultPopulation
       else
-        resultSampleSheet <- rbind(resultSampleSheet, resultPopulation)
-      #
-      # rm(populationSampleSheet)
-    }
+        resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
 
+      # rm(populationSampleSheet)
+      gc()
+
+    }
   }
 
   resultSampleSheet <- create_deltaq(envir, resultSampleSheet)
@@ -133,6 +132,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(methylation_data)
 
-
+  message(Sys.time(), " Batch completed:", batch_id)
   return((sample_sheet))
+
 }

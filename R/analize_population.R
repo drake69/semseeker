@@ -47,7 +47,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
 
   variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "envir", "sliding_window_size", "beta_superior_thresholds",
                            "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "analyze_single_sample_both", "delta_single_sample", "beta_medians")
-  i <- 0
+  i <- 1
 
   # for(i in 1:nrow(sample_sheet)) {
   summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
