@@ -1,7 +1,7 @@
 batch_correlation_check <- function(envir) {
 
-  y <- g <- 2
-  i <- 11
+  y <- g <- 1
+  i <- 1
   sample_sheet <- utils::read.csv2(file.path(envir$result_folderData,"sample_sheet_result.csv"))
   localKeys <- expand.grid("FIGURE"=envir$keys_figures_default[,1],"ANOMALY"= envir$keys_anomalies[,1])
 
@@ -14,36 +14,42 @@ batch_correlation_check <- function(envir) {
                  "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
                  ".RNGkind_length", "tail", "RNGstr")
 
-  summary_cor <- foreach::foreach(i = 1:nrow(localKeys), .combine = rbind ) %dorng%
-  # for(i in 1:nrow(localKeys))
+  # summary_cor <- foreach::foreach(i = 1:nrow(localKeys), .combine = rbind ) %dorng%
+  for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
     populations <- unique(sample_sheet$Sample_Group)
     sub_export <- c(to_export,"populations", "envir","key")
     total_data_for <- foreach::foreach(g = 1:length(populations), .combine = rbind, .export = sub_export ) %dorng%
-    # for(g in 1:length(populations))
-    {
-      pop <- populations[g]
-      tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(pop) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-      file_to_read <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
-      if(file.exists(file_to_read))
+      # for(g in 1:length(populations))
       {
-        temp <- fst::read_fst(file_to_read, as.data.table = T)
-        if(key$ANOMALY=="MUTATIONS" | key$ANOMALY=="LESIONS")
-          temp$VALUE <- 1
-        # if(exists("total_data_for"))
-        #   total_data_for <- rbind(total_data_for,temp)
-        # else
-        #   total_data_for <- temp
-        temp
+        pop <- populations[g]
+        tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(pop) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+        file_to_read <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
+        if(file.exists(file_to_read))
+        {
+          temp <- fst::read_fst(file_to_read, as.data.table = T)
+          if(key$ANOMALY=="MUTATIONS" | key$ANOMALY=="LESIONS")
+            temp$VALUE <- 1
+          # if(exists("total_data_for"))
+          #   total_data_for <- rbind(total_data_for,temp)
+          # else
+          #   total_data_for <- temp
+          temp
+        }
       }
-    }
 
     total_data <- total_data_for
     rm(total_data_for)
 
+    if(ncol(total_data)==4)
+      colnames(total_data) <- c("CHR","START","END","SAMPLEID")
+
+    if(ncol(total_data)==5)
+      colnames(total_data) <- c("CHR","START","END","VALUE","SAMPLEID")
+
     if(plyr::empty(total_data))
-      return(NULL)
+      return()
 
     total_data$KEY <- paste(total_data$CHR, total_data$START, total_data$END, sep="_")
     total_data$VALUE <- as.numeric(total_data$VALUE)
@@ -73,7 +79,7 @@ batch_correlation_check <- function(envir) {
       }
       else
       {
-        return(NULL)
+        return()
         # pca_contrib <- NULL
         # pca_summary <- data.frame("dim"="NA","cumulative percentage of variance"="NA")
       }
@@ -96,9 +102,15 @@ batch_correlation_check <- function(envir) {
       pca_contrib <- merge(pca_contrib, sample_sheet[,c("Sample_ID","Batch_ID")], by="Sample_ID")
       pca_contrib$Batch_ID <- as.factor(pca_contrib$Batch_ID)
     }
+    pca_contrib <- as.data.frame(pca_contrib)
     result_file <- file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$ANOMALY), as.character(key$FIGURE)), "csv")
     utils::write.csv2(pca_contrib,result_file,row.names = F)
 
+    if(length(unique(t(unique(stats::na.omit(pca_contrib[,!(colnames(pca_contrib) %in% c("Batch_ID"))])))))==1
+       | plyr::empty(stats::na.omit(pca_contrib)))
+    {
+      return()
+    }
     pca_contrib_to_plot <- pca_contrib
     pca_contrib_to_plot$Batch_ID <- as.factor(paste("Batch",pca_contrib$Batch_ID, sep=""))
 
@@ -133,24 +145,24 @@ batch_correlation_check <- function(envir) {
     #calculate association with dunn test
 
     kk <- colnames(pca_contrib[,-(which(colnames(pca_contrib)=="Batch_ID" | colnames(pca_contrib)=="Sample_ID"))])
-    dunn.results <- foreach::foreach(y = 1: length(kk), .combine= "rbind", .export = c("kk","pca_contrib")) %dorng%
-      # for( y in 1: length(kk))
-      {
-        k.formula <- stats::as.formula(paste(kk[y], "Batch_ID", sep = "~"))
-        k.result <- stats::kruskal.test( k.formula, data = pca_contrib)
-        dunn.result <- FSA::dunnTest( k.formula,data=pca_contrib,method="bh")
-        dunn.result <- as.data.frame(t(dunn.result$res[c("Comparison","P.adj")]))
-        colnames(dunn.result) <- dunn.result[1,]
-        dunn.result <- dunn.result[-1,]
-        dunn.result$dunn.p.value <- any(dunn.result < 0.05)
-        dunn.result$dim <- kk[y]
-        dunn.result$kruskal.wallis.p.value <- k.result$p.value
-        # if(exists("dunn.results"))
-        #   dunn.results <- rbind(dunn.results,dunn.result)
-        # else
-        #   dunn.results <- dunn.result
-        dunn.result
-      }
+    # dunn.results <- foreach::foreach(y = 1: length(kk), .combine= "rbind", .export = c("kk","pca_contrib")) %dorng%
+    for( y in 1: length(kk))
+    {
+      k.formula <- stats::as.formula(paste(kk[y], "Batch_ID", sep = "~"))
+      k.result <- stats::kruskal.test( k.formula, data = pca_contrib)
+      dunn.result <- FSA::dunnTest( k.formula,data=pca_contrib,method="bh")
+      dunn.result <- as.data.frame(t(dunn.result$res[c("Comparison","P.adj")]))
+      colnames(dunn.result) <- dunn.result[1,]
+      dunn.result <- dunn.result[-1,]
+      dunn.result$dunn.p.value <- any(dunn.result < 0.05)
+      dunn.result$dim <- kk[y]
+      dunn.result$kruskal.wallis.p.value <- k.result$p.value
+      if(exists("dunn.results"))
+        dunn.results <- rbind(dunn.results,dunn.result)
+      else
+        dunn.results <- dunn.result
+      # dunn.result
+    }
     result_cor <- merge(result_cor, dunn.results, by="dim")
     rm(dunn.results)
 
@@ -165,11 +177,11 @@ batch_correlation_check <- function(envir) {
       result_cor$figure <- key$FIGURE
     }
 
-    # if(exists("summary_cor"))
-    #   summary_cor <- rbind(result_cor,summary_cor)
-    # else
-    #   summary_cor <- result_cor
-    result_cor
+    if(exists("summary_cor"))
+      summary_cor <- rbind(result_cor,summary_cor)
+    else
+      summary_cor <- result_cor
+    # result_cor
   }
   result_file <- file_path_build(batch_analysis_folder, c("result","cor"), "csv")
   utils::write.csv2(summary_cor,result_file,row.names = F)

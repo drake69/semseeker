@@ -43,7 +43,8 @@ test_that("range_beta_values", {
   # message(nrow(sample_sheet))
   testthat::expect_true(sum(colnames(rr)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values"))==3)
   testthat::expect_true(nrow(rr)==nrow(methylation_data))
-
+  testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_superior_thresholds[1])
+  testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_median_values[1])
   # future::plan( future::multisession)
 })
 

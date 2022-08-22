@@ -51,6 +51,7 @@ create_heatmap <-
                              "%dorng%", "j", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName",
                              "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion", ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG",
                              ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider", ".RNGkind_length", "tail", "RNGstr","keys")
+    variables_to_export_nested <- c(variables_to_export, "anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","g","figures","variables_to_export")
     # g <- 0
     i <- 0
     j <- 0
@@ -58,7 +59,6 @@ create_heatmap <-
     keys <- expand.grid("anomalies"= anomalies,"figures"= figures)
     foreach::foreach(g = 1:length(anomalies), .export = variables_to_export) %dorng%
       {
-        variables_to_export_nested <- c(variables_to_export, "anomalies", "inputBedDataFrame", "pops", "file_prefix", "chartFolder","g","figures","variables_to_export")
         foreach::foreach(j = 1:nrow(keys), .export = variables_to_export_nested) %dorng%
           # for(j in 1:nrow(keys))
           {
@@ -101,5 +101,5 @@ create_heatmap <-
           }
       }
 
-    
+
   }

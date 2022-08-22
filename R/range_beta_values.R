@@ -18,11 +18,11 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   # for(r in 1:1000)
   result <- foreach::foreach(r = 1:nrow(beta_values), .combine = "rbind", .export = c("beta_values","iqrTimes")) %dorng%
     {
-      b_values <- beta_values[r,1]
+      b_values <- as.vector(t(beta_values[r,]))
       betaQ1Values <-  stats::quantile(b_values, 0.25)
       betaQ3Values <- stats::quantile(b_values, 0.75)
       beta_median_values <- stats::quantile(b_values, 0.5)
-      betaValuesIQR <- stats::IQR(b_values )
+      betaValuesIQR <- stats::IQR(b_values)
 
       beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
       beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
@@ -43,5 +43,6 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   #                beta_superior_thresholds = beta_superior_thresholds,
   #                beta_median_values = beta_median_values)
 
+  message("Thresholds defined for: ", nrow(result$beta_inferior_thresholds), " probes.")
   return(result)
 }

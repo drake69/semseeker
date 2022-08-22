@@ -80,6 +80,7 @@ test_that("semeeker", {
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
              parallel_strategy = "multisession", anomalies="DELTAQ", metaareas="GENE", figures="BOTH")
 
+  # batch_correlation_check(envir)
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "fst")
   localFileRes_both <- fst::read_fst(fileToRead)
@@ -94,6 +95,12 @@ test_that("semeeker", {
 
   testthat::expect_true(nrow(localFileRes_both)>0)
 
-  # batch_correlation_check(envir)
+
+  # test deltaq creation
+  tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAQ_BOTH")
+  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAQ" ,"BOTH" ), "fst")
+  localFileRes_both <- fst::read_fst(fileToRead)
+  testthat::expect_true(sum(is.na(localFileRes_both$VALUE))==0)
+
 })
 

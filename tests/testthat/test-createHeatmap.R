@@ -45,7 +45,7 @@ test_that("create_heatmap", {
                           probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet = sample_sheet, sp)
+  create_multiple_bed(envir, sample_sheet = sample_sheet)
 
 
   populations <- c("Control")
