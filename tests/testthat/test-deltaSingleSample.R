@@ -7,7 +7,7 @@ testthat::test_that("delta_single_sample",{
 
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 
-  nitem <- 5e3
+  nitem <- 4e5
   values <- as.data.frame(rnorm(nitem, mean=0.5, sd=0.7))
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]

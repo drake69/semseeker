@@ -2,9 +2,9 @@ test_that("analize_batch", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "multisession")
+  envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
-  nitem <- 5e3
+  nitem <- 4e5
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -43,6 +43,6 @@ test_that("analize_batch", {
   testthat::expect_true(nrow(sp)==nrow(sample_sheet))
   testthat::expect_true(sum(na.omit(sp[,"MUTATIONS_BOTH"])>0)>0)
 
-  # future::plan( future::multisession)
+  future::plan(future::multisession)
 })
 
