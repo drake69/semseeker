@@ -1,4 +1,4 @@
-  test_that("analize_population", {
+test_that("semeeker", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -34,22 +34,25 @@
 
   # browser()
   sp <- analize_population(envir = envir,
-    methylation_data=methylation_data,
-                    sliding_window_size = sliding_window_size,
-                    beta_superior_thresholds = beta_superior_thresholds,
-                    beta_inferior_thresholds = beta_inferior_thresholds,
-                    sample_sheet = sample_sheet,
-                    beta_medians = beta_medians,
-                    bonferroni_threshold = bonferroni_threshold,
-                    probe_features = probe_features
-                    )
+                           methylation_data=methylation_data,
+                           sliding_window_size = sliding_window_size,
+                           beta_superior_thresholds = beta_superior_thresholds,
+                           beta_inferior_thresholds = beta_inferior_thresholds,
+                           sample_sheet = sample_sheet,
+                           beta_medians = beta_medians,
+                           bonferroni_threshold = bonferroni_threshold,
+                           probe_features = probe_features
+  )
 
-  sp$Sample_Group <- sample_sheet$Sample_Group
+  create_multiple_bed(envir, sample_sheet)
 
-  message(nrow(sp))
-  message(nrow(sample_sheet))
-  expect_true(nrow(sp)==nrow(sample_sheet))
+  resiltPopulation <- create_deltaq(envir, sp)
 
-  future::plan( future::multisession)
+  # test deltaq creation
+  tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAQ_BOTH")
+  fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAQ" ,"BOTH" ), "fst")
+  localFileRes_both <- fst::read_fst(fileToRead)
+  testthat::expect_true(sum(is.na(localFileRes_both$VALUE))==0)
+
 })
 

@@ -2,7 +2,7 @@ test_that("quantreg_summary", {
 
   library(stringi)
 
-  nitem <- 5e3
+  nitem <- 4e5
   nsamples <- 4
   tempDataFrame <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   tempDataFrame <- as.data.frame(matrix(tempDataFrame,nitem,nsamples))

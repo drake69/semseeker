@@ -7,9 +7,9 @@ test_that("create_heatmap", {
   anomalies <- c("DELTAS")
   metaareas <- c("GENE")
 
-  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "multisession", maxResources = 90, figures, anomalies, metaareas)
+  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures, anomalies, metaareas)
 
-  nitem <- 5e3
+  nitem <- 4e5
   nsamples <- 5
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -46,6 +46,7 @@ test_that("create_heatmap", {
   )
 
   create_multiple_bed(envir, sample_sheet = sample_sheet)
+  sp$Sample_Group <- sample_sheet$Sample_Group
 
 
   populations <- c("Control")

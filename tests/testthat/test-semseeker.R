@@ -2,10 +2,10 @@ test_that("semeeker", {
 
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "multisession")
+  envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
 
-  nitem <- 5e3
+  nitem <- 4e5
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -27,7 +27,7 @@ test_that("semeeker", {
 
   #########
 
-  nitem <- 5e3
+  nitem <- 4e5
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -50,7 +50,7 @@ test_that("semeeker", {
   ##########
 
 
-  nitem <- 5e3
+  nitem <- 4e5
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -78,7 +78,7 @@ test_that("semeeker", {
   methylation_data <- list(methylation_data_1, methylation_data_2, methylation_data_3)
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
-             parallel_strategy = "multisession", anomalies="DELTAQ", metaareas="GENE", figures="BOTH")
+             parallel_strategy = "sequential", anomalies="DELTAQ", metaareas="GENE", figures="BOTH")
 
   # batch_correlation_check(envir)
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")

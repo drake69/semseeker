@@ -7,9 +7,9 @@ test_that("annotate_bed", {
   anomalies <- c("DELTAS")
   metaareas <- c("GENE")
 
-  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "multisession", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
+  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  nitem <- 5e3
+  nitem <- 4e5
   nsamples <- 5
 
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
@@ -42,6 +42,7 @@ test_that("annotate_bed", {
                           bonferroni_threshold = 0.01,
                           probe_features = probe_features
   )
+  sp$Sample_Group <- sample_sheet$Sample_Group
 
   create_multiple_bed(envir, sample_sheet = sample_sheet)
 
