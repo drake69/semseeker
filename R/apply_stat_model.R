@@ -159,8 +159,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
                  "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count")
 
   # message("Starting foreach withh: ", iters, " items")
-  # result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
-  for(g in g_start:iters)
+  result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
+  # for(g in g_start:iters)
   {
     #g <- 2
     burdenValue <- cols[g]
