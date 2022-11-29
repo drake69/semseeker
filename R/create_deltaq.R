@@ -31,8 +31,11 @@ create_deltaq <- function(envir, resultPopulation){
     }
   }
 
-  rm(deltaq_temp)
-  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,1] , n=4)) * 2
+  if (plyr::empty(deltaq))
+      {
+       stop("Something wrong with multiple bed files!")
+  }
+  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=4)) * 2
 
   localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
                            "FIGURE"=envir$keys_figures_default[,1],
