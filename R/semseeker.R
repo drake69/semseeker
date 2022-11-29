@@ -73,8 +73,9 @@ semseeker <- function(sample_sheet,
   sample_sheet <- sample_sheet_result
   utils::write.csv2(sample_sheet, file.path(envir$result_folderData , "sample_sheet_result.csv"), row.names = F)
   message("Saving Sample Sheet with Results! ", Sys.time())
-  # if(length(methylation_data)>1)
-  #   batch_correlation_check(envir)
+
+  if(length(methylation_data)>1)
+    batch_correlation_check(envir)
 
   if(length(sample_sheet$Sample_Group=="Reference")>0)
     populations <- c("Reference","Control","Case")

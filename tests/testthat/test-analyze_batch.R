@@ -38,6 +38,8 @@ test_that("analize_batch", {
                         batch_id = batch_id)
 
 
+  sp$Sample_Group <- sample_sheet$Sample_Group
+
   # message(nrow(sp))
   # message(nrow(sample_sheet))
   testthat::expect_true(nrow(sp)==nrow(sample_sheet))
