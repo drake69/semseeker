@@ -100,9 +100,10 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
         bonferroni_threshold = bonferroni_threshold,
         probe_features = PROBES
       )
-      create_multiple_bed(envir, resultPopulation)
+
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- populationName
+      create_multiple_bed(envir, resultPopulation)
 
       # resultPopulation
       # resultPopulation
