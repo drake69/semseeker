@@ -159,8 +159,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
                  "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count")
 
   # message("Starting foreach withh: ", iters, " items")
-  result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
-  # for(g in g_start:iters)
+  # result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
+  for(g in g_start:iters)
   {
     #g <- 2
     burdenValue <- cols[g]
@@ -244,11 +244,11 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
         model <- stats::lm(formula = sig.formula, data = as.data.frame(tempDataFrame))
         residuals <-  model$residuals
-        shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) round(stats::shapiro.test(residuals)$p.value,3) else NA
+        shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
         Breusch_Pagan_pvalue <- lmtest::bptest(model)$p.value
       }
       else
-        shapiro_pvalue <- if(length(tempDataFrame[,burdenValue])>3 & length(unique(tempDataFrame[,burdenValue]))>3) round(stats::shapiro.test(tempDataFrame[,burdenValue])$p.value,3) else NA
+        shapiro_pvalue <- if(length(tempDataFrame[,burdenValue])>3 & length(unique(tempDataFrame[,burdenValue]))>3) (stats::shapiro.test(tempDataFrame[,burdenValue])$p.value) else NA
 
       if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
       {
@@ -347,27 +347,27 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "GROUP" = key$GROUP,
           "SUBGROUP" = key$SUBGROUP,
           "AREA_OF_TEST" = burdenValue,
-          "PVALUE" = round(pvalue,3),
+          "PVALUE" = (pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
-          "BETA" = if(exists("result_glm")) round(summary(result_glm )$coeff[-1, 1][1],3)  else NA,
-          "AIC" = if(exists("result_glm")) round(result_glm$aic,3)  else NA,
-          "RESIDUALS.SUM" = if(exists("result_glm")) round(sum(result_glm$residuals),3)  else NA,
+          "BETA" = if(exists("result_glm")) (summary(result_glm )$coeff[-1, 1][1])  else NA,
+          "AIC" = if(exists("result_glm")) (result_glm$aic)  else NA,
+          "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
           "FAMILY" = family_test,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
           "SHAPIRO.PVALUE" = shapiro_pvalue,
           "BREUSCH-PAGAN.PVALUE" = Breusch_Pagan_pvalue,
-          "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) round(bartlett_pvalue$p.value,3)  else NA,
+          "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) (bartlett_pvalue$p.value)  else NA,
           "CASE.LABEL"= if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA,
           "COUNT.CASE"=length(independent_variableData1stLevel),
-          "MEAN.CASE" = round(mean(independent_variableData1stLevel),3),
-          "SD.CASE"=round(stats::sd(independent_variableData1stLevel),3),
+          "MEAN.CASE" = (mean(independent_variableData1stLevel)),
+          "SD.CASE"=(stats::sd(independent_variableData1stLevel)),
           "CONTROL.LABEL" = as.character(independent_variable2ndLevel),
           "COUNT.CONTROL"=length(stats::na.omit(independent_variableData2ndLevel)),
-          "MEAN.CONTROL"=round(mean(independent_variableData2ndLevel),3),
-          "SD.CONTROL"= round(stats::sd(independent_variableData2ndLevel),3),
-          "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
+          "MEAN.CONTROL"=(mean(independent_variableData2ndLevel)),
+          "SD.CONTROL"= (stats::sd(independent_variableData2ndLevel)),
+          "RHO"= if(exists("result_cor"))  (result_cor$estimate) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
           "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
@@ -386,12 +386,12 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "GROUP" = key$GROUP,
           "SUBGROUP" = key$SUBGROUP,
           "AREA_OF_TEST" = burdenValue,
-          "PVALUE" = round(pvalue,3),
+          "PVALUE" = (pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
-          "BETA" = if(exists("result_glm")) round(summary( result_glm )$coeff[-1, 1][1],3) else NA,
-          "AIC" = if(exists("result_glm")) round(result_glm$aic,3)  else NA,
-          "RESIDUALS.SUM" = if(exists("result_glm")) round(sum(result_glm$residuals),3)  else NA,
+          "BETA" = if(exists("result_glm")) (summary( result_glm )$coeff[-1, 1][1]) else NA,
+          "AIC" = if(exists("result_glm")) (result_glm$aic)  else NA,
+          "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
           "FAMILY" = family_test,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
@@ -400,13 +400,13 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "BARTLETT.PVALUE" = NA,
           "CASE.LABEL"= as.character(independent_variable),
           "COUNT.CASE"=length(independent_variableData),
-          "MEAN.CASE" = round(mean(independent_variableData),3),
-          "SD.CASE"= round(stats::sd(independent_variableData ),3),
+          "MEAN.CASE" = NA,
+          "SD.CASE"= NA,
           "CONTROL.LABEL" = "BURDEN.VALUE",
           "COUNT.CONTROL"=length(dependentVariableData),
-          "MEAN.CONTROL"=round(mean(dependentVariableData),3),
-          "SD.CONTROL"= round(stats::sd(dependentVariableData),3),
-          "RHO"= if(exists("result_cor"))  round(result_cor$estimate,4) else NA,
+          "MEAN.CONTROL"=(mean(dependentVariableData)),
+          "SD.CONTROL"= (stats::sd(dependentVariableData)),
+          "RHO"= if(exists("result_cor"))  (result_cor$estimate) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
           "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
@@ -460,12 +460,12 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     }
   }
 
-  
+
   if(exists("result_temp"))
   {
     result_temp <- unique(result_temp)
-    result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"),3)
-    result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- round(stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"),3)
+    result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUEADJ"]  <- (stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"))
+    result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUEADJ"]  <- (stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"))
     return(result_temp)
   }
   return(NULL)
