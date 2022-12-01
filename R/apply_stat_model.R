@@ -336,7 +336,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       # beta <- exp(summary( result_glm )$coeff[-1, 1][1])
       # result_temp <-
 
-      if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" & family_test!="kendall" & !grepl("quantreg", family_test))
+      if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" &
+         family_test!="kendall" & !grepl("quantreg", family_test)
+         & family_test!="poisson")
       {
         independent_variableData1stLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable1stLevel ,burdenValue])
         independent_variableData2ndLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable2ndLevel,burdenValue])
