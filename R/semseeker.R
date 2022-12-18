@@ -87,8 +87,8 @@ semseeker <- function(sample_sheet,
 
   if(sum(envir$keys_metaareas[,1]=="CHR")==1)
   {
-    subGroups <- c("")
-    probes_prefix = "PROBES"
+    subGroups <- c("CHR")
+    probes_prefix = "PROBES_CHR_"
     mainGroupLabel =  "CHR"
     subGroupLabel= "GROUP"
 
