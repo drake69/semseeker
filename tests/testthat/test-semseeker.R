@@ -5,7 +5,7 @@ test_that("semeeker", {
   envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -27,7 +27,7 @@ test_that("semeeker", {
 
   #########
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -50,7 +50,7 @@ test_that("semeeker", {
   ##########
 
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]

@@ -1,6 +1,6 @@
 test_that("sort_by_chr_and_start", {
 
-  nitem <- 4e5
+  nitem <- 1e3
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
