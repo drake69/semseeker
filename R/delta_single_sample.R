@@ -77,7 +77,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
 
   ### get deltas from medians #########################################################
 
-  deltas <- data.frame("DELTA"= round(values - beta_medians,5), row.names = probe_features$PROBE)
+  deltas <- data.frame("DELTA"= values - beta_medians, row.names = probe_features$PROBE)
   colnames(deltas) <- "DELTA"
 
   # if (!test_match_order(row.names(deltas), probe_features$PROBE)) {
@@ -91,9 +91,9 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
 
   result <- ""
   result <- result[-1]
-  result["DELTAS_HYPO"] <- round(mean(deltasAnnotated_hypoSorted$DELTA),5)
-  result["DELTAS_HYPER"] <- round(mean(deltasAnnotated_hyperSorted$DELTA),5)
-  result["DELTAS_BOTH"] <- round(mean(deltasAnnotated_bothSorted$DELTA),5)
+  result["DELTAS_HYPO"] <- mean(deltasAnnotated_hypoSorted$DELTA)
+  result["DELTAS_HYPER"] <- mean(deltasAnnotated_hyperSorted$DELTA)
+  result["DELTAS_BOTH"] <- mean(deltasAnnotated_bothSorted$DELTA)
 
 
   return(result)
