@@ -4,7 +4,7 @@ test_that("semeeker", {
   tempFolder <- paste("/tmp/semseeker/", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 20
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]

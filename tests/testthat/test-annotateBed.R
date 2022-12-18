@@ -9,7 +9,7 @@ test_that("annotate_bed", {
 
   envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 5
 
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
@@ -109,8 +109,8 @@ test_that("annotate_bed", {
   # parallel::stopCluster(computationCluster)
 
 
-  groups <- c("")
-  probes_prefix = "PROBES"
+  groups <- c("CHR")
+  probes_prefix = "PROBES_CHR_"
   columnLabel =  "CHR"
   groupingColumnLabel="GROUP"
 
@@ -126,5 +126,25 @@ test_that("annotate_bed", {
     groupingColumnLabel)
 
   bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+
+  groups <- c("")
+  probes_prefix = "PROBES"
+  columnLabel =  "PROBE"
+  groupingColumnLabel="GROUP"
+
+  # create and read
+  final_bed <- annotate_bed (
+    envir,
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
+  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+
+  tt <- fst::read.fst(bedFileName)
 
 })

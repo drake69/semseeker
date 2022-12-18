@@ -3,7 +3,7 @@ test_that("association_analysis", {
   library(stringi)
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 30
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -27,6 +27,20 @@ test_that("association_analysis", {
   mySampleSheet$Group <- c(rep(TRUE,nsamples/2), rep(FALSE,nsamples/2))
   mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
   mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
+
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
+  #todo: test incremental association analysis
+
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+                                   "covariates"=c("Covariates1+Covariates2"),
+                                   "family_test"=c("quantreg_0.5_1000_15000"),
+                                   "transformation"="scale",
+                                   "depth_analysis"=3,
+                                   "filter_p_value" = FALSE)
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="CHR")
   inferenceFolder <- file.path(tempFolder,"Inference")

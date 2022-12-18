@@ -4,7 +4,7 @@ test_that("create_excel_pivot", {
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 10
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
@@ -74,8 +74,14 @@ test_that("create_excel_pivot", {
   expect_true(file.exists(file.path(envir$result_folderData,"Pivots/GENE.xlsx")))
 
   subGroups <- c("")
-  probes_prefix = "PROBES"
+  probes_prefix = "PROBES_CHR_"
   mainGroupLabel =  "CHR"
+  subGroupLabel="GROUP"
+  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+
+  subGroups <- c("")
+  probes_prefix = "PROBES"
+  mainGroupLabel =  "PROBE"
   subGroupLabel="GROUP"
   create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 

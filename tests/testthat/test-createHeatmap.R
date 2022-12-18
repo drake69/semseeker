@@ -9,7 +9,7 @@ test_that("create_heatmap", {
 
   envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures, anomalies, metaareas)
 
-  nitem <- 4e5
+  nitem <- 1e3
   nsamples <- 5
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -55,6 +55,13 @@ test_that("create_heatmap", {
 
   subGroups <- c("")
   probes_prefix = "PROBES"
+  mainGroupLabel =  "PROBE"
+  subGroupLabel= "GROUP"
+
+  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+
+  subGroups <- c("CHR")
+  probes_prefix = "PROBES_CHR_"
   mainGroupLabel =  "CHR"
   subGroupLabel= "GROUP"
 

@@ -9,7 +9,7 @@
 #
 #   sample_detail <- data.frame("Sample_ID"= Sample_ID,"Sample_Group"= Sample_Group)
 #
-#   nitem <- 4e5
+#   nitem <- 1e3
 #   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
 #   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
 # probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
