@@ -34,10 +34,19 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
   anomalies <- envir$keys_anomalies[,1]
   populations <- c("Reference","Control","Case")
 
-  if(sum(envir$keys_metaareas[,1]=="CHR")==1)
+  if(sum(envir$keys_metaareas[,1]=="PROBE")==1)
   {
     subGroups <- c("")
     probes_prefix = "PROBES"
+    mainGroupLabel =  "PROBE"
+    subGroupLabel= "GROUP"
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  }
+
+  if(sum(envir$keys_metaareas[,1]=="CHR")==1)
+  {
+    subGroups <- c("CHR")
+    probes_prefix = "PROBES_CHR_"
     mainGroupLabel =  "CHR"
     subGroupLabel= "GROUP"
     create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
@@ -250,7 +259,7 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
           if(independent_variable=="Sample_Group")
             study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
 
-          if(family_test=="binomial")
+          if(family_test=="binomial" || family_test=="wilcoxon")
           {
 
             chartFolder <- dir_check_and_create(envir$result_folderChart,"POPULATION_COMPARISON")
@@ -391,7 +400,8 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
       result <- rbind(result, result_temp_foreach)
 
     result <- unique(result)
-    result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
+    result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method = "BH")
+    result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method = "BY")
     result <- result[order(result$PVALUEADJ),]
 
     if(filter_p_value)
@@ -404,7 +414,8 @@ association_analysis <- function(inference_details,result_folder, maxResources=9
         old_results <- utils::read.csv2(fileNameResults, header = T)
         result <- rbind(result, old_results)
       }
-      result[,"PVALUEADJ_ALL"] <- round(stats::p.adjust(result[,"PVALUE"],method = "BH"),5)
+      result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method = "BH")
+      result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method = "BY")
       result <- result[order(result$PVALUEADJ),]
       utils::write.csv2(result,fileNameResults , row.names = FALSE)
     }
