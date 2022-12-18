@@ -79,7 +79,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
   ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ"))
-  ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR"))
+  ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR","PROBE"))
 
 
 
@@ -131,9 +131,16 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_areas_chr <- expand.grid("GROUP"="CHR",
                                       "SUBGROUP"="CHR")
 
+  ssEnv$keys_areas_probe <- expand.grid("GROUP"="PROBE",
+                                      "SUBGROUP"="PROBE")
+
   ssEnv$keys_anomalies_figures_areas <- rbind(
     expand.grid("GROUP"="CHR",
                 "SUBGROUP"="CHR",
+                "FIGURE"=figures,
+                "ANOMALY"=anomalies),
+    expand.grid("GROUP"="PROBE",
+                "SUBGROUP"="PROBE",
                 "FIGURE"=figures,
                 "ANOMALY"=anomalies),
     expand.grid("GROUP"="DMR",

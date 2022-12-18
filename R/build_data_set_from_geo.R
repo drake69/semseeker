@@ -9,11 +9,19 @@
 #' @export
 build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
 
+    if(file.exists(GEOgse))
+    {
+      gse <- GEOquery::getGEO(filename = GEOgse, GSEMatrix = TRUE)
+      phenoDataName <- basename(GEOgse)
+      samplesheet <- gse@phenoData@data
+    }
+    else
+    {
+      gse <- GEOquery::getGEO(GEO = GEOgse, GSEMatrix = TRUE)
+      phenoDataName <-  paste(GEOgse, "_series_matrix.txt.gz", sep = "")
+      samplesheet <- gse[[phenoDataName]]@phenoData@data
+    }
 
-    gse <- GEOquery::getGEO(GEOgse, GSEMatrix = TRUE)
-
-    phenoDataName <-  paste(GEOgse, "_series_matrix.txt.gz", sep = "")
-    samplesheet <- gse[[phenoDataName]]@phenoData@data
 
     samplesheet$Sample_ID <- samplesheet$geo_accession
     samplesheet$Sample_Group <- ""

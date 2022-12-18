@@ -25,7 +25,7 @@ annotate_bed(
 
 \item{anomalies}{vector of lesions/mutations to use to build the folder path}
 
-\item{groups}{vector of genomic are to cycle and group the annotated data}
+\item{groups}{vector of genomic area to cycle and group the annotated data}
 
 \item{probes_prefix}{prefix to use to get the annotated probes dataset}
 

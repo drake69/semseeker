@@ -4,7 +4,7 @@
 #' @param populations vector of population to cycle with to build the folder path
 #' @param figures vector of hyper /hypo to use to build the folder path
 #' @param anomalies vector of lesions/mutations to use to build the folder path
-#' @param groups vector of genomic are to cycle and group the annotated data
+#' @param groups vector of genomic area to cycle and group the annotated data
 #' @param probes_prefix prefix to use to get the annotated probes dataset
 #' @param columnLabel label of the column of the genomic area gene, island ,dmr etc..
 #' @param groupingColumnLabel label of the column of the genomic sub area body, tss1500
@@ -74,7 +74,8 @@ annotate_bed <- function (
       tempFile
     }
 
-  colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
+  # colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
+  colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END"))
   final_bed <- final_bed[, colname_to_preserve]
 
   if(exists("final_bed_temp"))
@@ -90,7 +91,7 @@ annotate_bed <- function (
 
   # utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
-  
+
   return(final_bed)
 
 }
