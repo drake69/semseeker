@@ -74,8 +74,6 @@ semseeker <- function(sample_sheet,
   utils::write.csv2(sample_sheet, file.path(envir$result_folderData , "sample_sheet_result.csv"), row.names = F)
   message("Saving Sample Sheet with Results! ", Sys.time())
 
-  if(length(methylation_data)>1)
-    batch_correlation_check(envir)
 
   if(length(sample_sheet$Sample_Group=="Reference")>0)
     populations <- c("Reference","Control","Case")
@@ -84,6 +82,18 @@ semseeker <- function(sample_sheet,
 
   figures <- envir$keys_figures[,1]
   anomalies <- envir$keys_anomalies[,1]
+
+  if(sum(envir$keys_metaareas[,1]=="PROBE")==1)
+  {
+    subGroups <- c("")
+    probes_prefix = "PROBES"
+    mainGroupLabel =  "PROBE"
+    subGroupLabel= "GROUP"
+
+    create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+    chrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+    create_heatmap( envir=envir,inputBedDataFrame =  chrBed,anomalies = anomalies, file_prefix = "PROBE", groupColumnLabels = c("PROBE"))
+  }
 
   if(sum(envir$keys_metaareas[,1]=="CHR")==1)
   {
@@ -167,6 +177,10 @@ semseeker <- function(sample_sheet,
 
   # geneontology_analysis_webgestalt(envir$result_folderData = envir$result_folderData, fileName = fileName)
   # euristic_analysis_webgestalt(envir$result_folderData = envir$result_folderData)
+
+  if(length(methylation_data)>1)
+    batch_correlation_check(envir)
+
   message("Job Completed !")
 
   future::plan( future::sequential)
