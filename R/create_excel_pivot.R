@@ -2,7 +2,7 @@
 create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
   final_bed <-  annotate_bed( envir=envir, populations =   populations,figures =  figures ,anomalies =  anomalies,
-                              groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel,groupingColumnLabel =   subGroupLabel)
+                              groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel, groupingColumnLabel = subGroupLabel)
   i <- 0
   k <- 0
   if (is.null(final_bed))
@@ -71,7 +71,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
 
             sheet_name <- gsub(" ","", paste0( anomaly,"_",figure,"_", mainGroupLabel,"_", grp, sep=""), fixed=TRUE)
             temp_list <- list(tempDataFrame)
-            
+
             stats::setNames(temp_list, sheet_name)
           }
         }
@@ -106,5 +106,5 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
     if(!exists("old_sheet_list"))
       message("No pivot tables to save.")
   }
-  
+
 }
