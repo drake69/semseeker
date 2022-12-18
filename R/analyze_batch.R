@@ -55,7 +55,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   # methylation_data <- data.frame(PROBE = row.names(methylation_data), methylation_data[ , which(!(colnames(methylation_data)%in%referencePopulationSampleSheet$Sample_ID))]  )
 
 
-  if (plyr::empty(referencePopulationMatrix) |
+  if (plyr::empty(referencePopulationMatrix) ||
       ncol(referencePopulationMatrix) < 2) {
     message("Empty methylation_data ", Sys.time())
     stop("Empty methylation_data ")
@@ -73,7 +73,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
+  # variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
   # resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
   for (i in 1:length(envir$keys_populations[,1]))
   {
