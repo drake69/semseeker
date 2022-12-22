@@ -37,7 +37,7 @@ Imports:
     utils,
     withr,
     zoo
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Suggests: 
     gtools,
     stringi,
