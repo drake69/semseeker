@@ -38,7 +38,7 @@ build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
       # sample <- 1
       print(sample)
       fileName <- samplesheet [sample,"supplementary_file"]
-      if(fileName=="" | fileName=="NONE")
+      if(fileName=="" || fileName=="NONE")
         next
       tempData <-  gsub("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/", "", fileName)
       tempData <-  gsub("suppl/", "", tempData)
