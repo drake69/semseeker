@@ -58,7 +58,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
           {
             if(anomaly=="DELTAS")
               tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
-                                               fun.aggregate = mean, drop = TRUE)
+                                               fun.aggregate = sum, drop = TRUE)
             else
               tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
                                                fun.aggregate = sum, drop = TRUE)
