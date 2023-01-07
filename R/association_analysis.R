@@ -232,11 +232,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # define file results filename
           if(is.null(covariates) || length(covariates)  ==  0)
           {
-            file_suffix <- "_test_result"
+            file_suffix <- ""
           }
           else
           {
-            file_suffix <- "_test_corrected_result"
+            file_suffix <- paste(covariates, collapse = "_")
           }
           fileNameResults <- file_path_build(envir$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
 
