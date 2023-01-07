@@ -111,6 +111,12 @@ association_analysis <- function(inference_details,result_folder, maxResources =
       }
 
       independent_variable <- gsub(" ","", inference_detail$independent_variable)
+
+      if(independent_variable %in% covariates)
+      {
+        stop("The independent variable is also present as covariate!")
+      }
+
       if( is.null(independent_variable) || length(independent_variable)  ==  0)
       {
         message("Warning: one indipendent variable is missed! Skipped.")

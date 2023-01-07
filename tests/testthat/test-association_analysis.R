@@ -31,6 +31,18 @@ test_that("association_analysis", {
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
   #todo: test incremental association analysis
 
+
+  # inference_details <- expand.grid("independent_variable"= "Phenotest",
+  #                                  "covariates"=c("Phenotest+Covariates1+Covariates2"),
+  #                                  "family_test"=c("quantreg_0.5_1000_15000"),
+  #                                  "transformation"="scale",
+  #                                  "depth_analysis"=3,
+  #                                  "filter_p_value" = FALSE)
+  #
+  # # inference_details,result_folder, maxResources, parallel_strategy
+  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+
+
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
                                    "family_test"=c("quantreg_0.5_1000_15000"),
