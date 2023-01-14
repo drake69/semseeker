@@ -42,10 +42,20 @@ test_that("association_analysis", {
   # # inference_details,result_folder, maxResources, parallel_strategy
   # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
 
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+                                   "covariates"=c("Covariates1+Covariates2"),
+                                   "family_test"=c("quantreg_0.5"),
+                                   "transformation"="scale",
+                                   "depth_analysis"=3,
+                                   "filter_p_value" = FALSE)
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
-                                   "family_test"=c("quantreg_0.5_1000_15000"),
+                                   "family_test"=c("quantreg_0.5_100_1000"),
                                    "transformation"="scale",
                                    "depth_analysis"=3,
                                    "filter_p_value" = FALSE)
@@ -93,9 +103,24 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
 
   fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_test_result", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+                                   "covariates"="",
+                                   "family_test"=c("gaussian"),
+                                   "transformation"="scale",
+                                   "depth_analysis"=3,
+                                   "filter_p_value" = FALSE)
+
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
+
+  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_gaussian_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -160,5 +185,16 @@ test_that("association_analysis", {
   fileToRead <- file_path_build(inferenceFolder, "1_Group_quantile_5_wilcoxon_test_result", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
-})
+
+  inference_details <- expand.grid("independent_variable"= "Group",
+                                   "covariates"="",
+                                   "family_test"=c("wilcoxon"),
+                                   "transformation"="quantile_5",
+                                   "depth_analysis"=3,
+                                   "filter_p_value" = FALSE)
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
+
+  })
 
