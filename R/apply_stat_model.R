@@ -37,7 +37,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   df_colnames <- colnames(tempDataFrame)
   if( !is.null(dim(burden_values))  & dototal) {
-    # browser()
     sum_area <- apply(burden_values, 1, sum)
     if(depth_analysis==2)
     {
@@ -52,7 +51,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     }
   }
 
-  # #browser()
   if(family_test != "poisson")
     burden_values <- burden_values + 0.001
 
@@ -136,7 +134,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
 
   tempDataFrame <- data.frame(df_head, burden_values)
-  # #browser()
   if(ncol(tempDataFrame)!=length(df_colnames))
     browser()
   colnames(tempDataFrame) <- df_colnames
@@ -168,18 +165,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     # message(g)
     if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>2){
 
-      if (family_test=="poisson")
-      {
-        if(is.null(covariates) || length(covariates)==0)
-        {
-          covariates_model <- independent_variable
-        } else
-        {
-          covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
-        }
-        sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
-      }
-
       if(family_test=="wilcoxon" | family_test=="t.test")
       {
         covariates_model <- independent_variable
@@ -189,18 +174,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
       {
         covariates_model <- independent_variable
-        sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
-      }
-
-      if (family_test=="gaussian")
-      {
-        if(is.null(covariates) || length(covariates)==0)
-        {
-          covariates_model <- independent_variable
-        } else
-        {
-          covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
-        }
         sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
       }
 
@@ -217,8 +190,16 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         sig.formula <- stats::as.formula(paste0(independent_variable,"~", covariates_model, sep=""))
       }
 
-      # #browser()
-      if(family_test=="binomial" | family_test=="poisson" | family_test=="wilcoxon" | family_test=="t.test")
+      if(family_test=="gaussian" | family_test=="poisson" | grepl("quantreg", family_test))
+      {
+        if(is.null(covariates) || length(covariates)==0)
+          covariates_model <- independent_variable
+        else
+          covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
+        sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+      }
+
+      if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="t.test")
       {
         bartlett_pvalue <- stats::bartlett.test( stats::as.formula(paste0(burdenValue,"~", independent_variable, sep="")),
                                                  data= as.data.frame(tempDataFrame) )
@@ -231,85 +212,83 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         bartlett_pvalue <- stats::bartlett.test( stats::as.formula("depVar ~ indepVar"), data= localDataFrame )
       }
 
+
       Breusch_Pagan_pvalue <- NA
-      if(family_test=="gaussian" | family_test=="poisson" | grepl("quantreg", family_test))
-      {
-
-        if(is.null(covariates) || length(covariates)==0)
-        {
-          covariates_model <- independent_variable
-        } else
-        {
-          covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
-        }
-        sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
-        model <- stats::lm(formula = sig.formula, data = as.data.frame(tempDataFrame))
-        residuals <-  model$residuals
-        shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
-        Breusch_Pagan_pvalue <- lmtest::bptest(model)$p.value
-      }
-      else
-        shapiro_pvalue <- if(length(tempDataFrame[,burdenValue])>3 & length(unique(tempDataFrame[,burdenValue]))>3) (stats::shapiro.test(tempDataFrame[,burdenValue])$p.value) else NA
-
       if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
       {
         result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
         pvalue <- summary(result_glm )$coeff[-1, 4][1]
+        beta_value <- (summary(result_glm )$coeff[-1, 1][1])
+        aic_value <- (result_glm$aic)
+        residuals <-  result_glm$resid
+        #calculate shapiro of working residuals
+        shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
+        # Breusch_Pagan_pvalue <- lmtest::bptest( data=residuals )$p.value
       }
+      else
+        #calculate shapiro of burden values
+        shapiro_pvalue <- if(length(tempDataFrame[,burdenValue])>3 & length(unique(tempDataFrame[,burdenValue]))>3) (stats::shapiro.test(tempDataFrame[,burdenValue])$p.value) else NA
 
       if(grepl("quantreg", family_test))
       {
-        if(is.null(covariates) || length(covariates)==0)
-        {
-          covariates_model <- independent_variable
-        } else
-        {
-          covariates_model <- paste0(paste0(c(independent_variable, covariates),collapse="+", sep=""))
-        }
-        sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
         lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
         quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
         if(length(quantreg_params)<4)
         {
-          message("Quantreg has not all the required parameters!")
-          }
-        n_permutations_test <- as.numeric(quantreg_params[3])
-        n_permutations <- as.numeric(quantreg_params[4])
-        tau <- as.numeric(quantreg_params[2])
-
-        model.x <-  suppressMessages(lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
-        if(n_permutations > n_permutations_test)
-        {
-          model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
-          beta_full <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
-          tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
-          colnames(tt) <- colnames(model.x.boot)
-          boot_vector <- stats::na.omit(tt[,independent_variable])
-          boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
-        }
-        ci.lower.adjusted <- NA
-        ci.upper.adjusted <- NA
-
-        if(boot.bca[1] <0 & boot.bca[2]>0 )
-        {
-          n_permutations <- n_permutations_test
+          message("Nothing to do! Not enough parameter for quantile regression!.")
+          return(NULL)
+          # if(length(quantreg_params)<2)
+          #   {
+          # }
+          # tau = as.numeric(quantreg_params[2])
+          # result_quantreg <- quantreg::rq(formula = sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, method="sfn", model = T)
+          # pvalue <- summary(result_quantreg )[["tTable"]][2,5]
+          # beta_value <- (summary(result_quantreg)$coeff[-1, 1][1])
+          # aic_value <- (result_quantreg$aic)
+          # residuals <-  result_quantreg$resid
+          # #calculate shapiro of working residuals
+          # shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
         }
         else
         {
-          model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations))
-          beta_full <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
-          tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
-          colnames(tt) <- colnames(model.x.boot)
-          boot_vector <- stats::na.omit(tt[,independent_variable])
-          boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
-          boot.bca.adjusted <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control,  boot_success = boot_success, tests_count=tests_count)
-          ci.lower.adjusted <-  boot.bca.adjusted[1]
-          ci.upper.adjusted <- boot.bca.adjusted[2]
-        }
+          n_permutations_test <- as.numeric(quantreg_params[3])
+          n_permutations <- as.numeric(quantreg_params[4])
+          tau <- as.numeric(quantreg_params[2])
 
-        ci.lower <- boot.bca[1]
-        ci.upper <- boot.bca[2]
-        pvalue <- boot.bca[3]
+          model.x <-  suppressMessages(lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
+          if(n_permutations > n_permutations_test)
+          {
+            model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
+            beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
+            tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
+            colnames(tt) <- colnames(model.x.boot)
+            boot_vector <- stats::na.omit(tt[,independent_variable])
+            boot.bca <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
+          }
+          ci.lower.adjusted <- NA
+          ci.upper.adjusted <- NA
+
+          if(boot.bca[1] <0 & boot.bca[2]>0 )
+          {
+            n_permutations <- n_permutations_test
+          }
+          else
+          {
+            model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations))
+            beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
+            tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
+            colnames(tt) <- colnames(model.x.boot)
+            boot_vector <- stats::na.omit(tt[,independent_variable])
+            boot.bca <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
+            boot.bca.adjusted <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control,  boot_success = boot_success, tests_count=tests_count)
+            ci.lower.adjusted <-  boot.bca.adjusted[1]
+            ci.upper.adjusted <- boot.bca.adjusted[2]
+          }
+
+          ci.lower <- boot.bca[1]
+          ci.upper <- boot.bca[2]
+          pvalue <- boot.bca[3]
+        }
       }
 
       if(family_test=="wilcoxon")
@@ -333,7 +312,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
 
       pvalueadjusted <- pvalue
-      # #browser()
       # beta <- exp(summary( result_glm )$coeff[-1, 1][1])
       # result_temp <-
 
@@ -353,8 +331,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "PVALUE" = (pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
-          "BETA" = if(exists("result_glm")) (summary(result_glm )$coeff[-1, 1][1])  else NA,
-          "AIC" = if(exists("result_glm")) (result_glm$aic)  else NA,
+          "BETA" = if(exists("beta_value")) beta_value  else NA,
+          "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
           "FAMILY" = family_test,
           "transformation" = transformation,
@@ -379,7 +357,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         )
       } else
       {
-        # #browser()
         dependentVariableData <- as.numeric(stats::na.omit(tempDataFrame[!is.na(tempDataFrame[,independent_variable]),burdenValue]))
         independent_variableData <- as.numeric(stats::na.omit(tempDataFrame[  ,independent_variable]))
         local_result <- data.frame (
@@ -392,8 +369,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "PVALUE" = (pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
-          "BETA" = if(exists("result_glm")) (summary( result_glm )$coeff[-1, 1][1]) else NA,
-          "AIC" = if(exists("result_glm")) (result_glm$aic)  else NA,
+          "BETA" = if(exists("beta_value")) beta_value  else NA,
+          "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
           "FAMILY" = family_test,
           "transformation" = transformation,
