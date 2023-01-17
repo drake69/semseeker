@@ -72,7 +72,7 @@ test_that("association_analysis", {
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
-                                   "family_test"=c("quantreg_0.5_1000_15000"),
+                                   "family_test"=c("quantreg_0.5_1000_15000_0.9"),
                                    "transformation"="scale",
                                    "depth_analysis"=3,
                                    "filter_p_value" = FALSE)
@@ -128,7 +128,7 @@ test_that("association_analysis", {
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
-                                   "family_test"=c("quantreg_0.5_1000_15000"),
+                                   "family_test"=c("quantreg_0.5_1000_15000_0.9"),
                                    "transformation"="scale",
                                    "depth_analysis"=1,
                                    "filter_p_value" = FALSE)
