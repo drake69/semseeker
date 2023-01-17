@@ -12,7 +12,7 @@ quantreg_summary(
   tau,
   independent_variable,
   lqm_control,
-  conf.level = 0.95,
+  conf.level,
   boot_success = 0,
   tests_count = 1
 )

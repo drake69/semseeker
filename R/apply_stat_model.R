@@ -214,7 +214,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
 
       Breusch_Pagan_pvalue <- NA
-      if(family_test=="gaussian" | family_test=="binomial" | family_test=="poisson")
+      if( family_test=="binomial" | family_test=="poisson")
       {
         result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
         pvalue <- summary(result_glm )$coeff[-1, 4][1]
@@ -224,6 +224,16 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         #calculate shapiro of working residuals
         shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
         # Breusch_Pagan_pvalue <- lmtest::bptest( data=residuals )$p.value
+      } else if(family_test=="gaussian")
+      {
+        result_glm  <- stats::lm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
+        pvalue <- summary(result_glm )$coeff[-1, 4][1]
+        beta_value <- (summary(result_glm )$coeff[-1, 1][1])
+        aic_value <- (result_glm$aic)
+        residuals <-  result_glm$residuals
+        #calculate shapiro of working residuals
+        shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
+        Breusch_Pagan_pvalue <- lmtest::bptest( data=residuals )$p.value
       }
       else
         #calculate shapiro of burden values
@@ -233,7 +243,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       {
         lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
         quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
-        if(length(quantreg_params)<4)
+        if(length(quantreg_params)<5)
         {
           message("Nothing to do! Not enough parameter for quantile regression!.")
           return(NULL)
@@ -254,6 +264,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           n_permutations_test <- as.numeric(quantreg_params[3])
           n_permutations <- as.numeric(quantreg_params[4])
           tau <- as.numeric(quantreg_params[2])
+          conf.level <- as.numeric(quantreg_params[5])
 
           model.x <-  suppressMessages(lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
           if(n_permutations > n_permutations_test)
@@ -263,7 +274,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
             tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
             colnames(tt) <- colnames(model.x.boot)
             boot_vector <- stats::na.omit(tt[,independent_variable])
-            boot.bca <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
+            boot.bca <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control, conf.level = conf.level)
           }
           ci.lower.adjusted <- NA
           ci.upper.adjusted <- NA
@@ -279,8 +290,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
             tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
             colnames(tt) <- colnames(model.x.boot)
             boot_vector <- stats::na.omit(tt[,independent_variable])
-            boot.bca <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
-            boot.bca.adjusted <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control,  boot_success = boot_success, tests_count=tests_count)
+            boot.bca <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control, conf.level = conf.level)
+            boot.bca.adjusted <- quantreg_summary(boot_vector, beta_value, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control,  boot_success = boot_success, tests_count=tests_count, conf.level = conf.level)
             ci.lower.adjusted <-  boot.bca.adjusted[1]
             ci.upper.adjusted <- boot.bca.adjusted[2]
           }

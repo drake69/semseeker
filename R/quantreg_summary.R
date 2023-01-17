@@ -13,7 +13,7 @@
 #'
 #' @return ci and pvalue with BCA method
 #' @importFrom doRNG %dorng%
-quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control, conf.level = 0.95, boot_success = 0, tests_count=1 ){
+quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, tau, independent_variable, lqm_control, conf.level , boot_success = 0, tests_count=1 ){
 
 
   # #BCA method
