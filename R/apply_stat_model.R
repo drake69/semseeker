@@ -226,14 +226,21 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         # Breusch_Pagan_pvalue <- lmtest::bptest( data=residuals )$p.value
       } else if(family_test=="gaussian")
       {
-        result_glm  <- stats::lm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
+
+        # sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+        # model <- stats::lm(formula = sig.formula, data = as.data.frame(tempDataFrame))
+        # residuals <-  model$residuals
+        # shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
+        # Breusch_Pagan_pvalue <- lmtest::bptest(model)$p.value
+
+        result_glm  <- stats::lm( formula = sig.formula, data = as.data.frame(tempDataFrame))
         pvalue <- summary(result_glm )$coeff[-1, 4][1]
         beta_value <- (summary(result_glm )$coeff[-1, 1][1])
-        aic_value <- (result_glm$aic)
+        aic_value <- 0 #(result_glm$aic)
         residuals <-  result_glm$residuals
         #calculate shapiro of working residuals
         shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
-        Breusch_Pagan_pvalue <- lmtest::bptest( data=residuals )$p.value
+        # Breusch_Pagan_pvalue <- lmtest::bptest(data=residuals )$p.value
       }
       else
         #calculate shapiro of burden values
@@ -265,8 +272,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           n_permutations <- as.numeric(quantreg_params[4])
           tau <- as.numeric(quantreg_params[2])
           conf.level <- as.numeric(quantreg_params[5])
-
-          model.x <-  suppressMessages(lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
+          model.x <-  suppressMessages(lqmm::lqm( formula = sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
           if(n_permutations > n_permutations_test)
           {
             model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
@@ -304,13 +310,13 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       if(family_test=="wilcoxon")
       {
-        result_w  <- suppressWarnings(stats::wilcox.test(sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
+        result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
         pvalue <- result_w$p.value
       }
 
       if(family_test=="t.test")
       {
-        result_w  <-stats::t.test(sig.formula, data = as.data.frame(tempDataFrame))
+        result_w  <-stats::t.test(formula= sig.formula, data = as.data.frame(tempDataFrame))
         pvalue <- result_w$p.value
       }
 
