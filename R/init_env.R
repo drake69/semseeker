@@ -82,7 +82,6 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR","PROBE"))
 
 
-
   figures <- if(is.null(arguments[["figures"]])) ssEnv$keys_figures_default[,1] else arguments$figures
   anomalies <- if(is.null(arguments[["anomalies"]]))  ssEnv$keys_anomalies_default[,1] else arguments$anomalies
   metaareas <- if(is.null(arguments[["metaareas"]]))  ssEnv$keys_metaareas_default[,1] else arguments$metaareas

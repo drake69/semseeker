@@ -74,7 +74,7 @@ quantreg_summary <-function(boot_vector, estimate, working_data, sig.formula, ta
 
   Bca <- coxed::bca(boot_vector, conf.level = conf.level)
   p.value <- 0
-  if(Bca[1]<0 & Bca[2]>0)
+  if(sign(Bca[1]) != sign(Bca[2]))
     p.value<- 1
 
 

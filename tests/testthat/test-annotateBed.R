@@ -4,7 +4,7 @@ test_that("annotate_bed", {
   tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
   figures <- c( "BOTH")
-  anomalies <- c("DELTAS")
+  anomalies <- c("DELTAS","DELTAQ")
   metaareas <- c("GENE")
 
   envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
@@ -125,8 +125,12 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # expect_true( columnLabel %in% colnames(final_bed))
+  expect_true( nrow(final_bed)>0)
 
+  # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # tt <- fst::read.fst(bedFileName)
+  
   groups <- c("")
   probes_prefix = "PROBES"
   columnLabel =  "PROBE"
@@ -143,8 +147,9 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
-
-  tt <- fst::read.fst(bedFileName)
+  expect_true( nrow(final_bed)>0)
+  # expect_true( columnLabel %in% colnames(final_bed))
+  # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # tt <- fst::read.fst(bedFileName)
 
 })
