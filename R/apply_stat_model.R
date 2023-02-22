@@ -260,8 +260,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           else
           {
             # Define function to compute p-value and beta regression coefficient
-            compute_beta <- function(sig.formula, tau) {
-              fit <- quantreg::rq(sig.formula, tau = tau)
+            compute_beta <- function(sig.formula, tau, dataFrame) {
+              fit <- quantreg::rq(formula =  sig.formula,data = as.data.frame(dataFrame),  tau = tau)
               coef <-as.data.frame(summary(fit, se = "boot")$coefficients)[2,"Value"]
               pval <- as.data.frame(summary(fit, se = "boot")$coefficients)[2, "Pr(>|t|)"]
               return(list(beta = coef, pval = pval))
@@ -270,7 +270,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
             tau = as.numeric(quantreg_params[2])
             n_permutations <- as.numeric(quantreg_params[3])
             # Compute beta and p-value for n_permutations replications
-            results <- replicate(n_permutations, compute_beta(sig.formula, tau))
+            results <- replicate(n_permutations, compute_beta(sig.formula, tau, dataFrame=tempDataFrame))
             # Compute average beta and p-value
             beta_value <- mean(unlist(t(results)[,"beta"]))
             pvalue <- mean(unlist(t(results)[,"pval"]))
