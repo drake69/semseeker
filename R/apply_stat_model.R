@@ -252,7 +252,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
         if(length(quantreg_params)<5)
         {
-          if(length(quantreg_params)<3)
+          if(length(quantreg_params)<4)
           {
             message("Nothing to do! Not enough parameter for quantile regression!.")
             return(NULL)
@@ -268,13 +268,19 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
             }
 
             tau = as.numeric(quantreg_params[2])
-            n_permutations <- as.numeric(quantreg_params[3])
+            n_permutations_test <- as.numeric(quantreg_params[3])
             # Compute beta and p-value for n_permutations replications
-            results <- replicate(n_permutations, compute_beta(sig.formula, tau, dataFrame=tempDataFrame))
+            results <- replicate(n_permutations_test, compute_beta(sig.formula, tau, dataFrame=tempDataFrame))
             # Compute average beta and p-value
+            pvalue <- max(unlist(t(results)[,"pval"]))
+            if(pvalue < 0.05)
+            {
+              n_permutations <- as.numeric(quantreg_params[4])
+              results <- replicate(n_permutations, compute_beta(sig.formula, tau, dataFrame=tempDataFrame))
+              # Compute average beta and p-value
+              pvalue <- max(unlist(t(results)[,"pval"]))
+            }
             beta_value <- mean(unlist(t(results)[,"beta"]))
-            pvalue <- mean(unlist(t(results)[,"pval"]))
-
             # tau = as.numeric(quantreg_params[2])
             # result_quantreg <- quantreg::rq(formula = sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, method="sfn", model = T)
             # pvalue <- summary(result_quantreg )[["tTable"]][2,5]
