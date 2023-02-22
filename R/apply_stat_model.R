@@ -252,8 +252,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
         if(length(quantreg_params)<5)
         {
-          message("Nothing to do! Not enough parameter for quantile regression!.")
-          return(NULL)
           if(length(quantreg_params)<3)
           {
             message("Nothing to do! Not enough parameter for quantile regression!.")
