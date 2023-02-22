@@ -254,17 +254,38 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         {
           message("Nothing to do! Not enough parameter for quantile regression!.")
           return(NULL)
-          # if(length(quantreg_params)<2)
-          #   {
-          # }
-          # tau = as.numeric(quantreg_params[2])
-          # result_quantreg <- quantreg::rq(formula = sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, method="sfn", model = T)
-          # pvalue <- summary(result_quantreg )[["tTable"]][2,5]
-          # beta_value <- (summary(result_quantreg)$coeff[-1, 1][1])
-          # aic_value <- (result_quantreg$aic)
-          # residuals <-  result_quantreg$resid
-          # #calculate shapiro of working residuals
-          # shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
+          if(length(quantreg_params)<3)
+          {
+            message("Nothing to do! Not enough parameter for quantile regression!.")
+            return(NULL)
+          }
+          else
+          {
+            # Define function to compute p-value and beta regression coefficient
+            compute_beta <- function(sig.formula, tau) {
+              fit <- quantreg::rq(sig.formula, tau = tau)
+              coef <-as.data.frame(summary(fit, se = "boot")$coefficients)[2,"Value"]
+              pval <- as.data.frame(summary(fit, se = "boot")$coefficients)[2, "Pr(>|t|)"]
+              return(list(beta = coef, pval = pval))
+            }
+
+            tau = as.numeric(quantreg_params[2])
+            n_permutations <- as.numeric(quantreg_params[3])
+            # Compute beta and p-value for n_permutations replications
+            results <- replicate(n_permutations, compute_beta(sig.formula, tau))
+            # Compute average beta and p-value
+            beta_value <- mean(unlist(t(results)[,"beta"]))
+            pvalue <- mean(unlist(t(results)[,"pval"]))
+
+            # tau = as.numeric(quantreg_params[2])
+            # result_quantreg <- quantreg::rq(formula = sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, method="sfn", model = T)
+            # pvalue <- summary(result_quantreg )[["tTable"]][2,5]
+            # beta_value <- (summary(result_quantreg)$coeff[-1, 1][1])
+            # aic_value <- (result_quantreg$aic)
+            # residuals <-  result_quantreg$resid
+            #calculate shapiro of working residuals
+            # shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
+          }
         }
         else
         {
