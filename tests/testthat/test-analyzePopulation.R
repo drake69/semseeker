@@ -51,5 +51,6 @@
   expect_true(nrow(sp)==nrow(sample_sheet))
 
   future::plan( future::multisession)
+
 })
 
