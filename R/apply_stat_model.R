@@ -273,9 +273,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
             results <- replicate(n_permutations_test, compute_beta(sig.formula, tau, dataFrame=tempDataFrame))
             # Compute average beta and p-value
             pvalue <- max(unlist(t(results)[,"pval"]))
-            if(pvalue < 0.05)
+            n_permutations <- as.numeric(quantreg_params[4])
+            if(pvalue < 0.05 && n_permutations_test!= n_permutations)
             {
-              n_permutations <- as.numeric(quantreg_params[4])
               results <- replicate(n_permutations, compute_beta(sig.formula, tau, dataFrame=tempDataFrame))
               # Compute average beta and p-value
               pvalue <- max(unlist(t(results)[,"pval"]))
