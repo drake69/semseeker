@@ -179,6 +179,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             "PVALUEADJ"  =  "",
             "TEST"  =  "",
             "BETA"  =  "",
+            "STD.ERROR" = "",
             "AIC"  =  "",
             "RESIDUALS.SUM"  =  "",
             "FAMILY"  =  "",

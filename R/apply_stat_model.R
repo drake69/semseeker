@@ -254,8 +254,15 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         {
           if(length(quantreg_params)<4)
           {
-            message("Nothing to do! Not enough parameter for quantile regression!.")
-            return(NULL)
+            tau = as.numeric(quantreg_params[2])
+            model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
+            pvalue <- summary(model)$tTable[2,"Pr(>|t|)"]
+            std.error <- summary(model)$tTable[2,"Std. Error"]
+            beta_value <- summary(model)$tTable[2,"Value"]
+            ci.lower <- summary(model)$tTable[2,"lower bound"]
+            ci.upper <- summary(model)$tTable[2,"upper bound"]
+            # message("Nothing to do! Not enough parameter for quantile regression!.")
+            # return(NULL)
           }
           else
           {
@@ -274,7 +281,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
             # Compute average beta and p-value
             pvalue <- max(unlist(t(results)[,"pval"]))
             n_permutations <- as.numeric(quantreg_params[4])
-            if(pvalue < 0.05 && n_permutations_test!= n_permutations)
+            if(pvalue < 0.05 && n_permutations_test < n_permutations)
             {
               results <- replicate(n_permutations, compute_beta(sig.formula, tau, dataFrame=tempDataFrame))
               # Compute average beta and p-value
@@ -374,6 +381,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
           "BETA" = if(exists("beta_value")) beta_value  else NA,
+          "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
           "FAMILY" = family_test,
@@ -412,6 +420,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
           "BETA" = if(exists("beta_value")) beta_value  else NA,
+          "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
           "FAMILY" = family_test,
@@ -456,6 +465,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         "PVALUEADJ" = NA,
         "TEST" = "SINGLE_AREA",
         "BETA" = NA,
+        "STD.ERROR" = NA,
         "AIC" = NA,
         "RESIDUALS.SUM" = NA,
         "FAMILY" = family_test,
