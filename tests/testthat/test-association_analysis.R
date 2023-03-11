@@ -74,8 +74,8 @@ test_that("association_analysis", {
     "filter_p_value" = FALSE)
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
-
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential",
+    figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
@@ -83,6 +83,16 @@ test_that("association_analysis", {
                                    "transformation"="scale",
                                    "depth_analysis"=3,
                                    "filter_p_value" = FALSE)
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+    "covariates"=c("Covariates1+Covariates2"),
+    "family_test"=c("quantreg_0.5_100_1000_0.99_np"),
+    "transformation"="scale",
+    "depth_analysis"=3,
+    "filter_p_value" = FALSE)
 
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
