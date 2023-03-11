@@ -7,11 +7,6 @@
 quantreg_summary(
   boot_vector,
   estimate,
-  working_data,
-  sig.formula,
-  tau,
-  independent_variable,
-  lqm_control,
   conf.level,
   boot_success = 0,
   tests_count = 1
@@ -22,6 +17,12 @@ quantreg_summary(
 
 \item{estimate}{beta regression}
 
+\item{conf.level}{confidence intervals alpha level}
+
+\item{boot_success}{number of success respecting the null hypothesis}
+
+\item{tests_count}{how many tests were done}
+
 \item{working_data}{data to regress}
 
 \item{sig.formula}{formula for model}
@@ -31,12 +32,6 @@ quantreg_summary(
 \item{independent_variable}{name of indenpendent variable}
 
 \item{lqm_control}{controls of lqmm packages}
-
-\item{conf.level}{confidence intervals alpha level}
-
-\item{boot_success}{number of success respecting the null hypothesis}
-
-\item{tests_count}{how many tests were done}
 }
 \value{
 ci and pvalue with BCA method
