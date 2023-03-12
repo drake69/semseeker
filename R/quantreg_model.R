@@ -44,13 +44,13 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
       tau = as.numeric(quantreg_params[2])
       n_permutations_test <- as.numeric(quantreg_params[3])
       # Compute beta and p-value for n_permutations replications
-      results <- replicate(n_permutations_test, compute_qr_beta_boot_p(sig.formula, tau, dataFrame=tempDataFrame))
+      results <- replicate(n_permutations_test, compute_qr_beta_boot_p(sig.formula, tau, localDataFrame=tempDataFrame))
       # Compute average beta and p-value
       pvalue <- max(unlist(t(results)[,"pval"]))
       n_permutations <- as.numeric(quantreg_params[4])
       if(pvalue < 0.05 && n_permutations_test < n_permutations)
       {
-        results <- replicate(n_permutations, compute_qr_beta_boot_p(sig.formula, tau, dataFrame=tempDataFrame))
+        results <- replicate(n_permutations, compute_qr_beta_boot_p(sig.formula, tau, localDataFrame=tempDataFrame))
         # Compute average beta and p-value
         pvalue <- max(unlist(t(results)[,"pval"]))
       }
