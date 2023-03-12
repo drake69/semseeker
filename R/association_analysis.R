@@ -406,6 +406,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     result <- unique(result)
     result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BH")
     result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BY")
+    result[,"PVALUEADJ_ALL_FDR"] <- stats::p.adjust(result[,"PVALUE"],method  =  "fdr")
     result <- result[order(result$PVALUEADJ),]
 
     if(filter_p_value)
