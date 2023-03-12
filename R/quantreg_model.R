@@ -58,7 +58,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
       r_model <- "quantreg::rq"
     }
   }
-  else
+  if(length(quantreg_params)==5)
   {
     # use lqmm package and apply quantreg with bootstrap and confidence interval of regression beta
     # quantreg + quantile + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta
@@ -71,6 +71,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
       beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
+      std.error <- summary(model)$tTable[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])
@@ -87,6 +88,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations))
       beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
+      std.error <- summary(model)$tTable[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])
@@ -144,6 +146,6 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   residuals <- NA
   shapiro_pvalue <- NA
 
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model ))
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error ))
 
 }

@@ -31,7 +31,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
                  "independent_variable1stLevel", "independent_variable2ndLevel",
                  "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count",
-                  "data_preparation","apply_stat_model_sig.formula","quantreg_model")
+                  "data_preparation","apply_stat_model_sig.formula","quantreg_model",
+                  "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue")
 
   # message("Starting foreach withh: ", iters, " items")
   message(Sys.time()," I'll perform:",iters," tests." )
@@ -62,6 +63,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       ci.lower <- model_result$ci.lower
       ci.upper <- model_result$ci.upper
       r_model <- model_result$r_model
+      std.error <- model$std.error
 
       if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" &
          family_test!="kendall" & !grepl("quantreg", family_test)
@@ -76,19 +78,19 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "GROUP" = key$GROUP,
           "SUBGROUP" = key$SUBGROUP,
           "AREA_OF_TEST" = burdenValue,
-          "PVALUE" = (pvalue),
+          "PVALUE" = (model_result$pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
           "BETA" = if(exists("beta_value")) beta_value  else NA,
           "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
-          "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
+          "RESIDUALS.SUM" = if(exists("model_result")) (sum(model_result$residuals))  else NA,
           "FAMILY" = r_model,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
           "SHAPIRO.PVALUE" = shapiro_pvalue,
           "BREUSCH-PAGAN.PVALUE" = Breusch_Pagan_pvalue,
-          "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) (bartlett_pvalue$p.value)  else NA,
+          "BARTLETT.PVALUE" = if(exists("bartlett_pvalue")) (bartlett_pvalue)  else NA,
           "CASE.LABEL"= if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA,
           "COUNT.CASE"=length(independent_variableData1stLevel),
           "MEAN.CASE" = (mean(independent_variableData1stLevel)),
@@ -97,7 +99,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "COUNT.CONTROL"=length(stats::na.omit(independent_variableData2ndLevel)),
           "MEAN.CONTROL"=(mean(independent_variableData2ndLevel)),
           "SD.CONTROL"= (stats::sd(independent_variableData2ndLevel)),
-          "RHO"= if(exists("result_cor"))  (result_cor$estimate) else NA,
+          "RHO"= if(r_model=="stats::cor.test")  (model_result$estimate) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
           "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
@@ -115,13 +117,13 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "GROUP" = key$GROUP,
           "SUBGROUP" = key$SUBGROUP,
           "AREA_OF_TEST" = burdenValue,
-          "PVALUE" = (pvalue),
+          "PVALUE" = (model_result$pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
           "BETA" = if(exists("beta_value")) beta_value  else NA,
           "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
-          "RESIDUALS.SUM" = if(exists("result_glm")) (sum(result_glm$residuals))  else NA,
+          "RESIDUALS.SUM" = if(exists("model_result")) (sum(model_result$residuals))  else NA,
           "FAMILY" = r_model,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
@@ -136,7 +138,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "COUNT.CONTROL"=length(dependentVariableData),
           "MEAN.CONTROL"=(mean(dependentVariableData)),
           "SD.CONTROL"= (stats::sd(dependentVariableData)),
-          "RHO"= if(exists("result_cor"))  (result_cor$estimate) else NA,
+          "RHO"= if(r_model=="stats::cor.test")  (model_result$estimate) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
           "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,

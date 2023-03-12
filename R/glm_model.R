@@ -13,5 +13,6 @@ glm_model <- function(family_test, tempDataFrame, sig.formula )
   ci.lower <- NA
   ci.upper <- NA
   r_model <- "stats::glm"
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model ))
+  std.error <- "NA"
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error ))
 }

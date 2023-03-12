@@ -19,6 +19,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula )
     result_cor <- stats::cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independent_variable]), method = as.character(family_test))
     pvalue <- result_cor$p.value
     r_model <- "stats::cor.test"
+    beta_value <- result_cor$estimate
   }
 
   ci.lower <- NA
@@ -27,7 +28,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula )
   aic_value <- NA
   residuals <- NA
   shapiro_pvalue <- NA
-
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model ))
+  std.error <- NA
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error ))
 
 }
