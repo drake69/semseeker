@@ -63,7 +63,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       ci.lower <- model_result$ci.lower
       ci.upper <- model_result$ci.upper
       r_model <- model_result$r_model
-      std.error <- model$std.error
+      std.error <- model_result$std.error
 
       if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" &
          family_test!="kendall" & !grepl("quantreg", family_test)
