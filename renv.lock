@@ -161,10 +161,10 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-58.2",
+      "Version": "7.3-58.3",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "e02d1a0f6122fd3e634b25b433704344",
+      "Hash": "9586b552d57f5516fe4d25398c1bacd6",
       "Requirements": []
     },
     "Matrix": {
@@ -1518,10 +1518,10 @@
     },
     "mgcv": {
       "Package": "mgcv",
-      "Version": "1.8-41",
+      "Version": "1.8-42",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "6b3904f13346742caa3e82dd0303d4ad",
+      "Hash": "3460beba7ccc8946249ba35327ba902a",
       "Requirements": [
         "Matrix",
         "nlme"
@@ -2301,10 +2301,10 @@
     },
     "survival": {
       "Package": "survival",
-      "Version": "3.5-3",
+      "Version": "3.5-5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "aea2b8787db7088ba50ba389848569ee",
+      "Hash": "d683341b1fa2e8d817efde27d6e6d35b",
       "Requirements": [
         "Matrix"
       ]
