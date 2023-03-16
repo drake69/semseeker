@@ -34,7 +34,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
       beta_value <- summary(model)$tTable[2,"Value"]
       ci.lower <- summary(model)$tTable[2,"lower bound"]
       ci.upper <- summary(model)$tTable[2,"upper bound"]
-      r_model <- "lqmm::lqm"
+      r_model <- "lqmm_lqm"
     }
     else
     {
@@ -55,7 +55,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
         pvalue <- max(unlist(t(results)[,"pval"]))
       }
       beta_value <- mean(unlist(t(results)[,"beta"]))
-      r_model <- "quantreg::rq"
+      r_model <- "quantreg_rq"
     }
   }
   if(length(quantreg_params)==5)
@@ -101,10 +101,10 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     ci.lower <- boot.bca[1]
     ci.upper <- boot.bca[2]
     pvalue <- boot.bca[3]
-    r_model <- "lqmm::lqm"
+    r_model <- "lqmm_lqm"
   }
 
-  if(length(quantreg_params==6))
+  if(length(quantreg_params)==6)
   {
     tau <- as.numeric(quantreg_params[2])
     n_permutations_test <- as.numeric(quantreg_params[3])
@@ -139,7 +139,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
       ci.upper <- boot.bca[2]
       pvalue <- boot.bca[3]
     }
-    r_model <- "lqmm::lqm"
+    r_model <- "lqmm_lqm"
   }
 
   aic_value <- NA
