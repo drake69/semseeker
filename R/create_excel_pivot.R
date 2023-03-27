@@ -15,7 +15,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
   final_bed[,"KEY"] <- as.factor(final_bed[,"KEY"])
   final_bed[,"FIGURE"] <- as.factor(final_bed[,"FIGURE"])
   final_bed[,"POPULATION"] <- as.factor(final_bed[,"POPULATION"])
-  final_bed[,"VALUE"] <- as.numeric(final_bed[,"POPULATION"])
+  final_bed[,"VALUE"] <- as.numeric(final_bed[,"VALUE"])
 
   numberOfCase <- length(unique(subset(final_bed, final_bed$POPULATION == "Case" )$SAMPLEID))
   numberOfControl <- length(unique(subset(final_bed, final_bed$POPULATION == "Control" )$SAMPLEID))
@@ -42,13 +42,13 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
     # for(k in 1:nrow(envir$keys))
     {
       # k <- 1
-      grp <- envir$keys[k,"groups"]
-      anomaly <- envir$keys[k,"anomalies"]
+      grp <- as.character(envir$keys[k,"groups"])
+      anomaly <- as.character(envir$keys[k,"anomalies"])
       pivot_file_name <- envir$keys$future_shee_list[k]
       temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
       if(!plyr::empty(temp))
       {
-        anomaly <- envir$keys[k,"anomalies"]
+        anomaly <- as.character(envir$keys[k,"anomalies"])
         tempAnomaly <- subset(temp, temp$ANOMALY == as.character(anomaly))
         if(!plyr::empty(tempAnomaly))
         {
@@ -57,9 +57,11 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
           if(!plyr::empty(tempDataFrame))
           {
             if(anomaly=="DELTAS")
-              tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
-                                               fun.aggregate = sum, drop = TRUE)
-            else
+              browser()
+            # if(anomaly=="DELTAS")
+            #   tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
+            #                                    fun.aggregate = sum, drop = TRUE)
+            # else
               tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
                                                fun.aggregate = sum, drop = TRUE)
 

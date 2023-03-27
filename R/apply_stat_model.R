@@ -64,6 +64,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       ci.upper <- model_result$ci.upper
       r_model <- model_result$r_model
       std.error <- model_result$std.error
+      n_permutations <- model_result$n_permutations
 
       if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" &
          family_test!="kendall" & !grepl("quantreg", family_test)
@@ -85,7 +86,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("model_result")) (sum(model_result$residuals))  else NA,
-          "FAMILY" = family,
+          "FAMILY" = family_test,
           "R.PACK" = r_model,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
@@ -125,7 +126,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("model_result")) (sum(model_result$residuals))  else NA,
-          "FAMILY" = family,
+          "FAMILY" = family_test,
           "R.PACK" = r_model,
           "transformation" = transformation,
           "COVARIATES" = paste0(covariates,collapse=" "),
@@ -140,7 +141,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "COUNT.CONTROL"=length(dependentVariableData),
           "MEAN.CONTROL"=(mean(dependentVariableData)),
           "SD.CONTROL"= (stats::sd(dependentVariableData)),
-          "RHO"= if(r_model=="stats_:cor.test")  (model_result$estimate) else NA,
+          "RHO"= if(r_model=="stats_cor.test")  (model_result$estimate) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
           "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
@@ -171,7 +172,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       #   "STD.ERROR" = NA,
       #   "AIC" = NA,
       #   "RESIDUALS.SUM" = NA,
-      # "FAMILY" = family,
+      # "FAMILY" = family_test,
       # "R.PACK" = r_model,
       #   "transformation" = transformation,
       #   "COVARIATES" = paste0(covariates,collapse=" "),

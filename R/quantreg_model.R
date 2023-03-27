@@ -19,6 +19,7 @@ compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
 
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
 {
+  n_permutations <- NA
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
   # quantreg_params template quantreg + quantile + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta
@@ -146,6 +147,6 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   residuals <- NA
   shapiro_pvalue <- NA
 
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error ))
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations ))
 
 }
