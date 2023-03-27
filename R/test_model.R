@@ -29,6 +29,8 @@ test_model <- function (family_test, tempDataFrame, sig.formula )
   residuals <- NA
   shapiro_pvalue <- NA
   std.error <- NA
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error ))
+  n_permutations <- NA
+
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations ))
 
 }

@@ -138,7 +138,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
         result_folderPivot <- dir_check_and_create(envir$result_folderData,"Pivots")
 
-        file_result_prefix <- paste0( depth_analysis,"_", as.character(independent_variable),"_",sep = "")
+        file_result_prefix <- paste0(envir$keys_anomalies[,1], depth_analysis, as.character(independent_variable),sep = "_")
 
         study_summary <- subset(study_summary, study_summary$Sample_Group !=  "Reference")
         #########################################################################################################
