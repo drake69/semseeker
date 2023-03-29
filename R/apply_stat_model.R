@@ -22,7 +22,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   boot_success <- if(is.null(arguments[["boot_success"]])) 0 else arguments$boot_success
   tests_count <- if(is.null(arguments[["tests_count"]])) 1 else arguments$tests_count
-  tempDataFrame <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
+  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis, envir)
+  tempDataFrame <- prepared_data$tempDataFrame
+  independent_variable1stLevel <- prepared_data$independent_variable1stLevel
+  independent_variable2ndLevel <- prepared_data$independent_variable2ndLevel
 
   Breusch_Pagan_pvalue <- NA
   cols <- colnames(tempDataFrame)
@@ -49,7 +52,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         model_result <- glm_model(family_test, tempDataFrame, sig.formula )
 
       if(family_test=="wilcoxon" | family_test=="t.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
-        model_result <- test_model(family_test, tempDataFrame, sig.formula )
+        model_result <- test_model(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 
       if (grepl("quantreg", family_test))
         model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
@@ -62,6 +65,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       shapiro_pvalue <- model_result$shapiro_pvalue
       ci.lower <- model_result$ci.lower
       ci.upper <- model_result$ci.upper
+      ci.upper.adjusted <- model_result$ci.upper.adjusted
+      ci.lower.adjusted <- model_result$ci.lower.adjusted
       r_model <- model_result$r_model
       std.error <- model_result$std.error
       n_permutations <- model_result$n_permutations

@@ -1,4 +1,16 @@
-test_model <- function (family_test, tempDataFrame, sig.formula )
+#' Title
+#'
+#' @param family_test
+#' @param tempDataFrame
+#' @param sig.formula
+#' @param burdenValue
+#' @param independent_variable
+#'
+#' @return
+#' @export
+#'
+#' @examples
+test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 {
   if(family_test=="wilcoxon")
   {
@@ -30,7 +42,9 @@ test_model <- function (family_test, tempDataFrame, sig.formula )
   shapiro_pvalue <- NA
   std.error <- NA
   n_permutations <- NA
+  ci.lower.adjusted <- NA
+  ci.upper.adjusted <- NA
 
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations ))
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
 
 }
