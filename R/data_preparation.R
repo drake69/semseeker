@@ -1,4 +1,20 @@
-data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
+#' Title
+#'
+#' @param family_test
+#' @param transformation
+#' @param tempDataFrame
+#' @param independent_variable
+#' @param g_start
+#' @param dototal
+#' @param covariates
+#' @param depth_analysis
+#' @param envir
+#'
+#' @return
+#' @export
+#'
+#' @examples
+data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis, envir)
 {
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame
@@ -125,5 +141,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   #  we want to preserve the NA in the indipendent variables to be removed by the models
   tempDataFrame[apply(tempDataFrame,2,is.nan)] <- 0
 
-  return (tempDataFrame)
+  result <- list(tempDataFrame, independent_variable1stLevel, independent_variable2ndLevel)
+  names(result) <- c("tempDataFrame", "independent_variable1stLevel","independent_variable2ndLevel")
+  return (result)
 }

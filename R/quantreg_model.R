@@ -1,3 +1,14 @@
+#' Title
+#'
+#' @param sig.formula
+#' @param df
+#' @param tau
+#' @param lqm_control
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
 {
   cols <- colnames(df)
@@ -9,6 +20,16 @@ compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
   return(beta_value)
 }
 
+#' Title
+#'
+#' @param sig.formula
+#' @param tau
+#' @param localDataFrame
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
   fit <- quantreg::rq(formula =  sig.formula,data = as.data.frame(localDataFrame),  tau = tau)
   coef <-as.data.frame(summary(fit, se = "boot")$coefficients)[2,"Value"]
@@ -17,6 +38,19 @@ compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
 }
 
 
+#' Title
+#'
+#' @param family_test
+#' @param sig.formula
+#' @param tempDataFrame
+#' @param independent_variable
+#' @param boot_success
+#' @param tests_count
+#'
+#' @return
+#' @export
+#'
+#' @examples
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
 {
   n_permutations <- NA
@@ -147,6 +181,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   residuals <- NA
   shapiro_pvalue <- NA
 
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations ))
+
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
 
 }

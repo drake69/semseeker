@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param family_test
+#' @param tempDataFrame
+#' @param sig.formula
+#'
+#' @return
+#' @export
+#'
+#' @examples
 glm_model <- function(family_test, tempDataFrame, sig.formula )
 {
 
@@ -15,5 +25,8 @@ glm_model <- function(family_test, tempDataFrame, sig.formula )
   r_model <- "stats::glm"
   std.error <- "NA"
   n_permutations <- NA
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error, n_permutations ))
+  ci.lower.adjusted <- NA
+  ci.upper.adjusted <- NA
+
+  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error, n_permutations,ci.lower.adjusted,ci.upper.adjusted ))
 }

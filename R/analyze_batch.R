@@ -20,12 +20,13 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   if(nrow(methylation_data) == 866562)
     message("INFO:seems an EPIC dataset.")
 
-  PROBES <- PROBES[(PROBES$PROBE %in% rownames(methylation_data)),]
-  methylation_data <- methylation_data[rownames(methylation_data) %in% PROBES$PROBE, ]
+  probes <- get("PROBES")
+  probes <- probes[(probes$PROBE %in% rownames(methylation_data)),]
+  methylation_data <- methylation_data[rownames(methylation_data) %in% probes$PROBE, ]
   methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
 
-  #PROBES <- sort_by_chr_and_start(PROBES)
-  if (!test_match_order(row.names(methylation_data), PROBES$PROBE)) {
+  # probes <- sort_by_chr_and_start(probes)
+  if (!test_match_order(row.names(methylation_data), probes$PROBE)) {
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
 
@@ -98,7 +99,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
         sample_sheet = populationSampleSheet,
         beta_medians = populationControlRangeBetaValues$beta_median_values,
         bonferroni_threshold = bonferroni_threshold,
-        probe_features = PROBES
+        probe_features = probes
       )
 
       resultPopulation <- as.data.frame(resultPopulation)

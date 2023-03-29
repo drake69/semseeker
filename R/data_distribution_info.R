@@ -19,5 +19,5 @@ data_distribution_info <- function(family_test, tempDataFrame, burdenValue, inde
   if(family_test_missed)
     stop("data_distribution_info: familyt test is missed")
 
-  return(bartlett_pvalue)
+  return(bartlett_pvalue$p.value)
 }
