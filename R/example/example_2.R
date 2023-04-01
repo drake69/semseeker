@@ -1,11 +1,11 @@
 install.packages("devtools")
-library("devtools")
+require("devtools")
 install_github("drake69/semseeker")
-library("semseeker")
+require("semseeker")
 packageVersion('semseeker')
 
 devtools::install_github("hrbrmstr/dtupdate")
-library(dtupdate)
+require(dtupdate)
 github_update()
 
 workingFolder <- file.path("~/Downloads/GSE139307")
@@ -25,7 +25,7 @@ write.table(
   quote = FALSE
 )
 
-library(ChAMP)
+require(ChAMP)
 idat_folder <- workingFolder
 result_folder = file.path( workingFolder,"/result/")
 

@@ -36,7 +36,7 @@ test_that("create_excel_pivot", {
                           bonferroni_threshold = 0.01,
                           probe_features = probe_features
   )
-  sp$Sample_Group <- sample_sheet$Sample_Group
+
 
   create_multiple_bed(envir, sample_sheet = sample_sheet)
 
@@ -74,16 +74,18 @@ test_that("create_excel_pivot", {
   expect_true(file.exists(file.path(envir$result_folderData,"Pivots/GENE.xlsx")))
 
   subGroups <- c("")
-  probes_prefix = "PROBES_CHR_"
-  mainGroupLabel =  "CHR"
-  subGroupLabel="GROUP"
-  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-
-  subGroups <- c("")
   probes_prefix = "PROBES"
   mainGroupLabel =  "PROBE"
   subGroupLabel="GROUP"
   create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  expect_true(file.exists(file.path(envir$result_folderData,"Pivots/PROBE.xlsx")))
+
+  subGroups <- c("")
+  probes_prefix = "PROBES_CHR_"
+  mainGroupLabel =  "CHR"
+  subGroupLabel="GROUP"
+  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  expect_true(file.exists(file.path(envir$result_folderData,"Pivots/CHR.xlsx")))
 
   #TODO: test incremental pivot
 

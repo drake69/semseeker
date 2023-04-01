@@ -17,6 +17,9 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
     pvalue <- result_w$p.value
     r_model <- "stats_wilcox.test"
+    dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
+    SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
+    beta_value <- median(SPLIT[[1]]) - median(SPLIT[[2]])
   }
 
   if(family_test=="t.test")
@@ -24,6 +27,9 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_w  <-stats::t.test(formula= sig.formula, data = as.data.frame(tempDataFrame))
     pvalue <- result_w$p.value
     r_model <- "stats_t.test"
+    dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
+    SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
+    beta_value <- mean(SPLIT[[1]]) - mean(SPLIT[[2]])
   }
 
   if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
@@ -36,7 +42,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
 
   ci.lower <- NA
   ci.upper <- NA
-  beta_value <- NA
   aic_value <- NA
   residuals <- NA
   shapiro_pvalue <- NA
