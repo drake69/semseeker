@@ -109,7 +109,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
       beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
-      std.error <- summary(model.x.boot)$tTable[2,"Std. Error"]
+      std.error <- summary(model.x.boot)[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])
@@ -126,7 +126,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations))
       beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
-      std.error <- summary(model.x.boot)$tTable[2,"Std. Error"]
+      std.error <- summary(model.x.boot)[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])

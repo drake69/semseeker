@@ -68,7 +68,7 @@ annotate_bed <- function (
       grp <- envir$keysLocal[i,"GROUP"]
 
       if(probes_prefix=="PROBES")
-        probes_prefix <- "PROBE_CHR_CHR"
+        probes_prefix <- "PROBES_CHR_CHR"
 
       probes <- get(paste0(probes_prefix, grp,sep=""))
       resFolder <- dir_check_and_create(envir$result_folderData,pop)
