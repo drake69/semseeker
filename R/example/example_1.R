@@ -4,9 +4,10 @@
 # https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE186766
 
 install.packages("devtools")
-library("devtools")
+require("devtools")
 install_github("drake69/semseeker", force=TRUE)
-library("semseeker")
+require("semseeker")
+require(ChAMP)
 
 
 workingFolder <- file.path(getwd(),"/tmp/")
@@ -29,7 +30,6 @@ write.table(
   quote = FALSE
 )
 
-library(ChAMP)
 idat_folder <- workingFolder
 result_folder = file.path( workingFolder,"/result/")
 
