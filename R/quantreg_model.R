@@ -54,6 +54,9 @@ compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
 {
   n_permutations <- NA
+  ci.lower.adjusted <- NA
+  ci.upper.adjusted <- NA
+
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
   # quantreg_params template quantreg + quantile + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta
@@ -106,7 +109,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
       beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
-      std.error <- summary(model)$tTable[2,"Std. Error"]
+      std.error <- summary(model.x.boot)$tTable[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])
@@ -123,7 +126,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations))
       beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
-      std.error <- summary(model)$tTable[2,"Std. Error"]
+      std.error <- summary(model.x.boot)$tTable[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])

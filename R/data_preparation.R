@@ -19,6 +19,8 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame
 
+  independent_variable1stLevel <- NA
+  independent_variable2ndLevel <- NA
   if(is.factor(tempDataFrame[, independent_variable]))
   {
     independent_variable1stLevel <- levels(tempDataFrame[, independent_variable])[1]
@@ -138,7 +140,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   if(sum(lost_cols)!=0)
     utils::write.csv2(lostDataFrame, file.path(envir$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
 
-  #  we want to preserve the NA in the indipendent variables to be removed by the models
+  #  we want to preserve the NA in the independent variables to be removed by the models
   tempDataFrame[apply(tempDataFrame,2,is.nan)] <- 0
 
   result <- list(tempDataFrame, independent_variable1stLevel, independent_variable2ndLevel)
