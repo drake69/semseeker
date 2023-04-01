@@ -28,44 +28,53 @@ test_that("association_analysis", {
   mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
   mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
-    parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
   #todo: test incremental association analysis
+  inferenceFolder <- file.path(tempFolder,"Inference")
 
-  # inference_details <- expand.grid("independent_variable"= "Phenotest",
-  #                                  "covariates"=c("Covariates1+Covariates2"),
-  #                                  "family_test"=c("quantreg_0.5_1000_15000_0.9"),
-  #                                  "transformation"="scale",
-  #                                  "depth_analysis"=1,
-  #                                  "filter_p_value" = FALSE)
-  #
-  # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
-  #
-  # fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
-  # localFileRes <- read.table(fileToRead, sep=";")
-  # testthat::expect_true(nrow(localFileRes)>0)
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+                                   "covariates"=c("Covariates1+Covariates2"),
+                                   "family_test"=c("quantreg_0.5_1000_15000_0.9"),
+                                   "transformation"="scale",
+                                   "depth_analysis"=1,
+                                   "filter_p_value" = FALSE)
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
+
+  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
 
 
-  # inference_details <- expand.grid("independent_variable"= "Phenotest",
-  #                                  "covariates"=c("Phenotest+Covariates1+Covariates2"),
-  #                                  "family_test"=c("quantreg_0.5_1000_15000"),
-  #                                  "transformation"="scale",
-  #                                  "depth_analysis"=3,
-  #                                  "filter_p_value" = FALSE)
-  #
-  # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  inference_details <- expand.grid("independent_variable"= "Covariates1",
+                                   "covariates"=c("Phenotest+Covariates2"),
+                                   "family_test"=c("quantreg_0.5_1000_15000"),
+                                   "transformation"="scale",
+                                   "depth_analysis"=3,
+                                   "filter_p_value" = FALSE)
 
-  # inference_details <- expand.grid("independent_variable"= "Phenotest",
-  #                                  "covariates"=c("Covariates1+Covariates2"),
-  #                                  "family_test"=c("quantreg_0.5"),
-  #                                  "transformation"="scale",
-  #                                  "depth_analysis"=3,
-  #                                  "filter_p_value" = FALSE)
-  #
-  # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+
+  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+                                   "covariates"=c("Covariates1+Covariates2"),
+                                   "family_test"=c("quantreg_0.5"),
+                                   "transformation"="scale",
+                                   "depth_analysis"=3,
+                                   "filter_p_value" = FALSE)
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+
+  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates"=c("Covariates1+Covariates2"),
@@ -77,6 +86,10 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential",
     figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+
+  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
@@ -97,10 +110,12 @@ test_that("association_analysis", {
 
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
 
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="CHR")
-  inferenceFolder <- file.path(tempFolder,"Inference")
 
 
   #todo: test incremental association analysis
@@ -171,51 +186,52 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
-  # inference_details <- expand.grid("independent_variable"= "Phenotest",
-  #   "covariates" =c("Covariates1+Covariates2"),
-  #   "family_test"=c("gaussian"),
-  #   "transformation"="scale",
-  #   "depth_analysis"=1,
-  #   "filter_p_value" = FALSE)
-  #
-  #
-  # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
-  #
-  # fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
-  # localFileRes <- read.table(fileToRead, sep=";")
-  # testthat::expect_true(nrow(localFileRes)>0)
-  #
-  # inference_details <- expand.grid("independent_variable"= "Phenotest",
-  #   "covariates"=c("Covariates1+Covariates2"),
-  #   "family_test"=c("gaussian"),
-  #   "transformation"="scale",
-  #   "depth_analysis"=3,
-  #   "filter_p_value" = FALSE)
-  #
-  #
-  # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
-  #
-  # fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
-  # localFileRes <- read.table(fileToRead, sep=";")
-  # testthat::expect_true(nrow(localFileRes)>0)
-  #
-  #
-  #
-  # inference_details <- expand.grid("independent_variable"= "Phenotest",
-  #   "covariates"=c("Covariates1+Covariates2"),
-  #   "family_test"=c("gaussian"),
-  #   "transformation"="log10",
-  #   "depth_analysis"=2,
-  #   "filter_p_value" = FALSE)
-  #
-  #
-  # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", metaareas="GENE")
-  #
-  # fileToRead <- file_path_build(inferenceFolder, "2_Phenotest_log10_gaussian_Covariates1_Covariates2", extension = "csv")
-  # localFileRes <- read.table(fileToRead, sep=";")
-  # testthat::expect_true(nrow(localFileRes)>0)
-  #
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+    "covariates" =c("Covariates1+Covariates2"),
+    "family_test"=c("gaussian"),
+    "transformation"="scale",
+    "depth_analysis"=1,
+    "filter_p_value" = FALSE)
+
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
+
+  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+    "covariates"=c("Covariates1+Covariates2"),
+    "family_test"=c("gaussian"),
+    "transformation"="scale",
+    "depth_analysis"=3,
+    "filter_p_value" = FALSE)
+
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
+
+  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+
+
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+    "covariates"=c("Covariates1+Covariates2"),
+    "family_test"=c("gaussian"),
+    "transformation"="log10",
+    "depth_analysis"=2,
+    "filter_p_value" = FALSE)
+
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", metaareas="GENE")
+
+  fileToRead <- file_path_build(inferenceFolder, "2_Phenotest_log10_gaussian_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
   })
+
