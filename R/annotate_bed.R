@@ -67,6 +67,9 @@ annotate_bed <- function (
       fig <- envir$keysLocal[i,"FIGURE"]
       grp <- envir$keysLocal[i,"GROUP"]
 
+      if(probes_prefix=="PROBES")
+        probes_prefix <- "PROBE_CHR_CHR"
+
       probes <- get(paste0(probes_prefix, grp,sep=""))
       resFolder <- dir_check_and_create(envir$result_folderData,pop)
       tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,

@@ -28,7 +28,8 @@ test_that("association_analysis", {
   mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
   mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
+    parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
   #todo: test incremental association analysis
 
   # inference_details <- expand.grid("independent_variable"= "Phenotest",

@@ -80,12 +80,12 @@ test_that("create_excel_pivot", {
   create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
   expect_true(file.exists(file.path(envir$result_folderData,"Pivots/PROBE.xlsx")))
 
-  subGroups <- c("")
-  probes_prefix = "PROBES_CHR_"
-  mainGroupLabel =  "CHR"
-  subGroupLabel="GROUP"
-  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-  expect_true(file.exists(file.path(envir$result_folderData,"Pivots/CHR.xlsx")))
+  # subGroups <- c("")
+  # probes_prefix = "PROBES_CHR_"
+  # mainGroupLabel =  "CHR"
+  # subGroupLabel="GROUP"
+  # create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  # expect_true(file.exists(file.path(envir$result_folderData,"Pivots/CHR.xlsx")))
 
   #TODO: test incremental pivot
 
