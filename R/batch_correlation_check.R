@@ -9,10 +9,10 @@ batch_correlation_check <- function(envir) {
   chartFolder <- dir_check_and_create(envir$result_folderChart,"BATCH")
 
   to_export <- c("localKeys", "sample_sheet", "%dorng%", "g", "dir_check_and_create", "envir", "file_path_build",
-                 "batch_analysis_folder", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName", "getDoParName",
-                 "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion", ".getRNG", ".getRNGattribute", "hasRNG",
-                 "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-                 ".RNGkind_length", "tail", "RNGstr")
+    "batch_analysis_folder", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName", "getDoParName",
+    "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion", ".getRNG", ".getRNGattribute", "hasRNG",
+    "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
+    ".RNGkind_length", "tail", "RNGstr")
 
   # summary_cor <- foreach::foreach(i = 1:nrow(localKeys), .combine = rbind ) %dorng%
   for(i in 1:nrow(localKeys))
@@ -107,7 +107,7 @@ batch_correlation_check <- function(envir) {
     utils::write.csv2(pca_contrib,result_file,row.names = F)
 
     if(length(unique(t(unique(stats::na.omit(pca_contrib[,!(colnames(pca_contrib) %in% c("Batch_ID"))])))))==1
-       | plyr::empty(stats::na.omit(pca_contrib)))
+      | plyr::empty(stats::na.omit(pca_contrib)))
     {
       return()
     }
@@ -118,8 +118,8 @@ batch_correlation_check <- function(envir) {
     # print(filename)
     # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
     ggplot2::qplot("Dim.1", "Dim.2", data= as.data.frame(pca_contrib_to_plot),
-                   col = "Batch_ID", xlab="Dimension 1", ylab="Dimension 2",
-                   main = paste(key$ANOMALY, " ", key$FIGURE, sep="") ) + ggplot2::labs( colour= "Batch_ID") + ggplot2::theme(legend.position = "bottom")
+      col = "Batch_ID", xlab="Dimension 1", ylab="Dimension 2",
+      main = paste(key$ANOMALY, " ", key$FIGURE, sep="") ) + ggplot2::labs( colour= "Batch_ID") + ggplot2::theme(legend.position = "bottom")
     # grDevices::dev.off()
     ggplot2::ggsave(
       filename,

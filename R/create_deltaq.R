@@ -31,10 +31,11 @@ create_deltaq <- function(envir, resultPopulation){
     }
   }
 
-  if (plyr::empty(deltaq))
-      {
-       stop("Something wrong with multiple bed files!")
+  if (!exists("deltaq")| plyr::empty(deltaq))
+  {
+     stop("Something wrong with multiple bed files!")
   }
+
   deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=4)) * 2
 
   localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),

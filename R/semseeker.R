@@ -178,8 +178,8 @@ semseeker <- function(sample_sheet,
   # geneontology_analysis_webgestalt(envir$result_folderData = envir$result_folderData, fileName = fileName)
   # euristic_analysis_webgestalt(envir$result_folderData = envir$result_folderData)
 
-  if(length(methylation_data)>1)
-    batch_correlation_check(envir)
+  # if(length(methylation_data)>1)
+  #   batch_correlation_check(envir)
 
   message("Job Completed !")
 

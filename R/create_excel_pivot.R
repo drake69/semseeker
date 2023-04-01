@@ -56,14 +56,14 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
           tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
           if(!plyr::empty(tempDataFrame))
           {
-            if(anomaly=="DELTAS")
-              browser()
+            # if(anomaly=="DELTAS")
+            #   browser()
             # if(anomaly=="DELTAS")
             #   tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
             #                                    fun.aggregate = sum, drop = TRUE)
             # else
-              tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
-                                               fun.aggregate = sum, drop = TRUE)
+            tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
+                                             fun.aggregate = sum, drop = TRUE)
 
             pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
             fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
