@@ -16,7 +16,7 @@ glm_model <- function(family_test, tempDataFrame, sig.formula )
   pvalue <- summary(result_glm )$coeff[-1, 4][1]
   beta_value <- (summary(result_glm )$coeff[-1, 1][1])
   aic_value <- (result_glm$aic)
-  residuals <-  result_glm$resid
+  residuals <-  sum(result_glm$resid)
   #calculate shapiro of working residuals
   shapiro_pvalue <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
   # Breusch_Pagan_pvalue <- lmtest::bptest( data=residuals )$p.value

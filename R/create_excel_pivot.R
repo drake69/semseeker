@@ -5,7 +5,7 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
                               groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel, groupingColumnLabel = subGroupLabel)
   i <- 0
   k <- 0
-  if (is.null(final_bed))
+  if (is.null(final_bed) | plyr::empty(final_bed) | nrow(final_bed)==0)
     return()
 
   reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
