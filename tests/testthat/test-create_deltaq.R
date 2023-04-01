@@ -5,7 +5,7 @@ test_that("semeeker", {
   envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
   nitem <- 1e3
-  nsamples <- 20
+  nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
@@ -26,7 +26,7 @@ test_that("semeeker", {
 
   Sample_ID <- stri_rand_strings(nsamples, 15, pattern = "[A-Za-z]")
   colnames(methylation_data) <- Sample_ID
-  Sample_Group <- rep("Control",nsamples)
+  Sample_Group <- c(rep("Control",nsamples/3),rep("Case",nsamples/3),rep("Reference",nsamples/3))
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
   beta_medians <- beta_superior_thresholds + beta_inferior_thresholds / 2
   sliding_window_size <- 11
@@ -44,9 +44,9 @@ test_that("semeeker", {
                            probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet)
 
-  resiltPopulation <- create_deltaq(envir, sp)
+  create_multiple_bed(envir, sample_sheet)
+  resiltPopulation <- create_deltaq(envir, sample_sheet)
 
   # test deltaq creation
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAQ_BOTH")
