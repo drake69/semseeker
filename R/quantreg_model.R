@@ -56,6 +56,14 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   n_permutations <- NA
   ci.lower.adjusted <- NA
   ci.upper.adjusted <- NA
+  ci.lower <- NA
+  ci.upper <- NA
+  aic_value <- NA
+  residuals <- NA
+  shapiro_pvalue <- NA
+  std.error <- NA
+  beta_value <- NA
+  pvalue <- NA
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
@@ -180,9 +188,6 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     r_model <- "lqmm_lqm"
   }
 
-  aic_value <- NA
-  residuals <- NA
-  shapiro_pvalue <- NA
 
 
   return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
