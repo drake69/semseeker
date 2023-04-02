@@ -1,7 +1,8 @@
 test_that("semeeker", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/", stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  tmp <- tempdir()
+  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   envir <- init_env(tempFolder, parallel_strategy = "sequential")
 
   nitem <- 1e3
