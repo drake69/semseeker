@@ -7,7 +7,11 @@
 compute_qr_beta_boot_p(sig.formula, tau, localDataFrame)
 }
 \arguments{
-\item{localDataFrame}{}
+\item{sig.formula}{formula to use for regression application}
+
+\item{tau}{tau to apply the quantile regression}
+
+\item{localDataFrame}{dataframe to apply th regression model}
 }
 \description{
 Title

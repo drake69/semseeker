@@ -17,7 +17,23 @@ data_preparation(
 )
 }
 \arguments{
-\item{envir}{}
+\item{family_test}{test or regression to apply}
+
+\item{transformation}{transformation to apply to data}
+
+\item{tempDataFrame}{data frame to use for test/regression}
+
+\item{independent_variable}{regressor}
+
+\item{g_start}{starting column of the dataframe}
+
+\item{dototal}{boolean to calculate the total burden test/regression}
+
+\item{covariates}{vector of covariates to be found in the sample sheet}
+
+\item{depth_analysis}{1 only sample, 2 chr, 3 alle genomic areas}
+
+\item{envir}{environment infos}
 }
 \description{
 Title

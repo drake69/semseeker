@@ -2,13 +2,7 @@
 
 export(association_analysis)
 export(build_data_set_from_geo)
-export(compute_qr_beta_boot_p)
-export(compute_quantreg_beta_boot_np)
-export(data_preparation)
-export(glm_model)
-export(quantreg_model)
 export(semseeker)
-export(test_model)
 importFrom(doRNG,"%dorng%")
 importFrom(dplyr,"%>%")
 importFrom(foreach,"%dopar%")

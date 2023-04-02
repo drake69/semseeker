@@ -13,7 +13,15 @@ test_model(
 )
 }
 \arguments{
-\item{independent_variable}{}
+\item{family_test}{which family test to apply}
+
+\item{tempDataFrame}{data frame to use with the test}
+
+\item{sig.formula}{formula to apply}
+
+\item{burdenValue}{burden colon name}
+
+\item{independent_variable}{independent variable for regressor}
 }
 \description{
 Title

@@ -1,12 +1,11 @@
 #' Title
 #'
-#' @param sig.formula
-#' @param df
-#' @param tau
-#' @param lqm_control
+#' @param sig.formula formula to apply
+#' @param df dataframe to use
+#' @param tau tau at which apply the wuantile regression
+#' @param lqm_control specification of the lqmm package
 #'
 #' @return
-#' @export
 #'
 #' @examples
 compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
@@ -22,12 +21,11 @@ compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
 
 #' Title
 #'
-#' @param sig.formula
-#' @param tau
-#' @param localDataFrame
+#' @param sig.formula formula to use for regression application
+#' @param tau tau to apply the quantile regression
+#' @param localDataFrame dataframe to apply th regression model
 #'
 #' @return
-#' @export
 #'
 #' @examples
 compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
@@ -40,15 +38,14 @@ compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
 
 #' Title
 #'
-#' @param family_test
-#' @param sig.formula
-#' @param tempDataFrame
-#' @param independent_variable
-#' @param boot_success
-#' @param tests_count
+#' @param family_test family lqmm, quantreg
+#' @param sig.formula formula of the model
+#' @param tempDataFrame data
+#' @param independent_variable name of regressor
+#' @param boot_success number of success tests to calculate corrected confidence interval
+#' @param tests_count count of total executed tests
 #'
 #' @return
-#' @export
 #'
 #' @examples
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)

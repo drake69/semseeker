@@ -1,11 +1,10 @@
 #' Title
 #'
-#' @param family_test
-#' @param tempDataFrame
-#' @param sig.formula
+#' @param family_test regression model to apply
+#' @param tempDataFrame data frame to use for the model
+#' @param sig.formula formula to apply the model
 #'
 #' @return
-#' @export
 #'
 #' @examples
 glm_model <- function(family_test, tempDataFrame, sig.formula )
