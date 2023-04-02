@@ -1,7 +1,8 @@
 test_that("annotate_bed", {
 
   library(stringi)
-  tempFolder <- paste("/tmp/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  tmp <- tempdir()
+  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
   figures <- c( "BOTH")
   anomalies <- c("DELTAS","DELTAQ")
