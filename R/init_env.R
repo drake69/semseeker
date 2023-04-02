@@ -8,6 +8,9 @@
 #' @return the working environment
 init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession", ...)
 {
+
+  utils::data("PROBES")
+  utils::data("PROBES_CHR_CHR")
   set.seed(7658776)
 
   #allow export of object of 8gb with future

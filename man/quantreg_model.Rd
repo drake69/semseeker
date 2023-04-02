@@ -14,7 +14,17 @@ quantreg_model(
 )
 }
 \arguments{
-\item{tests_count}{}
+\item{family_test}{family lqmm, quantreg}
+
+\item{sig.formula}{formula of the model}
+
+\item{tempDataFrame}{data}
+
+\item{independent_variable}{name of regressor}
+
+\item{boot_success}{number of success tests to calculate corrected confidence interval}
+
+\item{tests_count}{count of total executed tests}
 }
 \description{
 Title

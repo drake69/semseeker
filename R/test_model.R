@@ -1,13 +1,12 @@
 #' Title
 #'
-#' @param family_test
-#' @param tempDataFrame
-#' @param sig.formula
-#' @param burdenValue
-#' @param independent_variable
+#' @param family_test which family test to apply
+#' @param tempDataFrame data frame to use with the test
+#' @param sig.formula formula to apply
+#' @param burdenValue burden colon name
+#' @param independent_variable independent variable for regressor
 #'
 #' @return
-#' @export
 #'
 #' @examples
 test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
@@ -19,7 +18,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     r_model <- "stats_wilcox.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
-    beta_value <- median(SPLIT[[1]]) - median(SPLIT[[2]])
+    beta_value <- stats::median(SPLIT[[1]]) - stats::median(SPLIT[[2]])
   }
 
   if(family_test=="t.test")

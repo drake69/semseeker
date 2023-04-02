@@ -7,7 +7,11 @@
 glm_model(family_test, tempDataFrame, sig.formula)
 }
 \arguments{
-\item{sig.formula}{}
+\item{family_test}{regression model to apply}
+
+\item{tempDataFrame}{data frame to use for the model}
+
+\item{sig.formula}{formula to apply the model}
 }
 \description{
 Title

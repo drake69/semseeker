@@ -1,17 +1,16 @@
 #' Title
 #'
-#' @param family_test
-#' @param transformation
-#' @param tempDataFrame
-#' @param independent_variable
-#' @param g_start
-#' @param dototal
-#' @param covariates
-#' @param depth_analysis
-#' @param envir
+#' @param family_test test or regression to apply
+#' @param transformation transformation to apply to data
+#' @param tempDataFrame data frame to use for test/regression
+#' @param independent_variable regressor
+#' @param g_start starting column of the dataframe
+#' @param dototal boolean to calculate the total burden test/regression
+#' @param covariates vector of covariates to be found in the sample sheet
+#' @param depth_analysis 1 only sample, 2 chr, 3 alle genomic areas
+#' @param envir environment infos
 #'
 #' @return
-#' @export
 #'
 #' @examples
 data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis, envir)

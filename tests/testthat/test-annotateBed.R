@@ -9,7 +9,7 @@ test_that("annotate_bed", {
 
   envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  nitem <- 1e3
+  nitem <- 1e5
   nsamples <- 5
 
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
@@ -130,7 +130,7 @@ test_that("annotate_bed", {
 
   # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
-  
+
   groups <- c("")
   probes_prefix = "PROBES"
   columnLabel =  "PROBE"

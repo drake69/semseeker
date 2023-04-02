@@ -7,7 +7,13 @@
 compute_quantreg_beta_boot_np(sig.formula, df, tau, lqm_control)
 }
 \arguments{
-\item{lqm_control}{}
+\item{sig.formula}{formula to apply}
+
+\item{df}{dataframe to use}
+
+\item{tau}{tau at which apply the wuantile regression}
+
+\item{lqm_control}{specification of the lqmm package}
 }
 \description{
 Title

@@ -24,6 +24,7 @@
 association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
 {
 
+
   j <- 0
   k <- 0
   z <- 0
@@ -429,4 +430,5 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   }
 
   future::plan( future::sequential)
+
 }
