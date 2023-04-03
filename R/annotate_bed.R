@@ -70,11 +70,13 @@ annotate_bed <- function (
       if(probes_prefix=="PROBES" | probes_prefix=="PROBES_CHR_")
       {
         probes <- semseeker::PROBES_CHR_CHR
-        }
+        message("loaded probes: PROBES_CHR_CHR")
+      }
       else
       {
         probes_name <- paste0(probes_prefix, grp,sep="")
-        probes <- get(probes_name)
+        probes <- get(probes_name, envir = asNamespace("semseeker"))
+        message("loaded probes:", probes_name)
       }
 
 
