@@ -1,12 +1,5 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-#
-# See https://github.com/r-lib/actions/tree/master/examples#readme for
-# additional example workflows available for the R community.
-
-name: R
+name: R workflow
+description: This is a workflow for building, installing dependencies, and testing an R package.
 
 on:
   push:
@@ -15,14 +8,16 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  jobs:
+    build:
+      contents: read
 
 jobs:
   build:
     runs-on: macos-latest
     strategy:
       matrix:
-        r-version: ['4.2.2']
+        r-version: ['4.2.3']
 
     steps:
       - uses: actions/checkout@v3
@@ -32,9 +27,7 @@ jobs:
           r-version: ${{ matrix.r-version }}
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "rcmdcheck"))
-          remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
+          Rscript -e 'install.packages(c("remotes", "rcmdcheck"))'
+          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
       - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+        run: Rscript -e 'rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")'

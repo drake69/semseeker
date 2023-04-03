@@ -1,0 +1,118 @@
+name: Package Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Setup R and dependencies
+        uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: '4.2.3'
+      - name: Install package dependencies
+        run: |
+          Rscript -e "install.packages('devtools')"
+          Rscript -e "devtools::install_deps(dependencies = TRUE)"
+      
+      - name: Build Windows Binary
+        run: |
+          Rscript -e "devtools::build_win()"
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Release Drafter
+        uses: release-drafter/release-drafter@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-path: .github/release-drafter.yaml
+
+  build_mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Setup R and dependencies
+        uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: '4.2.3'
+          
+      - name: Install package dependencies
+        run: |
+          Rscript -e "install.packages('devtools')"
+          Rscript -e "devtools::install_deps(dependencies = TRUE)"
+          
+      - name: Build Mac Binary
+        run: |
+          Rscript -e "devtools::build_mac()"
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Release Drafter
+        uses: release-drafter/release-drafter@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-path: .github/release-drafter.yaml
+
+  build_ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Setup R and dependencies
+        uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: '4.2.3'
+          
+      - name: Install package dependencies
+        run: |
+          Rscript -e "install.packages('devtools')"
+          Rscript -e "devtools::install_deps(dependencies = TRUE)"
+          
+      - name: Build Ubuntu Binary
+        run: |
+          R CMD build .
+          
+      - name: Check Ubuntu Binary
+        run: |
+          R CMD check *.tar.gz --as-cran
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Install Release Drafter
+        uses: release-drafter/release-drafter@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-path: .github/release-drafter.yaml
+
+  publish:
+    needs: [build_windows, build_mac, build_ubuntu]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Setup R and dependencies
+        uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: '4.2.3'
+      
+      - name: Install release package
+        run: |
+          Rscript -e "install.packages('devtools')"
+          Rscript -e "devtools::install_github('USERNAME/PACKAGE')"
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Publish Package
+        run: |
+          Rscript -e "devtools::release()"
+
