@@ -20,7 +20,7 @@ create_multiple_bed <- function(envir, sample_sheet){
     key <- localKeys[i,]
     tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
     temp_file <- tempdir()
-    # temp_file <- paste("/tmp/", stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),sep="")
+    temp_file <- paste(temp_file, stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),sep="")
     fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
     j <- 0
     for ( j in 1:nrow(sample_sheet))
