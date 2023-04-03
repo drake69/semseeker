@@ -50,7 +50,7 @@ test_that("read_multiple_bed", {
   groupingColumnLabel="GROUP"
   populationName <- unique(Sample_Group)
 
-  probe_features <- get(paste0(probes_prefix,"Whole",sep=""))
+  probe_features <- get(paste0(probes_prefix,"Whole",sep=""), envir = asNamespace("semseeker"))
 
 
   res <-read_multiple_bed (envir, "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)

@@ -67,12 +67,16 @@ annotate_bed <- function (
       fig <- envir$keysLocal[i,"FIGURE"]
       grp <- envir$keysLocal[i,"GROUP"]
 
-      if(probes_prefix=="PROBES")
-        probes_name <- "PROBES_CHR_CHR"
+      if(probes_prefix=="PROBES" | probes_prefix=="PROBES_CHR_")
+      {
+        probes <- semseeker::PROBES_CHR_CHR
+        }
       else
+      {
         probes_name <- paste0(probes_prefix, grp,sep="")
+        probes <- get(probes_name)
+      }
 
-      probes <- get(probes_name)
 
       resFolder <- dir_check_and_create(envir$result_folderData,pop)
       tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,

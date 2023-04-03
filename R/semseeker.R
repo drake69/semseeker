@@ -23,6 +23,11 @@ semseeker <- function(sample_sheet,
                       parallel_strategy ="multisession",
                       ... ) {
 
+  # cippa <- get("PROBES_Gene_TSS1500", envir = asNamespace("semseeker"))
+  # message("loaded TSS1500")
+  # cippa <- semseeker::PROBES_CHR_CHR
+  # message("cippa rows", nrow(cippa))
+
   envir <- init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
 
   # set digits to 22
