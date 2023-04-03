@@ -38,7 +38,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
                   "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue")
 
   # message("Starting foreach withh: ", iters, " items")
-  message(Sys.time()," I'll perform:",iters," tests." )
+  message("INFO: ", Sys.time(), " I'll perform:",iters," tests." )
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
   # for(g in g_start:iters)
   {
@@ -202,7 +202,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     }
   }
 
-  message(Sys.time()," I performed:",iters," tests." )
+  message("INFO: ", Sys.time(), " I performed:",iters," tests." )
 
   if(exists("result_temp"))
   {

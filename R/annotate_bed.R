@@ -32,7 +32,7 @@ annotate_bed <- function (
     if(file.info(bedFileName)$size < 10)
     {
       final_bed <- NULL
-      message("Given up file:", final_bed, " is empty!")
+      message("WARNING: ", Sys.time(), " Given up file:", final_bed, " is empty!")
     }
     else
     {
@@ -70,13 +70,13 @@ annotate_bed <- function (
       if(probes_prefix=="PROBES" | probes_prefix=="PROBES_CHR_")
       {
         probes <- semseeker::PROBES_CHR_CHR
-        message("loaded probes: PROBES_CHR_CHR")
+        # message("DEBUG: loaded probes: PROBES_CHR_CHR")
       }
       else
       {
         probes_name <- paste0(probes_prefix, grp,sep="")
         probes <- get(probes_name, envir = asNamespace("semseeker"))
-        message("loaded probes:", probes_name)
+        # message("DEBUG: loaded probes:", probes_name)
       }
 
 

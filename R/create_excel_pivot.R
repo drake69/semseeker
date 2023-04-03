@@ -99,14 +99,14 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
           asTable = TRUE,
           overwrite = TRUE
         )
-        message("Saved spreadsheet file:", fileNameXLS)
+        message("INFO: ", Sys.time(), " Saved spreadsheet file:", fileNameXLS)
       }
     )
   }
   else
   {
     if(!exists("old_sheet_list"))
-      message("No pivot tables to save.")
+      message("INFO: ", Sys.time(), " No pivot tables to save.")
   }
 
 }

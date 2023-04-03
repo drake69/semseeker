@@ -49,7 +49,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
       test_it <- list(...)
     },
     error = function(cond)  {
-      message ("Function's arguments must be passed explicitily !")
+      message ("ERROR: ", Sys.time(), " Function's arguments must be passed explicitily !")
       message(cond)
       stop()
     }
@@ -60,16 +60,16 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(parallel_strategy=="multisession")
   {
     future::plan( future::multisession, workers = nCore)
-    message("I will work in multisession with:", nCore, " Cores")
+    message("INFO: ", Sys.time(), " I will work in multisession with:", nCore, " Cores")
   }
   if(parallel_strategy=="multicore")
   {
     future::plan( future::multicore, workers = nCore)
-    message("I will work in muticore with:", nCore," Cores")
+    message("INFO: ", Sys.time(), " I will work in muticore with:", nCore," Cores")
   }
   if(parallel_strategy=="cluster")
   {
-    message ("Cluster feature not implemented!")
+    message ("ERROR: ", Sys.time(), " Cluster feature not implemented!")
     stop()
     future::plan( future::cluster, workers = nCore)
   }
@@ -77,7 +77,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
      & parallel_strategy!="cluster")
   {
     future::plan( future::sequential)
-    message("I will work in sequential mode")
+    message("INFO: ", Sys.time(), " I will work in sequential mode")
   }
 
   ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
@@ -92,21 +92,21 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   if(sum(figures %in% ssEnv$keys_figures_default[,1])==0)
   {
-    message("The only allowed figures values are:", ssEnv$keys_figures_default)
+    message("INFO: ", Sys.time(), " The only allowed figures values are:", ssEnv$keys_figures_default)
     stop()
   }
   if(sum(anomalies %in% ssEnv$keys_anomalies_default[,1])==0)
   {
-    message("The only allowed anomalies values are:", ssEnv$keys_anomalies_default)
+    message("INFO: ", Sys.time(), " The only allowed anomalies values are:", ssEnv$keys_anomalies_default)
     stop()
   }
   if(sum(metaareas %in% ssEnv$keys_metaareas_default[,1])==0)
   {
-    message("The only allowed areas values are:", ssEnv$keys_metaareas_default)
+    message("INFO: ", Sys.time(), " The only allowed areas values are:", ssEnv$keys_metaareas_default)
     stop()
   }
 
-  message("I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
+  message("INFO: ", Sys.time(), " I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
 
   ssEnv$gene_subareas <- data.frame("subarea"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
   ssEnv$island_subareas <- data.frame("subarea"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))

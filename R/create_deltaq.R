@@ -60,7 +60,7 @@ create_deltaq <- function(envir, resultPopulation){
         tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
         fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)),  as.character(key$EXT))
         fst::write.fst( x= localFileRes, fileToWrite)
-        message(Sys.time(), " Created DELTAQ multiple annotated file!", fileToWrite)
+        message("INFO: ", Sys.time(), " Created DELTAQ multiple annotated file!", fileToWrite)
 
         tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",fun.aggregate = sum, drop = TRUE)
         colnames(tempDataFrame) <- c("SAMPLEID","VALUE")

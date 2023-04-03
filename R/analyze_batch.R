@@ -8,20 +8,20 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   methylation_data <- methDataTemp[, -c(1)]
 
   rm(methDataTemp)
-  message("INFO:working on batch:", batch_id)
-  message("INFO: I will work on:", nrow(methylation_data), " PROBES.")
+  message("INFO: ", Sys.time(), " working on batch:", batch_id)
+  message("INFO: ", Sys.time(), " I will work on:", nrow(methylation_data), " PROBES.")
 
   if(nrow(methylation_data) == 485512)
-    message("INFO:seems a 450k dataset.")
+    message("INFO: ", Sys.time(), " seems a 450k dataset.")
 
   if(nrow(methylation_data) == 27578)
-    message("INFO:seems a 27k dataset.")
+    message("INFO: ", Sys.time(), " seems a 27k dataset.")
 
   if(nrow(methylation_data) == 866562)
-    message("INFO:seems an EPIC dataset.")
+    message("INFO: ", Sys.time(), " seems an EPIC dataset.")
 
   probes <- semseeker::PROBES_CHR_CHR
-  message("loaded probes: PROBES_CHR_CHR")
+  message("DEBUG: ", Sys.time(), " loaded probes: PROBES_CHR_CHR")
   probes <- probes[(probes$PROBE %in% rownames(methylation_data)),]
   methylation_data <- methylation_data[rownames(methylation_data) %in% probes$PROBE, ]
   methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
@@ -59,8 +59,8 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
 
   if (plyr::empty(referencePopulationMatrix) ||
       ncol(referencePopulationMatrix) < 2) {
-    message("Empty methylation_data ", Sys.time())
-    stop("Empty methylation_data ")
+    message("ERROR: ", Sys.time(), " Empty methylation_data ", Sys.time())
+    stop("INFO: ", Sys.time(), " Empty methylation_data ")
   }
 
   populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
@@ -86,7 +86,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
     populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
 
     if (length(populationMatrixColumns)==0) {
-      message("WARNING: Population ",populationName, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
+      message("WARNING: ", Sys.time(), "  Population ",populationName, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
     }
     else
     {
@@ -135,7 +135,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(methylation_data)
 
-  message(Sys.time(), " Batch completed:", batch_id)
+  message("INFO: ", Sys.time(), "  Batch completed:", batch_id)
   return((sample_sheet))
 
 }
