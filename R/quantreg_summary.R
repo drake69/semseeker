@@ -2,11 +2,6 @@
 #'
 #' @param boot_vector vector of boot statistc beta regression
 #' @param estimate beta regression
-#' @param working_data data to regress
-#' @param sig.formula formula for model
-#' @param tau quantile to regress at
-#' @param independent_variable name of indenpendent variable
-#' @param lqm_control controls of lqmm packages
 #' @param conf.level confidence intervals alpha level
 #' @param boot_success number of success respecting the null hypothesis
 #' @param tests_count how many tests were done

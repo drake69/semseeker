@@ -7,7 +7,7 @@ Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
 Description: Stochastic epimutation and enriched region upstream and downstream tool for EWAS.
 License: AGPL-3
 Encoding: UTF-8
-URL: http://github.com/drake69/semseeker
+URL: https://github.com/drake69/semseeker
 BugReports: https://github.com/drake69/semseeker/issues
 Imports:
     coxed,
