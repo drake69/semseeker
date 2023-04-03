@@ -20,7 +20,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   if(nrow(methylation_data) == 866562)
     message("INFO:seems an EPIC dataset.")
 
-  probes <- get("PROBES")
+  probes <- get("PROBES_CHR_CHR")
   probes <- probes[(probes$PROBE %in% rownames(methylation_data)),]
   methylation_data <- methylation_data[rownames(methylation_data) %in% probes$PROBE, ]
   methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
