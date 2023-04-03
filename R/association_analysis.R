@@ -101,7 +101,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     family_test <- inference_detail$family_test
     if( is.null(family_test) || length(family_test)  ==  0)
     {
-      message("Warning: one test family_test is missed! Skipped.")
+      message("WARNING: ", Sys.time(), " One test family_test is missed! Skipped.")
     }
     else
     {
@@ -115,12 +115,12 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
       if(independent_variable %in% covariates)
       {
-        stop("The independent variable is also present as covariate!")
+        stop("ERROR: ", Sys.time(), " The independent variable is also present as covariate!")
       }
 
       if( is.null(independent_variable) || length(independent_variable)  ==  0)
       {
-        message("Warning: one indipendent variable is missed! Skipped.")
+        message("WARNING: ", Sys.time(), " One indipendent variable is missed! Skipped.")
       }
       else
       {
@@ -128,7 +128,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         if( is.null(depth_analysis) || length(depth_analysis)  ==  0)
         {
           depth_analysis <- 1
-          message("Warning: missed depth analysis inference forced to 1.")
+          message("WARNING: ", Sys.time(), " Missed depth analysis inference forced to 1.")
         }
 
         study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
@@ -147,7 +147,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
         if (!(independent_variable %in% colnames(study_summary)))
         {
-          message(" This indipendent variabile:", independent_variable, " is missed! Skipping")
+          message("WARNING: ", Sys.time(), " This indipendent variabile:", independent_variable, " is missed! Skipping")
         }
         else
         {
@@ -348,7 +348,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
                 if (file.exists(fname))
                 {
-                  message(Sys.time()," Starting to read pivot:", fname,".")
+                  message("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
                   tempDataFrame <- utils::read.csv(fname, sep  =  ";")
                   #assign the area name (eg gene...) to the rows
                   row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
@@ -363,7 +363,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   tt <- t(tt)
                   tt <- as.data.frame(tt)
                   tt$Sample_ID <- rownames(tt)
-                  message(Sys.time()," Read pivot:", fname, " with ", ncol(tt), " rows.")
+                  message("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tt), " rows.")
                   if(nrow(tt)>1)
                   {
                     tt <- subset(tt, "POPULATION"  !=   "Reference")

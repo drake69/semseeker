@@ -63,7 +63,7 @@ semseeker <- function(sample_sheet,
   batch_id <- 1
   for(batch_id in 1:length(sample_sheet))
   {
-    message("Working on batch:",batch_id)
+    message("INFO: ", Sys.time(), " Working on batch:",batch_id)
     sample_sheet_local <- sample_sheet[[batch_id]]
     methylation_data_local <- stats::na.omit(methylation_data[[batch_id]])
     methylation_data_local <- methylation_data_local[rownames(methylation_data_local)%in%probes_to_preserve,]
@@ -77,7 +77,7 @@ semseeker <- function(sample_sheet,
 
   sample_sheet <- sample_sheet_result
   utils::write.csv2(sample_sheet, file.path(envir$result_folderData , "sample_sheet_result.csv"), row.names = F)
-  message("Saving Sample Sheet with Results! ", Sys.time())
+  message("INFO: ", Sys.time(), " Saving Sample Sheet with Results! ", Sys.time())
 
 
   if(length(sample_sheet$Sample_Group=="Reference")>0)
@@ -186,7 +186,7 @@ semseeker <- function(sample_sheet,
   # if(length(methylation_data)>1)
   #   batch_correlation_check(envir)
 
-  message("Job Completed !")
+  message("INFO: ", Sys.time(), " Job Completed !")
 
   future::plan( future::sequential)
 }

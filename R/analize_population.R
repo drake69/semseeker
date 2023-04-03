@@ -38,11 +38,11 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   missed_samples <- setdiff(setdiff(sample_names, existent_samples), "PROBE")
 
   if (length(missed_samples) != 0) {
-    message("These samples data are missed: ", paste0(missed_samples, sep = " "), Sys.time())
+    message("INFO: ", Sys.time(), " These samples data are missed: ", paste0(missed_samples, sep = " "))
   }
 
-  message("WarmedUP AnalyzePopulation", Sys.time())
-  message("Start population analyze ", Sys.time())
+  message("INFO: ", Sys.time(), " WarmedUP AnalyzePopulation")
+  message("INFO: ", Sys.time(), " Start population analyze ")
 
 
   variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "envir", "sliding_window_size", "beta_superior_thresholds",
@@ -70,14 +70,14 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   colnames(summary_population) <- c("Sample_ID","DELTAS_HYPO","DELTAS_HYPER","DELTAS_BOTH","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO",
                                     "LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH")
   rownames(summary_population) <- summary_population$Sample_ID
-  message("Row count result:", nrow(summary_population))
+  message("INFO: ", Sys.time(), " Row count result:", nrow(summary_population))
   rm(methylation_data)
 
 
-  message("Completed population analysis ", Sys.time())
+  message("INFO: ", Sys.time(), " Completed population analysis ")
   end_time <- Sys.time()
   time_taken <- (end_time - start_time)
-  # message("Completed population with summary", Sys.time(), " Time taken: ", time_taken)
+  message("INFO: ", Sys.time(), " Completed population with summary - Time taken: ", time_taken)
 
   return(summary_population)
 }

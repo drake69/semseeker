@@ -1,7 +1,7 @@
 #' @importFrom doRNG %dorng%
 create_multiple_bed <- function(envir, sample_sheet){
 
-  message(Sys.time(), " Started multiple annotated file creation!")
+  message("INFO: ", Sys.time(), " Started multiple annotated file creation!")
 
   #create multiple file bed
   i <- 0
@@ -48,7 +48,7 @@ create_multiple_bed <- function(envir, sample_sheet){
 
         fst::write.fst(x = utils::read.table(temp_file, sep = "\t"),path = fileToWrite)
         file.remove(temp_file)
-        message(Sys.time(), " Created multiple annotated file!", fileToWrite)
+        message("INFO: ", Sys.time(), " Created multiple annotated file!", fileToWrite)
     }
     gc()
   }
