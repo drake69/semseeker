@@ -10,9 +10,6 @@
 #' @param depth_analysis 1 only sample, 2 chr, 3 alle genomic areas
 #' @param envir environment infos
 #'
-#' @return
-#'
-#' @examples
 data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis, envir)
 {
   transformation <- as.character(transformation)

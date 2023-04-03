@@ -6,9 +6,6 @@
 #' @param burdenValue burden colon name
 #' @param independent_variable independent variable for regressor
 #'
-#' @return
-#'
-#' @examples
 test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 {
   if(family_test=="wilcoxon")
