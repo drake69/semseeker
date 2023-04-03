@@ -22,16 +22,6 @@ quantreg_summary(
 \item{boot_success}{number of success respecting the null hypothesis}
 
 \item{tests_count}{how many tests were done}
-
-\item{working_data}{data to regress}
-
-\item{sig.formula}{formula for model}
-
-\item{tau}{quantile to regress at}
-
-\item{independent_variable}{name of indenpendent variable}
-
-\item{lqm_control}{controls of lqmm packages}
 }
 \value{
 ci and pvalue with BCA method

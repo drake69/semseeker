@@ -43,7 +43,7 @@ Suggests:
     stringi,
     testthat
 Depends: 
-    R (>= 4.2.1)
+    R (>= 4.2.3)
 LazyData: true
 LazyDataCompression: gzip
 SysDataCompression: bzip2
