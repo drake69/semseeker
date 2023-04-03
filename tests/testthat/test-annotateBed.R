@@ -52,6 +52,43 @@ test_that("annotate_bed", {
   figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("DELTAS")
 
+  groups <- c("")
+  probes_prefix = "PROBES"
+  columnLabel =  "PROBE"
+  groupingColumnLabel="GROUP"
+
+  # create and read
+  final_bed <- annotate_bed (
+    envir,
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
+  expect_true( nrow(final_bed)>0)
+
+  groups <- c("CHR")
+  probes_prefix = "PROBES_CHR_"
+  columnLabel =  "CHR"
+  groupingColumnLabel="GROUP"
+
+  # create and read
+  final_bed <- annotate_bed (
+    envir,
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
+  # expect_true( columnLabel %in% colnames(final_bed))
+  expect_true( nrow(final_bed)>0)
+
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
   columnLabel =  "GENE"
@@ -110,45 +147,10 @@ test_that("annotate_bed", {
   # parallel::stopCluster(computationCluster)
 
 
-  groups <- c("CHR")
-  probes_prefix = "PROBES_CHR_"
-  columnLabel =  "CHR"
-  groupingColumnLabel="GROUP"
-
-  # create and read
-  final_bed <- annotate_bed (
-    envir,
-    populations ,
-    figures ,
-    anomalies ,
-    groups ,
-    probes_prefix ,
-    columnLabel ,
-    groupingColumnLabel)
-
-  # expect_true( columnLabel %in% colnames(final_bed))
-  expect_true( nrow(final_bed)>0)
 
   # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
-  groups <- c("")
-  probes_prefix = "PROBES"
-  columnLabel =  "PROBE"
-  groupingColumnLabel="GROUP"
-
-  # create and read
-  final_bed <- annotate_bed (
-    envir,
-    populations ,
-    figures ,
-    anomalies ,
-    groups ,
-    probes_prefix ,
-    columnLabel ,
-    groupingColumnLabel)
-
-  expect_true( nrow(final_bed)>0)
   # expect_true( columnLabel %in% colnames(final_bed))
   # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
