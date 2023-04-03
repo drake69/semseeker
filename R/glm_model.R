@@ -4,9 +4,6 @@
 #' @param tempDataFrame data frame to use for the model
 #' @param sig.formula formula to apply the model
 #'
-#' @return
-#'
-#' @examples
 glm_model <- function(family_test, tempDataFrame, sig.formula )
 {
 

@@ -5,16 +5,15 @@
 #' @param tau tau at which apply the wuantile regression
 #' @param lqm_control specification of the lqmm package
 #'
-#' @return
-#'
-#' @examples
 compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
 {
   cols <- colnames(df)
   tempDataFrame <- Rfast::colShuffle(as.matrix(df))
   tempDataFrame <- as.data.frame(tempDataFrame)
   colnames(tempDataFrame) <- cols
-  model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
+  suppressMessages({
+    model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
+  })
   beta_value <- summary(model)$tTable[2,"Value"]
   return(beta_value)
 }
@@ -25,11 +24,10 @@ compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
 #' @param tau tau to apply the quantile regression
 #' @param localDataFrame dataframe to apply th regression model
 #'
-#' @return
-#'
-#' @examples
 compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
-  fit <- quantreg::rq(formula =  sig.formula,data = as.data.frame(localDataFrame),  tau = tau)
+  suppressMessages({
+    fit <- quantreg::rq(formula =  sig.formula,data = as.data.frame(localDataFrame),  tau = tau)
+  })
   coef <-as.data.frame(summary(fit, se = "boot")$coefficients)[2,"Value"]
   pval <- as.data.frame(summary(fit, se = "boot")$coefficients)[2, "Pr(>|t|)"]
   return(list(beta = coef, pval = pval))
@@ -45,9 +43,6 @@ compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
 #' @param boot_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-#' @return
-#'
-#' @examples
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
 {
   n_permutations <- NA
@@ -71,7 +66,9 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     if(length(quantreg_params)<4)
     {
       tau = as.numeric(quantreg_params[2])
-      model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
+      suppressMessages({
+        model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
+      })
       pvalue <- summary(model)$tTable[2,"Pr(>|t|)"]
       std.error <- summary(model)$tTable[2,"Std. Error"]
       beta_value <- summary(model)$tTable[2,"Value"]
@@ -109,7 +106,9 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     n_permutations <- as.numeric(quantreg_params[4])
     tau <- as.numeric(quantreg_params[2])
     conf.level <- as.numeric(quantreg_params[5])
-    model.x <-  suppressMessages(lqmm::lqm( formula = sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
+    suppressMessages({
+      model.x <-  suppressMessages(lqmm::lqm( formula = sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
+    })
     if(n_permutations > n_permutations_test)
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
@@ -154,8 +153,9 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     n_permutations <- as.numeric(quantreg_params[4])
     conf.level <- as.numeric(quantreg_params[5])
     parametric <- as.numeric(quantreg_params[6]=="p")
-
-    model <- lqmm::lqm(sig.formula, tau =tau, data = as.data.frame(tempDataFrame), na.action = stats::na.omit, control = lqm_control)
+    suppressMessages({
+      model <- lqmm::lqm(sig.formula, tau =tau, data = as.data.frame(tempDataFrame), na.action = stats::na.omit, control = lqm_control)
+    })
     beta_value <- summary(model)$tTable[2,"Value"]
     std.error <- summary(model)$tTable[2,"Std. Error"]
     ci.lower <- summary(model)$tTable[2,"lower bound"]
