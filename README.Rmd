@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -23,17 +25,16 @@ cat(
   badge_lifecycle("experimental"),
   badge_codecov("drake69/semseeker"),
   badge_last_commit("drake69/semseeker"),
-  badge_github_actions("drake69/semseeker")
+  badge_github_actions("drake69/semseeker"),
+  badge_repostatus("Active")
 )
-  # badge_repostatus("Active"),
-  # badge_codefactor("drake69/semseeker")
 ```
 
 The goal of semseeker is to find all methylation localized and enriched variants.
 
 ## Installation
 
-You can install semseeker using devtools, future relese will be
+You can install semseeker using devtools, future release will be
 available through CRAN.
 
 Install the latest release:
