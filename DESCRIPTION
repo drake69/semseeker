@@ -25,6 +25,7 @@ Imports:
     lqmm,
     openxlsx,
     plyr,
+    progressr,
     quantreg,
     readxl,
     reshape2,
@@ -47,4 +48,3 @@ Depends:
 LazyData: true
 LazyDataCompression: gzip
 SysDataCompression: bzip2
-

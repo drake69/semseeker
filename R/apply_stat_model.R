@@ -31,18 +31,23 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   cols <- colnames(tempDataFrame)
   iters <- length(cols)
   g <- 0
-  to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
-                 "independent_variable1stLevel", "independent_variable2ndLevel",
-                 "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count",
-                  "data_preparation","apply_stat_model_sig.formula","quantreg_model",
-                  "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue")
 
+  progress_bar <- progressr::progressor(along = g_start:iters)
+
+  to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
+    "independent_variable1stLevel", "independent_variable2ndLevel",
+    "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count",
+    "data_preparation","apply_stat_model_sig.formula","quantreg_model",
+    "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
+    "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_values","iqrTimes"
+    )
   # message("Starting foreach withh: ", iters, " items")
   message("INFO: ", Sys.time(), " I'll perform:",iters," tests." )
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
   # for(g in g_start:iters)
   {
     burdenValue <- cols[g]
+    progress_bar(sprintf("genomic area: %s", burdenValue))
     if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>2){
 
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
@@ -202,6 +207,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     }
   }
 
+  message("\n")
   message("INFO: ", Sys.time(), " I performed:",iters," tests." )
 
   if(exists("result_temp"))

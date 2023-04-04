@@ -14,7 +14,7 @@
 analyze_single_sample <- function(envir, values, sliding_window_size, thresholds, figure, sample_detail, bonferroni_threshold = 0.05, probe_features) {
 
   # browser()
-  start_time_single_sample <- Sys.time()
+  # start_time_single_sample <- Sys.time()
   # message(sample_detail$Sample_ID, " ", "SingleSample Sample analysis warmingUP ", Sys.time())
   result <- ""
   result <- result[-1]
@@ -50,9 +50,9 @@ analyze_single_sample <- function(envir, values, sliding_window_size, thresholds
   if(figure=="HYPER")
      result["PROBES_COUNT"] <- dim(probe_features)[1]
 
-  end_time_single_sample <- Sys.time()
-  time_taken <- end_time_single_sample - start_time_single_sample
-  message(sample_detail$Sample_ID, " ", "Completed sample ", time_taken)
+  # end_time_single_sample <- Sys.time()
+  # time_taken <- end_time_single_sample - start_time_single_sample
+  # message("DEBUG: ", Sys.time(), " ", sample_detail$Sample_ID, " ", "Completed sample ", time_taken)
   return(result)
 }
 

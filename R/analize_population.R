@@ -27,7 +27,7 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
 
   # browser()
   start_time <- Sys.time()
-  message("AnalyzePopulation warmingUP ", Sys.time())
+  message("INFO: ", Sys.time(), " AnalyzePopulation warmingUP ")
 
   methylation_data <- stats::na.omit(methylation_data)
 
@@ -42,11 +42,19 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
   }
 
   message("INFO: ", Sys.time(), " WarmedUP AnalyzePopulation")
-  message("INFO: ", Sys.time(), " Start population analyze ")
+  message("INFO: ", Sys.time(), " Start population analysis")
 
+  # progress_bar <- progress::progress_bar$new(
+  #   format = paste("INFO: Performing population analysis [:bar] :percent eta: :eta"),
+  #   total = nrow(sample_sheet),
+  #   clear = FALSE,
+  #   width= 60)
+
+  progress_bar <- progressr::progressor(along = 1:nrow(sample_sheet))
 
   variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "envir", "sliding_window_size", "beta_superior_thresholds",
-                           "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "analyze_single_sample_both", "delta_single_sample", "beta_medians")
+                           "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "analyze_single_sample_both", "delta_single_sample", "beta_medians", "progress_bar",
+                           "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
   i <- 1
 
   # for(i in 1:nrow(sample_sheet)) {
@@ -61,10 +69,14 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
     delta_result <- delta_single_sample (envir = envir, values = beta_values, high_thresholds = beta_superior_thresholds, low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail,
                                          beta_medians = beta_medians, probe_features = probe_features)
     sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result, "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions)
+
+    progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
+    # progress_bar$tick()
     sample_status_temp
   }
 
-
+  message("\n")
+  # progress_bar$terminate()
   summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)
   colnames(summary_population) <- c("Sample_ID","DELTAS_HYPO","DELTAS_HYPER","DELTAS_BOTH","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO",
