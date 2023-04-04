@@ -14,7 +14,8 @@ compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
   suppressMessages({
     model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
   })
-  beta_value <- summary(model)$tTable[2,"Value"]
+  summary_qr <- suppressMessages(summary(model)$tTable)
+  beta_value <- summary_qr[2,"Value"]
   return(beta_value)
 }
 
@@ -69,11 +70,12 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
       suppressMessages({
         model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
       })
-      pvalue <- summary(model)$tTable[2,"Pr(>|t|)"]
-      std.error <- summary(model)$tTable[2,"Std. Error"]
-      beta_value <- summary(model)$tTable[2,"Value"]
-      ci.lower <- summary(model)$tTable[2,"lower bound"]
-      ci.upper <- summary(model)$tTable[2,"upper bound"]
+      summary_qr <- suppressMessages(summary(model)$tTable)
+      pvalue <- summary_qr[2,"Pr(>|t|)"]
+      std.error <- summary_qr[2,"Std. Error"]
+      beta_value <- summary_qr[2,"Value"]
+      ci.lower <- summary_qr[2,"lower bound"]
+      ci.upper <- summary_qr[2,"upper bound"]
       r_model <- "lqmm_lqm"
     }
     else
@@ -156,15 +158,16 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     suppressMessages({
       model <- lqmm::lqm(sig.formula, tau =tau, data = as.data.frame(tempDataFrame), na.action = stats::na.omit, control = lqm_control)
     })
-    beta_value <- summary(model)$tTable[2,"Value"]
-    std.error <- summary(model)$tTable[2,"Std. Error"]
-    ci.lower <- summary(model)$tTable[2,"lower bound"]
-    ci.upper <- summary(model)$tTable[2,"upper bound"]
-    pvalue <- summary(model)$tTable[2,"Pr(>|t|)"]
+    summary_qr <- suppressMessages(summary(model)$tTable)
+    beta_value <- summary_qr[2,"Value"]
+    std.error <- summary_qr[2,"Std. Error"]
+    ci.lower <- summary_qr[2,"lower bound"]
+    ci.upper <- summary_qr[2,"upper bound"]
+    pvalue <- summary_qr[2,"Pr(>|t|)"]
 
     if(n_permutations > n_permutations_test)
     {
-      boot_beta <- replicate(n_permutations_test, compute_quantreg_beta_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control))
+      boot_beta <- suppressMessages(replicate(n_permutations_test, compute_quantreg_beta_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
       boot.bca <- quantreg_summary(boot_beta, beta_value, conf.level = conf.level)
       ci.lower <- boot.bca[1]
       ci.upper <- boot.bca[2]
@@ -176,7 +179,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     }
     else
     {
-      boot_beta <- replicate(n_permutations, compute_quantreg_beta_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control))
+      boot_beta <- suppressMessages(replicate(n_permutations, compute_quantreg_beta_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
       boot.bca <- quantreg_summary(boot_beta, beta_value, conf.level = conf.level)
       ci.lower <- boot.bca[1]
       ci.upper <- boot.bca[2]

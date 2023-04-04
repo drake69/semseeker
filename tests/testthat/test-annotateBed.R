@@ -43,7 +43,7 @@ test_that("annotate_bed", {
                           bonferroni_threshold = 0.01,
                           probe_features = probe_features
   )
-  sp$Sample_Group <- sample_sheet$Sample_Group
+  # sp$Sample_Group <- sample_sheet$Sample_Group
 
   create_multiple_bed(envir, sample_sheet = sample_sheet)
 

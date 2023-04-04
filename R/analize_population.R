@@ -75,7 +75,6 @@ analize_population <- function(envir, methylation_data, sliding_window_size, bet
     sample_status_temp
   }
 
-  message("\n")
   # progress_bar$terminate()
   summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)
