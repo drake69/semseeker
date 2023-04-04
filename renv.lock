@@ -2239,6 +2239,18 @@
       ],
       "Hash": "14dc9f7a3c91ebb14ec5bb9208a07061"
     },
+    "progressr": {
+      "Package": "progressr",
+      "Version": "0.13.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "digest",
+        "utils"
+      ],
+      "Hash": "376a8ebcc878f9c1395e212548fc297a"
+    },
     "promises": {
       "Package": "promises",
       "Version": "1.2.0.1",

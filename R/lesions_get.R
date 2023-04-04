@@ -78,7 +78,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
 
   }
 
-  message("INFO: ", Sys.time(), " Got lesions for sample !")
+  # message("INFO: ", Sys.time(), " Got lesions for sample !")
   return(lesionWeighted)
 
 }

@@ -197,5 +197,9 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
                                "sort_by_chr_and_start", "test_match_order", "lesions_get",
                                "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
 
+  # to manage progress bar
+  progressr::handlers(global = TRUE)
+  progressr::handlers("progress")
+
   return(ssEnv)
 }
