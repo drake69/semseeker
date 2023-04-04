@@ -5,12 +5,15 @@
 
 <!-- badges: start -->
 
-[![](https://img.shields.io/badge/devel%20version-0.6.22-blue.svg)](https://github.com/drake69/semseeker)
+[![](https://img.shields.io/badge/devel%20version-0.7.16-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![](https://app.codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://app.codecov.io/gh/drake69/semseeker)
+[![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
 [![R build
 status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
+[![Project Status: Active - The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 The goal of semseeker is to find all methylation localized and enriched
 variants.
@@ -84,7 +87,7 @@ working example with data from Gene Expression Omnibus (GEO)
 
 # Input requirements
 
--   the samplesheet dataframe should contain a column called
-    Sample_Group, the admitted values are: Case, Control, Reference. if
-    you don0t have the Refernce population you can duplicate the Control
-    population rows and use Reference in the Sample_Group column.
+- the samplesheet dataframe should contain a column called Sample_Group,
+  the admitted values are: Case, Control, Reference. if you don0t have
+  the Refernce population you can duplicate the Control population rows
+  and use Reference in the Sample_Group column.
