@@ -47,7 +47,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # for(g in g_start:iters)
   {
     burdenValue <- cols[g]
-    progress_bar(sprintf("genomic area: %s", burdenValue))
+    progress_bar(sprintf("genomic area: %s", stringr::str_pad( burdenValue, 20, side=c('left'), pad=' ')))
     if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>2){
 
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
@@ -207,7 +207,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     }
   }
 
-  message("\n")
   message("INFO: ", Sys.time(), " I performed:",iters," tests." )
 
   if(exists("result_temp"))

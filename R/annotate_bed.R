@@ -56,8 +56,8 @@ annotate_bed <- function (
       "GROUP" = groups
     )
 
-  message("INFO: ", Sys.time(), "Annotating genomic areas.")
-  progress_bar <- progressr::progressor(along = 1:nrow(sample_sheet))
+  message("INFO: ", Sys.time(), " Annotating genomic areas.")
+  progress_bar <- progressr::progressor(along = 1:nrow(envir$keysLocal))
 
   variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel",
                            "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
@@ -70,9 +70,14 @@ annotate_bed <- function (
       fig <- envir$keysLocal[i,"FIGURE"]
       grp <- envir$keysLocal[i,"GROUP"]
 
-      if(probes_prefix=="PROBES" | probes_prefix=="PROBES_CHR_")
+      if(probes_prefix=="PROBES_CHR_")
       {
         probes <- semseeker::PROBES_CHR_CHR
+        # message("DEBUG: loaded probes: PROBES_CHR_CHR")
+      }
+      else if(probes_prefix=="PROBES")
+      {
+        probes <- semseeker::PROBES
         # message("DEBUG: loaded probes: PROBES_CHR_CHR")
       }
       else
@@ -86,7 +91,7 @@ annotate_bed <- function (
       resFolder <- dir_check_and_create(envir$result_folderData,pop)
       tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
                                     columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
-      progress_bar(sprintf("sample=%g",i))
+      progress_bar()
       tempFile
     }
 

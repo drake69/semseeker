@@ -37,7 +37,7 @@ test_that("association_analysis", {
                                    "covariates"=c("Covariates1+Covariates2"),
                                    "family_test"=c("quantreg_0.5_1000_15000_0.9"),
                                    "transformation"="scale",
-                                   "depth_analysis"=1,
+                                   "depth_analysis"=3,
                                    "filter_p_value" = FALSE)
 
   # inference_details,result_folder, maxResources, parallel_strategy
