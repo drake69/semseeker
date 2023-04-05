@@ -43,7 +43,7 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential")
 
-  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -234,6 +234,6 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
-  close_env()
+  close_env(envir)
   })
 

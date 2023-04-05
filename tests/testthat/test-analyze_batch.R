@@ -46,6 +46,6 @@ test_that("analize_batch", {
   testthat::expect_true(nrow(sp)==nrow(sample_sheet))
   testthat::expect_true(sum(na.omit(sp[,"MUTATIONS_BOTH"])>0)>0)
 
-  close_env()
+  close_env(envir)
 })
 

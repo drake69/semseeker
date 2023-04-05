@@ -51,7 +51,7 @@
   message(nrow(sample_sheet))
   expect_true(nrow(sp)==nrow(sample_sheet))
 
-  close_env()
+  close_env(envir)
 
 })
 

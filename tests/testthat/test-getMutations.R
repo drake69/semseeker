@@ -28,5 +28,5 @@ testthat::test_that("mutations_get",{
                )
 
   expect_false(length(mutations)==0)
-  close_env()
+  close_env(envir)
 })

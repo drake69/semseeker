@@ -57,7 +57,8 @@ annotate_bed <- function (
     )
 
   message("INFO: ", Sys.time(), " Annotating genomic areas.")
-  progress_bar <- progressr::progressor(along = 1:nrow(envir$keysLocal))
+  if(envir$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(envir$keysLocal))
 
   variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel",
                            "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
@@ -92,7 +93,8 @@ annotate_bed <- function (
       resFolder <- dir_check_and_create(envir$result_folderData,pop)
       tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
                                     columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
-      progress_bar()
+      if(envir$showprogress)
+        progress_bar()
       tempFile
     }
 
