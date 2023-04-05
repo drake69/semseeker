@@ -20,8 +20,8 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   if(nrow(methylation_data) == 866562)
     message("INFO: ", Sys.time(), " seems an EPIC dataset.")
 
-  probes <- semseeker::PROBES_CHR_CHR
-  message("DEBUG: ", Sys.time(), " loaded probes: PROBES_CHR_CHR")
+  probes <- semseeker::PROBES
+  message("DEBUG: ", Sys.time(), " loaded probes: PROBES")
   probes <- probes[(probes$PROBE %in% rownames(methylation_data)),]
   methylation_data <- methylation_data[rownames(methylation_data) %in% probes$PROBE, ]
   methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
