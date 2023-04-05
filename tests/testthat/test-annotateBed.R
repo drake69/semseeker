@@ -154,5 +154,5 @@ test_that("annotate_bed", {
   # expect_true( columnLabel %in% colnames(final_bed))
   # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
-
+  close_env()
 })

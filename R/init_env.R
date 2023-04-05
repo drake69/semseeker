@@ -164,6 +164,20 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures[,1],"anomalies"=ssEnv$keys_anomalies[,1])
 
+  probes_subGroups <- ""
+  probes_Prefix <- "PROBES"
+  probes_MainGroupLabel <-  "PROBE"
+  probes_SubGroupLabel <- "GROUP"
+
+  ssEnv$keys_probe_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
+
+  probes_subGroups <- "CHR"
+  probes_Prefix <- "PROBES_CHR_"
+  probes_MainGroupLabel <-  "CHR"
+  probes_SubGroupLabel <- "GROUP"
+
+  ssEnv$keys_chr_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
+
   probes_subGroups <- ssEnv$gene_subareas[,1]
   probes_Prefix <- "PROBES_Gene_"
   probes_MainGroupLabel <-  "GENE"

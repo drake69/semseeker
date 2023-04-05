@@ -58,5 +58,5 @@ test_that("create_multiple_bed", {
 
   # expect_true(nrow(localFileRes_hyper)>0 | nrow(localFileRes_hypo)>0 | nrow(localFileRes_both)>0)
 
-
+  close_env()
 })

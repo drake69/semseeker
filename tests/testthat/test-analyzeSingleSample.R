@@ -35,5 +35,5 @@ testthat::test_that("analyze_single_sample",{
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
-
+  close_env()
 })
