@@ -20,6 +20,6 @@ test_that("test_match_order", {
 
   #values not matching
   expect_true( !test_match_order( probe_features[-nrow(probe_features),"ABSOLUTE"],probe_features[-1, "ABSOLUTE"] ))
-  close_env()
+  close_env(envir)
 }
 )

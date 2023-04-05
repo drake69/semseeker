@@ -104,5 +104,5 @@ test_that("create_excel_pivot", {
 #   subGroupLabel="GROUP"
 #   create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
-  close_env()
+  close_env(envir)
 })

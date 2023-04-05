@@ -25,6 +25,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
 
   ssEnv$logFolder <-  dir_check_and_create(result_folder,c("log"))
+
   foreachIndex <- 0
 
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
@@ -55,6 +56,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     }
   )
   arguments <- list(...)
+
+  ssEnv$showprogress <- FALSE
+  if(!is.null(arguments[["showprogress"]]))
+  {
+    ssEnv$showprogress <- if(is.null(arguments[["showprogress"]])) ssEnv$keys_figures_default[,1] else arguments$showprogress
+  }
 
   # TODO: improve planning parallel management using also cluster
   if(parallel_strategy=="multisession")
@@ -211,9 +218,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
                                "sort_by_chr_and_start", "test_match_order", "lesions_get",
                                "mutations_get","PROBES_Gene_3UTR", "PROBES_Gene_5UTR","PROBES_DMR_DMR","PROBES_Gene_Body")
 
-  # to manage progress bar
-  progressr::handlers(global = TRUE)
-  progressr::handlers("progress")
 
+  # to manage progress bar
+  if(ssEnv$showprogress)
+  {
+    progressr::handlers(global = TRUE)
+    progressr::handlers("progress")
+  }
   return(ssEnv)
 }

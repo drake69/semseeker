@@ -429,5 +429,5 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
   }
 
-  close_env()
+  close_env(envir)
 }

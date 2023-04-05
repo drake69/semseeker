@@ -124,5 +124,5 @@ test_that("create_heatmap", {
   # final_bed <- NULL
   # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
 
-  close_env()
+  close_env(envir)
 })

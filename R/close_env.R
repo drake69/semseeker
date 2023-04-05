@@ -1,8 +1,9 @@
-close_env <- function()
+close_env <- function(envir)
 {
 
-  progressr::handlers()
-  progressr::handlers(global = FALSE)
+  if (envir$showprogress)
+    progressr::handlers()
+  # progressr::handlers(global = FALSE)
   future::plan( future::sequential)
   message("INFO: ", Sys.time(), " Job Completed !")
 }

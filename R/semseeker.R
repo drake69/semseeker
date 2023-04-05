@@ -186,5 +186,5 @@ semseeker <- function(sample_sheet,
   # if(length(methylation_data)>1)
   #   batch_correlation_check(envir)
 
-  close_env()
+  close_env(envir)
 }

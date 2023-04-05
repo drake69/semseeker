@@ -32,7 +32,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   iters <- length(cols)
   g <- 0
 
-  progress_bar <- progressr::progressor(along = g_start:iters)
+  if(envir$showprogress)
+    progress_bar <- progressr::progressor(along = g_start:iters)
+  else
+    progress_bar <- ""
 
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
     "independent_variable1stLevel", "independent_variable2ndLevel",
@@ -47,7 +50,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # for(g in g_start:iters)
   {
     burdenValue <- cols[g]
-    progress_bar(sprintf("genomic area: %s", stringr::str_pad( burdenValue, 20, side=c('left'), pad=' ')))
+    if(envir$showprogress)
+      progress_bar(sprintf("genomic area: %s", stringr::str_pad( burdenValue, 20, side=c('left'), pad=' ')))
     if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>2){
 
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
@@ -217,4 +221,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     return(result_temp)
   }
   return(NULL)
+  if(envir$showprogress)
+    remove(progress_bar)
 }

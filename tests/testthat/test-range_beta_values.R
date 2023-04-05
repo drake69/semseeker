@@ -47,6 +47,6 @@ test_that("range_beta_values", {
   testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_superior_thresholds[1])
   testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_median_values[1])
 
-  close_env()
+  close_env(envir)
 })
 
