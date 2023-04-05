@@ -28,6 +28,7 @@ Imports:
     progressr,
     quantreg,
     readxl,
+    RColorBrewer,
     reshape2,
     Rfast,
     R.utils,

@@ -13,6 +13,6 @@ test_that("sort_by_chr_and_start", {
   second <- sort_by_chr_and_start( probe_features[order(probe_features$START),])
 
   expect_true( test_match_order( sort_by_chr_and_start(probe_features)$ABSOLUTE,second$ABSOLUTE))
-  close_env(envir)
+  # close_env(envir)
 }
 )
