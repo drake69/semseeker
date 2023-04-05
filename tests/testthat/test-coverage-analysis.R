@@ -20,12 +20,12 @@ test_that("coverage-analysis", {
 
   row.names(methylation_data) <- probe_features$PROBE
 
-  res_cov <- coverage_analysis(methylation_data)
+  res_cov <- coverage_analysis(methylation_data, envir)
 
   # message(nrow(sp))
   # message(nrow(sample_sheet))
-  testthat::expect_true(nrow(sp)==nrow(sample_sheet))
-  testthat::expect_true(sum(na.omit(sp[,"MUTATIONS_BOTH"])>0)>0)
+  testthat::expect_true(nrow(res_cov)!=0)
+  # testthat::expect_true(sum(na.omit(sp[,"MUTATIONS_BOTH"])>0)>0)
 
   close_env(envir)
 })

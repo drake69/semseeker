@@ -3,7 +3,7 @@ testthat::test_that("mutations_get",{
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder)
+  envir <- init_env(tempFolder)
 
   Sample_ID <- stringi::stri_rand_strings(1, 15, pattern = "[A-Za-z]")
 

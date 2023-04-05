@@ -1,4 +1,4 @@
-coverage_analysis <- function(methylation_data)
+coverage_analysis <- function(methylation_data, envir)
 {
   # probes <- PROBES_CHR_CHR
   # grp <- c("CHR")
@@ -41,9 +41,21 @@ coverage_analysis <- function(methylation_data)
       cov_result <- rbind(cov_result, cov_stat)
     else
       cov_result <- cov_stat
+
+    colnames(total_count) <- c("GROUP","COUNT_TOTAL")
+    total_count$AREA <- grp
+    total_count$SUBGROUP <- SUBGROUP
+
+    if(exists("tot_result"))
+      tot_result <- rbind(total_count, tot_result)
+    else
+      tot_result <- total_count
   }
 
   cov_result <- reshape2::dcast(data = cov_result, GROUP + SUBGROUP ~ COV_PERC, value.var = "COUNT", sum)
+  tot_result <- subset(tot_result, SUBGROUP!="CHR" & SUBGROUP != "Whole")
+  # tot_result <- aggregate(tot_result$SUBGROUP, list(tot_result$COUNT_TOTAL), FUN=length)
+  tot_result <- reshape2::dcast(data = tot_result, AREA + SUBGROUP ~ COUNT_TOTAL, value.var = "COUNT_TOTAL", length)
 
   chartFolder <- dir_check_and_create(envir$result_folderChart,"COVERAGE")
   tt <- as.data.frame(cov_result[,3:ncol(cov_result)])
