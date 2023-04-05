@@ -34,6 +34,6 @@ test_that("population_check", {
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
-
+  close_env()
 })
 

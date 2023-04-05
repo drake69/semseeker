@@ -234,5 +234,6 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  close_env()
   })
 

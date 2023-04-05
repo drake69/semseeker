@@ -50,5 +50,5 @@ testthat::test_that("lesions_get",{
   )
 
   expect_true(nrow(lesions_hyper)!=0 | nrow(lesions_hypo)!=0)
-
+  close_env()
 })

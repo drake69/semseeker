@@ -186,7 +186,5 @@ semseeker <- function(sample_sheet,
   # if(length(methylation_data)>1)
   #   batch_correlation_check(envir)
 
-  message("INFO: ", Sys.time(), " Job Completed !")
-
-  future::plan( future::sequential)
+  close_env()
 }

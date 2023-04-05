@@ -54,6 +54,6 @@ test_that("semeeker", {
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAQ" ,"BOTH" ), "fst")
   localFileRes_both <- fst::read_fst(fileToRead)
   testthat::expect_true(sum(is.na(localFileRes_both$VALUE))==0)
-
+  close_env()
 })
 

@@ -429,6 +429,5 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
   }
 
-  future::plan( future::sequential)
-
+  close_env()
 }

@@ -61,6 +61,6 @@ test_that("read_multiple_bed", {
   # res <-read_multiple_bed (envir, "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
   # res <-read_multiple_bed (envir, "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
   # expect_true(nrow(res)>0)
-
+  close_env()
 }
 )

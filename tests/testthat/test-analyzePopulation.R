@@ -51,7 +51,7 @@
   message(nrow(sample_sheet))
   expect_true(nrow(sp)==nrow(sample_sheet))
 
-  future::plan( future::multisession)
+  close_env()
 
 })
 
