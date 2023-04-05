@@ -3,6 +3,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
 
   # browser()
   methylation_data <- as.data.frame(methylation_data)
+  coverage_analysis(methylation_data = methylation_data, envir = envir)
   methDataTemp <- data.frame( "PROBE"= rownames(methylation_data), methylation_data)
   methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
   methylation_data <- methDataTemp[, -c(1)]
