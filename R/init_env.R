@@ -92,7 +92,6 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR","PROBE"))
   # ,"PROBE"
 
-
   figures <- if(is.null(arguments[["figures"]])) ssEnv$keys_figures_default[,1] else arguments$figures
   anomalies <- if(is.null(arguments[["anomalies"]]))  ssEnv$keys_anomalies_default[,1] else arguments$anomalies
   metaareas <- if(is.null(arguments[["metaareas"]]))  ssEnv$keys_metaareas_default[,1] else arguments$metaareas
@@ -129,20 +128,35 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_anomalies <-  data.frame("ANOMALY"=anomalies)
   ssEnv$keys_metaareas <- data.frame("METAAREA"=metaareas)
 
-  ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND",
-                                          "SUBGROUP"=ssEnv$island_subareas[,1]
-  )
-  ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE",
+  if("ISLAND" %in% metaareas)
+    ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND",
+                                            "SUBGROUP"=ssEnv$island_subareas[,1]
+    )
+  else
+  {
+    ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND","SUBGROUP"="")[-1,]
+  }
+
+  if("GENE" %in% metaareas)
+    ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE",
                                        "SUBGROUP"=ssEnv$gene_subareas[,1]
-  )
-  ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR",
-                                      "SUBGROUP"="DMR")
+    )
+  else
+  {
+    ssEnv$keys_areas_gene <- expand.grid("GROUP"="GENE","SUBGROUP"="")[-1,]
+  }
 
-  ssEnv$keys_areas_chr <- expand.grid("GROUP"="CHR",
-                                      "SUBGROUP"="CHR")
+  ssEnv$keys_areas_dmr <- expand.grid("GROUP"="DMR","SUBGROUP"="DMR")
+  if (!("DMR" %in% metaareas))
+    ssEnv$keys_areas_dmr <- ssEnv$keys_areas_dmr[-1,]
 
-  ssEnv$keys_areas_probe <- expand.grid("GROUP"="PROBE",
-                                      "SUBGROUP"="PROBE")
+  ssEnv$keys_areas_chr <- expand.grid("GROUP"="CHR","SUBGROUP"="CHR")
+  if (!("CHR" %in% metaareas))
+    ssEnv$keys_areas_chr <- ssEnv$keys_areas_chr[-1,]
+
+  ssEnv$keys_areas_probe <- expand.grid("GROUP"="PROBE","SUBGROUP"="PROBE")
+  if(!("PROBE" %in% metaareas))
+    ssEnv$keys_areas_probe <-  ssEnv$keys_areas_probe[-1,]
 
   ssEnv$keys_anomalies_figures_areas <- rbind(
     expand.grid("GROUP"="CHR",
@@ -167,28 +181,59 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
                 "ANOMALY"=anomalies)
   )
 
+  # remove anomaies if metaareas not in options
   ssEnv$keys_anomalies_figures_areas <- ssEnv$keys_anomalies_figures_areas[ ssEnv$keys_anomalies_figures_areas$GROUP %in% metaareas, ]
 
   ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures[,1],"anomalies"=ssEnv$keys_anomalies[,1])
 
-  probes_subGroups <- ""
-  probes_Prefix <- "PROBES"
-  probes_MainGroupLabel <-  "PROBE"
-  probes_SubGroupLabel <- "GROUP"
+  if(nrow(ssEnv$keys_areas_probe)>0)
+  {
+    probes_subGroups <- ""
+    probes_Prefix <- "PROBES"
+    probes_MainGroupLabel <-  "PROBE"
+    probes_SubGroupLabel <- "GROUP"
+  }
+  else
+  {
+    probes_subGroups <- NULL
+    probes_Prefix <- NULL
+    probes_MainGroupLabel <-  NULL
+    probes_SubGroupLabel <- NULL
+  }
 
   ssEnv$keys_probe_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
 
-  probes_subGroups <- "CHR"
-  probes_Prefix <- "PROBES_CHR_"
-  probes_MainGroupLabel <-  "CHR"
-  probes_SubGroupLabel <- "GROUP"
+  if(nrow(ssEnv$keys_areas_chr)>0)
+  {
+    probes_subGroups <- "CHR"
+    probes_Prefix <- "PROBES_CHR_"
+    probes_MainGroupLabel <-  "CHR"
+    probes_SubGroupLabel <- "GROUP"
+  }
+  else
+  {
+    probes_subGroups <- NULL
+    probes_Prefix <- NULL
+    probes_MainGroupLabel <-  NULL
+    probes_SubGroupLabel <- NULL
+  }
 
   ssEnv$keys_chr_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
 
-  probes_subGroups <- ssEnv$gene_subareas[,1]
-  probes_Prefix <- "PROBES_Gene_"
-  probes_MainGroupLabel <-  "GENE"
-  probes_SubGroupLabel <- "GROUP"
+  if(nrow(ssEnv$keys_areas_gene)>0)
+  {
+    probes_subGroups <- ssEnv$gene_subareas[,1]
+    probes_Prefix <- "PROBES_Gene_"
+    probes_MainGroupLabel <-  "GENE"
+    probes_SubGroupLabel <- "GROUP"
+  }
+  else
+  {
+    probes_subGroups <- NULL
+    probes_Prefix <- NULL
+    probes_MainGroupLabel <-  NULL
+    probes_SubGroupLabel <- NULL
+  }
 
   ssEnv$keys_gene_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
   # probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
@@ -197,17 +242,37 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # probes.450k
   # probes.850k
 
-  probes_Prefix <- "PROBES_Island_"
-  probes_subGroups <- ssEnv$island_subareas[,1]
-  probes_MainGroupLabel <- "ISLAND"
-  probes_SubGroupLabel <- "RELATION_TO_CPGISLAND"
+  if(nrow(ssEnv$keys_areas_island)>0)
+  {
+    probes_Prefix <- "PROBES_Island_"
+    probes_subGroups <- ssEnv$island_subareas[,1]
+    probes_MainGroupLabel <- "ISLAND"
+    probes_SubGroupLabel <- "RELATION_TO_CPGISLAND"
+  }
+  else
+  {
+    probes_subGroups <- NULL
+    probes_Prefix <- NULL
+    probes_MainGroupLabel <-  NULL
+    probes_SubGroupLabel <- NULL
+  }
   ssEnv$keys_island_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
   # probes <-  rbind(expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups), probes)
 
-  probes_subGroups <- c("DMR")
-  probes_Prefix <- "PROBES_DMR_"
-  probes_MainGroupLabel <-  "DMR"
-  probes_SubGroupLabel <- "GROUP"
+  if(nrow(ssEnv$keys_areas_dmr)>0)
+  {
+    probes_subGroups <- c("DMR")
+    probes_Prefix <- "PROBES_DMR_"
+    probes_MainGroupLabel <-  "DMR"
+    probes_SubGroupLabel <- "GROUP"
+  }
+  else
+  {
+    probes_subGroups <- NULL
+    probes_Prefix <- NULL
+    probes_MainGroupLabel <-  NULL
+    probes_SubGroupLabel <- NULL
+  }
   ssEnv$keys_dmr_probes <-  expand.grid("prefix"=probes_Prefix,"maingrouplable"= probes_MainGroupLabel,"subgrouplable"= probes_SubGroupLabel,"subgroups"= probes_subGroups)
 
   # probes <-  rbind( ssEnv$keys_island_probes, ssEnv$keys_gene_probes, ssEnv$keys_dmr_probes )
