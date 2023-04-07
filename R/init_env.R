@@ -114,7 +114,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   message("INFO: ", Sys.time(), " I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
 
-  ssEnv$gene_subareas <- data.frame("subarea"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"))
+  ssEnv$gene_subareas <- data.frame("subarea"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","5UTR","ExonBnd","Whole"))
   ssEnv$island_subareas <- data.frame("subarea"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
 
   if(!is.null(arguments[["metaareassub"]]))
