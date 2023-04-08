@@ -4,6 +4,7 @@ bca_pvalue_for_lqm <-
            model,
            working_data)
   {
+    boot.bca <- NA
     # browser()
     # boot.bca <- coxed::bca(na.omit(boot_vector))
     # p_value <- boot.p_value::boot.p_value(na.omit(boot_vector), type = "bca", theta_null = 0)

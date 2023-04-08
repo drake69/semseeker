@@ -151,7 +151,7 @@ semseeker <- function(sample_sheet,
     create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
     dmrBed <- annotate_bed(envir=envir,populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-    create_heatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, file_prefix = mainGroupLabel, groupColumnLabels = c("DMR") )
+    create_heatmap( envir=envir,inputBedDataFrame =  dmrBed,anomalies = anomalies, file_prefix = mainGroupLabel, groupColumnLabels = "DMR" )
   }
 
   # if (!is.null(geneBed))

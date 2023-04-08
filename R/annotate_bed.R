@@ -71,23 +71,6 @@ annotate_bed <- function (
       fig <- envir$keysLocal[i,"FIGURE"]
       grp <- envir$keysLocal[i,"GROUP"]
 
-      # if(probes_prefix=="PROBES_CHR_")
-      # {
-      #   probes <- semseeker::PROBES_CHR_CHR
-      #   # message("DEBUG: loaded probes: PROBES_CHR_CHR")
-      # }
-      # else if(probes_prefix=="PROBES")
-      # {
-      #   probes <- semseeker::PROBES
-      #   # message("DEBUG: loaded probes: PROBES_CHR_CHR")
-      # }
-      # else
-      # {
-      #   probes_name <- paste0(probes_prefix, grp,sep="")
-      #   probes <- get(probes_name, envir = asNamespace("semseeker"))
-      #   # message("DEBUG: loaded probes:", probes_name)
-      # }
-
       probes <- probes_get(probes_prefix, grp)
 
       resFolder <- dir_check_and_create(envir$result_folderData,pop)
@@ -115,6 +98,7 @@ annotate_bed <- function (
 
   # utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
 
+  # final_bed <- unique(final_bed[, c("SAMPLEID","PROBE",columnLabel,groupingColumnLabel,"FIGURE","ANOMALY","POPULATION","VALUE")])
 
   return(final_bed)
 

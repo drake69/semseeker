@@ -14,7 +14,7 @@ create_heatmap <-
 
     chartFolder <- dir_check_and_create(envir$result_folderChart,file_prefix)
 
-    if (is.null(inputBedDataFrame))
+    if (is.null(inputBedDataFrame) | plyr::empty(inputBedDataFrame) | nrow(inputBedDataFrame)==0)
       return()
 
     # MUTATIONS "CHR" "SAMPLEID" "GENE" "ACCESSION" "GROUP" "POSITION" "VALUE" "FIGURE" "ANOMALY" "POPULATION"
