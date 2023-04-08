@@ -17,5 +17,7 @@ probes_get <- function(probes_prefix, grp)
     # message("DEBUG: loaded probes:", probes_name)
   }
 
+  probes <- unique(probes[, !(colnames(probes) %in% c("ACCESSION","POSITION"))])
+
   return(probes)
 }

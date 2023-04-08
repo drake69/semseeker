@@ -57,6 +57,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   std.error <- NA
   beta_value <- NA
   pvalue <- NA
+  boot.bca <- NA
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))

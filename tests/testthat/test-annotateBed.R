@@ -69,6 +69,7 @@ test_that("annotate_bed", {
     groupingColumnLabel)
 
   expect_true( nrow(final_bed)>0)
+  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   groups <- c("CHR")
   probes_prefix = "PROBES_CHR_"
@@ -88,6 +89,7 @@ test_that("annotate_bed", {
 
   # expect_true( columnLabel %in% colnames(final_bed))
   expect_true( nrow(final_bed)>0)
+  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -107,6 +109,7 @@ test_that("annotate_bed", {
 
   bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
 
+  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   anomalies <- c("DELTAQ")
   # create and read
@@ -126,6 +129,7 @@ test_that("annotate_bed", {
 
   # not empty data set
   expect_true(nrow(final_bed)>0)
+  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   # has the correct header
   expect_true( columnLabel %in% colnames(final_bed))
@@ -142,6 +146,9 @@ test_that("annotate_bed", {
     groupingColumnLabel)
 
   expect_true( columnLabel %in% colnames(final_bed))
+
+
+  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)

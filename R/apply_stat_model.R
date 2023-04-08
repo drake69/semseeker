@@ -42,8 +42,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count",
     "data_preparation","apply_stat_model_sig.formula","quantreg_model",
     "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
-    "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_values","iqrTimes"
-    )
+    "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_values","iqrTimes","envir")
   # message("Starting foreach withh: ", iters, " items")
   message("INFO: ", Sys.time(), " I'll perform:",iters," tests." )
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
@@ -63,8 +62,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       if(family_test=="wilcoxon" | family_test=="t.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
         model_result <- test_model(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 
+      sink("/dev/null")
       if (grepl("quantreg", family_test))
         model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
+      sink()
 
       pvalue <- model_result$pvalue
       beta_value <- model_result$beta_value
