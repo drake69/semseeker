@@ -10,7 +10,8 @@ test_that("create_multiple_bed", {
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
@@ -26,6 +27,8 @@ test_that("create_multiple_bed", {
   colnames(methylation_data) <- Sample_ID
   Sample_Group <- rep("Control",nsamples)
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
+
+  ####################################################################################
 
   sp <- analize_population(envir,
                            methylation_data=methylation_data,
@@ -48,7 +51,9 @@ test_that("create_multiple_bed", {
 
   expect_true(nrow(localFileRes_both)>0)
 
-  # tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPO"))
+  ####################################################################################
+
+    # tempresult_folder <-dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPO"))
   # fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPO" ), "fst")
   # localFileRes_hypo <- read.table(fileToRead, sep="\t")
   #

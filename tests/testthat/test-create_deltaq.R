@@ -8,7 +8,8 @@ test_that("semeeker", {
   nitem <- 1e3
   nsamples <- 21
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
 
@@ -30,6 +31,8 @@ test_that("semeeker", {
   Sample_Group <- c(rep("Control",nsamples/3),rep("Case",nsamples/3),rep("Reference",nsamples/3))
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
   beta_medians <- beta_superior_thresholds + beta_inferior_thresholds / 2
+
+  ####################################################################################
   sliding_window_size <- 11
   bonferroni_threshold <- 0.01
 
@@ -54,6 +57,9 @@ test_that("semeeker", {
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAQ" ,"BOTH" ), "fst")
   localFileRes_both <- fst::read_fst(fileToRead)
   testthat::expect_true(sum(is.na(localFileRes_both$VALUE))==0)
+
+  ####################################################################################
+
   close_env(envir)
 })
 

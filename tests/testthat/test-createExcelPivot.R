@@ -11,7 +11,11 @@ test_that("create_excel_pivot", {
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  # length(unique(probes$PROBE))==nrow(probes)
+  # probes <- probes[sample(1:nrow(probes), size=nitem),]
+
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
@@ -28,6 +32,8 @@ test_that("create_excel_pivot", {
   Sample_Group <- c(rep("Control",nsamples/2), rep("Case",nsamples/2))
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
+  ####################################################################################
+
   sp <- analize_population(envir = envir,
                           methylation_data=methylation_data,
                           sliding_window_size = 11,
@@ -41,6 +47,8 @@ test_that("create_excel_pivot", {
 
 
   create_multiple_bed(envir, sample_sheet = sample_sheet)
+
+  ####################################################################################
 
   populations <- c("Control","Case")
 
@@ -75,6 +83,8 @@ test_that("create_excel_pivot", {
 
   expect_true(file.exists(file.path(envir$result_folderData,"Pivots/GENE.xlsx")))
 
+  ####################################################################################
+
   subGroups <- c("")
   probes_prefix = "PROBES"
   mainGroupLabel =  "PROBE"
@@ -82,7 +92,9 @@ test_that("create_excel_pivot", {
   create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
   expect_true(file.exists(file.path(envir$result_folderData,"Pivots/PROBE.xlsx")))
 
-  # subGroups <- c("")
+  ####################################################################################
+
+    # subGroups <- c("")
   # probes_prefix = "PROBES_CHR_"
   # mainGroupLabel =  "CHR"
   # subGroupLabel="GROUP"

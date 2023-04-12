@@ -5,7 +5,8 @@ testthat::test_that("lesions_get",{
 
   nitem <- 1e3
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
 
@@ -18,6 +19,8 @@ testthat::test_that("lesions_get",{
 
   row.names(tresholds) <- probe_features$PROBE
   row.names(values) <- row.names(tresholds)
+
+  ####################################################################################
 
   mutations <- mutations_get(
     values = values,
@@ -50,5 +53,7 @@ testthat::test_that("lesions_get",{
   )
 
   expect_true(nrow(lesions_hyper)!=0 | nrow(lesions_hypo)!=0)
-  close_env(envir)
+
+  ####################################################################################
+
 })

@@ -12,13 +12,16 @@ testthat::test_that("analyze_single_sample",{
   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 
   row.names(tresholds) <- probe_features$PROBE
   row.names(values) <- row.names(tresholds)
+
+  ####################################################################################
 
   sp <- analyze_single_sample(envir = envir, values = values,
                       sliding_window_size = 11,
@@ -32,6 +35,8 @@ testthat::test_that("analyze_single_sample",{
   outputFolder <- dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPO"))
   fileName <- file_path_build(outputFolder,c(Sample_ID,"MUTATIONS","HYPO"), "bed")
   expect_true(file.exists(fileName))
+
+  ####################################################################################
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)

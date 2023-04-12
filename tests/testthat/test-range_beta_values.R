@@ -8,7 +8,8 @@ test_that("range_beta_values", {
   nitem <- 5e4
   nsamples <- 21
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
 
@@ -30,6 +31,7 @@ test_that("range_beta_values", {
   # batch_id <- 1
   iqrTimes <- 3
 
+  ####################################################################################
   rr <- range_beta_values(methylation_data)
   # sp <- analyze_batch(  envir = envir,
   #                       methylation_data =  methylation_data,
@@ -43,9 +45,14 @@ test_that("range_beta_values", {
   # message(nrow(sp))
   # message(nrow(sample_sheet))
   testthat::expect_true(sum(colnames(rr)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values"))==3)
+
+  ####################################################################################
   testthat::expect_true(nrow(rr)==nrow(methylation_data))
+  ####################################################################################
   testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_superior_thresholds[1])
+  ####################################################################################
   testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_median_values[1])
+  ####################################################################################
 
   close_env(envir)
 })

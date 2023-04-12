@@ -3,11 +3,13 @@ test_that("association_analysis", {
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  message(tempFolder)
 
   nitem <- 1e3
   nsamples <- 30
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
 
@@ -29,7 +31,12 @@ test_that("association_analysis", {
   mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
   mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
 
+  ####################################################################################
+
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data,result_folder = tempFolder,parallel_strategy="sequential")
+
+  ####################################################################################
+
   #todo: test incremental association analysis
   inferenceFolder <- file.path(tempFolder,"Inference")
 
@@ -47,6 +54,7 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
 
   inference_details <- expand.grid("independent_variable"= "Covariates1",
                                    "covariates"=c("Phenotest+Covariates2"),
@@ -56,6 +64,17 @@ test_that("association_analysis", {
                                    "filter_p_value" = FALSE)
 
   # inference_details,result_folder, maxResources, parallel_strategy
+  # test with area selection
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH",
+    anomalies=c("DELTAS","DELTAQ"), metaareas="CHR",areas_selection=c("chr1","chr2"))
+
+  fileToRead <- file_path_build(inferenceFolder, "3_Covariates1_scale_quantreg_0.5_10_150_Phenotest_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+  ####################################################################################
+
+  # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH",
     anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
 
@@ -63,6 +82,7 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
@@ -79,6 +99,8 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
+
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates"=c("Covariates1+Covariates2"),
     "family_test"=c("quantreg_0.5"),
@@ -94,6 +116,8 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
+
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
                                    "family_test"=c("quantreg_0.5_10_100_0.99"),
@@ -106,6 +130,8 @@ test_that("association_analysis", {
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_10_100_0.99_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
+
+  ####################################################################################
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates"=c("Covariates1+Covariates2"),
@@ -120,11 +146,9 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
-
-  # semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="CHR")
+  ####################################################################################
 
   #todo: test incremental association analysis
-
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
                                    "family_test"=c("quantreg_0.5_10_150_0.9"),
@@ -141,6 +165,8 @@ test_that("association_analysis", {
   test_both <- nrow(localFileRes)
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
+
   inference_details <- expand.grid("independent_variable"= "Group",
                                    "covariates"="",
                                    "family_test"=c("wilcoxon"),
@@ -156,6 +182,43 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
+
+
+  inference_details <- expand.grid("independent_variable"= "Group",
+    "covariates"="",
+    "family_test"=c("t.test"),
+    "transformation"="log",
+    "depth_analysis"=1,
+    "filter_p_value" = FALSE)
+
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", metaareas="GENE")
+
+  fileToRead <- file_path_build(inferenceFolder, "1_Group_log_wilcoxon_", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+  ####################################################################################
+
+  inference_details <- expand.grid("independent_variable"= "Group",
+    "covariates"="",
+    "family_test"=c("pearson"),
+    "transformation"="log",
+    "depth_analysis"=1,
+    "filter_p_value" = FALSE)
+
+
+  # inference_details,result_folder, maxResources, parallel_strategy
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", metaareas="GENE")
+
+  fileToRead <- file_path_build(inferenceFolder, "1_Group_log_pearson_", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+  ####################################################################################
+
   inference_details <- expand.grid("independent_variable"= "Group",
                                    "covariates"="",
                                    "family_test"=c("wilcoxon"),
@@ -170,6 +233,8 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
+
   inference_details <- expand.grid("independent_variable"= "Group",
                                    "covariates"="",
                                    "family_test"=c("wilcoxon"),
@@ -182,6 +247,8 @@ test_that("association_analysis", {
   fileToRead <- file_path_build(inferenceFolder, "3_Group_quantile_5_wilcoxon_", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
+
+  ####################################################################################
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates" =c("Covariates1+Covariates2"),
@@ -198,6 +265,8 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
+  ####################################################################################
+
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates"=c("Covariates1+Covariates2"),
     "family_test"=c("gaussian"),
@@ -213,7 +282,7 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
-
+  ####################################################################################
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates"=c("Covariates1+Covariates2"),
@@ -230,6 +299,7 @@ test_that("association_analysis", {
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
-  close_env(envir)
+  ####################################################################################
+  # close_env(envir)
   })
 

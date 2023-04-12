@@ -16,21 +16,30 @@ test_that("population_check", {
   Sample_Group <- c(rep("Control",nsamples/3),rep("Reference",nsamples/3),rep("Case",nsamples/3))
   mySampleSheet <- data.frame(Sample_Group, Sample_ID)
 
+  ####################################################################################
 
   # all fine
   expect_true(is.null(population_check(mySampleSheet, methylation_data, envir)))
+
+  ####################################################################################
 
   #Sample_ID has NA
   mySampleSheet$Sample_ID[1] <- NA
   expect_true(!is.null(population_check(mySampleSheet, methylation_data, envir)))
 
+  ####################################################################################
+
   #Sample_Group has NA
   mySampleSheet$Sample_Group[1] <- NA
   expect_true(!is.null(population_check(mySampleSheet, methylation_data, envir)))
 
+  ####################################################################################
+
   #Lost Sample_Group Values
   mySampleSheet$Sample_Group <- NA
   expect_true(!is.null(population_check(mySampleSheet, methylation_data, envir)))
+
+  ####################################################################################
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
