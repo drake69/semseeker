@@ -5,7 +5,7 @@ create_deltaq <- function(envir, resultPopulation){
   variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "envir", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
                            ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
                            ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-                           ".RNGkind_length", "tail", "RNGstr","update_multiple_bed")
+                           ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probes_get")
   i <- 2
   localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
                            "FIGURE"=envir$keys_figures_default[,1],
