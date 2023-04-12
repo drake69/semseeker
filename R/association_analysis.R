@@ -24,11 +24,17 @@
 association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
 {
 
-
   j <- 0
   k <- 0
   z <- 0
   envir <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
+
+  arguments <- list(...)
+  areas_selection <- c()
+  if(!is.null(arguments[["areas_selection"]]))
+  {
+    areas_selection <-arguments$areas_selection
+  }
 
 
   figures <- envir$keys_figures[,1]
@@ -351,40 +357,43 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   message("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
                   tempDataFrame <- utils::read.csv(fname, sep  =  ";")
                   #assign the area name (eg gene...) to the rows
+                  # has SAMPLEID as name but is the genomic area
                   row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+                  if(length(areas_selection)>0)
+                    tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection, ]
                   #removes area name (eg. gene...)
                   tempDataFrame <- tempDataFrame[,-1]
                   # max_row_count <- ceiling(10^6/ncol(tempDataFrame))
                   # batch_count <- ceiling(nrow(tempDataFrame)/max_row_count)
                   # for(h in 0:batch_count)
                   # {
-                  # tt <- tempDataFrame[ (1+h*max_row_count):min((h+1)*max_row_count,nrow(tempDataFrame)), ]
-                  tt <- tempDataFrame
-                  tt <- t(tt)
-                  tt <- as.data.frame(tt)
-                  tt$Sample_ID <- rownames(tt)
-                  message("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tt), " rows.")
-                  if(nrow(tt)>1)
+                  # tempDataFrameBatch <- tempDataFrame[ (1+h*max_row_count):min((h+1)*max_row_count,nrow(tempDataFrame)), ]
+                  tempDataFrameBatch <- tempDataFrame
+                  tempDataFrameBatch <- t(tempDataFrameBatch)
+                  tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                  tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
+                  message("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
+                  if(nrow(tempDataFrameBatch)>1)
                   {
-                    tt <- subset(tt, "POPULATION"  !=   "Reference")
-                    tt <- subset(tt, "POPULATION"  !=   0)
-                    tt <-  merge( x  =   sample_names, y  =   tt,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
-                    tt <- as.data.frame(tt)
-                    tt$POPULATION <- sample_names[, independent_variable]
-                    tt[is.na(tt)] <- 0
-                    tt[, independent_variable] <- sample_names[, independent_variable]
-                    tt <- tt[, !(names(tt) %in% c("POPULATION","Sample_ID"))]
-                    cols <- (gsub(" ", "_", colnames(tt)))
+                    tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   "Reference")
+                    tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   0)
+                    tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
+                    tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                    tempDataFrameBatch$POPULATION <- sample_names[, independent_variable]
+                    tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
+                    tempDataFrameBatch[, independent_variable] <- sample_names[, independent_variable]
+                    tempDataFrameBatch <- tempDataFrameBatch[, !(names(tempDataFrameBatch) %in% c("POPULATION","Sample_ID"))]
+                    cols <- (gsub(" ", "_", colnames(tempDataFrameBatch)))
                     cols <- (gsub("-", "_", cols))
                     cols <- (gsub(":", "_", cols))
                     cols <- (gsub("/", "_", cols))
                     cols <- (gsub("'", "_", cols))
-                    tt <- as.data.frame(tt)
-                    if(length(colnames(tt)) !=  length(cols))
+                    tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                    if(length(colnames(tempDataFrameBatch)) !=  length(cols))
                       browser()
-                    colnames(tt) <- cols
+                    colnames(tempDataFrameBatch) <- cols
                     g_start <- 2 + length(covariates)
-                    result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tt, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
+                    result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
                                                                 key  =  key, transformation =  transformation, dototal  =  TRUE,
                                                                 logFolder =  envir$logFolder, independent_variable, depth_analysis, envir, ...)
 
