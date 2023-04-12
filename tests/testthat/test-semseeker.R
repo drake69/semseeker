@@ -9,7 +9,8 @@ test_that("semeeker", {
   nitem <- 1e3
   nsamples <- 21
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
 
@@ -31,7 +32,8 @@ test_that("semeeker", {
   nitem <- 1e3
   nsamples <- 21
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
 
@@ -54,7 +56,8 @@ test_that("semeeker", {
   nitem <- 1e3
   nsamples <- 21
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
 
@@ -78,6 +81,8 @@ test_that("semeeker", {
   mySampleSheet <- list(mySampleSheet_1, mySampleSheet_2, mySampleSheet_3)
   methylation_data <- list(methylation_data_1, methylation_data_2, methylation_data_3)
 
+  ####################################################################################
+
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
              parallel_strategy = "sequential", anomalies="DELTAQ", metaareas="GENE", figures="BOTH")
 
@@ -89,6 +94,8 @@ test_that("semeeker", {
 
   testthat::expect_true(nrow(localFileRes_both)>0)
 
+  ####################################################################################
+
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAS_BOTH")
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAS" ,"BOTH" ), "fst")
   localFileRes_both <- fst::read_fst(fileToRead)
@@ -96,12 +103,15 @@ test_that("semeeker", {
 
   testthat::expect_true(nrow(localFileRes_both)>0)
 
+  ####################################################################################
 
   # test deltaq creation
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAQ_BOTH")
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "DELTAQ" ,"BOTH" ), "fst")
   localFileRes_both <- fst::read_fst(fileToRead)
   testthat::expect_true(sum(is.na(localFileRes_both$VALUE))==0)
+
+  ####################################################################################
 
 })
 

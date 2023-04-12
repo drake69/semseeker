@@ -10,13 +10,14 @@ test_that("annotate_bed", {
 
   envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  nitem <- 1e5
+  nitem <- 1e3
   nsamples <- 5
 
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]

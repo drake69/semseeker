@@ -10,7 +10,8 @@ test_that("read_multiple_bed", {
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
@@ -27,6 +28,7 @@ test_that("read_multiple_bed", {
   Sample_Group <- rep("Control",nsamples)
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
+  ####################################################################################
   sp <- analize_population(envir=envir,
                            methylation_data=methylation_data,
                            sliding_window_size = 11,
@@ -58,6 +60,8 @@ test_that("read_multiple_bed", {
 
   res <-read_multiple_bed (envir, "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
   expect_true(nrow(res)>0)
+  ####################################################################################
+
   # res <-read_multiple_bed (envir, "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
   # res <-read_multiple_bed (envir, "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
   # expect_true(nrow(res)>0)

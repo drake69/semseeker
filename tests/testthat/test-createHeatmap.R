@@ -13,7 +13,8 @@ test_that("create_heatmap", {
   nitem <- 1e3
   nsamples <- 5
 
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
+  probes <- probes_get("PROBES_Gene_","Whole")
+  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
@@ -34,6 +35,8 @@ test_that("create_heatmap", {
   colnames(methylation_data) <- Sample_ID
   Sample_Group <- rep("Control",nsamples)
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
+
+  ####################################################################################
 
   sp <- analize_population(envir = envir,
                           methylation_data=methylation_data,
@@ -72,6 +75,8 @@ test_that("create_heatmap", {
 
   expect_true(file.exists(file.path(envir$result_folderChart,"/CHR/Control_CHR_MUTATIONS_BOTH.png")))
 
+  ####################################################################################
+
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
   columnLabel =  "GENE"
@@ -90,6 +95,8 @@ test_that("create_heatmap", {
 
   create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GENE"))
   expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_MUTATIONS_BOTH.png")))
+
+  ####################################################################################
 
   figures <- c("BOTH")
   anomalies <- c("DELTAS")
@@ -113,10 +120,12 @@ test_that("create_heatmap", {
   create_heatmap(envir, inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GROUP"))
   expect_true(file.exists(file.path(envir$result_folderChart,"/GENE_AREA/Control_GENE_AREA_DELTAS_BOTH.png")))
 
+  ####################################################################################
 
   create_heatmap( envir=envir,inputBedDataFrame =  final_bed,anomalies = anomalies, file_prefix = "GENE", groupColumnLabels = c("GENE"))
   expect_true(file.exists(file.path(envir$result_folderChart,"/GENE/Control_GENE_DELTAS_BOTH.png")))
 
+  ####################################################################################
 
   # final_bed <- final_bed [1:2,]
   # create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
