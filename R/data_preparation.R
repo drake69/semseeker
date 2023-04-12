@@ -96,19 +96,21 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
       independent_variableValues <-as.data.frame(as.numeric(tempDataFrame[,variable_to_transform]))
     }
     independent_variableValuesOrig <- independent_variableValues
-    try(
-      {
-        independent_variableValues = switch(
-          as.character(transformation),
-          "scale" = if(ncol(independent_variableValues)>1) as.data.frame(apply(independent_variableValues,2,scale)) else scale(independent_variableValues),
-          "log" = log(independent_variableValues),
-          "log2" = log2(independent_variableValues),
-          "log10"= log10(independent_variableValues),
-          "exp" = exp(independent_variableValues),
-          "none" = independent_variableValues,
-          independent_variableValues
-        )
-      }
+    suppressWarnings(
+      try(
+        {
+          independent_variableValues = switch(
+            as.character(transformation),
+            "scale" = if(ncol(independent_variableValues)>1) as.data.frame(apply(independent_variableValues,2,scale)) else scale(independent_variableValues),
+            "log" = log(independent_variableValues),
+            "log2" = log2(independent_variableValues),
+            "log10"= log10(independent_variableValues),
+            "exp" = exp(independent_variableValues),
+            "none" = independent_variableValues,
+            independent_variableValues
+          )
+        }
+      )
     )
 
     # if(grepl("quantile", transformation))

@@ -68,9 +68,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     if(length(quantreg_params)<4)
     {
       tau = as.numeric(quantreg_params[2])
-      suppressMessages({
-        model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
-      })
+      model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
       summary_qr <- suppressMessages(summary(model)$tTable)
       pvalue <- summary_qr[2,"Pr(>|t|)"]
       std.error <- summary_qr[2,"Std. Error"]
