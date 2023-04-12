@@ -75,10 +75,10 @@ coverage_analysis <- function(methylation_data, envir)
   temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$GROUP, temp_cov_result$subgroup, sep=" ")
   temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / temp_cov_result$TOTAL_AREAS,2)
 
-  ggp <- ggplot2::ggplot(temp_cov_result, ggplot2::aes_string("GENOMIC_AREA", "COV_PERC")) +    # Create default ggplot2 heatmap
-    ggplot2::geom_tile(ggplot2::aes_string(fill = "AREA_PERC")) +
+  ggp <- ggplot2::ggplot(temp_cov_result, ggplot2::aes(.data$GENOMIC_AREA, .data$COV_PERC)) +    # Create default ggplot2 heatmap
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
-    ggplot2::geom_text(ggplot2::aes_string(label = "AREA_PERC")) +
+    ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC)) +
     ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
     ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
     ggplot2::labs(fill  = "Percentage\nover\neach\narea") +
@@ -112,18 +112,18 @@ coverage_analysis <- function(methylation_data, envir)
     dplyr::summarise(AREA_PERC = sum(.data$AREA_PERC)) %>%
     dplyr::mutate(GENOMIC_AREA = 'Total')
 
-  ggp <- ggplot2::ggplot(data = temp_cov_result, ggplot2::aes_string( x ="GENOMIC_AREA", y="COV_PERC" )) +    # Create default ggplot2 heatmap
-    ggplot2::geom_tile(ggplot2::aes_string(fill = "AREA_PERC")) +
+  ggp <- ggplot2::ggplot(data = temp_cov_result, ggplot2::aes( x =.data$GENOMIC_AREA, y=.data$COV_PERC )) +    # Create default ggplot2 heatmap
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
-    ggplot2::geom_text(ggplot2::aes_string(label = "AREA_PERC"), size=3) +
+    ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC), size=3) +
     ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
     ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
     ggplot2::labs(fill  = "Percentage\nover\nwhole\ngenome", color="% Covered\narea\nover\nstudied") +
-    ggplot2::geom_point(data = h_total, ggplot2::aes_string(color = "AREA_PERC"), size = 10, shape = 19) +
-    ggplot2::geom_point(data = v_total, ggplot2::aes_string(color = "AREA_PERC"), size = 10, shape = 19) +
+    ggplot2::geom_point(data = h_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
+    ggplot2::geom_point(data = v_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
     ggplot2::scale_color_gradient2(low = "white",high = "grey",midpoint = 0) +
-    ggplot2::geom_text(data = h_total, size = 3, ggplot2::aes_string(label = "AREA_PERC")) +
-    ggplot2::geom_text(data = v_total, size = 3, ggplot2::aes_string(label = "AREA_PERC"))
+    ggplot2::geom_text(data = h_total, size = 3, ggplot2::aes(label = .data$AREA_PERC)) +
+    ggplot2::geom_text(data = v_total, size = 3, ggplot2::aes(label = .data$AREA_PERC))
 
   ggplot2::ggsave(
     filename,
