@@ -46,10 +46,10 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
 
     if(!plyr::empty(sourceData))
     {
-      if(sum(grepl("END", colnames(probe_features)))>0)
-        sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START","END"))
+      if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
+        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START","END"))
       else
-        sourceData <- dplyr::inner_join(sourceData, probe_features, by = c("CHR", "START"))
+        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START"))
 
       sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
 
