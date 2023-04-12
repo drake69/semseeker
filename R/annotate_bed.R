@@ -61,7 +61,7 @@ annotate_bed <- function (
     progress_bar <- progressr::progressor(along = 1:nrow(envir$keysLocal))
 
   variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel",
-                           "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
+                           "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","probes_get")
 
   # for(i in 1:nrow(envir$keysLocal))
   final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%

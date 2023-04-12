@@ -44,7 +44,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
     "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_values","iqrTimes","envir")
   # message("Starting foreach withh: ", iters, " items")
-  message("INFO: ", Sys.time(), " I'll perform:",iters," tests." )
+
+  message("INFO: ", Sys.time(), " I'll perform:",iters - length(covariates)," tests." )
   result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
   # for(g in g_start:iters)
   {
@@ -127,6 +128,13 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       {
         dependentVariableData <- as.numeric(stats::na.omit(tempDataFrame[!is.na(tempDataFrame[,independent_variable]),burdenValue]))
         independent_variableData <- as.numeric(stats::na.omit(tempDataFrame[  ,independent_variable]))
+
+        if(sum(is.na(dependentVariableData)>0) | sum(is.na(independent_variableData)))
+        {
+          message("ERROR: ", Sys.time(), "The submitted data are not factorial or numeric.")
+          stop()
+        }
+
         local_result <- data.frame (
           "INDIPENDENT.VARIABLE"= independent_variable,
           "ANOMALY" = key$ANOMALY,
