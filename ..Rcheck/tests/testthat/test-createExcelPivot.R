@@ -27,8 +27,7 @@ test_that("create_excel_pivot", {
   Sample_Group <- c(rep("Control",nsamples/2), rep("Case",nsamples/2))
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analize_population(envir = envir,
-                          methylation_data=methylation_data,
+  sp <- analize_population(methylation_data=methylation_data,
                           sliding_window_size = 11,
                           beta_superior_thresholds = beta_superior_thresholds,
                           beta_inferior_thresholds = beta_inferior_thresholds,

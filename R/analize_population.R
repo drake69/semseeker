@@ -1,7 +1,6 @@
 #' Calculate stochastic epi mutations from a methylation dataset as outcome
 #' report of pivot
 #'
-#' @param envir semseekere working infos
 #' @param methylation_data whole matrix of data to analyze.
 #' @param sliding_window_size size of the sliding widows to compute epilesions
 #' default 11 probes.
@@ -23,8 +22,9 @@
 #' @importFrom foreach %dopar%
 #' @importFrom doRNG %dorng%
 
-analize_population <- function(envir, methylation_data, sliding_window_size, beta_superior_thresholds, beta_inferior_thresholds, sample_sheet, beta_medians, bonferroni_threshold = 0.05, probe_features) {
+analize_population <- function(methylation_data, sliding_window_size, beta_superior_thresholds, beta_inferior_thresholds, sample_sheet, beta_medians, bonferroni_threshold = 0.05, probe_features) {
 
+  envir <- .pkgglobalenv$ssEnv
   # browser()
   start_time <- Sys.time()
   message("INFO: ", Sys.time(), " AnalyzePopulation warmingUP ")

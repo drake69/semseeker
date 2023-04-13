@@ -67,7 +67,7 @@ semseeker <- function(sample_sheet,
     sample_sheet_local <- sample_sheet[[batch_id]]
     methylation_data_local <- stats::na.omit(methylation_data[[batch_id]])
     methylation_data_local <- methylation_data_local[rownames(methylation_data_local)%in%probes_to_preserve,]
-    sample_sheet_local <- analyze_batch(envir, methylation_data_local, sample_sheet_local, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
+    sample_sheet_local <- analyze_batch(methylation_data_local, sample_sheet_local, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
     if(exists("sample_sheet_result"))
       sample_sheet_result <- plyr::rbind.fill(sample_sheet_result, sample_sheet_local)
     else

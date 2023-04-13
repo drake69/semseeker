@@ -6,7 +6,6 @@
 report of pivot}
 \usage{
 analize_population(
-  envir,
   methylation_data,
   sliding_window_size,
   beta_superior_thresholds,
@@ -18,8 +17,6 @@ analize_population(
 )
 }
 \arguments{
-\item{envir}{semseekere working infos}
-
 \item{methylation_data}{whole matrix of data to analyze.}
 
 \item{sliding_window_size}{size of the sliding widows to compute epilesions
@@ -43,6 +40,8 @@ selector followed by selection value,}
 
 \item{probe_features}{probes detail from 27 to EPIC illumina dataset
 lesions definition}
+
+\item{envir}{semseekere working infos}
 }
 \value{
 files into the result folder with pivot table and bedgraph.

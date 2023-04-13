@@ -13,7 +13,7 @@
 #   nitem <- 1e3
 #   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
 #   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
-#  probes <- probes_get("PROBES_Gene_","Whole")
+#  probes <- semseeker::PROBES
 # probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
 # probe_features <- unique(probe_features)
 # probe_features$END <- probe_features$START

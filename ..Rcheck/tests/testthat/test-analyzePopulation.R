@@ -34,8 +34,7 @@
   bonferroni_threshold <- 0.01
 
   # browser()
-  sp <- analize_population(envir = envir,
-    methylation_data=methylation_data,
+  sp <- analize_population(methylation_data=methylation_data,
                     sliding_window_size = sliding_window_size,
                     beta_superior_thresholds = beta_superior_thresholds,
                     beta_inferior_thresholds = beta_inferior_thresholds,

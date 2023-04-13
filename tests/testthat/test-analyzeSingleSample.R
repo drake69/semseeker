@@ -1,5 +1,6 @@
 testthat::test_that("analyze_single_sample",{
 
+
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -12,7 +13,7 @@ testthat::test_that("analyze_single_sample",{
   tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
   values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -20,6 +21,10 @@ testthat::test_that("analyze_single_sample",{
 
   row.names(tresholds) <- probe_features$PROBE
   row.names(values) <- row.names(tresholds)
+
+  ####################################################################################
+
+  get_meth_tech(methylation_data)
 
   ####################################################################################
 

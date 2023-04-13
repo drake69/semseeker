@@ -11,7 +11,7 @@ testthat::test_that("delta_single_sample",{
   nitem <- 1e3
   values <- as.data.frame(rnorm(nitem, mean=0.5, sd=0.7))
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -25,6 +25,10 @@ testthat::test_that("delta_single_sample",{
   row.names(low_thresholds) <- probe_features$PROBE
 
   beta_medians <- high_thresholds - low_thresholds
+
+  ####################################################################################
+
+  get_meth_tech(methylation_data)
 
   ####################################################################################
 

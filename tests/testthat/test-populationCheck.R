@@ -18,6 +18,10 @@ test_that("population_check", {
 
   ####################################################################################
 
+  get_meth_tech(methylation_data)
+
+  ####################################################################################
+
   # all fine
   expect_true(is.null(population_check(mySampleSheet, methylation_data, envir)))
 

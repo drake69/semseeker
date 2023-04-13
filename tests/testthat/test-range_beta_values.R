@@ -8,7 +8,7 @@ test_that("range_beta_values", {
   nitem <- 5e4
   nsamples <- 21
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -33,8 +33,7 @@ test_that("range_beta_values", {
 
   ####################################################################################
   rr <- range_beta_values(methylation_data)
-  # sp <- analyze_batch(  envir = envir,
-  #                       methylation_data =  methylation_data,
+  # sp <- analyze_batch(  methylation_data =  methylation_data,
   #                       sample_sheet =  sample_sheet,
   #                       sliding_window_size = sliding_window_size,
   #                       bonferroni_threshold =  bonferroni_threshold,
