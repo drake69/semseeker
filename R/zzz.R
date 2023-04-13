@@ -1,4 +1,4 @@
-.pkgglobalenv <- new.env(parent=emptyenv())
+# .pkgglobalenv <- new.env(parent=emptyenv())
 
 .onLoad <- function(libname, pkgname) {
   .pkgglobalenv <- new.env(parent=emptyenv())
