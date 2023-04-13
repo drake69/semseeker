@@ -1,5 +1,6 @@
 test_that("analize_batch", {
 
+  # source("R/zzz.R")
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -8,7 +9,8 @@ test_that("analize_batch", {
   nitem <- 1e3
   nsamples <- 21
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  # probes <- semseeker::PROBES
+  probes <- semseeker::PROBES_CHR_CHR
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -28,13 +30,16 @@ test_that("analize_batch", {
 
   ####################################################################################
 
+  get_meth_tech(methylation_data)
+
+  ####################################################################################
+
   sliding_window_size <- 11
   bonferroni_threshold <- 0.01
   batch_id <- 1
   iqrTimes <- 3
 
-  sp <- analyze_batch(  envir = envir,
-                        methylation_data =  methylation_data,
+  sp <- analyze_batch(methylation_data =  methylation_data,
                         sample_sheet =  sample_sheet,
                         sliding_window_size = sliding_window_size,
                         bonferroni_threshold =  bonferroni_threshold,

@@ -1,25 +1,20 @@
-analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
+analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
 {
+  message("INFO: ", Sys.time(), " working on batch:", batch_id)
+
+  envir <- .pkgglobalenv$ssEnv
 
   # browser()
   methylation_data <- as.data.frame(methylation_data)
-  coverage_analysis(methylation_data = methylation_data, envir = envir)
+  get_meth_tech(methylation_data)
+  coverage_analysis(methylation_data = methylation_data)
+
   methDataTemp <- data.frame( "PROBE"= rownames(methylation_data), methylation_data)
   methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
   methylation_data <- methDataTemp[, -c(1)]
-
   rm(methDataTemp)
-  message("INFO: ", Sys.time(), " working on batch:", batch_id)
+
   message("INFO: ", Sys.time(), " I will work on:", nrow(methylation_data), " PROBES.")
-
-  if(nrow(methylation_data) == 485512)
-    message("INFO: ", Sys.time(), " seems a 450k dataset.")
-
-  if(nrow(methylation_data) == 27578)
-    message("INFO: ", Sys.time(), " seems a 27k dataset.")
-
-  if(nrow(methylation_data) == 866562)
-    message("INFO: ", Sys.time(), " seems an EPIC dataset.")
 
   probes <- semseeker::PROBES
   message("DEBUG: ", Sys.time(), " loaded probes: PROBES")
@@ -93,7 +88,6 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
     {
       # browser()
       resultPopulation <- analize_population(
-        envir = envir,
         methylation_data = methylation_data[, populationMatrixColumns] ,
         sliding_window_size = sliding_window_size,
         beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,

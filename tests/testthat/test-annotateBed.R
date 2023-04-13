@@ -1,5 +1,6 @@
 test_that("annotate_bed", {
 
+
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -16,7 +17,7 @@ test_that("annotate_bed", {
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -34,8 +35,12 @@ test_that("annotate_bed", {
   Sample_Group <- rep("Control",nsamples)
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analize_population(envir,
-                          methylation_data=methylation_data,
+  ####################################################################################
+
+  get_meth_tech(methylation_data)
+
+  ####################################################################################
+  sp <- analize_population(methylation_data=methylation_data,
                           sliding_window_size = 11,
                           beta_superior_thresholds = beta_superior_thresholds,
                           beta_inferior_thresholds = beta_inferior_thresholds,

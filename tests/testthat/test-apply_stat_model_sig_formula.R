@@ -1,5 +1,6 @@
 test_that("apply_stat_model_sig_formula", {
 
+  
   family_test = "gaussian"
   burdenValue = "dependent_variable"
   independent_variable = "independent_variable"

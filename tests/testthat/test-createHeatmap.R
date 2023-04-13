@@ -13,7 +13,7 @@ test_that("create_heatmap", {
   nitem <- 1e3
   nsamples <- 5
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -38,8 +38,11 @@ test_that("create_heatmap", {
 
   ####################################################################################
 
-  sp <- analize_population(envir = envir,
-                          methylation_data=methylation_data,
+  get_meth_tech(methylation_data)
+
+  ####################################################################################
+
+  sp <- analize_population(methylation_data=methylation_data,
                           sliding_window_size = 11,
                           beta_superior_thresholds = beta_superior_thresholds,
                           beta_inferior_thresholds = beta_inferior_thresholds,

@@ -290,5 +290,8 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     progressr::handlers(global = TRUE)
     progressr::handlers("progress")
   }
+
+  assign("ssEnv", ssEnv, envir=.pkgglobalenv)
+
   return(ssEnv)
 }

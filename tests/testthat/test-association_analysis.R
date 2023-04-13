@@ -8,7 +8,7 @@ test_that("association_analysis", {
   nitem <- 1e3
   nsamples <- 30
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -30,6 +30,10 @@ test_that("association_analysis", {
   mySampleSheet$Group <- c(rep(TRUE,nsamples/2), rep(FALSE,nsamples/2))
   mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
   mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
+
+  ####################################################################################
+
+  get_meth_tech(methylation_data)
 
   ####################################################################################
 

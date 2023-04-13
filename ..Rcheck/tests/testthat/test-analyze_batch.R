@@ -1,3 +1,4 @@
+
 test_that("analize_batch", {
 
   library(stringi)
@@ -30,8 +31,7 @@ test_that("analize_batch", {
   batch_id <- 1
   iqrTimes <- 3
 
-  sp <- analyze_batch(  envir = envir,
-                        methylation_data =  methylation_data,
+  sp <- analyze_batch( methylation_data =  methylation_data,
                         sample_sheet =  sample_sheet,
                         sliding_window_size = sliding_window_size,
                         bonferroni_threshold =  bonferroni_threshold,

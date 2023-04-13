@@ -1,8 +1,9 @@
-coverage_analysis <- function(methylation_data, envir)
+coverage_analysis <- function(methylation_data)
 {
   # probes <- PROBES_CHR_CHR
   # grp <- c("CHR")
   # probes_prefix <- "PROBES_CHR_"
+  envir <- .pkgglobalenv$ssEnv
 
   keys <- rbind(
     envir$keys_gene_probes,

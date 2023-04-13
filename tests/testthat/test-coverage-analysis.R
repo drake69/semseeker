@@ -1,14 +1,16 @@
 test_that("coverage-analysis", {
 
+  
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "sequential")
+  init_env(tempFolder, parallel_strategy = "sequential")
+  # envir <- .pkgglobalenv$ssEnv
 
   nitem <- 1e3
   nsamples <- 21
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -21,14 +23,14 @@ test_that("coverage-analysis", {
 
   row.names(methylation_data) <- probe_features$PROBE
 
-  res_cov <- coverage_analysis(methylation_data, envir)
+  res_cov <- coverage_analysis(methylation_data)
   testthat::expect_true(nrow(res_cov)!=0)
 
   # test cases of some ara fully missed
   nitem <- 1e2
   nsamples <- 21
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -42,11 +44,11 @@ test_that("coverage-analysis", {
   row.names(methylation_data) <- probe_features$PROBE
   ####################################################################################
 
-  res_cov <- coverage_analysis(methylation_data, envir)
+  res_cov <- coverage_analysis(methylation_data)
   testthat::expect_true(nrow(res_cov)!=0)
 
   ####################################################################################
 
-  close_env(envir)
+  # close_env(envir)
 })
 

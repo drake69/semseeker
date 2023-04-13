@@ -8,7 +8,7 @@ test_that("semeeker", {
   nitem <- 1e3
   nsamples <- 21
 
-  probes <- probes_get("PROBES_Gene_","Whole")
+  probes <- semseeker::PROBES
   probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -33,12 +33,15 @@ test_that("semeeker", {
   beta_medians <- beta_superior_thresholds + beta_inferior_thresholds / 2
 
   ####################################################################################
+
+  get_meth_tech(methylation_data)
+
+  ####################################################################################
   sliding_window_size <- 11
   bonferroni_threshold <- 0.01
 
   # browser()
-  sp <- analize_population(envir = envir,
-                           methylation_data=methylation_data,
+  sp <- analize_population(methylation_data=methylation_data,
                            sliding_window_size = sliding_window_size,
                            beta_superior_thresholds = beta_superior_thresholds,
                            beta_inferior_thresholds = beta_inferior_thresholds,
