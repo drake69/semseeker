@@ -3,9 +3,9 @@ test_that("create_excel_pivot", {
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "sequential")
+  ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
-  nitem <- 1e3
+  nitem <- 1e4
   nsamples <- 10
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
@@ -38,7 +38,7 @@ test_that("create_excel_pivot", {
   )
   sp$Sample_Group <- sample_sheet$Sample_Group
 
-  create_multiple_bed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed( sample_sheet = sample_sheet)
 
   populations <- c("Control","Case")
 
@@ -52,7 +52,7 @@ test_that("create_excel_pivot", {
 
   # create and read
   final_bed <- annotate_bed (
-    envir,
+    
     populations ,
     figures ,
     anomalies ,
@@ -69,21 +69,21 @@ test_that("create_excel_pivot", {
   probes_prefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
-  expect_true(file.exists(file.path(envir$result_folderData,"Pivots/GENE.xlsx")))
+  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
 
   subGroups <- c("")
   probes_prefix = "PROBES_CHR_"
   mainGroupLabel =  "CHR"
   subGroupLabel="GROUP"
-  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   subGroups <- c("")
   probes_prefix = "PROBES"
   mainGroupLabel =  "PROBE"
   subGroupLabel="GROUP"
-  create_excel_pivot (envir=envir, populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   #TODO: test incremental pivot
 

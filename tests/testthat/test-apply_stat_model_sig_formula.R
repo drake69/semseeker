@@ -7,7 +7,7 @@ test_that("apply_stat_model_sig_formula", {
   covariates = c("cov1","cov2","cov3")
 
   ff1 <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-  expect_true(ff1==as.formula("dependent_variable~independent_variable+cov1+cov2+cov3"))
+  testthat::expect_true(ff1==as.formula("dependent_variable~independent_variable+cov1+cov2+cov3"))
 
   family_test = "binomial"
   burdenValue = "dependent_variable"
@@ -15,7 +15,7 @@ test_that("apply_stat_model_sig_formula", {
   covariates = c("cov1","cov2","cov3")
 
   ff1 <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-  expect_true(ff1==as.formula("independent_variable~dependent_variable+cov1+cov2+cov3"))
+  testthat::expect_true(ff1==as.formula("independent_variable~dependent_variable+cov1+cov2+cov3"))
 
   family_test = "wilcoxon"
   burdenValue = "dependent_variable"
@@ -23,6 +23,6 @@ test_that("apply_stat_model_sig_formula", {
   covariates = c("cov1","cov2","cov3")
 
   ff1 <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-  expect_true(ff1==as.formula("dependent_variable~independent_variable"))
+  testthat::expect_true(ff1==as.formula("dependent_variable~independent_variable"))
 
 })

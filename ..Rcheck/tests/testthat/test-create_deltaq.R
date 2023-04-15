@@ -3,9 +3,9 @@ test_that("semeeker", {
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "sequential")
+  ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
-  nitem <- 1e3
+  nitem <- 1e4
   nsamples <- 20
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -44,9 +44,9 @@ test_that("semeeker", {
                            probe_features = probe_features
   )
 
-  create_multiple_bed(envir, sample_sheet)
+  create_multiple_bed( sample_sheet)
 
-  resiltPopulation <- create_deltaq(envir, sp)
+  resiltPopulation <- create_deltaq( sp)
 
   # test deltaq creation
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAQ_BOTH")

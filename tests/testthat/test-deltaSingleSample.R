@@ -1,30 +1,8 @@
 testthat::test_that("delta_single_sample",{
 
-  library(stringi)
-
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder)
-
-  Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
-
-  nitem <- 1e3
-  values <- as.data.frame(rnorm(nitem, mean=0.5, sd=0.7))
-
-  probes <- semseeker::PROBES
-  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
-  probe_features <- unique(probe_features)
-  probe_features$END <- probe_features$START
-  probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
-
-  high_thresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
-  low_thresholds <- data.frame(rnorm(nitem, mean=0.2, sd=0.2))
-
-  row.names(values) <- probe_features$PROBE
-  row.names(high_thresholds) <- probe_features$PROBE
-  row.names(low_thresholds) <- probe_features$PROBE
-
-  beta_medians <- high_thresholds - low_thresholds
+  ssEnv <- init_env(tempFolder)
 
   ####################################################################################
 
@@ -33,11 +11,10 @@ testthat::test_that("delta_single_sample",{
   ####################################################################################
 
   delta_single_sample(
-    envir = envir,
-    values = values,
-    high_thresholds = high_thresholds,
-    low_thresholds = low_thresholds,
-    sample_detail = data.frame("Sample_ID"= Sample_ID, "Sample_Group"="Control"),
+    values = methylation_data[,1],
+    high_thresholds = beta_superior_thresholds,
+    low_thresholds = beta_inferior_thresholds,
+    sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")],
     beta_medians = beta_medians,
     probe_features = probe_features
   )
@@ -45,9 +22,10 @@ testthat::test_that("delta_single_sample",{
   result_folderData  <-  dir_check_and_create(tempFolder, "Data")
   outputFolder <- dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
   fileName <- file_path_build(outputFolder,c(Sample_ID,"DELTAS","BOTH"), "bedgraph")
-  expect_true(file.exists(fileName))
+  testthat::expect_true(file.exists(fileName))
 
   ####################################################################################
-  close_env(envir)
+  unlink(tempFolder, recursive = TRUE)
+  close_env()
 
 })
