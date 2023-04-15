@@ -80,7 +80,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(parallel_strategy=="cluster")
   {
     message ("ERROR: ", Sys.time(), " Cluster feature not implemented!")
-    stop()
+    stop("I'm STOPPING HERE!")
     future::plan( future::cluster, workers = nCore)
   }
   if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
@@ -102,18 +102,19 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(sum(figures %in% ssEnv$keys_figures_default[,1])==0)
   {
     message("INFO: ", Sys.time(), " The only allowed figures values are:", ssEnv$keys_figures_default)
-    stop()
+    stop("I'm STOPPING HERE!")
   }
   if(sum(anomalies %in% ssEnv$keys_anomalies_default[,1])==0)
   {
     message("INFO: ", Sys.time(), " The only allowed anomalies values are:", ssEnv$keys_anomalies_default)
-    stop()
+    stop("I'm STOPPING HERE!")
   }
   if(sum(metaareas %in% ssEnv$keys_metaareas_default[,1])==0)
   {
     message("INFO: ", Sys.time(), " The only allowed areas values are:", ssEnv$keys_metaareas_default)
-    stop()
+    stop("I'm STOPPING HERE!")
   }
+
 
   message("INFO: ", Sys.time(), " I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
 
@@ -123,7 +124,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(!is.null(arguments[["metaareassub"]]))
   {
     ssEnv$gene_subareas <- as.data.frame(ssEnv$gene_subareas[ssEnv$gene_subareas[,"subarea"]  %in% arguments$metaareassub,])
-    ssEnv$island_subareas <- as.data.frame(ssEnv$island_subareas[ssEnv$island_subareas[,"subarea"] %in% arguments$metaareassub,  ])
+    ssEnv$island_subareas <- as.data.frame(ssEnv$island_subareas[ssEnv$island_subareas[,"subarea"] %in% arguments$metaareassub,])
+    if(sum(arguments$metaareassub %in% c(ssEnv$gene_subareas[,1],ssEnv$island_subareas))==0)
+    {
+      message("INFO: ", Sys.time(), " The only allowed areas values are:", ssEnv$keys_metaareas_default)
+      stop("I'm STOPPING HERE!")
+    }
   }
 
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))

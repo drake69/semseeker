@@ -21,8 +21,8 @@ test_that("create_multiple_bed", {
   )
 
   create_multiple_bed(mySampleSheet)
-
-  tempresult_folder <-dir_check_and_create(ssEnv$result_folderData,c("Control","MUTATIONS_BOTH"))
+  result_folderData  <-  dir_check_and_create(tempFolder, "Data")
+  tempresult_folder <-dir_check_and_create(result_folderData,c("Control","MUTATIONS_BOTH"))
   fileToRead <- file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "fst")
   localFileRes_both <- fst::read_fst(fileToRead)
   testthat::expect_true(nrow(localFileRes_both)>0)

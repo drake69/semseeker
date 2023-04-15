@@ -11,6 +11,10 @@ test_that("test_match_order", {
   ####################################################################################
   #values not matching
   testthat::expect_true( !test_match_order( probe_features[-nrow(probe_features),"ABSOLUTE"],probe_features[-1, "ABSOLUTE"] ))
-  # close_env()
+
+  ####################################################################################
+  #one of two is NULL
+  testthat::expect_false( test_match_order( probe_features$ABSOLUTE,NULL) )
+
 }
 )
