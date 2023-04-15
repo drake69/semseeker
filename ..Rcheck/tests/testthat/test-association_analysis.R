@@ -4,34 +4,10 @@ test_that("association_analysis", {
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
-  nitem <- 1e3
-  nsamples <- 30
-
-  probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
-  probe_features <- unique(probe_features)
-  probe_features$END <- probe_features$START
-
-  nitem <- min(nitem, nrow(probe_features))
-
-  probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
-
-  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
-  row.names(methylation_data) <- probe_features$PROBE[1:nitem]
-
-  Sample_ID <- stringi::stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
-  colnames(methylation_data) <- Sample_ID
-  Sample_Group <- c(rep("Control",nsamples/3),rep("Reference",nsamples/3),rep("Case",nsamples/3))
-  mySampleSheet <- data.frame(Sample_Group, Sample_ID)
-
-  mySampleSheet$Phenotest <- rnorm(nsamples, mean= 1000, sd= 567)
-  mySampleSheet$Group <- c(rep(TRUE,nsamples/2), rep(FALSE,nsamples/2))
-  mySampleSheet$Covariates1 <- rnorm(nsamples, mean= 567, sd= 1000)
-  mySampleSheet$Covariates2 <- rnorm(nsamples, mean= 67, sd= 100)
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
-  #todo: test incremental association analysis
 
+  #todo: test incremental association analysis
   # inference_details <- expand.grid("independent_variable"= "Phenotest",
   #                                  "covariates"=c("Covariates1+Covariates2"),
   #                                  "family_test"=c("quantreg_0.5_1000_15000_0.9"),

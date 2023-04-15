@@ -3,7 +3,7 @@ testthat::test_that("lesions_get",{
   library(stringi)
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 
-  nitem <- 1e3
+  nitem <- 1e4
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
@@ -49,6 +49,6 @@ testthat::test_that("lesions_get",{
     grouping_column = "CHR"
   )
 
-  expect_true(nrow(lesions_hyper)!=0 | nrow(lesions_hypo)!=0)
+  testthat::expect_true(nrow(lesions_hyper)!=0 | nrow(lesions_hypo)!=0)
 
 })

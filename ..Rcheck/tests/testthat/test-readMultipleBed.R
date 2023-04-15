@@ -3,9 +3,9 @@ test_that("read_multiple_bed", {
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "sequential")
+  ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
-  nitem <- 1e3
+  nitem <- 1e4
   nsamples <- 5
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
@@ -38,7 +38,7 @@ test_that("read_multiple_bed", {
   )
 
   sp$Sample_Group <- sample_sheet$Sample_Group
-  create_multiple_bed(envir, sample_sheet)
+  create_multiple_bed( sample_sheet)
 
   figures <- c("HYPO", "HYPER", "BOTH")
   anomalies <- c("MUTATIONS","LESIONS","DELTAS")
@@ -49,17 +49,17 @@ test_that("read_multiple_bed", {
   groupingColumnLabel="GROUP"
   populationName <- unique(Sample_Group)
 
-  probe_features <- get(paste0(probes_prefix,"Whole",sep=""), envir = asNamespace("semseeker"))
+  probe_features <- get(paste0(probes_prefix,"Whole",sep=""), envir=asNamespace("semseeker"))
 
 
-  res <-read_multiple_bed (envir, "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
-  expect_true(nrow(res)>0)
+  res <-read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  testthat::expect_true(nrow(res)>0)
 
-  res <-read_multiple_bed (envir, "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
-  expect_true(nrow(res)>0)
-  # res <-read_multiple_bed (envir, "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
-  # res <-read_multiple_bed (envir, "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
-  # expect_true(nrow(res)>0)
+  res <-read_multiple_bed ( "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  testthat::expect_true(nrow(res)>0)
+  # res <-read_multiple_bed ( "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # res <-read_multiple_bed ( "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # testthat::expect_true(nrow(res)>0)
 
 }
 )
