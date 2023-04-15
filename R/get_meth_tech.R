@@ -1,6 +1,5 @@
 get_meth_tech <- function(methylation_data)
 {
-
   ssEnv <- .pkgglobalenv$ssEnv
 
   if(nrow(methylation_data) == 485512)
@@ -12,31 +11,25 @@ get_meth_tech <- function(methylation_data)
   if(nrow(methylation_data) == 866562)
     message("INFO: ", Sys.time(), " seems an EPIC dataset.")
 
-  probes <- semseeker::PROBES_CHR_CHR
+  probes <- semseeker::PROBES
   methylation_data$PROBE <- rownames(methylation_data)
   methylation_data_check <- merge(methylation_data,probes, by="PROBE")
 
-  k27 <- nrow(unique(subset(methylation_data_check, !k450 & !k850)))>0
-  k450 <- nrow(unique(subset(methylation_data_check, k450 & !k850)))>0
-  k850 <- nrow(unique(subset(methylation_data_check, !k450 & k850)))>0
+  methylation_data_check <- na.omit(subset(methylation_data_check, CHR !=""))
 
-  if(k27)
-  {
-    ssEnv$tech <- "k27"
-    message("INFO: ", Sys.time(), " the dataset is a 27k dataset.")
-  }
+  tech <- colSums(methylation_data_check[,c("k27","k450","k850")])
 
-  if(k450)
-  {
-    ssEnv$tech <- "k450"
-    message("INFO: ", Sys.time(), " the dataset is a 450k dataset.")
-  }
+  tech <-  c("k27","k450","k850")[which(tech==max(tech))]
 
-  if(k850)
-  {
-    ssEnv$tech <- "k850"
-    message("INFO: ", Sys.time(), " the dataset is a 850k dataset.")
-  }
+  msg = switch(
+    tech,
+    "k27"= paste("INFO: ", Sys.time(), " the dataset is a 27k dataset."),
+    "k450"= paste("INFO: ", Sys.time(), " the dataset is a 450k dataset."),
+    "k850"= paste("INFO: ", Sys.time(), " the dataset is a 850k dataset.")
+  )
+
+  ssEnv$tech <- tech
+  message(msg)
 
   assign("ssEnv", ssEnv, envir=.pkgglobalenv)
 

@@ -1,6 +1,5 @@
 #' read multiple bed with annotated data as per input parameter
 #'
-#' @param envir semseekere working infos
 #' @param anomalyLabel anomaly definition used to label folder and files eg MUTATIONS, LESIONS
 #' @param probe_features features of probe CHR and START and NAME
 #' @param figureLable figures like hypo/hyper to built the data path
@@ -11,10 +10,13 @@
 #' @return list of pivot by column identified with column Label and by Sample
 
 #'
-read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
+read_multiple_bed <- function( anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
 {
+
+  ssEnv <- .pkgglobalenv$ssEnv
+
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
-  souceFolder <- dir_check_and_create(envir$result_folderData, c(as.character(populationName),f))
+  souceFolder <- dir_check_and_create(ssEnv$result_folderData, c(as.character(populationName),f))
 
   if(as.character(anomalyLabel)=="DELTAS" | as.character(anomalyLabel)=="DELTAQ")
   {
@@ -38,6 +40,9 @@ read_multiple_bed <- function(envir, anomalyLabel, figureLable, probe_features, 
     colnames(sourceData) <- col_names
 
     sourceData$CHR <- as.factor(sourceData$CHR)
+    if(nrow(probe_features)==0 | nrow(sourceData)==0)
+      return(sourceData)
+
     probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
     probe_features <- probe_features[(probe_features$CHR %in% unique((sourceData$CHR))), ]

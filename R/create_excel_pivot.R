@@ -1,14 +1,16 @@
 #' @importFrom doRNG %dorng%
-create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
+create_excel_pivot <-  function( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
-  final_bed <-  annotate_bed( envir=envir, populations =   populations,figures =  figures ,anomalies =  anomalies,
+  ssEnv <- .pkgglobalenv$ssEnv
+
+  final_bed <-  annotate_bed(populations =   populations,figures =  figures ,anomalies =  anomalies,
                               groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel, groupingColumnLabel = subGroupLabel)
   i <- 0
   k <- 0
   if (is.null(final_bed) | plyr::empty(final_bed) | nrow(final_bed)==0)
     return()
 
-  reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
+  reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
   final_bed <- data.frame(final_bed, "KEY" = final_bed[,mainGroupLabel])
   final_bed[,mainGroupLabel] <- as.factor(final_bed[,mainGroupLabel])
@@ -25,34 +27,34 @@ create_excel_pivot <-  function(envir, populations, figures, anomalies, subGroup
   # sheetListNames <- vector(mode="list")
 
   fileNameXLS <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
-  envir$keys <- expand.grid("groups"= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-  envir$keys$future_shee_list <-  paste(envir$keys$anomalies,"_",envir$keys$figures,"_",  mainGroupLabel,"_",envir$keys$groups, sep="")
+  ssEnv$keys <- expand.grid("groups"= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
+  ssEnv$keys$future_shee_list <-  paste(ssEnv$keys$anomalies,"_",ssEnv$keys$figures,"_",  mainGroupLabel,"_",ssEnv$keys$groups, sep="")
 
   if(file.exists(fileNameXLS))
   {
     old_sheet_list <- readxl::excel_sheets(fileNameXLS)
     # old_workbook <- openxlsx::loadWorkbook(fileNameXLS)
     # old_sheet_list <- old_workbook$sheet_names
-    envir$keys <- envir$keys[!(envir$keys$future_shee_list %in% old_sheet_list), ]
+    ssEnv$keys <- ssEnv$keys[!(ssEnv$keys$future_shee_list %in% old_sheet_list), ]
   }
 
 
-  toExport <- c("envir", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
-  sheetList <- foreach::foreach(k=1:nrow(envir$keys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
-    # for(k in 1:nrow(envir$keys))
+  toExport <- c("ssEnv", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
+  sheetList <- foreach::foreach(k=1:nrow(ssEnv$keys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
+    # for(k in 1:nrow(ssEnv$keys))
     {
       # k <- 1
-      grp <- as.character(envir$keys[k,"groups"])
-      anomaly <- as.character(envir$keys[k,"anomalies"])
-      pivot_file_name <- envir$keys$future_shee_list[k]
+      grp <- as.character(ssEnv$keys[k,"groups"])
+      anomaly <- as.character(ssEnv$keys[k,"anomalies"])
+      pivot_file_name <- ssEnv$keys$future_shee_list[k]
       temp <- subset(tempPopData, tempPopData[,subGroupLabel]==grp)
       if(!plyr::empty(temp))
       {
-        anomaly <- as.character(envir$keys[k,"anomalies"])
+        anomaly <- as.character(ssEnv$keys[k,"anomalies"])
         tempAnomaly <- subset(temp, temp$ANOMALY == as.character(anomaly))
         if(!plyr::empty(tempAnomaly))
         {
-          figure <- as.character(envir$keys[k,"figures"])
+          figure <- as.character(ssEnv$keys[k,"figures"])
           tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
           if(!plyr::empty(tempDataFrame))
           {

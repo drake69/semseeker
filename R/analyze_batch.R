@@ -2,7 +2,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
 {
   message("INFO: ", Sys.time(), " working on batch:", batch_id)
 
-  envir <- .pkgglobalenv$ssEnv
+  ssEnv <- .pkgglobalenv$ssEnv
 
   # browser()
   methylation_data <- as.data.frame(methylation_data)
@@ -39,7 +39,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   # }
 
 
-  population_checkResult <- population_check(sample_sheet, methylation_data, envir)
+  population_checkResult <- population_check(sample_sheet, methylation_data)
   if(!is.null(population_checkResult))
   {
     stop(population_checkResult)
@@ -61,8 +61,8 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
 
   populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
 
-  # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
-  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(envir$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
+  # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
+  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]
@@ -71,13 +71,13 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  # variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
-  # resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  for (i in 1:length(envir$keys_populations[,1]))
+  # variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
+  # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  for (i in 1:length(ssEnv$keys_populations[,1]))
   {
 
     #
-    populationName <- envir$keys_populations[i,1]
+    populationName <- ssEnv$keys_populations[i,1]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == populationName, ]
     populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
 
@@ -100,7 +100,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
 
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- populationName
-      create_multiple_bed(envir, resultPopulation)
+      create_multiple_bed( resultPopulation)
 
       # resultPopulation
       # resultPopulation
@@ -118,7 +118,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
     }
   }
 
-  resultSampleSheet <- create_deltaq(envir, resultSampleSheet)
+  resultSampleSheet <- create_deltaq( resultSampleSheet)
 
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)

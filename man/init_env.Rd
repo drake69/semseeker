@@ -2,7 +2,7 @@
 % Please edit documentation in R/init_env.R
 \name{init_env}
 \alias{init_env}
-\title{init environment}
+\title{init ssEnvonment}
 \usage{
 init_env(
   result_folder,
@@ -21,8 +21,8 @@ init_env(
 \item{...}{other options to filter elaborations}
 }
 \value{
-the working environment
+the working ssEnvonment
 }
 \description{
-init environment
+init ssEnvonment
 }

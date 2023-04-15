@@ -8,10 +8,12 @@
 #' @param dototal boolean to calculate the total burden test/regression
 #' @param covariates vector of covariates to be found in the sample sheet
 #' @param depth_analysis 1 only sample, 2 chr, 3 alle genomic areas
-#' @param envir environment infos
 #'
-data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis, envir)
+data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
 {
+
+  ssEnv <- .pkgglobalenv$ssEnv
+
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame
 
@@ -136,7 +138,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   lost_cols <- colSums(apply(tempDataFrame,2,is.nan))!=0
   lostDataFrame <-  colnames(tempDataFrame)[lost_cols]
   if(sum(lost_cols)!=0)
-    utils::write.csv2(lostDataFrame, file.path(envir$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
+    utils::write.csv2(lostDataFrame, file.path(ssEnv$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
 
   #  we want to preserve the NA in the independent variables to be removed by the models
   tempDataFrame[apply(tempDataFrame,2,is.nan)] <- 0

@@ -1,4 +1,4 @@
-log_event <- function(envir,...)
+log_event <- function(...)
 {
   arguments <- list(...)
 
