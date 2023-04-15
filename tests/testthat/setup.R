@@ -1,5 +1,5 @@
 
-nitem <- 4e3
+nitem <- 4e4
 nsamples <- 21
 
 probes <- semseeker::PROBES
@@ -50,7 +50,7 @@ beta_superior_thresholds <<- beta_superior_thresholds
 tresholds <<- tresholds
 
 sliding_window_size <<- 11
-bonferroni_threshold <<- 0.01
+bonferroni_threshold <<- 0.1
 batch_id <<- 1
 iqrTimes <<- 3
 

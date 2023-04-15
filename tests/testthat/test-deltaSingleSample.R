@@ -21,7 +21,7 @@ testthat::test_that("delta_single_sample",{
 
   result_folderData  <-  dir_check_and_create(tempFolder, "Data")
   outputFolder <- dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
-  fileName <- file_path_build(outputFolder,c(Sample_ID,"DELTAS","BOTH"), "bedgraph")
+  fileName <- file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTH"), "bedgraph")
   testthat::expect_true(file.exists(fileName))
 
   ####################################################################################
