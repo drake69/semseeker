@@ -1,11 +1,11 @@
-#' init environment
+#' init ssEnvonment
 #'
 #' @param result_folder where result of semseeker will bestored
 #' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param ... other options to filter elaborations
 #'
-#' @return the working environment
+#' @return the working ssEnvonment
 init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession", ...)
 {
 
@@ -18,6 +18,9 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   ssEnv <- list()
   ssEnv$parallel_strategy <- parallel_strategy
+
+  tmp <- tempdir()
+  ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")

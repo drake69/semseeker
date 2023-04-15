@@ -13,8 +13,7 @@
 #' @param sample_sheet name of samplesheet's column to use as control population
 #' selector followed by selection value,
 #' @param beta_medians name of samplesheet's column to use as control population
-#' selector followed by selection value,
-#' @param envir semseekere working infos
+#' selector followed by selection value
 #' @param bonferroni_threshold threshold to define which pValue accept for
 #' @param probe_features probes detail from 27 to EPIC illumina dataset
 #' lesions definition
@@ -24,7 +23,7 @@
 
 analize_population <- function(methylation_data, sliding_window_size, beta_superior_thresholds, beta_inferior_thresholds, sample_sheet, beta_medians, bonferroni_threshold = 0.05, probe_features) {
 
-  envir <- .pkgglobalenv$ssEnv
+  ssEnv <- .pkgglobalenv$ssEnv
   # browser()
   start_time <- Sys.time()
   message("INFO: ", Sys.time(), " AnalyzePopulation warmingUP ")
@@ -50,10 +49,10 @@ analize_population <- function(methylation_data, sliding_window_size, beta_super
   #   clear = FALSE,
   #   width= 60)
 
-  if(envir$showprogress)
+  if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(sample_sheet))
 
-  variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "envir", "sliding_window_size", "beta_superior_thresholds",
+  variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "ssEnv", "sliding_window_size", "beta_superior_thresholds",
                            "bonferroni_threshold", "probe_features", "beta_inferior_thresholds", "analyze_single_sample_both", "delta_single_sample", "beta_medians", "progress_bar",
                            "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
   i <- 1
@@ -63,15 +62,17 @@ analize_population <- function(methylation_data, sliding_window_size, beta_super
     local_sample_detail <- sample_sheet[i,]
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
-    hyper_result <- analyze_single_sample(envir=envir, values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail, bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
-    hypo_result <- analyze_single_sample(envir=envir, values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail, bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
-    both_result_mutations <- analyze_single_sample_both(envir=envir, sample_detail =  local_sample_detail, "MUTATIONS")
-    both_result_lesions <- analyze_single_sample_both(envir=envir, sample_detail =  local_sample_detail, "LESIONS")
-    delta_result <- delta_single_sample (envir = envir, values = beta_values, high_thresholds = beta_superior_thresholds, low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail,
+    hyper_result <- analyze_single_sample( values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,
+      bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
+    hypo_result <- analyze_single_sample( values = beta_values, sliding_window_size = sliding_window_size,  thresholds = beta_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail,
+      bonferroni_threshold = bonferroni_threshold, probe_features = probe_features)
+    both_result_mutations <- analyze_single_sample_both( sample_detail =  local_sample_detail, "MUTATIONS")
+    both_result_lesions <- analyze_single_sample_both( sample_detail =  local_sample_detail, "LESIONS")
+    delta_result <- delta_single_sample ( values = beta_values, high_thresholds = beta_superior_thresholds, low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail,
                                          beta_medians = beta_medians, probe_features = probe_features)
     sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result, "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions)
 
-    if(envir$showprogress)
+    if(ssEnv$showprogress)
       progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
     # progress_bar$tick()
     sample_status_temp

@@ -34,14 +34,12 @@ population selector followed by selection value,}
 selector followed by selection value,}
 
 \item{beta_medians}{name of samplesheet's column to use as control population
-selector followed by selection value,}
+selector followed by selection value}
 
 \item{bonferroni_threshold}{threshold to define which pValue accept for}
 
 \item{probe_features}{probes detail from 27 to EPIC illumina dataset
 lesions definition}
-
-\item{envir}{semseekere working infos}
 }
 \value{
 files into the result folder with pivot table and bedgraph.

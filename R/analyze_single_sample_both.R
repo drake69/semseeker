@@ -1,5 +1,6 @@
-analyze_single_sample_both <- function(envir, sample_detail, anomaly) {
+analyze_single_sample_both <- function( sample_detail, anomaly) {
 
+  ssEnv <- .pkgglobalenv$ssEnv
   start_time_single_sample <- Sys.time()
   # message(sample_detail$Sample_ID, " ", "SingleSampleBoth Sample analysis warmingUP ", Sys.time())
   result <- ""
@@ -13,7 +14,7 @@ analyze_single_sample_both <- function(envir, sample_detail, anomaly) {
   for( i in 1:length(figures))
   {
     figure <- figures[i]
-    folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(anomaly,"_", figure, sep = "")))
+    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(anomaly,"_", figure, sep = "")))
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,anomaly,figure),"bed")
     if(file.exists(fileName))
     {
@@ -23,7 +24,7 @@ analyze_single_sample_both <- function(envir, sample_detail, anomaly) {
   }
 
   figure <- "BOTH"
-  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(anomaly,"_", figure, sep = "")))
+  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(anomaly,"_", figure, sep = "")))
   fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,anomaly,figure),"bed")
 
   dump_sample_as_bed_file(

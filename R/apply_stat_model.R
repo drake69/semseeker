@@ -10,19 +10,19 @@
 #' @param logFolder where to save log file
 #' @param independent_variable independent variable name
 #' @param depth_analysis depth's analysis
-#' @param envir object environment
 #' @param ... extra parameters
 #'
 #' @importFrom doRNG %dorng%
 #'
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder,
-                             independent_variable, depth_analysis=3, envir , ...)
+                             independent_variable, depth_analysis=3, ...)
 {
+  ssEnv <- .pkgglobalenv$ssEnv
   arguments <- list(...)
 
   boot_success <- if(is.null(arguments[["boot_success"]])) 0 else arguments$boot_success
   tests_count <- if(is.null(arguments[["tests_count"]])) 1 else arguments$tests_count
-  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis, envir)
+  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
   tempDataFrame <- prepared_data$tempDataFrame
   independent_variable1stLevel <- prepared_data$independent_variable1stLevel
   independent_variable2ndLevel <- prepared_data$independent_variable2ndLevel
@@ -32,7 +32,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   iters <- length(cols)
   g <- 0
 
-  if(envir$showprogress)
+  if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = g_start:iters)
   else
     progress_bar <- ""
@@ -42,7 +42,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count",
     "data_preparation","apply_stat_model_sig.formula","quantreg_model",
     "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
-    "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_values","iqrTimes","envir")
+    "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_values","iqrTimes","ssEnv")
   # message("Starting foreach withh: ", iters, " items")
 
   message("INFO: ", Sys.time(), " I'll perform:",iters - length(covariates)," tests." )
@@ -50,7 +50,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # for(g in g_start:iters)
   {
     burdenValue <- cols[g]
-    if(envir$showprogress)
+    if(ssEnv$showprogress)
       progress_bar(sprintf("genomic area: %s", stringr::str_pad( burdenValue, 20, side=c('left'), pad=' ')))
     if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>2){
 
@@ -230,6 +230,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     return(result_temp)
   }
   return(NULL)
-  if(envir$showprogress)
+  if(ssEnv$showprogress)
     remove(progress_bar)
 }

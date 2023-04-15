@@ -12,8 +12,7 @@ data_preparation(
   g_start,
   dototal,
   covariates,
-  depth_analysis,
-  envir
+  depth_analysis
 )
 }
 \arguments{
@@ -32,8 +31,6 @@ data_preparation(
 \item{covariates}{vector of covariates to be found in the sample sheet}
 
 \item{depth_analysis}{1 only sample, 2 chr, 3 alle genomic areas}
-
-\item{envir}{environment infos}
 }
 \description{
 Title
