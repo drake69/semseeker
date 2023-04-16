@@ -265,7 +265,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             {
               g_start <- 2 + length(covariates)
               result_temp <- apply_stat_model(tempDataFrame  =  study_summary[, c(independent_variable, covariates, cols[j])], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
-                                              key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, logFolder =  ssEnv$logFolder, independent_variable, depth_analysis,  ...)
+                                              key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
               result <- rbind(result, result_temp)
             }
 
@@ -366,7 +366,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection, ]
                   #removes area name (eg. gene...)
                   tempDataFrame <- tempDataFrame[,-1]
-                  if(nrow(tempDataFrame)==0)
+                  if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
                     next
                   # max_row_count <- ceiling(10^6/ncol(tempDataFrame))
                   # batch_count <- ceiling(nrow(tempDataFrame)/max_row_count)
@@ -400,7 +400,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     g_start <- 2 + length(covariates)
                     result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
                                                                 key  =  key, transformation =  transformation, dototal  =  TRUE,
-                                                                logFolder =  ssEnv$logFolder, independent_variable, depth_analysis,  ...)
+                                                                session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
 
                     if(!exists("result_temp_foreach"))
                       result_temp_foreach <- result_temp_local_batch

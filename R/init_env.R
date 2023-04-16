@@ -16,7 +16,8 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   #allow export of object of 8gb with future
   options(future.globals.maxSize= 16 * 1024^3)
 
-  ssEnv <- list()
+  ssEnv <- get_session_info(result_folder)
+
   ssEnv$parallel_strategy <- parallel_strategy
 
   tmp <- tempdir()
@@ -25,9 +26,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
   ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
+  ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
 
-  ssEnv$logFolder <-  dir_check_and_create(result_folder,c("log"))
+  if (sink.number() != 0)
+    sink(NULL)
+  sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE)
 
   foreachIndex <- 0
 
@@ -42,7 +46,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     nCore <- if(floor(future::availableCores() * maxResources/100 ) > nCore ) nCore else floor(future::availableCores() * maxResources/100 )
   }
   # bootstrap cluster
-  outFile <- file.path(ssEnv$logFolder, "cluster_r.out")
+  outFile <- file.path(ssEnv$session_folder, "cluster_r.out")
 
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   doFuture::registerDoFuture()
@@ -300,7 +304,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     progressr::handlers("progress")
   }
 
-  assign("ssEnv", ssEnv, envir=.pkgglobalenv)
+  update_session_info(ssEnv)
 
   return(ssEnv)
 }

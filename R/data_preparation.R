@@ -138,7 +138,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   lost_cols <- colSums(apply(tempDataFrame,2,is.nan))!=0
   lostDataFrame <-  colnames(tempDataFrame)[lost_cols]
   if(sum(lost_cols)!=0)
-    utils::write.csv2(lostDataFrame, file.path(ssEnv$logFolder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
+    utils::write.csv2(lostDataFrame, file.path(ssEnv$session_folder,paste("lost_data_",transformation,"_",stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),".log", sep="")))
 
   #  we want to preserve the NA in the independent variables to be removed by the models
   tempDataFrame[apply(tempDataFrame,2,is.nan)] <- 0

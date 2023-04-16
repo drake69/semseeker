@@ -7,14 +7,14 @@
 #' @param key key to identify file to elaborate
 #' @param transformation transformation to apply to covariates, burden and independent variable
 #' @param dototal do a total per area
-#' @param logFolder where to save log file
+#' @param session_folder where to save log file
 #' @param independent_variable independent variable name
 #' @param depth_analysis depth's analysis
 #' @param ... extra parameters
 #'
 #' @importFrom doRNG %dorng%
 #'
-apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, logFolder,
+apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, session_folder,
                              independent_variable, depth_analysis=3, ...)
 {
   ssEnv <- .pkgglobalenv$ssEnv
@@ -64,9 +64,14 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         model_result <- test_model(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 
       sink("/dev/null")
+      # if (sink.number() != 0)
+      #   sink(NULL)
+      # sink(file.path(ssEnv$session_folder,"session_output.log"), split = FALSE, append = TRUE)
+      # sink(tempfile())
       if (grepl("quantreg", family_test))
         model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
       sink()
+      # sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE, append = TRUE)
 
       pvalue <- model_result$pvalue
       beta_value <- model_result$beta_value
