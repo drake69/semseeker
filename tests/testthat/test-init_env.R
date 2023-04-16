@@ -29,7 +29,7 @@ test_that("test_init_env", {
   # testthat::expect_true(ssEnv$shoprogress==TRUE)
 
   unlink(tempFolder,recursive = TRUE)
-  close_env()
+  # close_env()
 
 }
 )

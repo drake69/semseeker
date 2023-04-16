@@ -1,5 +1,5 @@
 
-nitem <- 4e4
+nitem <- 4e3
 nsamples <- 21
 
 probes <- semseeker::PROBES

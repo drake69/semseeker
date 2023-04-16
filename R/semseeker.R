@@ -177,7 +177,7 @@ semseeker <- function(sample_sheet,
   # rm(populationControlRangeBetaValues)
 
   # message("Starting inference Analysis.")
-  # inferenceAnalysis(ssEnv$result_folderData = ssEnv$result_folderData, ssEnv$logFolder= ssEnv$logFolder, inferenceDetails)
+  # inferenceAnalysis(ssEnv$result_folderData = ssEnv$result_folderData, ssEnv$session_folder= ssEnv$session_folder, inferenceDetails)
   # future::autoStopCluster(computationCluster)
   # doFuture::stopImplicitCluster()
 
