@@ -239,17 +239,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           if(!is.null(covariates) && !length(covariates)  ==  0)
             study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
-
-          # define file results filename
-          if(is.null(covariates) || length(covariates)  ==  0)
-          {
-            file_suffix <- ""
-          }
-          else
-          {
-            file_suffix <- paste(covariates, collapse = "_")
-          }
-          fileNameResults <- file_path_build(ssEnv$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
+          fileNameResults <- inference_file_name(inference_detail)
 
           # clean keys from already done association
           if(file.exists(fileNameResults))
