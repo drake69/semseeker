@@ -63,7 +63,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       if(family_test=="wilcoxon" | family_test=="t.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
         model_result <- test_model(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 
-      sink("/dev/null")
+      sink("NUL")
       # if (sink.number() != 0)
       #   sink(NULL)
       # sink(file.path(ssEnv$session_folder,"session_output.log"), split = FALSE, append = TRUE)
