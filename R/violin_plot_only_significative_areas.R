@@ -9,8 +9,8 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
 
   metaareas <- utils::read.csv2(file.path(ssEnv$result_folderData, "/Pivots/", figure,"/", paste(figure,"_",anomaly,"_",metaarea,"_",subgroup, ".csv", sep="")))
   results_inference <- utils::read.csv2(file.path(ssEnv$result_folderInference,inference_file_name))
-  results_inference <- subset(results_inference, ANOMALY==anomaly & FIGURE==figure & GROUP == group & SUBGROUP == subgroup
-    & INDIPENDENT.VARIABLE==independent_variable)
+  results_inference <- subset(results_inference, "ANOMALY"==anomaly & "FIGURE"==figure & "GROUP" == group & "SUBGROUP" == subgroup
+    & "INDIPENDENT.VARIABLE"==independent_variable)
 
   #pivot hase SAMPLEID over the genomic area of interest
   metaareas <- metaareas[metaareas$SAMPLEID %in% results_inference[results_inference$PVALUEADJ_ALL_BH<0.05, "AREA_OF_TEST"], ]
