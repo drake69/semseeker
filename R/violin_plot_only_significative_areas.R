@@ -1,5 +1,4 @@
 #' @importFrom doRNG %dorng%
-#' @export
 violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, anomaly,metaarea, subgroup, independent_variable, transformation)
 {
   ssEnv <- .pkgglobalenv$ssEnv

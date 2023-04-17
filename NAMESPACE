@@ -3,7 +3,6 @@
 export(association_analysis)
 export(build_data_set_from_geo)
 export(semseeker)
-export(violin_plot_only_significative_areas)
 importFrom(doRNG,"%dorng%")
 importFrom(dplyr,"%>%")
 importFrom(foreach,"%dopar%")
