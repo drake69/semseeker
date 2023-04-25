@@ -12,10 +12,9 @@ apply_stat_model(
   key,
   transformation,
   dototal,
-  logFolder,
+  session_folder,
   independent_variable,
   depth_analysis = 3,
-  envir,
   ...
 )
 }
@@ -34,13 +33,11 @@ apply_stat_model(
 
 \item{dototal}{do a total per area}
 
-\item{logFolder}{where to save log file}
+\item{session_folder}{where to save log file}
 
 \item{independent_variable}{independent variable name}
 
 \item{depth_analysis}{depth's analysis}
-
-\item{envir}{object environment}
 
 \item{...}{extra parameters}
 }

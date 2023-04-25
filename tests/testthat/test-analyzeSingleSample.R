@@ -1,44 +1,28 @@
 testthat::test_that("analyze_single_sample",{
 
-  library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <-  init_env(tempFolder, parallel_strategy = "sequential")
-  Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
-  Sample_Group <- "Control"
+  ssEnv <-  init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ####################################################################################
 
-  nitem <- 1e3
-
-  tresholds <- data.frame("tresholds"= rnorm(nitem, mean=0.5, sd= 0.5))
-  values <- data.frame(Sample_ID=rnorm(nitem, mean=0.2, sd=0.5))
-
-  probes <- probes_get("PROBES_Gene_","Whole")
-  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
-  probe_features <- unique(probe_features)
-  probe_features$END <- probe_features$START
-  probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
-
-  row.names(tresholds) <- probe_features$PROBE
-  row.names(values) <- row.names(tresholds)
+  get_meth_tech(methylation_data)
 
   ####################################################################################
 
-  sp <- analyze_single_sample(envir = envir, values = values,
-                      sliding_window_size = 11,
-                      thresholds = tresholds,
+  sp <- analyze_single_sample( values = methylation_data[,1],
+                      sliding_window_size = sliding_window_size,
+                      thresholds = rep(1,nrow(methylation_data)),
                       figure = "HYPO",
-                      sample_detail = data.frame("Sample_ID"=Sample_ID, "Sample_Group"=Sample_Group) ,
+                      sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")] ,
                       bonferroni_threshold = 0.05,
                       probe_features = probe_features)
 
 
-  outputFolder <- dir_check_and_create(envir$result_folderData,c("Control","MUTATIONS_HYPO"))
-  fileName <- file_path_build(outputFolder,c(Sample_ID,"MUTATIONS","HYPO"), "bed")
-  expect_true(file.exists(fileName))
+  outputFolder <- dir_check_and_create(ssEnv$result_folderData,c("Control","MUTATIONS_HYPO"))
+  fileName <- file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"MUTATIONS","HYPO"), "bed")
+  testthat::expect_true(file.exists(fileName))
 
   ####################################################################################
-
-  # doParallel::stopImplicitCluster()
-  # parallel::stopCluster(computationCluster)
-  close_env(envir)
+  unlink(tempFolder,recursive = TRUE)
+  close_env()
 })

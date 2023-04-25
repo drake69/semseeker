@@ -1,7 +1,6 @@
 #' create_heatmap load the multiple bed resulting from
 #' analysis organized into files and folders per anomaly and produce a pivot
 #'
-#' @param envir semseekere working infos
 #' @param inputBedDataFrame data frame to chart
 #' @param anomalies vector of anomalies to manage
 #' @param file_prefix main genomic area to char eg: gene
@@ -10,9 +9,11 @@
 #' @return list of pivot by column identified with file_prefix and by Sample
 #' @importFrom doRNG %dorng%
 create_heatmap <-
-  function(envir, inputBedDataFrame, anomalies, file_prefix, groupColumnLabels ) {
+  function( inputBedDataFrame, anomalies, file_prefix, groupColumnLabels ) {
 
-    chartFolder <- dir_check_and_create(envir$result_folderChart,file_prefix)
+    ssEnv <- .pkgglobalenv$ssEnv
+
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,file_prefix)
 
     if (is.null(inputBedDataFrame) | plyr::empty(inputBedDataFrame) | nrow(inputBedDataFrame)==0)
       return()

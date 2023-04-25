@@ -1,11 +1,12 @@
+
 test_that("analize_batch", {
 
   library(stringi)
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder, parallel_strategy = "sequential")
+  init_env(tempFolder, parallel_strategy = "sequential")
 
-  nitem <- 1e3
+  nitem <- 1e4
   nsamples <- 21
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -30,8 +31,7 @@ test_that("analize_batch", {
   batch_id <- 1
   iqrTimes <- 3
 
-  sp <- analyze_batch(  envir = envir,
-                        methylation_data =  methylation_data,
+  sp <- analyze_batch( methylation_data =  methylation_data,
                         sample_sheet =  sample_sheet,
                         sliding_window_size = sliding_window_size,
                         bonferroni_threshold =  bonferroni_threshold,

@@ -1,19 +1,19 @@
 #' #' @importFrom doRNG %dorng%
-#' create_excel_pivot_big <-  function(envir ) {
+#' create_excel_pivot_big <-  function(ssEnv ) {
 #'
 #'   k <- 0
-#'   reportFolder <- dir_check_and_create(envir$result_folderData,"Pivots")
-#'   sample_sheet <- utils::read.csv2(file.path(envir$result_folderData,"sample_sheet_result.csv"))
+#'   reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
+#'   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
 #'   sample_names <- sample_sheet$Sample_ID
-#'   toExport <- c("envir","dir_check_and_create","sample_names","k")
-#'   pivot <- foreach::foreach(k=1:nrow(envir$keys_anomalies_figures_areas), .export = toExport, .combine= rbind , .multicombine=TRUE ) %dorng%
-#'   # for(k in 1:nrow(envir$keys_anomalies_figures_areas))
+#'   toExport <- c("ssEnv","dir_check_and_create","sample_names","k")
+#'   pivot <- foreach::foreach(k=1:nrow(ssEnv$keys_anomalies_figures_areas), .export = toExport, .combine= rbind , .multicombine=TRUE ) %dorng%
+#'   # for(k in 1:nrow(ssEnv$keys_anomalies_figures_areas))
 #'   {
 #'     # k <- 1
-#'     anomaly <- as.character(envir$keys_anomalies_figures_areas[k,"ANOMALY"])
-#'     figure <- as.character(envir$keys_anomalies_figures_areas[k,"FIGURE"])
-#'     group <- as.character(envir$keys_anomalies_figures_areas[k,"GROUP"])
-#'     subgroup <- as.character(envir$keys_anomalies_figures_areas[k,"SUBGROUP"])
+#'     anomaly <- as.character(ssEnv$keys_anomalies_figures_areas[k,"ANOMALY"])
+#'     figure <- as.character(ssEnv$keys_anomalies_figures_areas[k,"FIGURE"])
+#'     group <- as.character(ssEnv$keys_anomalies_figures_areas[k,"GROUP"])
+#'     subgroup <- as.character(ssEnv$keys_anomalies_figures_areas[k,"SUBGROUP"])
 #'
 #'     pivot_file_name <- paste(anomaly,"_",figure,"_",  group,"_",subgroup, sep="")
 #'     pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)

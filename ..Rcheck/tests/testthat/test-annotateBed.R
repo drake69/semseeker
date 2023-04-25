@@ -8,9 +8,9 @@ test_that("annotate_bed", {
   anomalies <- c("DELTAS","DELTAQ")
   metaareas <- c("GENE")
 
-  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
+  init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  nitem <- 1e3
+  nitem <- 1e4
   nsamples <- 5
 
   methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
@@ -33,8 +33,7 @@ test_that("annotate_bed", {
   Sample_Group <- rep("Control",nsamples)
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analize_population(envir,
-                          methylation_data=methylation_data,
+  sp <- analize_population(methylation_data=methylation_data,
                           sliding_window_size = 11,
                           beta_superior_thresholds = beta_superior_thresholds,
                           beta_inferior_thresholds = beta_inferior_thresholds,
@@ -45,7 +44,7 @@ test_that("annotate_bed", {
   )
   sp$Sample_Group <- sample_sheet$Sample_Group
 
-  create_multiple_bed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed( sample_sheet = sample_sheet)
 
   populations <- c("Control")
 
@@ -59,7 +58,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    envir,
+    
     populations ,
     figures ,
     anomalies ,
@@ -68,13 +67,13 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
 
 
   anomalies <- c("DELTAQ")
   # create and read
   final_bed <- annotate_bed (
-    envir,
+    
     populations ,
     figures ,
     anomalies ,
@@ -85,17 +84,17 @@ test_that("annotate_bed", {
 
 
   # file extsits
-  expect_true(file.exists(bedFileName))
+  testthat::expect_true(file.exists(bedFileName))
 
   # not empty data set
-  expect_true(nrow(final_bed)>0)
+  testthat::expect_true(nrow(final_bed)>0)
 
   # has the correct header
-  expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( columnLabel %in% colnames(final_bed))
 
   #read again  existent
   final_bed <- annotate_bed (
-    envir,
+    
     populations ,
     figures ,
     anomalies ,
@@ -104,7 +103,7 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( columnLabel %in% colnames(final_bed))
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
@@ -117,7 +116,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    envir,
+    
     populations ,
     figures ,
     anomalies ,
@@ -126,10 +125,10 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  # expect_true( columnLabel %in% colnames(final_bed))
-  expect_true( nrow(final_bed)>0)
+  # testthat::expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( nrow(final_bed)>0)
 
-  # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
   groups <- c("")
@@ -139,7 +138,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    envir,
+    
     populations ,
     figures ,
     anomalies ,
@@ -148,9 +147,9 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  expect_true( nrow(final_bed)>0)
-  # expect_true( columnLabel %in% colnames(final_bed))
-  # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  testthat::expect_true( nrow(final_bed)>0)
+  # testthat::expect_true( columnLabel %in% colnames(final_bed))
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
 })

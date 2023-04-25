@@ -1,15 +1,16 @@
-coverage_analysis <- function(methylation_data, envir)
+coverage_analysis <- function(methylation_data)
 {
   # probes <- PROBES_CHR_CHR
   # grp <- c("CHR")
   # probes_prefix <- "PROBES_CHR_"
+  ssEnv <- .pkgglobalenv$ssEnv
 
   keys <- rbind(
-    envir$keys_gene_probes,
-    envir$keys_dmr_probes,
-    envir$keys_island_probes,
-    envir$keys_probe_probes,
-    envir$keys_chr_probes
+    ssEnv$keys_gene_probes,
+    ssEnv$keys_dmr_probes,
+    ssEnv$keys_island_probes,
+    ssEnv$keys_probe_probes,
+    ssEnv$keys_chr_probes
   )
 
   for ( k in 1:nrow(keys))
@@ -23,6 +24,9 @@ coverage_analysis <- function(methylation_data, envir)
       rm(covered_count)
 
     probes <- probes_get(probes_prefix, subgroup)
+    if(plyr::empty(probes) | nrow(probes)==0)
+      next
+
     total_count <- stats::aggregate(probes$PROBE, list(probes[, grp]), FUN=length)
     colnames(total_count) <- c(as.character(grp),"COUNT_TOTAL")
 
@@ -40,6 +44,9 @@ coverage_analysis <- function(methylation_data, envir)
       coverage$COUNT_COVERED <- 0
       # coverage <- merge(total_count, covered_count, by=grp, all.x = TRUE)
     }
+
+    if(nrow(coverage)<2)
+      next
 
     coverage <- coverage[ !is.na(coverage[,grp]),]
     coverage <- coverage[ coverage[,grp]!="",]
@@ -65,7 +72,10 @@ coverage_analysis <- function(methylation_data, envir)
 
   }
 
-  chartFolder <- dir_check_and_create(envir$result_folderChart,"COVERAGE")
+  if(nrow(tot_result)<1)
+    return()
+
+  chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
   filename = paste0( chartFolder,"/","EACH_AREA_COVERAGE_ANALYSIS.png",sep="")
 
   temp_cov_result <- subset(cov_result,subgroup !="Whole")
@@ -140,7 +150,7 @@ coverage_analysis <- function(methylation_data, envir)
   # cov_result <- reshape2::dcast(data = cov_result, GROUP + subgroup ~ COV_PERC, value.var = "COUNT", sum)
   # number_areas <- rowSums(cov_result[,3:ncol(cov_result)])
   # cov_result[,3:ncol(cov_result)] <- round(100*cov_result[,3:ncol(cov_result)]/number_areas,0)
-  # chartFolder <- dir_check_and_create(envir$result_folderChart,"COVERAGE")
+  # chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
   # tt <- as.data.frame(cov_result[,3:ncol(cov_result)])
   # rownames(tt) <- paste(cov_result$GROUP,cov_result$subgroup, sep=" ")
   # colors <- grDevices::hsv(0.560, seq(0,1,length.out = 100) , 1)

@@ -1,11 +1,11 @@
-#' init environment
+#' init ssEnvonment
 #'
 #' @param result_folder where result of semseeker will bestored
 #' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param ... other options to filter elaborations
 #'
-#' @return the working environment
+#' @return the working ssEnvonment
 init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession", ...)
 {
 
@@ -16,15 +16,22 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   #allow export of object of 8gb with future
   options(future.globals.maxSize= 16 * 1024^3)
 
-  ssEnv <- list()
+  ssEnv <- get_session_info(result_folder)
+
   ssEnv$parallel_strategy <- parallel_strategy
+
+  tmp <- tempdir()
+  ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
   ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
+  ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
 
-  ssEnv$logFolder <-  dir_check_and_create(result_folder,c("log"))
+  if (sink.number() != 0)
+    sink(NULL)
+  sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE)
 
   foreachIndex <- 0
 
@@ -39,7 +46,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     nCore <- if(floor(future::availableCores() * maxResources/100 ) > nCore ) nCore else floor(future::availableCores() * maxResources/100 )
   }
   # bootstrap cluster
-  outFile <- file.path(ssEnv$logFolder, "cluster_r.out")
+  outFile <- file.path(ssEnv$session_folder, "cluster_r.out")
 
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   doFuture::registerDoFuture()
@@ -77,7 +84,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(parallel_strategy=="cluster")
   {
     message ("ERROR: ", Sys.time(), " Cluster feature not implemented!")
-    stop()
+    stop("I'm STOPPING HERE!")
     future::plan( future::cluster, workers = nCore)
   }
   if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
@@ -99,18 +106,19 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(sum(figures %in% ssEnv$keys_figures_default[,1])==0)
   {
     message("INFO: ", Sys.time(), " The only allowed figures values are:", ssEnv$keys_figures_default)
-    stop()
+    stop("I'm STOPPING HERE!")
   }
   if(sum(anomalies %in% ssEnv$keys_anomalies_default[,1])==0)
   {
     message("INFO: ", Sys.time(), " The only allowed anomalies values are:", ssEnv$keys_anomalies_default)
-    stop()
+    stop("I'm STOPPING HERE!")
   }
   if(sum(metaareas %in% ssEnv$keys_metaareas_default[,1])==0)
   {
     message("INFO: ", Sys.time(), " The only allowed areas values are:", ssEnv$keys_metaareas_default)
-    stop()
+    stop("I'm STOPPING HERE!")
   }
+
 
   message("INFO: ", Sys.time(), " I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
 
@@ -120,7 +128,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(!is.null(arguments[["metaareassub"]]))
   {
     ssEnv$gene_subareas <- as.data.frame(ssEnv$gene_subareas[ssEnv$gene_subareas[,"subarea"]  %in% arguments$metaareassub,])
-    ssEnv$island_subareas <- as.data.frame(ssEnv$island_subareas[ssEnv$island_subareas[,"subarea"] %in% arguments$metaareassub,  ])
+    ssEnv$island_subareas <- as.data.frame(ssEnv$island_subareas[ssEnv$island_subareas[,"subarea"] %in% arguments$metaareassub,])
+    if(sum(arguments$metaareassub %in% c(ssEnv$gene_subareas[,1],ssEnv$island_subareas))==0)
+    {
+      message("INFO: ", Sys.time(), " The only allowed areas values are:", ssEnv$keys_metaareas_default)
+      stop("I'm STOPPING HERE!")
+    }
   }
 
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))
@@ -290,5 +303,8 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     progressr::handlers(global = TRUE)
     progressr::handlers("progress")
   }
+
+  update_session_info(ssEnv)
+
   return(ssEnv)
 }

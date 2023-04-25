@@ -15,7 +15,7 @@ local({
     if (!is.null(override))
       return(override)
 
-    # next, check environment variables
+    # next, check ssEnvonment variables
     # TODO: prefer using the configuration one in the future
     envvars <- c(
       "RENV_CONFIG_AUTOLOADER_ENABLED",
@@ -60,7 +60,11 @@ local({
 
   # load bootstrap tools   
   `%||%` <- function(x, y) {
-    if (is.environment(x) || length(x)) x else y
+    if (is.ssEnvonment(x) || length(x)) x else y
+  }
+  
+  `%??%` <- function(x, y) {
+    if (is.null(x)) y else x
   }
   
   bootstrap <- function(version, library) {
@@ -83,10 +87,21 @@ local({
   
   renv_bootstrap_repos <- function() {
   
+    # get CRAN repository
+    cran <- getOption("renv.repos.cran", "https://cloud.r-project.org")
+  
     # check for repos override
     repos <- Sys.getenv("RENV_CONFIG_REPOS_OVERRIDE", unset = NA)
-    if (!is.na(repos))
+    if (!is.na(repos)) {
+  
+      # check for RSPM; if set, use a fallback repository for renv
+      rspm <- Sys.getenv("RSPM", unset = NA)
+      if (identical(rspm, repos))
+        repos <- c(RSPM = rspm, CRAN = cran)
+  
       return(repos)
+  
+    }
   
     # check for lockfile repositories
     repos <- tryCatch(renv_bootstrap_repos_lockfile(), error = identity)
@@ -104,10 +119,7 @@ local({
     repos <- getOption("repos")
   
     # ensure @CRAN@ entries are resolved
-    repos[repos == "@CRAN@"] <- getOption(
-      "renv.repos.cran",
-      "https://cloud.r-project.org"
-    )
+    repos[repos == "@CRAN@"] <- cran
   
     # add in renv.bootstrap.repos if set
     default <- c(FALLBACK = "https://cloud.r-project.org")
@@ -341,7 +353,7 @@ local({
   renv_bootstrap_download_tarball <- function(version) {
   
     # if the user has provided the path to a tarball via
-    # an environment variable, then use it
+    # an ssEnvonment variable, then use it
     tarball <- Sys.getenv("RENV_BOOTSTRAP_TARBALL", unset = NA)
     if (is.na(tarball))
       return()
@@ -935,7 +947,7 @@ local({
     remapped <- renv_json_remap(json, map)
   
     # evaluate
-    eval(remapped, envir = baseenv())
+    eval(remapped, ssEnv = baseenv())
   
   }
   

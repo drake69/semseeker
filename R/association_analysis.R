@@ -24,10 +24,12 @@
 association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
 {
 
+  ssEnv <- .pkgglobalenv$ssEnv
+
   j <- 0
   k <- 0
   z <- 0
-  envir <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
+  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 
   arguments <- list(...)
   areas_selection <- c()
@@ -37,61 +39,61 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   }
 
 
-  figures <- envir$keys_figures[,1]
-  anomalies <- envir$keys_anomalies[,1]
+  figures <- ssEnv$keys_figures[,1]
+  anomalies <- ssEnv$keys_anomalies[,1]
   populations <- c("Reference","Control","Case")
 
-  if(sum(envir$keys_metaareas[,1]  ==  "PROBE")  ==  1)
+  if(sum(ssEnv$keys_metaareas[,1]  ==  "PROBE")  ==  1)
   {
     subGroups <- c("")
     probes_prefix <- "PROBES"
     mainGroupLabel <-  "PROBE"
     subGroupLabel <- "GROUP"
-    create_excel_pivot (envir = envir, populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
+    create_excel_pivot ( populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
   }
 
-  if(sum(envir$keys_metaareas[,1]  ==  "CHR")  ==  1)
+  if(sum(ssEnv$keys_metaareas[,1]  ==  "CHR")  ==  1)
   {
     subGroups <- c("CHR")
     probes_prefix <- "PROBES_CHR_"
     mainGroupLabel <-  "CHR"
     subGroupLabel <- "GROUP"
-    create_excel_pivot (envir = envir, populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
+    create_excel_pivot ( populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
   }
 
-  if(sum(envir$keys_metaareas[,1]  ==  "GENE")  ==  1)
+  if(sum(ssEnv$keys_metaareas[,1]  ==  "GENE")  ==  1)
   {
-    subGroups <- envir$gene_subareas[,1]
+    subGroups <- ssEnv$gene_subareas[,1]
     probes_prefix  =  "PROBES_Gene_"
     mainGroupLabel  =   "GENE"
     subGroupLabel = "GROUP"
 
-    create_excel_pivot (envir = envir, populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
+    create_excel_pivot ( populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
   }
 
 
-  if(sum(envir$keys_metaareas[,1]  ==  "ISLAND")  ==  1)
+  if(sum(ssEnv$keys_metaareas[,1]  ==  "ISLAND")  ==  1)
   {
     probes_prefix <- "PROBES_Island_"
-    subGroups <- envir$island_subareas[,1]
+    subGroups <- ssEnv$island_subareas[,1]
     mainGroupLabel <- "ISLAND"
     subGroupLabel <- "RELATION_TO_CPGISLAND"
-    create_excel_pivot (envir = envir, populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+    create_excel_pivot ( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
   }
 
-  if(sum(envir$keys_metaareas[,1]  ==  "DMR")  ==  1)
+  if(sum(ssEnv$keys_metaareas[,1]  ==  "DMR")  ==  1)
   {
     subGroups <- c("DMR")
     probes_prefix  =  "PROBES_DMR_"
     mainGroupLabel  =   "DMR"
     subGroupLabel = "GROUP"
-    create_excel_pivot (envir = envir,populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+    create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
   }
 
   # if(exists("figures")) figures,  if(exists("anomalies"))  anomalies,if(exists("metaareas"))  metaareas
 
   inference_details <- unique(inference_details)
-  # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "envir", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
+  # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
   #                          "getRNG", "%||%", ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", ".getRNGattribute", "isNumber", "isReal", "isInteger", ".foreachGlobals", "RNGprovider", ".RNGkind_length", "tail",
   #                          "file_path_build", "dir_check_and_create", "apply_stat_model", "doRNGversion", ".getRNG", "hasRNG", "nextRNG", "RNGkind", "setRNG", "RNGstr")
 
@@ -137,13 +139,13 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           message("WARNING: ", Sys.time(), " Missed depth analysis inference forced to 1.")
         }
 
-        study_summary <-   utils::read.csv2(file_path_build( envir$result_folderData, "sample_sheet_result","csv"))
+        study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
 
         # transform independent variable as factor
         if(family_test  ==  "binomial" || family_test  ==  "wilcoxon" || family_test  ==  "t.test")
           study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
 
-        result_folderPivot <- dir_check_and_create(envir$result_folderData,"Pivots")
+        result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
         file_result_prefix <- paste(depth_analysis, as.character(independent_variable),sep = "_")
 
@@ -228,7 +230,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # binomiale che si vuole usare per la regressione logistica
 
 
-          keys <- expand.grid("ANOMALY" =  envir$keys_anomalies[,1], "FIGURE" =  envir$keys_figures[,1])
+          keys <- expand.grid("ANOMALY" =  ssEnv$keys_anomalies[,1], "FIGURE" =  ssEnv$keys_figures[,1])
           cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep = "")
           keys$GROUP  =  "POPULATION"
           keys$SUBGROUP  =  "SAMPLE"
@@ -237,17 +239,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           if(!is.null(covariates) && !length(covariates)  ==  0)
             study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
-
-          # define file results filename
-          if(is.null(covariates) || length(covariates)  ==  0)
-          {
-            file_suffix <- ""
-          }
-          else
-          {
-            file_suffix <- paste(covariates, collapse = "_")
-          }
-          fileNameResults <- file_path_build(envir$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
+          fileNameResults <- inference_file_name(inference_detail)
 
           # clean keys from already done association
           if(file.exists(fileNameResults))
@@ -263,7 +255,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             {
               g_start <- 2 + length(covariates)
               result_temp <- apply_stat_model(tempDataFrame  =  study_summary[, c(independent_variable, covariates, cols[j])], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
-                                              key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, logFolder =  envir$logFolder, independent_variable, depth_analysis, envir, ...)
+                                              key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
               result <- rbind(result, result_temp)
             }
 
@@ -277,9 +269,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           if(family_test  ==  "binomial" || family_test  ==  "wilcoxon")
           {
 
-            chartFolder <- dir_check_and_create(envir$result_folderChart,"POPULATION_COMPARISON")
+            chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"POPULATION_COMPARISON")
 
-            if(sum(grepl(pattern = "MUTATIONS",x  =  envir$keys_anomalies))>0)
+            if(sum(grepl(pattern = "MUTATIONS",x  =  ssEnv$keys_anomalies))>0)
             {
               filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
               grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
@@ -290,7 +282,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               grDevices::dev.off()
             }
 
-            if(sum(grepl(pattern = "LESIONS",x  =  envir$keys_anomalies))>0)
+            if(sum(grepl(pattern = "LESIONS",x  =  ssEnv$keys_anomalies))>0)
             {
               filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
               grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
@@ -301,7 +293,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               grDevices::dev.off()
             }
 
-            if(sum(grepl(pattern = "DELTAS",x  =  envir$keys_anomalies))>0)
+            if(sum(grepl(pattern = "DELTAS",x  =  ssEnv$keys_anomalies))>0)
             {
               study_summaryToPlot$DELTAS_HYPO <- as.numeric(study_summaryToPlot$DELTAS_HYPO)
               study_summaryToPlot$DELTAS_BOTH <- as.numeric(study_summaryToPlot$DELTAS_BOTH)
@@ -315,7 +307,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               grDevices::dev.off()
             }
 
-            if(sum(grepl(pattern = "DELTAQ",x  =  envir$keys_anomalies))>0)
+            if(sum(grepl(pattern = "DELTAQ",x  =  ssEnv$keys_anomalies))>0)
             {
               filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
               grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
@@ -331,7 +323,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           if(depth_analysis >1)
           {
 
-            keys <- envir$keys_anomalies_figures_areas
+            keys <- ssEnv$keys_anomalies_figures_areas
             # clean keys from already done association
             if(file.exists(fileNameResults))
             {
@@ -342,7 +334,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             }
 
             nkeys <- nrow(keys)
-            variables_to_export_nested <- c("variables_to_export", "keys", "result_folderPivot", "sample_names", "independent_variable", "covariates", "family_test", "transformation", "envir", "depth_analysis","file_path_build", "apply_stat_model")
+            variables_to_export_nested <- c("variables_to_export", "keys", "result_folderPivot", "sample_names", "independent_variable", "covariates",
+              "family_test", "transformation", "ssEnv", "depth_analysis","file_path_build", "apply_stat_model")
             if(nrow(keys)>0)
               # result_temp_foreach <- foreach::foreach(k  =  1:nkeys, .combine  =  rbind, .export  =  variables_to_export_nested) %dorng%
               for (k in 1:nkeys)
@@ -363,6 +356,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection, ]
                   #removes area name (eg. gene...)
                   tempDataFrame <- tempDataFrame[,-1]
+                  if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
+                    next
                   # max_row_count <- ceiling(10^6/ncol(tempDataFrame))
                   # batch_count <- ceiling(nrow(tempDataFrame)/max_row_count)
                   # for(h in 0:batch_count)
@@ -395,7 +390,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     g_start <- 2 + length(covariates)
                     result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
                                                                 key  =  key, transformation =  transformation, dototal  =  TRUE,
-                                                                logFolder =  envir$logFolder, independent_variable, depth_analysis, envir, ...)
+                                                                session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
 
                     if(!exists("result_temp_foreach"))
                       result_temp_foreach <- result_temp_local_batch
@@ -428,15 +423,16 @@ association_analysis <- function(inference_details,result_folder, maxResources =
       if(file.exists(fileNameResults))
       {
         old_results <- utils::read.csv2(fileNameResults, header  =  T)
-        result <- rbind(result, old_results)
+        result <- plyr::rbind.fill(result, old_results)
       }
       result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BH")
       result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BY")
       result <- result[order(result$PVALUEADJ),]
+      result <- result[,colSums(is.na(result))<nrow(result)]
       utils::write.csv2(result,fileNameResults , row.names  =  FALSE)
     }
 
   }
 
-  close_env(envir)
+  close_env()
 }

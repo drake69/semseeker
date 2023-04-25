@@ -1,6 +1,5 @@
 #' takes a bed and its location (build with the details of popuationa nd genomic area)
 #' and annoate with detail about genomic area
-#' @param envir semseekere working infos
 #' @param populations vector of population to cycle with to build the folder path
 #' @param figures vector of hyper /hypo to use to build the folder path
 #' @param anomalies vector of lesions/mutations to use to build the folder path
@@ -13,7 +12,6 @@
 #' @importFrom doRNG %dorng%
 
 annotate_bed <- function (
-    envir,
     populations ,
     figures ,
     anomalies ,
@@ -23,9 +21,11 @@ annotate_bed <- function (
     groupingColumnLabel)
 {
 
+  ssEnv <- .pkgglobalenv$ssEnv
+
   i <- 0
   final_bed <- NULL
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
 
   if(file.exists(bedFileName))
   {
@@ -48,7 +48,7 @@ annotate_bed <- function (
       final_bed_temp <- as.data.frame(final_bed)
   }
 
-  envir$keysLocal <-
+  ssEnv$keysLocal <-
     expand.grid(
       "POPULATION" = populations,
       "FIGURE" = figures,
@@ -57,26 +57,26 @@ annotate_bed <- function (
     )
 
   message("INFO: ", Sys.time(), " Annotating genomic areas.")
-  if(envir$showprogress)
-    progress_bar <- progressr::progressor(along = 1:nrow(envir$keysLocal))
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(ssEnv$keysLocal))
 
-  variables_to_export <- c("envir", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel",
+  variables_to_export <- c("ssEnv", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel",
                            "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","probes_get")
 
-  # for(i in 1:nrow(envir$keysLocal))
-  final_bed <- foreach::foreach(i=1:nrow(envir$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
+  # for(i in 1:nrow(ssEnv$keysLocal))
+  final_bed <- foreach::foreach(i=1:nrow(ssEnv$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
     {
-      anomal <- envir$keysLocal[i,"ANOMALY"]
-      pop <- envir$keysLocal[i,"POPULATION"]
-      fig <- envir$keysLocal[i,"FIGURE"]
-      grp <- envir$keysLocal[i,"GROUP"]
+      anomal <- ssEnv$keysLocal[i,"ANOMALY"]
+      pop <- ssEnv$keysLocal[i,"POPULATION"]
+      fig <- ssEnv$keysLocal[i,"FIGURE"]
+      grp <- ssEnv$keysLocal[i,"GROUP"]
 
       probes <- probes_get(probes_prefix, grp)
 
-      resFolder <- dir_check_and_create(envir$result_folderData,pop)
-      tempFile <- read_multiple_bed(envir=envir, anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
+      resFolder <- dir_check_and_create(ssEnv$result_folderData,pop)
+      tempFile <- read_multiple_bed(anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
                                     columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
-      if(envir$showprogress)
+      if(ssEnv$showprogress)
         progress_bar()
       tempFile
     }
