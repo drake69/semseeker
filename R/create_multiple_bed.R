@@ -1,24 +1,26 @@
 #' @importFrom doRNG %dorng%
-create_multiple_bed <- function(envir, sample_sheet){
+create_multiple_bed <- function(sample_sheet){
+
+  ssEnv <- .pkgglobalenv$ssEnv
 
   message("INFO: ", Sys.time(), " Started multiple annotated file creation!")
 
   #create multiple file bed
   i <- 0
   localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),
-                           "FIGURE"=envir$keys_figures_default[,1] ,
+                           "FIGURE"=ssEnv$keys_figures_default[,1] ,
                            "ANOMALY"= c("MUTATIONS","LESIONS") ,"EXT"="bed")
   localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),
-                                            "FIGURE"=envir$keys_figures_default[,1],
+                                            "FIGURE"=ssEnv$keys_figures_default[,1],
                                             "ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
 
-  # to_export <- c("localKeys", "dir_check_and_create", "envir", "file_path_build", "sample_sheet")
+  # to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet")
   future::plan( future::sequential)
   # foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
-    tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+    tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
     temp_file <- tempdir()
     temp_file <- paste(temp_file, stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),sep="")
     fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
@@ -52,5 +54,5 @@ create_multiple_bed <- function(envir, sample_sheet){
     }
     gc()
   }
-  future::plan( envir$parallel_strategy)
+  future::plan( ssEnv$parallel_strategy)
 }

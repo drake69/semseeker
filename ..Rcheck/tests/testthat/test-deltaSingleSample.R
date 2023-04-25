@@ -4,11 +4,11 @@ testthat::test_that("delta_single_sample",{
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  envir <- init_env(tempFolder)
+  ssEnv <- init_env(tempFolder)
 
   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 
-  nitem <- 1e3
+  nitem <- 1e4
   values <- as.data.frame(rnorm(nitem, mean=0.5, sd=0.7))
 
   probe_features <- PROBES_Gene_Whole[!is.na(PROBES_Gene_Whole$START),c("CHR","START","PROBE")]
@@ -26,7 +26,7 @@ testthat::test_that("delta_single_sample",{
   beta_medians <- high_thresholds - low_thresholds
 
   delta_single_sample(
-    envir = envir,
+    
     values = values,
     high_thresholds = high_thresholds,
     low_thresholds = low_thresholds,
@@ -38,7 +38,7 @@ testthat::test_that("delta_single_sample",{
   result_folderData  <-  dir_check_and_create(tempFolder, "Data")
   outputFolder <- dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
   fileName <- file_path_build(outputFolder,c(Sample_ID,"DELTAS","BOTH"), "bedgraph")
-  expect_true(file.exists(fileName))
+  testthat::expect_true(file.exists(fileName))
 
 
 })

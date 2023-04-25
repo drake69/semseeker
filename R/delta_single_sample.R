@@ -6,11 +6,11 @@
 #' @param sample_detail details of sample to analyze
 #' @param beta_medians median to use for calculation
 #' @param probe_features genomic position of probes
-#' @param envir environment to get globals
 #' @return summary detail about the analysis
 #'
-delta_single_sample <- function (envir, values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
+delta_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
 
+  ssEnv <- .pkgglobalenv$ssEnv
   # if (!test_match_order(row.names(values), probe_features$PROBE)) {
   #   stop("Wrong order matching Probes and Values!", Sys.time())
   # }
@@ -46,7 +46,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
   deltasAnnotated_hyperSorted <- sort_by_chr_and_start(deltasAnnotated_hyper)
   deltasAnnotated_hyperSorted <- subset(deltasAnnotated_hyperSorted, deltasAnnotated_hyperSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
-  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPER"))
+  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPER"))
   dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hyperSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPER"),"bedgraph"))
 
   ### get deltas_hypo HYPER #########################################################
@@ -62,7 +62,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
   deltasAnnotated_hypoSorted <- sort_by_chr_and_start(deltasAnnotated_hypo)
   deltasAnnotated_hypoSorted <- subset(deltasAnnotated_hypoSorted, deltasAnnotated_hypoSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
-  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPO"))
+  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPO"))
   dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hypoSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPO"),"bedgraph"))
 
 
@@ -71,7 +71,7 @@ delta_single_sample <- function (envir, values, high_thresholds, low_thresholds,
   deltasAnnotated_bothSorted <- sort_by_chr_and_start(deltasAnnotated_both)
   deltasAnnotated_bothSorted <- subset(deltasAnnotated_bothSorted, deltasAnnotated_bothSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
-  folder_to_save <- dir_check_and_create(envir$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTH"))
+  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTH"))
   dump_sample_as_bed_file(data_to_dump = deltasAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTH"),"bedgraph"))
 
 

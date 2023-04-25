@@ -1,25 +1,20 @@
-analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
+analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
 {
+  message("INFO: ", Sys.time(), " working on batch:", batch_id)
+
+  ssEnv <- .pkgglobalenv$ssEnv
 
   # browser()
   methylation_data <- as.data.frame(methylation_data)
-  coverage_analysis(methylation_data = methylation_data, envir = envir)
+  get_meth_tech(methylation_data)
+  coverage_analysis(methylation_data = methylation_data)
+
   methDataTemp <- data.frame( "PROBE"= rownames(methylation_data), methylation_data)
   methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
   methylation_data <- methDataTemp[, -c(1)]
-
   rm(methDataTemp)
-  message("INFO: ", Sys.time(), " working on batch:", batch_id)
+
   message("INFO: ", Sys.time(), " I will work on:", nrow(methylation_data), " PROBES.")
-
-  if(nrow(methylation_data) == 485512)
-    message("INFO: ", Sys.time(), " seems a 450k dataset.")
-
-  if(nrow(methylation_data) == 27578)
-    message("INFO: ", Sys.time(), " seems a 27k dataset.")
-
-  if(nrow(methylation_data) == 866562)
-    message("INFO: ", Sys.time(), " seems an EPIC dataset.")
 
   probes <- semseeker::PROBES
   message("DEBUG: ", Sys.time(), " loaded probes: PROBES")
@@ -44,7 +39,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   # }
 
 
-  population_checkResult <- population_check(sample_sheet, methylation_data, envir)
+  population_checkResult <- population_check(sample_sheet, methylation_data)
   if(!is.null(population_checkResult))
   {
     stop(population_checkResult)
@@ -66,8 +61,8 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
 
   populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
 
-  # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(envir$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
-  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(envir$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
+  # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
+  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]
@@ -76,13 +71,13 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  # variables_to_export <- c( "envir", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
-  # resultSampleSheet <- foreach::foreach(i = 1:length(envir$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  for (i in 1:length(envir$keys_populations[,1]))
+  # variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
+  # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  for (i in 1:length(ssEnv$keys_populations[,1]))
   {
 
     #
-    populationName <- envir$keys_populations[i,1]
+    populationName <- ssEnv$keys_populations[i,1]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == populationName, ]
     populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
 
@@ -93,7 +88,6 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
     {
       # browser()
       resultPopulation <- analize_population(
-        envir = envir,
         methylation_data = methylation_data[, populationMatrixColumns] ,
         sliding_window_size = sliding_window_size,
         beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,
@@ -106,7 +100,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
 
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- populationName
-      create_multiple_bed(envir, resultPopulation)
+      create_multiple_bed( resultPopulation)
 
       # resultPopulation
       # resultPopulation
@@ -124,7 +118,7 @@ analyze_batch <- function(envir, methylation_data, sample_sheet, sliding_window_
     }
   }
 
-  resultSampleSheet <- create_deltaq(envir, resultSampleSheet)
+  resultSampleSheet <- create_deltaq( resultSampleSheet)
 
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)

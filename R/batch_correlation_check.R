@@ -1,14 +1,15 @@
-batch_correlation_check <- function(envir) {
+batch_correlation_check <- function() {
 
+  ssEnv <- .pkgglobalenv$ssEnv
   y <- g <- 1
   i <- 1
-  sample_sheet <- utils::read.csv2(file.path(envir$result_folderData,"sample_sheet_result.csv"))
-  localKeys <- expand.grid("FIGURE"=envir$keys_figures_default[,1],"ANOMALY"= envir$keys_anomalies[,1])
+  sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
+  localKeys <- expand.grid("FIGURE"=ssEnv$keys_figures_default[,1],"ANOMALY"= ssEnv$keys_anomalies[,1])
 
-  batch_analysis_folder <-dir_check_and_create(envir$result_folderData,"Batch_Analysis")
-  chartFolder <- dir_check_and_create(envir$result_folderChart,"BATCH")
+  batch_analysis_folder <-dir_check_and_create(ssEnv$result_folderData,"Batch_Analysis")
+  chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"BATCH")
 
-  to_export <- c("localKeys", "sample_sheet", "%dorng%", "g", "dir_check_and_create", "envir", "file_path_build",
+  to_export <- c("localKeys", "sample_sheet", "%dorng%", "g", "dir_check_and_create", "ssEnv", "file_path_build",
     "batch_analysis_folder", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName", "getDoParName",
     "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion", ".getRNG", ".getRNGattribute", "hasRNG",
     "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
@@ -19,12 +20,12 @@ batch_correlation_check <- function(envir) {
   {
     key <- localKeys[i,]
     populations <- unique(sample_sheet$Sample_Group)
-    sub_export <- c(to_export,"populations", "envir","key")
+    sub_export <- c(to_export,"populations", "ssEnv","key")
     total_data_for <- foreach::foreach(g = 1:length(populations), .combine = rbind, .export = sub_export ) %dorng%
       # for(g in 1:length(populations))
       {
         pop <- populations[g]
-        tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(pop) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(pop) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
         file_to_read <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
         if(file.exists(file_to_read))
         {

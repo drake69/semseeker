@@ -5,17 +5,9 @@
 \title{create_heatmap load the multiple bed resulting from
 analysis organized into files and folders per anomaly and produce a pivot}
 \usage{
-create_heatmap(
-  envir,
-  inputBedDataFrame,
-  anomalies,
-  file_prefix,
-  groupColumnLabels
-)
+create_heatmap(inputBedDataFrame, anomalies, file_prefix, groupColumnLabels)
 }
 \arguments{
-\item{envir}{semseekere working infos}
-
 \item{inputBedDataFrame}{data frame to chart}
 
 \item{anomalies}{vector of anomalies to manage}

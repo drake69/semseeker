@@ -6,7 +6,6 @@
 report of pivot}
 \usage{
 analize_population(
-  envir,
   methylation_data,
   sliding_window_size,
   beta_superior_thresholds,
@@ -18,8 +17,6 @@ analize_population(
 )
 }
 \arguments{
-\item{envir}{semseekere working infos}
-
 \item{methylation_data}{whole matrix of data to analyze.}
 
 \item{sliding_window_size}{size of the sliding widows to compute epilesions
@@ -37,7 +34,7 @@ population selector followed by selection value,}
 selector followed by selection value,}
 
 \item{beta_medians}{name of samplesheet's column to use as control population
-selector followed by selection value,}
+selector followed by selection value}
 
 \item{bonferroni_threshold}{threshold to define which pValue accept for}
 

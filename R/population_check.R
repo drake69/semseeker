@@ -1,6 +1,9 @@
 
-population_check <- function(sample_sheet, methylation_data, envir)
+population_check <- function(sample_sheet, methylation_data)
 {
+
+  ssEnv <- .pkgglobalenv$ssEnv
+
   sample_sheet <- as.data.frame(sample_sheet)
   sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", "MUTATIONS_HYPER", "LESIONS_HYPER", "MUTATIONS_HYPO", "LESIONS_HYPO", "MUTATIONS_BOTH", "LESIONS_BOTH"))]
 
@@ -46,7 +49,7 @@ population_check <- function(sample_sheet, methylation_data, envir)
   # reference population
   sample_sheet$Sample_Group <- R.utils::toCamelCase(tolower(sample_sheet$Sample_Group), capitalize=TRUE)
   sample_sheet$Sample_Group <- as.factor(sample_sheet$Sample_Group)
-  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% envir$keys_populations[,1]
+  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% ssEnv$keys_populations[,1]
   if (is.element(FALSE, matchedPopulation)) {
     result <- paste(result,  " The Sample_Group should contain only: Reference, Control, Case" )
   }

@@ -1,14 +1,16 @@
 #' @importFrom doRNG %dorng%
-create_deltaq <- function(envir, resultPopulation){
+create_deltaq <- function( resultPopulation){
+
+  ssEnv <- .pkgglobalenv$ssEnv
 
   #create multiple file bed
-  variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "envir", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
+  variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "ssEnv", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
                            ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
                            ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
                            ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probes_get")
   i <- 2
   localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
-                           "FIGURE"=envir$keys_figures_default[,1],
+                           "FIGURE"=ssEnv$keys_figures_default[,1],
                            "ANOMALY"="DELTAS" ,
                            "EXT"="fst"
   )
@@ -16,7 +18,7 @@ create_deltaq <- function(envir, resultPopulation){
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
-    tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+    tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
     fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), as.character(key$EXT))
     if(file.exists(fileToRead))
     {
@@ -39,7 +41,7 @@ create_deltaq <- function(envir, resultPopulation){
   deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=4))
 
   localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
-                           "FIGURE"=envir$keys_figures_default[,1],
+                           "FIGURE"=ssEnv$keys_figures_default[,1],
                            "ANOMALY"="DELTAS" ,
                            "EXT"="fst"
   )
@@ -57,7 +59,7 @@ create_deltaq <- function(envir, resultPopulation){
       {
         colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
 
-        tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
+        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
         fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)),  as.character(key$EXT))
         fst::write.fst( x= localFileRes, fileToWrite)
         message("INFO: ", Sys.time(), " Created DELTAQ multiple annotated file!", fileToWrite)
@@ -79,7 +81,7 @@ create_deltaq <- function(envir, resultPopulation){
   # for(i in 1:nrow(localKeys))
   # {
   #   key <- localKeys[i,]
-  #   tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
+  #   tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
   #   fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)),  as.character(key$EXT))
   #   if(file.exists(fileToRead))
   #   {
@@ -91,7 +93,7 @@ create_deltaq <- function(envir, resultPopulation){
   #       deltaq <- unique(deltaq)
   #       localFileRes[,4] <- deltaq[ deltaq$VALUE %in% localFileRes$VALUE, "DELTAQ"]
   #
-  #       tempresult_folderData <-dir_check_and_create(envir$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
+  #       tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
   #       fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)),  as.character(key$EXT))
   #       fst::write.fst( x= localFileRes, fileToWrite)
   #       # localFileRes <-fst::read.fst(fileToWrite)

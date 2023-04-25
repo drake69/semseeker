@@ -1,52 +1,32 @@
 test_that("annotate_bed", {
 
-  library(stringi)
+  
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
   figures <- c( "BOTH")
   anomalies <- c("DELTAS","DELTAQ")
   metaareas <- c("GENE")
+  ssEnv <- init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  envir <- init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
 
-  nitem <- 1e3
-  nsamples <- 5
+  ####################################################################################
 
-  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
+  get_meth_tech(methylation_data)
 
-  probes <- probes_get("PROBES_Gene_","Whole")
-  probe_features <- probes[!is.na(probes$START),c("CHR","START","PROBE")]
-  probe_features <- unique(probe_features)
-  probe_features$END <- probe_features$START
-  probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
-
-  beta_superior_thresholds <- data.frame(rnorm(nitem, mean = 1, sd=0.2))
-  beta_inferior_thresholds <- data.frame(rnorm(nitem, mean=0.2, sd=0.2))
-
-  row.names(beta_superior_thresholds) <- probe_features$PROBE
-  row.names(beta_inferior_thresholds) <- probe_features$PROBE
-  row.names(methylation_data) <- probe_features$PROBE
-
-  Sample_ID <- stringi::stri_rand_strings(nsamples, 7, pattern = "[A-Za-z]")
-  colnames(methylation_data) <- Sample_ID
-  Sample_Group <- rep("Control",nsamples)
-  sample_sheet <- data.frame(Sample_Group, Sample_ID)
-
-  sp <- analize_population(envir,
-                          methylation_data=methylation_data,
+  ####################################################################################
+  sp <- analize_population(methylation_data=methylation_data,
                           sliding_window_size = 11,
                           beta_superior_thresholds = beta_superior_thresholds,
                           beta_inferior_thresholds = beta_inferior_thresholds,
-                          sample_sheet = sample_sheet,
+                          sample_sheet = mySampleSheet,
                           beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
                           bonferroni_threshold = 0.01,
                           probe_features = probe_features
   )
-  # sp$Sample_Group <- sample_sheet$Sample_Group
+  # sp$Sample_Group <- mySampleSheet$Sample_Group
 
-  create_multiple_bed(envir, sample_sheet = sample_sheet)
+  create_multiple_bed( sample_sheet = mySampleSheet)
 
   populations <- c("Control")
 
@@ -60,7 +40,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    envir,
+
     populations ,
     figures ,
     anomalies ,
@@ -69,8 +49,8 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  expect_true( nrow(final_bed)>0)
-  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
+  testthat::expect_true( nrow(final_bed)>0)
+  testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   groups <- c("CHR")
   probes_prefix = "PROBES_CHR_"
@@ -79,7 +59,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    envir,
+
     populations ,
     figures ,
     anomalies ,
@@ -88,9 +68,9 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  # expect_true( columnLabel %in% colnames(final_bed))
-  expect_true( nrow(final_bed)>0)
-  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
+  # testthat::expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( nrow(final_bed)>0)
+  testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
   probes_prefix = "PROBES_Gene_"
@@ -99,7 +79,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    envir,
+
     populations ,
     figures ,
     anomalies ,
@@ -108,14 +88,14 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
 
-  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
+  testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   anomalies <- c("DELTAQ")
   # create and read
   final_bed <- annotate_bed (
-    envir,
+
     populations ,
     figures ,
     anomalies ,
@@ -126,18 +106,18 @@ test_that("annotate_bed", {
 
 
   # file extsits
-  expect_true(file.exists(bedFileName))
+  testthat::expect_true(file.exists(bedFileName))
 
   # not empty data set
-  expect_true(nrow(final_bed)>0)
-  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
+  testthat::expect_true(nrow(final_bed)>0)
+  testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   # has the correct header
-  expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( columnLabel %in% colnames(final_bed))
 
   #read again  existent
   final_bed <- annotate_bed (
-    envir,
+
     populations ,
     figures ,
     anomalies ,
@@ -146,21 +126,17 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( columnLabel %in% colnames(final_bed))
 
 
-  expect_true(nrow(final_bed)==nrow(unique(final_bed)))
+  testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
-  # doParallel::stopImplicitCluster()
-  # parallel::stopCluster(computationCluster)
-
-
-
-  # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
-  # expect_true( columnLabel %in% colnames(final_bed))
-  # bedFileName <- file_path_build(envir$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # testthat::expect_true( columnLabel %in% colnames(final_bed))
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
-  close_env(envir)
+  unlink(tempFolder,recursive = TRUE)
+  close_env()
 })

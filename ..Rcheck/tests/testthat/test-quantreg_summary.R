@@ -2,7 +2,7 @@ test_that("quantreg_summary", {
 
   library(stringi)
 
-  nitem <- 1e3
+  nitem <- 1e4
   nsamples <- 4
   tempDataFrame <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
   tempDataFrame <- as.data.frame(matrix(tempDataFrame,nitem,nsamples))
@@ -24,7 +24,7 @@ test_that("quantreg_summary", {
   boot_vector <- stats::na.omit(tt[,independent_variable])
   boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
 
-  expect_true(sum(is.null(boot.bca))==0)
+  testthat::expect_true(sum(is.null(boot.bca))==0)
 
 })
 

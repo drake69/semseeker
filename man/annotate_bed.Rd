@@ -6,7 +6,6 @@
 and annoate with detail about genomic area}
 \usage{
 annotate_bed(
-  envir,
   populations,
   figures,
   anomalies,
@@ -17,8 +16,6 @@ annotate_bed(
 )
 }
 \arguments{
-\item{envir}{semseekere working infos}
-
 \item{populations}{vector of population to cycle with to build the folder path}
 
 \item{figures}{vector of hyper /hypo to use to build the folder path}
