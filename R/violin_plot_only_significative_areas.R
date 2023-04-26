@@ -1,6 +1,10 @@
 #' @importFrom doRNG %dorng%
 violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, anomaly,metaarea, subgroup, independent_variable, transformation)
 {
+  inference_inference_file <- ""
+  group <- ""
+  s <- ""
+
   ssEnv <- .pkgglobalenv$ssEnv
   inference_file_name <- inference_inference_file(inference_detail)
 
