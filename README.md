@@ -5,8 +5,6 @@
 
 <!-- badges: start -->
 
-    #> ✔ Setting active project to
-    #> '/Users/lcorsaro/Documents/Progetti_Sviluppo/semseeker'
 
 [![](https://img.shields.io/badge/devel%20version-0.8.6-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -18,13 +16,13 @@ status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](h
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
-The goal of semseeker is to find all methylation localized and enriched
-variants.
+Semseeker aims to identify all variants that are enriched and localized
+in methylation.
 
 ## Installation
 
-You can install semseeker using devtools, future release will be
-available through CRAN.
+To install semseeker, you can use devtools; upcoming releases will be
+accessible via CRAN.
 
 Install the latest release:
 
@@ -34,8 +32,8 @@ Install the latest release:
 
 ## Quick Example
 
-This is a basic example which shows how you can create the beta’s
-methylation matrix to use for calculation using ChAMP:
+This basic example demonstrates the process of creating a methylation
+matrix for beta values that can be utilized in calculations using ChAMP:
 
     library(ChAMP)
     idat_folder <- "~/source_idat/"
@@ -71,7 +69,7 @@ methylation matrix to use for calculation using ChAMP:
 
     saveRDS(myNormN,"~/normalizedData.rds")
 
-This how to obtain the analyzed data:
+Here’s how you can obtain the analyzed data:
 
     library(semseeker)
 
@@ -85,12 +83,14 @@ This how to obtain the analyzed data:
 
 # Complete Example
 
-Look in to the example folder of the repository to seea complete and
-working example with data from Gene Expression Omnibus (GEO)
+You can find a complete and functional example, which includes data from
+Gene Expression Omnibus (GEO), by examining the repository’s “example”
+folder.
 
 # Input requirements
 
-- the samplesheet dataframe should contain a column called Sample_Group,
-  the admitted values are: Case, Control, Reference. if you don0t have
-  the Refernce population you can duplicate the Control population rows
-  and use Reference in the Sample_Group column.
+- The “samplesheet” dataframe must include a column named “Sample_Group”
+  with the following accepted values: “Case”, “Control”, and
+  “Reference”. If you do not have a Reference population, you may
+  duplicate the Control population rows and use “Reference” in the
+  “Sample_Group” column.
