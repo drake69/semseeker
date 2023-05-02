@@ -49,7 +49,6 @@ analyze_single_sample <- function(values, sliding_window_size, thresholds, figur
   if(figure=="HYPER")
      result["PROBES_COUNT"] <- dim(probe_features)[1]
 
-
   return(result)
 }
 
