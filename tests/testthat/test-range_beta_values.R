@@ -16,6 +16,12 @@ test_that("range_beta_values", {
   ####################################################################################
   testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_median_values[1])
   ####################################################################################
+  testthat::expect_true(rr$iqr[1]!=rr$beta_median_values[1])
+  ####################################################################################
+  testthat::expect_true(rr$q1[1]!=rr$beta_median_values[1])
+  ####################################################################################
+  testthat::expect_true(rr$q3[1]!=rr$beta_median_values[1])
+  ####################################################################################
 
   unlink(tempFolder,recursive = TRUE)
   close_env()
