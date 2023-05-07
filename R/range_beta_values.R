@@ -77,7 +77,8 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
 
     temp_result <- c("beta_inferior_thresholds"= beta_inferior_thresholds,
       "beta_superior_thresholds"= beta_superior_thresholds,
-      "beta_median_values"= beta_median_values)
+      "beta_median_values"= beta_median_values,
+      "iqr" = betaValuesIQR)
     names(temp_result) <- names(b_values)
     # if(attr(beta_row, "nb_cycles") %% 10 == 0)
     #   progress_bar_2()
@@ -90,7 +91,7 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
 
 
   result <- as.data.frame(t(th))
-  colnames(result) <- c("beta_inferior_thresholds","beta_superior_thresholds", "beta_median_values")
+  colnames(result) <- c("beta_inferior_thresholds","beta_superior_thresholds", "beta_median_values","iqr")
   # message("\n")
   # colnames(values) <- c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values")
   # row.names(values) <- row.names(beta_median_values)

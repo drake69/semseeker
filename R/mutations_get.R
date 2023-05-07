@@ -27,11 +27,8 @@ mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
 
   mutation <- as.numeric(comparison(values, thresholds))
 
-
   # names(mutation) <- rownames(values)
-
   # message(sampleName, " ", "Got probesOverThreshold ", Sys.time())
-
   ### get mutation_annotated_sorted ################################################################################################
 
   mutationAnnotated <- data.frame(as.data.frame(probe_features), "MUTATIONS" = mutation, row.names = probe_features$PROBE)
