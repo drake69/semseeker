@@ -3,7 +3,7 @@ coverage_analysis <- function(methylation_data)
   # probes <- PROBES_CHR_CHR
   # grp <- c("CHR")
   # probes_prefix <- "PROBES_CHR_"
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   keys <- rbind(
     ssEnv$keys_gene_probes,
@@ -105,7 +105,7 @@ coverage_analysis <- function(methylation_data)
   )
 
 
-  temp_cov_result <- subset(cov_result, subgroup !="Whole" & subgroup !="CHR" & subgroup !="PROBE")
+  temp_cov_result <- subset(cov_result, subgroup !="Whole" & subgroup !="CHR" & subgroup !="PROBE" & GROUP != "PROBE")
   total_areas <- sum(number_areas$TOTAL_AREAS)
   temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$GROUP, temp_cov_result$subgroup, sep=" ")
   temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / total_areas,2)
@@ -145,6 +145,42 @@ coverage_analysis <- function(methylation_data)
     dpi = 144
   )
 
+  #show total count of probes per area
+  # temp_cov_result <- subset(cov_result, subgroup !="Whole" & subgroup !="CHR" & subgroup !="PROBE")
+  # temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$GROUP, temp_cov_result$subgroup, sep=" ")
+  # temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / total_areas,2)
+  # filename = paste0( chartFolder,"/","WHOLE_GENOME_COVERAGE_ANALYSIS_ABSOLUTE_COUNT.png",sep="")
+  # h_total <- temp_cov_result %>%
+  #   dplyr::group_by(.data$GENOMIC_AREA) %>%
+  #   dplyr::summarise(AREA_COUNT = sum(.data$COUNT_COVERED)) %>%
+  #   dplyr::mutate(COUNT_TOTAL = 'Total')
+  # v_total <- temp_cov_result %>%
+  #   dplyr::group_by(.data$COV_PERC) %>%
+  #   dplyr::summarise(AREA_COUNT = sum(.data$COUNT_COVERED)) %>%
+  #   dplyr::mutate(GENOMIC_AREA = 'Total')
+  #
+  # ggp <- ggplot2::ggplot(data = temp_cov_result, ggplot2::aes( x =.data$GENOMIC_AREA, y=.data$COUNT_COVERED )) +    # Create default ggplot2 heatmap
+  #   ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_COUNT)) +
+  #   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  #   ggplot2::geom_text(ggplot2::aes(label = .data$AREA_COUNT), size=3) +
+  #   ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
+  #   ggplot2::labs(x = "Genomic Area", y = " Absolute count of covered Probes") +
+  #   ggplot2::labs(fill  = "Absolute Count\nover\nwhole\ngenome", color="% Absolute Count \narea\nover\nstudied") +
+  #   ggplot2::geom_point(data = h_total, ggplot2::aes(color = .data$AREA_COUNT), size = 10, shape = 19) +
+  #   ggplot2::geom_point(data = v_total, ggplot2::aes(color = .data$AREA_COUNT), size = 10, shape = 19) +
+  #   ggplot2::scale_color_gradient2(low = "white",high = "grey",midpoint = 0) +
+  #   ggplot2::geom_text(data = h_total, size = 3, ggplot2::aes(label = .data$AREA_COUNT)) +
+  #   ggplot2::geom_text(data = v_total, size = 3, ggplot2::aes(label = .data$AREA_COUNT))
+  #
+  # ggplot2::ggsave(
+  #   filename,
+  #   plot = ggp,
+  #   scale = 1,
+  #   width = 1240,
+  #   height = 1240,
+  #   units = c("px"),
+  #   dpi = 144
+  # )
   message("INFO: ", Sys.time(), " Coverage analysis executed." )
 
   # cov_result <- reshape2::dcast(data = cov_result, GROUP + subgroup ~ COV_PERC, value.var = "COUNT", sum)

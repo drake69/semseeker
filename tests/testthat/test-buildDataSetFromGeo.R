@@ -4,9 +4,9 @@
 #   skip_on_covr()
 #   skip_on_travis()
 #
-#   
-# tmp <- tempdir()
-# tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+#
+#   tmp <- tempdir()
+#   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 #   sample_sheet <- semseeker::build_data_set_from_geo("GSE132616",tempFolder, 1)
 #
 #   testthat::expect_true(nrow(mySampleSheet)>0)

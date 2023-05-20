@@ -12,16 +12,16 @@
 #' @importFrom doRNG %dorng%
 
 annotate_bed <- function (
-    populations ,
-    figures ,
-    anomalies ,
-    groups ,
-    probes_prefix ,
-    columnLabel ,
+    populations,
+    figures,
+    anomalies,
+    groups,
+    probes_prefix,
+    columnLabel,
     groupingColumnLabel)
 {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   i <- 0
   final_bed <- NULL
@@ -82,7 +82,7 @@ annotate_bed <- function (
     }
 
   # colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
-  colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END"))
+  colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","k27","k450","k850"))
   final_bed <- final_bed[, colname_to_preserve]
 
   if(exists("final_bed_temp"))

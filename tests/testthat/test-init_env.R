@@ -6,30 +6,30 @@ test_that("test_init_env", {
 
   ####################################################################################
 
-  expect_error(init_env(tempFolder, parallel_strategy = parallel_strategy, figures="HYPPO"), "I'm STOPPING HERE!")
+  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, figures="HYPPO"), "I'm STOPPING HERE!")
 
   ####################################################################################
 
-  expect_error(init_env(tempFolder, parallel_strategy = parallel_strategy, anomalies="HYPPO"), "I'm STOPPING HERE!")
+  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, anomalies="HYPPO"), "I'm STOPPING HERE!")
 
   ####################################################################################
 
-  expect_error(init_env(tempFolder, parallel_strategy = parallel_strategy, metaareas="HYPPO"), "I'm STOPPING HERE!")
+  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, metaareas="HYPPO"), "I'm STOPPING HERE!")
 
   ####################################################################################
 
-  expect_error(init_env(tempFolder, parallel_strategy ="cluster"), "I'm STOPPING HERE!")
+  expect_error( semseeker:::init_env(tempFolder, parallel_strategy ="cluster"), "I'm STOPPING HERE!")
 
   ####################################################################################
 
-  expect_error(init_env(tempFolder, parallel_strategy = parallel_strategy, metaareassub="HYPPO"), "I'm STOPPING HERE!")
+  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, metaareassub="HYPPO"), "I'm STOPPING HERE!")
 
   ####################################################################################
-  # ssEnv <- init_env(tempFolder, parallel_strategy = parallel_strategy, showprogress=TRUE)
+  # ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, showprogress=TRUE)
   # testthat::expect_true(ssEnv$shoprogress==TRUE)
 
   unlink(tempFolder,recursive = TRUE)
-  # close_env()
+  # semseeker:::close_env()
 
 }
 )

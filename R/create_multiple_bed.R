@@ -1,7 +1,7 @@
 #' @importFrom doRNG %dorng%
 create_multiple_bed <- function(sample_sheet){
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   message("INFO: ", Sys.time(), " Started multiple annotated file creation!")
 
@@ -9,15 +9,18 @@ create_multiple_bed <- function(sample_sheet){
   i <- 0
   localKeys <- expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),
                            "FIGURE"=ssEnv$keys_figures_default[,1] ,
-                           "ANOMALY"= c("MUTATIONS","LESIONS") ,"EXT"="bed")
+                           "ANOMALY"= c("MUTATIONS","LESIONS","DELTAQ","DELTARQ") ,
+                           "EXT"="bed")
   localKeys <- rbind(localKeys, expand.grid("POPULATION"=unique(sample_sheet$Sample_Group),
                                             "FIGURE"=ssEnv$keys_figures_default[,1],
-                                            "ANOMALY"="DELTAS" ,"EXT"="bedgraph"))
+                                            "ANOMALY"=c("DELTAS","DELTAR") ,
+                                            "EXT"="bedgraph")
+                    )
 
-  # to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet")
-  future::plan( future::sequential)
-  # foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
-  for(i in 1:nrow(localKeys))
+  to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet")
+  # future::plan( future::sequential)
+  foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
+  # for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
     tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))

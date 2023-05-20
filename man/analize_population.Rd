@@ -8,10 +8,8 @@ report of pivot}
 analize_population(
   methylation_data,
   sliding_window_size,
-  beta_superior_thresholds,
-  beta_inferior_thresholds,
   sample_sheet,
-  beta_medians,
+  beta_thresholds,
   bonferroni_threshold = 0.05,
   probe_features
 )
@@ -22,24 +20,15 @@ analize_population(
 \item{sliding_window_size}{size of the sliding widows to compute epilesions
 default 11 probes.}
 
-\item{beta_superior_thresholds}{data frame to select, from the sample sheet,
-samples to use as control as study population and as refereces two vectors
-within the first vector the names of the selection colum and tha second
-vector the study population selector,}
-
-\item{beta_inferior_thresholds}{name of samplesheet's column to use as control
-population selector followed by selection value,}
-
 \item{sample_sheet}{name of samplesheet's column to use as control population
 selector followed by selection value,}
 
-\item{beta_medians}{name of samplesheet's column to use as control population
-selector followed by selection value}
+\item{beta_thresholds}{thresholds defined to calculate epimutations
+lesions definition}
 
 \item{bonferroni_threshold}{threshold to define which pValue accept for}
 
-\item{probe_features}{probes detail from 27 to EPIC illumina dataset
-lesions definition}
+\item{probe_features}{probes detail from 27 to EPIC illumina dataset}
 }
 \value{
 files into the result folder with pivot table and bedgraph.

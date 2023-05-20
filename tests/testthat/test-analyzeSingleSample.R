@@ -2,14 +2,14 @@ testthat::test_that("analyze_single_sample",{
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  ssEnv <-  init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <-  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
   ####################################################################################
 
-  get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(methylation_data)
 
   ####################################################################################
 
-  sp <- analyze_single_sample( values = methylation_data[,1],
+  sp <- semseeker:::analyze_single_sample( values = methylation_data[,1],
                       sliding_window_size = sliding_window_size,
                       thresholds = rep(1,nrow(methylation_data)),
                       figure = "HYPO",
@@ -18,11 +18,11 @@ testthat::test_that("analyze_single_sample",{
                       probe_features = probe_features)
 
 
-  outputFolder <- dir_check_and_create(ssEnv$result_folderData,c("Control","MUTATIONS_HYPO"))
-  fileName <- file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"MUTATIONS","HYPO"), "bed")
+  outputFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c("Control","MUTATIONS_HYPO"))
+  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"MUTATIONS","HYPO"), "bed")
   testthat::expect_true(file.exists(fileName))
 
   ####################################################################################
   unlink(tempFolder,recursive = TRUE)
-  close_env()
+  semseeker:::close_env()
 })

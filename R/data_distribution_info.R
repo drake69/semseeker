@@ -8,7 +8,8 @@ data_distribution_info <- function(family_test, tempDataFrame, burdenValue, inde
     family_test_missed <- FALSE
   }
 
-  if(family_test=="gaussian" | family_test=="spearman" | family_test=="kendall" | family_test=="pearson" | grepl("quantreg",family_test))
+  if(family_test=="gaussian" | family_test=="spearman" | family_test=="kendall" | family_test=="pearson"
+    | grepl("quantreg",family_test) | grepl("poisson",family_test) )
   {
     localDataFrame <- data.frame("depVar"=tempDataFrame[, burdenValue],"indepVar"=1 )
     localDataFrame <- rbind( localDataFrame,  data.frame("depVar"=tempDataFrame[, independent_variable],"indepVar"=2 ))

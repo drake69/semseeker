@@ -13,12 +13,13 @@
 read_multiple_bed <- function( anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
 {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   f <- paste0(anomalyLabel,"_", figureLable, sep="")
   souceFolder <- dir_check_and_create(ssEnv$result_folderData, c(as.character(populationName),f))
 
-  if(as.character(anomalyLabel)=="DELTAS" | as.character(anomalyLabel)=="DELTAQ")
+  if(as.character(anomalyLabel)=="DELTAS" | as.character(anomalyLabel)=="DELTAQ"
+    | as.character(anomalyLabel)=="DELTAR" | as.character(anomalyLabel)=="DELTARQ")
   {
     file_extension <- "bedgraph"
     col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
@@ -64,7 +65,7 @@ read_multiple_bed <- function( anomalyLabel, figureLable, probe_features, column
       if(!plyr::empty(sourceData))
       {
         sourceData[is.na(sourceData)] <- 0
-        if(anomalyLabel!="DELTAS" & anomalyLabel!="DELTAQ" & !plyr::empty(sourceData))
+        if(anomalyLabel!="DELTAR" & anomalyLabel!="DELTAS" & anomalyLabel!="DELTAQ" & !plyr::empty(sourceData))
           sourceData$VALUE <- 1
 
         sourceData <- data.frame(sourceData,"FIGURE" = as.character(figureLable), "ANOMALY" = as.character(anomalyLabel), "POPULATION" = as.character(populationName))

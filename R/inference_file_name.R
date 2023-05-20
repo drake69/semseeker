@@ -1,6 +1,6 @@
 inference_file_name <- function(inference_detail)
 {
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   covariates <- inference_detail$covariates
   covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))

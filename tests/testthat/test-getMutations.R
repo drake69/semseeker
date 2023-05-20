@@ -1,13 +1,13 @@
-testthat::test_that("mutations_get",{
+testthat::test_that(" semseeker:::mutations_get",{
 
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  ssEnv <- init_env(tempFolder)
+  ssEnv <- semseeker:::init_env(tempFolder)
 
   ####################################################################################
 
-  mutations <- mutations_get(
+  mutations <-  semseeker:::mutations_get(
                values = methylation_data[,1],
                figure = "HYPO",
                thresholds = tresholds,
@@ -19,5 +19,5 @@ testthat::test_that("mutations_get",{
 
   ####################################################################################
   unlink(tempFolder, recursive = TRUE)
-  close_env()
+  semseeker:::close_env()
 })

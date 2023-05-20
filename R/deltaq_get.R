@@ -1,7 +1,7 @@
 #' @importFrom doRNG %dorng%
-create_deltaq <- function( resultPopulation){
+deltaq_get <- function( resultPopulation){
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   #create multiple file bed
   variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "ssEnv", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",

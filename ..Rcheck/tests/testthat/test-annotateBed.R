@@ -34,14 +34,15 @@ test_that("annotate_bed", {
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
   sp <- analize_population(methylation_data=methylation_data,
-                          sliding_window_size = 11,
-                          beta_superior_thresholds = beta_superior_thresholds,
-                          beta_inferior_thresholds = beta_inferior_thresholds,
-                          sample_sheet = sample_sheet,
-                          beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
-                          bonferroni_threshold = 0.01,
-                          probe_features = probe_features
+    sliding_window_size = 11,
+    sliding_window_size = sliding_window_size,
+    beta_thresholds = beta_thresholds,
+    sample_sheet = mySampleSheet,
+    bonferroni_threshold = bonferroni_threshold,
+    probe_features = probe_features,
+    bonferroni_threshold = 0.01,
   )
+
   sp$Sample_Group <- sample_sheet$Sample_Group
 
   create_multiple_bed( sample_sheet = sample_sheet)
@@ -58,7 +59,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    
+
     populations ,
     figures ,
     anomalies ,
@@ -73,7 +74,7 @@ test_that("annotate_bed", {
   anomalies <- c("DELTAQ")
   # create and read
   final_bed <- annotate_bed (
-    
+
     populations ,
     figures ,
     anomalies ,
@@ -94,7 +95,7 @@ test_that("annotate_bed", {
 
   #read again  existent
   final_bed <- annotate_bed (
-    
+
     populations ,
     figures ,
     anomalies ,
@@ -116,7 +117,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    
+
     populations ,
     figures ,
     anomalies ,
@@ -138,7 +139,7 @@ test_that("annotate_bed", {
 
   # create and read
   final_bed <- annotate_bed (
-    
+
     populations ,
     figures ,
     anomalies ,

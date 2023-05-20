@@ -2,21 +2,22 @@ test_that("analize_batch", {
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  ssEnv <- init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
   ####################################################################################
 
-  get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(methylation_data)
 
   ####################################################################################
 
   batch_id <- 2
-  sp <- analyze_batch(methylation_data =  methylation_data,
+  sp <- semseeker:::analyze_batch(methylation_data =  methylation_data,
     sample_sheet =  mySampleSheet,
     sliding_window_size = sliding_window_size,
     bonferroni_threshold =  bonferroni_threshold,
     iqrTimes =  iqrTimes,
-    batch_id = batch_id)
+    batch_id = batch_id
+  )
 
 
   sp$Sample_Group <- mySampleSheet$Sample_Group
@@ -25,6 +26,6 @@ test_that("analize_batch", {
 
   ####################################################################################
   unlink(tempFolder,recursive = TRUE)
-  close_env()
+  semseeker:::close_env()
 })
 

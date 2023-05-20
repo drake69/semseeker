@@ -7,8 +7,12 @@
 #'
 compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
 {
+  # browser()
   cols <- colnames(df)
-  tempDataFrame <- Rfast::colShuffle(as.matrix(df))
+  # tempDataFrame <- Rfast::colShuffle(as.matrix(df))
+  indepVar <- as.character(all.vars(sig.formula)[-1][1])
+  tempDataFrame <- df
+  tempDataFrame[ ,indepVar] <- sample(tempDataFrame[,indepVar])
   tempDataFrame <- as.data.frame(tempDataFrame)
   colnames(tempDataFrame) <- cols
   suppressMessages({
