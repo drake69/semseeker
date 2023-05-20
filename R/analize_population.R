@@ -61,10 +61,10 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
 
-    dump_sample_as_bed_file(
-      data_to_dump = beta_values,
-      fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"BETAS"),"bed")
-    )
+    # dump_sample_as_bed_file(
+    #   data_to_dump = beta_values,
+    #   fileName = file_path_build(folder_to_save,c(local_sample_detail$Sample_ID,"BETAS"),"bed")
+    # )
 
     hyper_result <- analyze_single_sample( values = beta_values, sliding_window_size = sliding_window_size,
       thresholds = beta_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,
