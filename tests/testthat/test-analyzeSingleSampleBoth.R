@@ -3,7 +3,7 @@
 #   
 # tmp <- tempdir()
 # tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-#   ssEnv <- init_env(tempFolder)
+#   ssEnv <- semseeker:::init_env(tempFolder)
 #
 #   Sample_ID <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z]")
 #   Sample_Group <- "Control"
@@ -21,23 +21,23 @@
 #   row.names(tresholds) <- probe_features$PROBE
 #   row.names(values) <- row.names(tresholds)
 #
-#   mutations <- mutations_get(
+#   mutations <-  semseeker:::mutations_get(
 #     values = values,
 #     figure = "HYPER",
 #     thresholds = tresholds,
-#     probe_features = probe_features,
+#     probe_features = probe_features
 #     sampleName = Sample_ID
 #   )
 #
 #   mutations <- subset(mutations, MUTATIONS == 1)[, c("CHR", "START", "END")]
-#   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", "HYPER", sep = "")))
+#   folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", "HYPER", sep = "")))
 #   dump_sample_as_bed_file(
 #     data_to_dump = mutations,
-#     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS","HYPER"),"bed")
+#     fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS","HYPER"),"bed")
 #   )
 #
 #
-#   res <- analyze_single_sample(ssEnv =   sample_detail = sample_detail, values = values, thresholds = thresholds, figure = )
+#   res <- semseeker:::analyze_single_sample(ssEnv =   sample_detail = sample_detail, values = values, thresholds = thresholds, figure = )
 #
 #   testthat::expect_true(as.numeric(res["MUTATIONS_BOTH"])!=0)
 #   testthat::expect_true(ncol(mutations)==3 )
@@ -45,7 +45,7 @@
 #   # da spiegare che test case è quello sotto
 #   # testthat::expect_true(mutations[1,2] == mutations[1,3]  )
 #
-#   fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS","HYPER"),"bed")
+#   fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS","HYPER"),"bed")
 #
 #   fileData <- read.table(fileName, sep="\t", header = FALSE)
 #   testthat::expect_true(nrow(mutations)==nrow(fileData))

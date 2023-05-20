@@ -12,6 +12,21 @@ test_that("association_analysis", {
 
   inferenceFolder <- file.path(tempFolder,"Inference")
   inference_details <- expand.grid("independent_variable"= "Phenotest",
+    "covariates"=c("Covariates1+Covariates2"),
+    "family_test"=c("poisson"),
+    "transformation"="",
+    "depth_analysis"=3,
+    "filter_p_value" = FALSE)
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+    anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_poisson_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+  ####################################################################################
+
+  inferenceFolder <- file.path(tempFolder,"Inference")
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
                                    "family_test"=c("quantreg_0.5_5_10_0.9"),
                                    "transformation"="scale",
@@ -19,7 +34,7 @@ test_that("association_analysis", {
                                    "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
     anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.9_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.9_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -35,7 +50,7 @@ test_that("association_analysis", {
   # test with area selection
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH",
     anomalies=c("DELTAS","DELTAQ"), metaareas="CHR",areas_selection=c("chr1","chr2"))
-  fileToRead <- file_path_build(inferenceFolder, "3_Covariates1_scale_quantreg_0.5_5_10_Phenotest_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Covariates1_scale_quantreg_0.5_5_10_Phenotest_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   firstRun <- nrow(localFileRes)
   testthat::expect_true(nrow(localFileRes)>0)
@@ -45,7 +60,7 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH",
     anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "3_Covariates1_scale_quantreg_0.5_5_10_Phenotest_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Covariates1_scale_quantreg_0.5_5_10_Phenotest_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
   secondRun <- nrow(localFileRes)
@@ -61,7 +76,7 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", anomalies=c("DELTAS","DELTAQ"),
     metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -78,7 +93,7 @@ test_that("association_analysis", {
   # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,
   #   figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
   #
-  # fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_Covariates1_Covariates2", extension = "csv")
+  # fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_Covariates1_Covariates2", extension = "csv")
   # localFileRes <- read.table(fileToRead, sep=";")
   # testthat::expect_true(nrow(localFileRes)>0)
 
@@ -91,7 +106,7 @@ test_that("association_analysis", {
                                    "depth_analysis"=3,
                                    "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.99_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.99_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -104,7 +119,7 @@ test_that("association_analysis", {
     "depth_analysis"=3,
     "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.99_np_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.99_np_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -118,7 +133,7 @@ test_that("association_analysis", {
                                    "depth_analysis"=3,
                                    "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="CHR")
-  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.9_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_5_10_0.9_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   test_both <- nrow(localFileRes)
   testthat::expect_true(nrow(localFileRes)>0)
@@ -132,7 +147,7 @@ test_that("association_analysis", {
                                    "depth_analysis"=1,
                                    "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "1_Group_log_wilcoxon_", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "1_Group_log_wilcoxon_", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -146,7 +161,7 @@ test_that("association_analysis", {
     "depth_analysis"=1,
     "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "1_Group_log_wilcoxon_", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "1_Group_log_wilcoxon_", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -159,7 +174,7 @@ test_that("association_analysis", {
     "depth_analysis"=1,
     "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "1_Group_log_pearson_", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "1_Group_log_pearson_", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -172,7 +187,7 @@ test_that("association_analysis", {
                                    "depth_analysis"=1,
                                    "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "1_Group_quantile_5_wilcoxon_", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "1_Group_quantile_5_wilcoxon_", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -185,7 +200,7 @@ test_that("association_analysis", {
                                    "depth_analysis"=3,
                                    "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", anomalies="DELTAS", metaareas="PROBE")
-  fileToRead <- file_path_build(inferenceFolder, "3_Group_quantile_5_wilcoxon_", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Group_quantile_5_wilcoxon_", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -199,7 +214,7 @@ test_that("association_analysis", {
     "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", anomalies="DELTAS", metaareas="GENE")
 
-  fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -216,7 +231,7 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", anomalies="DELTAS", metaareas="GENE")
 
-  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -233,7 +248,7 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, metaareas="GENE")
 
-  fileToRead <- file_path_build(inferenceFolder, "2_Phenotest_log10_gaussian_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "2_Phenotest_log10_gaussian_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
@@ -250,14 +265,14 @@ test_that("association_analysis", {
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, areas_selection=areas_selection, metaareas="PROBE")
 
-  fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_logn_gaussian_Covariates1_Covariates2", extension = "csv")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_logn_gaussian_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
 
 
   ####################################################################################
   unlink(tempFolder,recursive = TRUE)
-  close_env()
+  semseeker:::close_env()
 
   })
 

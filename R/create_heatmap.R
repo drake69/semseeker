@@ -11,7 +11,7 @@
 create_heatmap <-
   function( inputBedDataFrame, anomalies, file_prefix, groupColumnLabels ) {
 
-    ssEnv <- .pkgglobalenv$ssEnv
+    ssEnv <- get_session_info()
 
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,file_prefix)
 

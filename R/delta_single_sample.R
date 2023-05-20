@@ -10,40 +10,14 @@
 #'
 delta_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
 
-  ssEnv <- .pkgglobalenv$ssEnv
-  # if (!test_match_order(row.names(values), probe_features$PROBE)) {
-  #   stop("Wrong order matching Probes and Values!", Sys.time())
-  # }
-  #
-  # if (!test_match_order(row.names(high_thresholds), probe_features$PROBE)) {
-  #   stop("Wrong order matching Probes and high_thresholds!", Sys.time())
-  # }
-  #
-  # if (!test_match_order(row.names(low_thresholds), probe_features$PROBE)) {
-  #   stop("Wrong order matching Probes and low_thresholds!", Sys.time())
-  # }
-
-  # annotated_data <-   as.data.frame(probe_features)
-  #
-  # annotated_data$values <- values
-  # annotated_data$high_thresholds <- high_thresholds
-  # annotated_data$low_thresholds <- low_thresholds
-  #
-  # annotated_data <- subset(annotated_data, annotated_data$values > annotated_data$high_thresholds)
-  # annotated_data$DELTA <- annotated_data$high_thresholds - annotated_data$values
+  ssEnv <- get_session_info()
 
   ### get deltas HYPER #########################################################
   deltas_hyper <- data.frame("DELTA"= values - high_thresholds, row.names = probe_features$PROBE)
-  # row.names(deltas_hyper) <- row.names(values)
   colnames(deltas_hyper) <- "DELTA"
-
-  # if (!test_match_order(row.names(deltas_hyper), probe_features$PROBE)) {
-  #   stop("Wrong order matching Probes on deltas!", Sys.time())
-  # }
-
   deltasAnnotated_hyper <- data.frame(as.data.frame(probe_features), deltas_hyper)
-  # deltasAnnotated_hyperSorted <- deltasAnnotated_hyper
   deltasAnnotated_hyperSorted <- sort_by_chr_and_start(deltasAnnotated_hyper)
+  # save only deltas of epimutation
   deltasAnnotated_hyperSorted <- subset(deltasAnnotated_hyperSorted, deltasAnnotated_hyperSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPER"))
@@ -52,14 +26,9 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
   ### get deltas_hypo HYPER #########################################################
   deltas_hypo <- data.frame("DELTA"=  low_thresholds - values, row.names = probe_features$PROBE)
   colnames(deltas_hypo) <- "DELTA"
-
-  # if (!test_match_order(row.names(deltas_hypo), probe_features$PROBE)) {
-  #   stop("Wrong order matching Probes on deltas!", Sys.time())
-  # }
-
   deltasAnnotated_hypo <- data.frame(as.data.frame(probe_features), deltas_hypo, row.names = probe_features$PROBE)
-  # deltasAnnotated_hypoSorted <- deltasAnnotated_hypo
   deltasAnnotated_hypoSorted <- sort_by_chr_and_start(deltasAnnotated_hypo)
+  # save only deltas of epimutation
   deltasAnnotated_hypoSorted <- subset(deltasAnnotated_hypoSorted, deltasAnnotated_hypoSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPO"))
@@ -77,20 +46,20 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
 
   ### get deltas from medians #########################################################
 
-  deltas <- data.frame("DELTA"= values - beta_medians, row.names = probe_features$PROBE)
-  colnames(deltas) <- "DELTA"
-
-  # if (!test_match_order(row.names(deltas), probe_features$PROBE)) {
-  #   stop("Wrong order matching Probes on deltas!", Sys.time())
-  # }
-
-  # deltasAnnotated <- data.frame(as.data.frame(probe_features), deltas)
-  # # deltasAnnotatedSorted <- deltasAnnotated
-  # deltasAnnotatedSorted <- sort_by_chr_and_start(deltasAnnotated)
-  # deltasAnnotatedSorted <- subset(deltasAnnotatedSorted, deltasAnnotatedSorted$DELTA != 0)[, c("CHR", "START", "END", "DELTA")]
+  # deltas <- data.frame("DELTA"= values - beta_medians, row.names = probe_features$PROBE)
+  # colnames(deltas) <- "DELTA"
 
   result <- ""
   result <- result[-1]
+  if(mean(deltasAnnotated_hypoSorted$DELTA)<0 |
+      mean(deltasAnnotated_hyperSorted$DELTA) <0 |
+      mean(deltasAnnotated_bothSorted$DELTA) <0 )
+  {
+    message(mean(deltasAnnotated_hypoSorted$DELTA))
+    message(mean(deltasAnnotated_hyperSorted$DELTA))
+    message(mean(deltasAnnotated_bothSorted$DELTA))
+    stop("ERROR: I'm stopping here the deltas have negative values!")
+  }
   result["DELTAS_HYPO"] <- mean(deltasAnnotated_hypoSorted$DELTA)
   result["DELTAS_HYPER"] <- mean(deltasAnnotated_hyperSorted$DELTA)
   result["DELTAS_BOTH"] <- mean(deltasAnnotated_bothSorted$DELTA)

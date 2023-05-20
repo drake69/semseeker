@@ -1,6 +1,6 @@
 batch_correlation_check <- function() {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
   y <- g <- 1
   i <- 1
   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))

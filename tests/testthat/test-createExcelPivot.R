@@ -1,44 +1,44 @@
 test_that("create_excel_pivot", {
 
-  
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  ssEnv <- init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
   ####################################################################################
 
-  get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(methylation_data)
 
   ####################################################################################
 
-  sp <- analize_population(methylation_data=methylation_data,
-                          sliding_window_size = 11,
-                          beta_superior_thresholds = beta_superior_thresholds,
-                          beta_inferior_thresholds = beta_inferior_thresholds,
-                          sample_sheet = mySampleSheet,
-                          beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
-                          bonferroni_threshold = 0.01,
-                          probe_features = probe_features
+  sp <- semseeker:::analize_population(methylation_data=methylation_data,
+    sliding_window_size = sliding_window_size,
+    beta_thresholds = beta_thresholds,
+    sample_sheet = mySampleSheet,
+    bonferroni_threshold = bonferroni_threshold,
+    probe_features = probe_features
+
   )
 
 
-  create_multiple_bed( sample_sheet = mySampleSheet)
+  semseeker:::create_multiple_bed( sample_sheet = mySampleSheet)
 
   ####################################################################################
 
   populations <- c("Control","Case")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  anomalies <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ")
+  # figures <- c("HYPO")
+  # anomalies <- c("DELTAR")
 
   groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  # groups <- c("Whole")
   probes_prefix = "PROBES_Gene_"
   columnLabel =  "GENE"
   groupingColumnLabel="GROUP"
 
   # create and read
-  final_bed <- annotate_bed (
-
+  final_bed <- semseeker:::annotate_bed (
     populations ,
     figures ,
     anomalies ,
@@ -48,14 +48,15 @@ test_that("create_excel_pivot", {
     groupingColumnLabel)
 
   populations <- c("Control","Case")
-  figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  # figures <- c("HYPO", "HYPER", "BOTH")
+  # anomalies <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ")
 
-  subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  # subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subGroups <- groups
   probes_prefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
   subGroupLabel="GROUP"
-  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
 
@@ -65,7 +66,7 @@ test_that("create_excel_pivot", {
   probes_prefix = "PROBES"
   mainGroupLabel =  "PROBE"
   subGroupLabel="GROUP"
-  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/PROBE.xlsx")))
 
   ####################################################################################
@@ -74,7 +75,7 @@ test_that("create_excel_pivot", {
   # probes_prefix = "PROBES_CHR_"
   # mainGroupLabel =  "CHR"
   # subGroupLabel="GROUP"
-  # create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  # semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
   # testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/CHR.xlsx")))
 
   #TODO: test incremental pivot
@@ -84,13 +85,13 @@ test_that("create_excel_pivot", {
 #   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
 #   mainGroupLabel <- "ISLAND"
 #   subGroupLabel <- "RELATION_TO_CPGISLAND"
-#   create_excel_pivot ( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+#   semseeker:::create_excel_pivot ( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 #
 #   subGroups <- c("DMR")
 #   probes_prefix = "PROBES_DMR_"
 #   mainGroupLabel =  "DMR"
 #   subGroupLabel="GROUP"
-#   create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+#   semseeker:::create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
-  close_env()
+  semseeker:::close_env()
 })

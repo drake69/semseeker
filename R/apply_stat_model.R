@@ -17,7 +17,7 @@
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, session_folder,
                              independent_variable, depth_analysis=3, ...)
 {
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
   arguments <- list(...)
 
   boot_success <- if(is.null(arguments[["boot_success"]])) 0 else arguments$boot_success

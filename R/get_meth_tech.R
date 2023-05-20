@@ -1,6 +1,6 @@
 get_meth_tech <- function(methylation_data)
 {
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   if(nrow(methylation_data) == 485512)
     message("INFO: ", Sys.time(), " seems a 450k dataset.")

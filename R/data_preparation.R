@@ -12,7 +12,7 @@
 data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
 {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame

@@ -1,7 +1,7 @@
 close_env <- function()
 {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   if (ssEnv$showprogress)
     progressr::handlers()

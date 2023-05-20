@@ -3,10 +3,10 @@ test_that("range_beta_values", {
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder, parallel_strategy = parallel_strategy)
+  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
   ####################################################################################
-  rr <- range_beta_values(methylation_data, iqrTimes = iqrTimes)
+  rr <- semseeker:::range_beta_values(methylation_data, iqrTimes = iqrTimes)
   testthat::expect_true(sum(colnames(rr)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values"))==3)
 
   ####################################################################################
@@ -24,6 +24,6 @@ test_that("range_beta_values", {
   ####################################################################################
 
   unlink(tempFolder,recursive = TRUE)
-  close_env()
+  semseeker:::close_env()
 })
 

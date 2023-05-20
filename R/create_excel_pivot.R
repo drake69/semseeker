@@ -1,8 +1,7 @@
 #' @importFrom doRNG %dorng%
 create_excel_pivot <-  function( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 
-  ssEnv <- .pkgglobalenv$ssEnv
-
+  ssEnv <- get_session_info()
   final_bed <-  annotate_bed(populations =   populations,figures =  figures ,anomalies =  anomalies,
                               groups =   subGroups ,probes_prefix =   probes_prefix , columnLabel =  mainGroupLabel, groupingColumnLabel = subGroupLabel)
   i <- 0
@@ -41,8 +40,9 @@ create_excel_pivot <-  function( populations, figures, anomalies, subGroups, pro
 
   toExport <- c("ssEnv", "tempPopData", "subGroupLabel", "POPULATION", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
   sheetList <- foreach::foreach(k=1:nrow(ssEnv$keys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
-    # for(k in 1:nrow(ssEnv$keys))
+  # for(k in 1:nrow(ssEnv$keys))
     {
+      # browser()
       # k <- 1
       grp <- as.character(ssEnv$keys[k,"groups"])
       anomaly <- as.character(ssEnv$keys[k,"anomalies"])

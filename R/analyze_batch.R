@@ -2,7 +2,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
 {
   message("INFO: ", Sys.time(), " working on batch:", batch_id)
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   # browser()
   methylation_data <- as.data.frame(methylation_data)
@@ -45,6 +45,22 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
     stop(population_checkResult)
   }
 
+  # # save beta as rds and as pivot
+  # sample_info <- sample_sheet[,c("Sample_ID","Sample_Group")]
+  # colnames(sample_info) <- c("SAMPLEID","POPULATION")
+  # methylation_data_to_save <- data.frame("SAMPLEID"=rownames(methylation_data), methylation_data[, sample_sheet$Sample_ID])
+  # sample_info <- as.data.frame(t(sample_info))
+  # colnames(sample_info) <- sample_info[1,]
+  # sample_info <- cbind(data.frame("SAMPLEID"="POPULATION"), sample_info[-1,])
+  # methylation_data_to_save <- rbind(sample_info, methylation_data_to_save )
+  # pivot_subfolder <- dir_check_and_create(ssEnv$result_folderData, "BETA")
+  # fileName <- file_path_build(pivot_subfolder,c("BETA","BETA","PROBE","PROBE"),"csv")
+  # # fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
+  # utils::write.table(methylation_data_to_save, fileName, row.names = T, col.names = T, sep=";")
+  # rm(methylation_data_to_save)
+  # rm(sample_info)
+  # saveRDS(methylation_data,file_path_build(ssEnv$result_folderData, c(batch_id,"_methylation_data"),"rds"))
+
   # reference population
   referencePopulationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == "Reference", ]
   referencePopulationMatrix <- data.frame(PROBE = row.names(methylation_data), methylation_data[, referencePopulationSampleSheet$Sample_ID])
@@ -71,9 +87,10 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  # variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
-  # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  for (i in 1:length(ssEnv$keys_populations[,1]))
+  variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size",
+    "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed","probes")
+  resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  # for (i in 1:length(ssEnv$keys_populations[,1]))
   {
 
     #
@@ -86,14 +103,11 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
     }
     else
     {
-      # browser()
       resultPopulation <- analize_population(
-        methylation_data = methylation_data[, populationMatrixColumns] ,
+        methylation_data = methylation_data[, populationMatrixColumns],
         sliding_window_size = sliding_window_size,
-        beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,
-        beta_inferior_thresholds = populationControlRangeBetaValues$beta_inferior_thresholds,
         sample_sheet = populationSampleSheet,
-        beta_medians = populationControlRangeBetaValues$beta_median_values,
+        beta_thresholds = populationControlRangeBetaValues,
         bonferroni_threshold = bonferroni_threshold,
         probe_features = probes
       )
@@ -107,18 +121,20 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
       # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
       # #   browser()
 
-      if(!exists("resultSampleSheet"))
-        resultSampleSheet <- resultPopulation
-      else
-        resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
+      # if(!exists("resultSampleSheet"))
+      #   resultSampleSheet <- resultPopulation
+      # else
+      #   resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
 
       # rm(populationSampleSheet)
       gc()
-
+      resultPopulation
     }
   }
 
-  resultSampleSheet <- create_deltaq( resultSampleSheet)
+  # resultSampleSheet <- as.data.frame(resultSampleSheet)
+  resultSampleSheet <- deltaq_get(resultSampleSheet)
+  resultSampleSheet <- deltarq_get(resultSampleSheet)
 
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)

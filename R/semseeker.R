@@ -29,7 +29,7 @@ semseeker <- function(sample_sheet,
   # message("cippa rows", nrow(cippa))
 
   init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   # set digits to 22
   withr::local_options(list(digits = 22))

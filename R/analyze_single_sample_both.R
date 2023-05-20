@@ -1,6 +1,6 @@
 analyze_single_sample_both <- function( sample_detail, anomaly) {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
   start_time_single_sample <- Sys.time()
   # message(sample_detail$Sample_ID, " ", "SingleSampleBoth Sample analysis warmingUP ", Sys.time())
   result <- ""

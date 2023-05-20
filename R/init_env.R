@@ -9,6 +9,7 @@
 init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession", ...)
 {
 
+
   # utils::data("PROBES")
   # utils::data("PROBES_CHR_CHR")
   set.seed(7658776)
@@ -16,7 +17,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   #allow export of object of 8gb with future
   options(future.globals.maxSize= 16 * 1024^3)
 
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- get_session_info()
 
   ssEnv$parallel_strategy <- parallel_strategy
 
@@ -95,7 +96,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   }
 
   ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ"))
+  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ"))
   ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR","PROBE"))
   # ,"PROBE"
 
@@ -290,7 +291,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   # probes <-  rbind( ssEnv$keys_island_probes, ssEnv$keys_gene_probes, ssEnv$keys_dmr_probes )
 
-  ssEnv$functionToExport <- c( "analyze_single_sample",
+  ssEnv$functionToExport <- c( "analyze_single_sample","deltar_single_sample",
                                "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
                                "file_path_build","analyze_single_sample_both",
                                "sort_by_chr_and_start", "test_match_order", "lesions_get",

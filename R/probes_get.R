@@ -1,7 +1,7 @@
 probes_get <- function(probes_prefix, grp)
 {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   if(ssEnv$tech=="")
     stop("ERROR: ", Sys.time(), " Probes get should be called once defined which tech is used.")

@@ -2,11 +2,11 @@ testthat::test_that("delta_single_sample",{
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  ssEnv <- init_env(tempFolder)
+  ssEnv <- semseeker:::init_env(tempFolder)
 
   ####################################################################################
 
-  get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(methylation_data)
 
   ####################################################################################
 
@@ -19,13 +19,13 @@ testthat::test_that("delta_single_sample",{
     probe_features = probe_features
   )
 
-  result_folderData  <-  dir_check_and_create(tempFolder, "Data")
-  outputFolder <- dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
-  fileName <- file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTH"), "bedgraph")
+  result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
+  outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
+  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTH"), "bedgraph")
   testthat::expect_true(file.exists(fileName))
 
   ####################################################################################
   unlink(tempFolder, recursive = TRUE)
-  close_env()
+  semseeker:::close_env()
 
 })

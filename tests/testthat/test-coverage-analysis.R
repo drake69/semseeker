@@ -3,10 +3,10 @@ test_that("coverage-analysis", {
   
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  init_env(tempFolder, parallel_strategy = parallel_strategy)
+  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
-  get_meth_tech(methylation_data)
-  res_cov <- coverage_analysis(methylation_data)
+  semseeker:::get_meth_tech(methylation_data)
+  res_cov <- semseeker:::coverage_analysis(methylation_data)
   testthat::expect_true(nrow(res_cov)!=0)
 
   # test cases of some ara fully missed
@@ -27,11 +27,11 @@ test_that("coverage-analysis", {
   row.names(methylation_data) <- probe_features$PROBE
   ####################################################################################
 
-  res_cov <- coverage_analysis(methylation_data)
+  res_cov <- semseeker:::coverage_analysis(methylation_data)
   testthat::expect_true(nrow(res_cov)!=0)
 
   ####################################################################################
 
-  # close_env()
+  # semseeker:::close_env()
 })
 

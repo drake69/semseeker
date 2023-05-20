@@ -2,8 +2,8 @@
 
 export(association_analysis)
 export(build_data_set_from_geo)
+export(manhattan_plot_per_area)
 export(semseeker)
 importFrom(doRNG,"%dorng%")
 importFrom(dplyr,"%>%")
-importFrom(foreach,"%dopar%")
 importFrom(rlang,.data)
