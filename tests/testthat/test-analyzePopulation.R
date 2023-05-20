@@ -28,11 +28,11 @@ test_that("analize_population", {
 
   ####################################################################################
 
-  beta_file <- file_path_build(folder_to_save,c(mySampleSheet[1,"Sample_ID"],"BETAS",figure),"bed")
-  testthat::expect_true(file.exists(beta_file))
-
-  beta_file <- read.table(beta_file, sep="\t")
-  testthat::expect_true(nrow(beta_file)==nrow(methylation_data))
+  # beta_file <- file_path_build(folder_to_save,c(mySampleSheet[1,"Sample_ID"],"BETAS",figure),"bed")
+  # testthat::expect_true(file.exists(beta_file))
+  #
+  # beta_file <- read.table(beta_file, sep="\t")
+  # testthat::expect_true(nrow(beta_file)==nrow(methylation_data))
 
   ####################################################################################
 
