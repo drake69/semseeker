@@ -31,7 +31,6 @@ Imports:
     quantreg,
     readxl,
     reshape2,
-    Rfast,
     R.utils,
     rlang,
     stats,

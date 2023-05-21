@@ -10,15 +10,24 @@ pivot_to_long_format(
   group,
   subgroup,
   phenotype_column,
+  sample_sheet,
   areas_selection = NULL
 )
 }
 \arguments{
+\item{anomaly}{anomaly to filer HYPER, HYPO, BOTH}
+
+\item{figure}{DELTAS, DELTAQ,DELTAR, MUTATIONS}
+
+\item{group}{GENE, DMR ...}
+
+\item{subgroup}{TSS1500 ...}
+
 \item{phenotype_column}{column from the sample sheet to pair to each sample}
 
-\item{areas_selection}{genomic area to select, if NULL all areas will be selected}
+\item{sample_sheet}{sample sheet of samples}
 
-\item{area_pivot}{pivot dataframe to transform in long format}
+\item{areas_selection}{genomic area to select, if NULL all areas will be selected}
 }
 \value{
 the pivot in a long format of 3 columnns, the phontype column with name phenotype, the value of the anomaly and the area investigated

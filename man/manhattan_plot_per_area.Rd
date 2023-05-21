@@ -30,7 +30,7 @@ manhattan_plot_per_area(
 
 \item{phenotype}{variable to select from the sample_sheet to use for coloring point}
 
-\item{only_significant_areas}{}
+\item{only_significant_areas}{TRUE if filter for pvalue < 0.05}
 }
 \description{
 Title
