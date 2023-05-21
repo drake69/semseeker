@@ -105,7 +105,7 @@ coverage_analysis <- function(methylation_data)
   )
 
 
-  temp_cov_result <- subset(cov_result, subgroup !="Whole" & subgroup !="CHR" & subgroup !="PROBE" & GROUP != "PROBE")
+  temp_cov_result <- subset(cov_result, subgroup !="Whole" & subgroup !="CHR" & subgroup !="PROBE" & cov_result$GROUP != "PROBE")
   total_areas <- sum(number_areas$TOTAL_AREAS)
   temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$GROUP, temp_cov_result$subgroup, sep=" ")
   temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / total_areas,2)

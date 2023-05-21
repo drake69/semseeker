@@ -1,12 +1,16 @@
 #' Get the pivot in long format instead of wide format
 #'
-#' @param area_pivot pivot dataframe to transform in long format
 #' @param phenotype_column column from the sample sheet to pair to each sample
 #' @param areas_selection genomic area to select, if NULL all areas will be selected
+#' @param anomaly anomaly to filer HYPER, HYPO, BOTH
+#' @param figure DELTAS, DELTAQ,DELTAR, MUTATIONS
+#' @param group GENE, DMR ...
+#' @param subgroup TSS1500 ...
+#' @param sample_sheet sample sheet of samples
 #'
 #' @return the pivot in a long format of 3 columnns, the phontype column with name phenotype, the value of the anomaly and the area investigated
 #'
-pivot_to_long_format <- function (anomaly, figure, group,subgroup, phenotype_column, areas_selection=NULL)
+pivot_to_long_format <- function (anomaly, figure, group,subgroup, phenotype_column,sample_sheet, areas_selection=NULL)
 {
 
   ssEnv <- get_session_info()
