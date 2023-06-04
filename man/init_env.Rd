@@ -7,7 +7,7 @@
 init_env(
   result_folder,
   maxResources = 90,
-  parallel_strategy = "multisession",
+  parallel_strategy = "multicore",
   ...
 )
 }

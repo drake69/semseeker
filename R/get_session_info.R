@@ -1,9 +1,10 @@
-get_session_info <- function()
+get_session_info <- function(result_folder=NULL)
 {
   ssEnv <- .pkgglobalenv$ssEnv
   if(is.null(.pkgglobalenv) | is.null(ssEnv)){
-    result_folder <- getwd()
-    session_folder <- file.path(result_folder,"Log")
+    if(is.null(result_folder))
+      stop("ERROR: get_session_info called without result folder!")
+    session_folder <- dir_check_and_create(result_folder,"Log")
     ssEnv <- list()
     if(file.exists(file.path(session_folder,"session_info.rds")))
       ssEnv <- readRDS( file.path(session_folder,"session_info.rds"))

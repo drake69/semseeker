@@ -45,11 +45,11 @@ row.names(tresholds) <- probe_features$PROBE
 
 mySampleSheet <<- mySampleSheet
 
-methylation_data <<- methylation_data
+methylation_data <<- abs(methylation_data)
 beta_medians <<- beta_medians
-beta_inferior_thresholds <<- beta_inferior_thresholds
-beta_superior_thresholds <<- beta_superior_thresholds
-tresholds <<- tresholds
+beta_inferior_thresholds <<- abs(beta_inferior_thresholds)
+beta_superior_thresholds <<- abs(beta_superior_thresholds)
+tresholds <<- abs(tresholds)
 beta_thresholds <- data.frame("beta_median_values"=beta_medians,
                               "beta_inferior_thresholds"=beta_inferior_thresholds,
                               "beta_superior_thresholds"=beta_superior_thresholds,
@@ -59,5 +59,8 @@ sliding_window_size <<- 11
 bonferroni_threshold <<- 0.1
 batch_id <<- 1
 iqrTimes <<- 3
-parallel_strategy <<- "multicore"
+parallel_strategy <<- "sequential"
 
+# TODO
+# recover session stored
+#
