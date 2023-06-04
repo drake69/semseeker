@@ -26,8 +26,10 @@ create_excel_pivot <-  function( populations, figures, anomalies, subGroups, pro
   # sheetListNames <- vector(mode="list")
 
   fileNameXLS <- paste0(reportFolder,"/", mainGroupLabel,".xlsx" , sep="")
-  ssEnv$keys <- expand.grid("groups"= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
-  ssEnv$keys$future_shee_list <-  paste(ssEnv$keys$anomalies,"_",ssEnv$keys$figures,"_",  mainGroupLabel,"_",ssEnv$keys$groups, sep="")
+  ssEnv$keys <- unique(tempPopData[,c(subGroupLabel,"ANOMALY","FIGURE")])
+  colnames(ssEnv$keys) <- c("groups","anomalies","figures")
+  # ssEnv$keys <- expand.grid("groups"= unique(tempPopData[,subGroupLabel]), "anomalies"= anomalies, "figures"=figures)
+  ssEnv$keys$future_shee_list <-  unique(paste(final_bed$ANOMALY,"_",final_bed$FIGURE,"_",  mainGroupLabel,"_",final_bed$GROUP, sep=""))
 
   if(file.exists(fileNameXLS))
   {
@@ -55,15 +57,19 @@ create_excel_pivot <-  function( populations, figures, anomalies, subGroups, pro
         if(!plyr::empty(tempAnomaly))
         {
           figure <- as.character(ssEnv$keys[k,"figures"])
+          if(anomaly=="BETA")
+            figure <- "MEAN"
           tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
           if(!plyr::empty(tempDataFrame))
           {
             # if(anomaly=="DELTAS")
             #   browser()
-            # if(anomaly=="DELTAS")
-            #   tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
-            #                                    fun.aggregate = sum, drop = TRUE)
-            # else
+            if(anomaly=="BETA")
+            {
+              tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
+                fun.aggregate = mean, drop = TRUE)
+            }
+            else
             tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + POPULATION ~ KEY, value.var = "VALUE",
                                              fun.aggregate = sum, drop = TRUE)
 
