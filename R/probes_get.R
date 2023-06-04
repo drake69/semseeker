@@ -3,7 +3,7 @@ probes_get <- function(probes_prefix, grp)
 
   ssEnv <- get_session_info()
 
-  if(ssEnv$tech=="")
+  if(is.null(ssEnv$tech) | ssEnv$tech=="")
     stop("ERROR: ", Sys.time(), " Probes get should be called once defined which tech is used.")
 
   probes_filter <- semseeker::PROBES

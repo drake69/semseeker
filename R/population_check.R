@@ -5,7 +5,7 @@ population_check <- function(sample_sheet, methylation_data)
   ssEnv <- get_session_info()
 
   sample_sheet <- as.data.frame(sample_sheet)
-  sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", "MUTATIONS_HYPER", "LESIONS_HYPER", "MUTATIONS_HYPO", "LESIONS_HYPO", "MUTATIONS_BOTH", "LESIONS_BOTH"))]
+  sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", ssEnv$keys$pasted))]
 
   result <- NULL
 
@@ -53,6 +53,11 @@ population_check <- function(sample_sheet, methylation_data)
   if (is.element(FALSE, matchedPopulation)) {
     result <- paste(result,  " The Sample_Group should contain only: Reference, Control, Case" )
   }
+
+  refence_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group=="Reference"]
+  other_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group!="Reference"]
+  if (sum(refence_group %in% other_group)==length(refence_group))
+    ssEnv$keys_populations <-  data.frame("POPULATION"=c("Control","Case"))
 
   return(result)
 }

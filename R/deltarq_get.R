@@ -38,7 +38,7 @@ deltarq_get <- function( resultPopulation){
     stop("Something wrong with multiple bed files!")
   }
 
-  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=4))
+  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=100))
 
   localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
     "FIGURE"=ssEnv$keys_figures_default[,1],

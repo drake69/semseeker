@@ -63,7 +63,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   pvalue <- NA
   boot.bca <- NA
 
-  lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 5000, verbose = F )
+  lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
   # quantreg_params template quantreg + quantile + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta
   if(length(quantreg_params)<5)
@@ -72,13 +72,15 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     if(length(quantreg_params)<4)
     {
       tau = as.numeric(quantreg_params[2])
-      model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
-      summary_qr <- suppressMessages(summary(model)$tTable)
-      pvalue <- summary_qr[2,"Pr(>|t|)"]
-      std.error <- summary_qr[2,"Std. Error"]
-      beta_value <- summary_qr[2,"Value"]
-      ci.lower <- summary_qr[2,"lower bound"]
-      ci.upper <- summary_qr[2,"upper bound"]
+      try({
+        model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
+        summary_qr <- suppressMessages(summary(model)$tTable)
+        pvalue <- summary_qr[2,"Pr(>|t|)"]
+        std.error <- summary_qr[2,"Std. Error"]
+        beta_value <- summary_qr[2,"Value"]
+        ci.lower <- summary_qr[2,"lower bound"]
+        ci.upper <- summary_qr[2,"upper bound"]
+      })
       r_model <- "lqmm_lqm"
     }
     else
