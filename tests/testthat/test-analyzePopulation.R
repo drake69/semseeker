@@ -4,7 +4,7 @@ test_that("analize_population", {
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  semseeker:::init_env(tempFolder, parallel_strategy = "sequential")
+  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
   ####################################################################################
 
@@ -26,13 +26,6 @@ test_that("analize_population", {
 
   testthat::expect_true(nrow(sp)==nrow(mySampleSheet))
 
-  ####################################################################################
-
-  # beta_file <- file_path_build(folder_to_save,c(mySampleSheet[1,"Sample_ID"],"BETAS",figure),"bed")
-  # testthat::expect_true(file.exists(beta_file))
-  #
-  # beta_file <- read.table(beta_file, sep="\t")
-  # testthat::expect_true(nrow(beta_file)==nrow(methylation_data))
 
   ####################################################################################
 

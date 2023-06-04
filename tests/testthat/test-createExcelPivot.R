@@ -27,7 +27,7 @@ test_that("create_excel_pivot", {
   populations <- c("Control","Case")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ")
+  anomalies <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ","BETA")
   # figures <- c("HYPO")
   # anomalies <- c("DELTAR")
 

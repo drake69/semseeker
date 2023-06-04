@@ -74,6 +74,7 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
 
     beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
     # beta_inferior_thresholds[beta_inferior_thresholds<0] <- 0
+
     beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
 
     temp_result <- c("beta_inferior_thresholds"= beta_inferior_thresholds,
