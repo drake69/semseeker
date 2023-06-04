@@ -47,7 +47,7 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
   variables_to_export <- c("sample_sheet", "methylation_data", "analyze_single_sample", "ssEnv", "sliding_window_size",
                             "beta_superior_thresholds","deltar_single_sample","beta_inferior_thresholds","iqr","beta_median_values",
                            "bt","bonferroni_threshold", "probe_features", "analyze_single_sample_both", "delta_single_sample", "progress_bar",
-                           "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
+                           "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_single_sample")
   i <- 1
   beta_superior_thresholds <- beta_thresholds$beta_superior_thresholds
   beta_inferior_thresholds <- beta_thresholds$beta_inferior_thresholds
@@ -61,10 +61,7 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
 
-    # dump_sample_as_bed_file(
-    #   data_to_dump = beta_values,
-    #   fileName = file_path_build(folder_to_save,c(local_sample_detail$Sample_ID,"BETAS"),"bed")
-    # )
+    beta_sample <- beta_single_sample( beta_values,local_sample_detail,probe_features)
 
     hyper_result <- analyze_single_sample( values = beta_values, sliding_window_size = sliding_window_size,
       thresholds = beta_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,
@@ -87,7 +84,7 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
       iqr = iqr, probe_features = probe_features)
 
     sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result,
-      "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions, deltar_result)
+      "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions, deltar_result, beta_sample)
 
     if(ssEnv$showprogress)
       progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
@@ -99,7 +96,7 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
   summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)
   colnames(summary_population) <- c("Sample_ID","DELTAS_HYPO","DELTAS_HYPER","DELTAS_BOTH","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO",
-                                    "LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH","DELTAR_HYPO","DELTAR_HYPER","DELTAR_BOTH")
+                                    "LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH","DELTAR_HYPO","DELTAR_HYPER","DELTAR_BOTH","BETA_MEAN")
   rownames(summary_population) <- summary_population$Sample_ID
   message("INFO: ", Sys.time(), " Row count result:", nrow(summary_population))
   rm(methylation_data)

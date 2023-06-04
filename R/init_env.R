@@ -6,7 +6,7 @@
 #' @param ... other options to filter elaborations
 #'
 #' @return the working ssEnvonment
-init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multisession", ...)
+init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multicore", ...)
 {
 
 
@@ -14,11 +14,10 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # utils::data("PROBES_CHR_CHR")
   set.seed(7658776)
 
-  #allow export of object of 8gb with future
-  options(future.globals.maxSize= 16 * 1024^3)
+  #allow export of object of 32gb with future
+  options(future.globals.maxSize= 32 * 1024^3)
 
-  ssEnv <- get_session_info()
-
+  ssEnv <- get_session_info(result_folder)
   ssEnv$parallel_strategy <- parallel_strategy
 
   tmp <- tempdir()
@@ -29,6 +28,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
   ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
+
 
   if (sink.number() != 0)
     sink(NULL)
@@ -96,8 +96,8 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   }
 
   ssEnv$keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ"))
-  ssEnv$keys_metaareas_default <- data.frame("METAAREA"=c("GENE","ISLAND","DMR","CHR","PROBE"))
+  ssEnv$keys_anomalies_default <-  data.frame("ANOMALY"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ","BETA"))
+  ssEnv$keys_metaareas_default <- data.frame("metaareas"=c("GENE","ISLAND","DMR","CHR","PROBE"))
   # ,"PROBE"
 
   figures <- if(is.null(arguments[["figures"]])) ssEnv$keys_figures_default[,1] else arguments$figures
@@ -123,24 +123,29 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   message("INFO: ", Sys.time(), " I will focus on:", paste(anomalies, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(metaareas, collapse = " ", sep =" "))
 
-  ssEnv$gene_subareas <- data.frame("subarea"=c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","5UTR","ExonBnd","Whole"))
+  ssEnv$gene_subareas <- data.frame("subarea"=c("Body","TSS1500","TSS200","1stExon","3UTR","5UTR","ExonBnd","Whole"))
   ssEnv$island_subareas <- data.frame("subarea"=c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"))
 
   if(!is.null(arguments[["metaareassub"]]))
   {
     ssEnv$gene_subareas <- as.data.frame(ssEnv$gene_subareas[ssEnv$gene_subareas[,"subarea"]  %in% arguments$metaareassub,])
+    message("INFO: ", Sys.time(), " These gene's areas will be investigated:", ssEnv$gene_subareas[,1])
     ssEnv$island_subareas <- as.data.frame(ssEnv$island_subareas[ssEnv$island_subareas[,"subarea"] %in% arguments$metaareassub,])
+    message("INFO: ", Sys.time(), " These island's areas will be investigated:", ssEnv$island_subareas[,1])
     if(sum(arguments$metaareassub %in% c(ssEnv$gene_subareas[,1],ssEnv$island_subareas))==0)
     {
       message("INFO: ", Sys.time(), " The only allowed areas values are:", ssEnv$keys_metaareas_default)
       stop("I'm STOPPING HERE!")
     }
+  } else {
+    message("INFO: ", Sys.time(), " These gene's areas will be investigated:", ssEnv$gene_subareas[,1])
+    message("INFO: ", Sys.time(), " These island's areas will be investigated:", ssEnv$island_subareas[,1])
   }
 
   ssEnv$keys_populations <-  data.frame("POPULATION"=c("Reference","Control","Case"))
   ssEnv$keys_figures <-  data.frame("FIGURE"=figures)
   ssEnv$keys_anomalies <-  data.frame("ANOMALY"=anomalies)
-  ssEnv$keys_metaareas <- data.frame("METAAREA"=metaareas)
+  ssEnv$keys_metaareas <- data.frame("metaareas"=metaareas)
 
   if("ISLAND" %in% metaareas)
     ssEnv$keys_areas_island <-  expand.grid("GROUP"="ISLAND",
@@ -195,10 +200,19 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
                 "ANOMALY"=anomalies)
   )
 
-  # remove anomaies if metaareas not in options
+  levels( ssEnv$keys_anomalies_figures_areas$FIGURE) <- c( levels(ssEnv$keys_anomalies_figures_areas$FIGURE),"MEAN")
+  ssEnv$keys_anomalies_figures_areas$FIGURE[ssEnv$keys_anomalies_figures_areas$ANOMALY=="BETA"] <-"MEAN"
+  ssEnv$keys_anomalies_figures_areas <- unique(ssEnv$keys_anomalies_figures_areas)
+  ssEnv$keys_anomalies_figures_areas$pasted <- paste(ssEnv$keys_anomalies_figures_areas$anomalies,ssEnv$keys_anomalies_figures_areas$figures,ssEnv$keys_anomalies_figures_areas$GROUP, ssEnv$keys_anomalies_figures_areas$SUBGROUP, sep="_")
+
+  # remove anomalies if metaareas not in options
   ssEnv$keys_anomalies_figures_areas <- ssEnv$keys_anomalies_figures_areas[ ssEnv$keys_anomalies_figures_areas$GROUP %in% metaareas, ]
 
   ssEnv$keys <-  expand.grid("figures"=ssEnv$keys_figures[,1],"anomalies"=ssEnv$keys_anomalies[,1])
+  levels(ssEnv$keys$figures) <- c(levels(ssEnv$keys$figures),"MEAN")
+  ssEnv$keys$figures[ssEnv$keys$anomalies=="BETA"] <- "MEAN"
+  ssEnv$keys <- unique(ssEnv$keys)
+  ssEnv$keys$pasted <- paste(ssEnv$keys$anomalies,ssEnv$keys$figures, sep="_")
 
   if(nrow(ssEnv$keys_areas_probe)>0)
   {

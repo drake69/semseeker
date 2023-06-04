@@ -24,8 +24,6 @@
 association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
 {
 
-  ssEnv <- get_session_info()
-
   j <- 0
   k <- 0
   z <- 0
@@ -230,100 +228,25 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # binomiale che si vuole usare per la regressione logistica
 
 
-          keys <- expand.grid("ANOMALY" =  ssEnv$keys_anomalies[,1], "FIGURE" =  ssEnv$keys_figures[,1])
-          cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep = "")
-          keys$GROUP  =  "POPULATION"
-          keys$SUBGROUP  =  "SAMPLE"
-          iters <- length(cols)
-
-          if(!is.null(covariates) && !length(covariates)  ==  0)
-            study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
-
-          fileNameResults <- inference_file_name(inference_detail)
-
-          # clean keys from already done association
-          if(file.exists(fileNameResults))
+          for (a in length(anomalies))
           {
-            old_results <- utils::read.csv2(fileNameResults, header  =  T)
-            keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-            keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-            keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
-          }
+            keys <- expand.grid("ANOMALY" =  anomalies[a], "FIGURE" =  figures)
+            # aggiungiamo temporaneamente BETA MEAN
+            levels(keys$FIGURE) <- c(levels(keys$FIGURE), "MEAN")
+            keys$FIGURE[keys$ANOMALY=="BETA"] <- "MEAN"
+            keys <- unique(keys)
+            cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep = "")
+            # temporaneamente filtriamo per le colonne esistenti
+            cols <- cols[cols %in% colnames(study_summary)]
+            keys$GROUP  =  "POPULATION"
+            keys$SUBGROUP  =  "SAMPLE"
+            iters <- length(cols)
 
-          if(nrow(keys)>0)
-            for(j in seq_along(nrow(keys)))
-            {
-              g_start <- 2 + length(covariates)
-              result_temp <- apply_stat_model(tempDataFrame  =  study_summary[, c(independent_variable, covariates, cols[j])], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
-                                              key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
-              result <- rbind(result, result_temp)
-            }
+            if(!is.null(covariates) && !length(covariates)  ==  0)
+              study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
-          result <- result[order(result$PVALUEADJ),]
+            fileNameResults <- inference_file_name(inference_detail, anomalies[a])
 
-          study_summaryToPlot <- study_summary
-
-          if(independent_variable  ==  "Sample_Group")
-            study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
-
-          if(family_test  ==  "binomial" || family_test  ==  "wilcoxon")
-          {
-
-            chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"POPULATION_COMPARISON")
-
-            if(sum(grepl(pattern = "MUTATIONS",x  =  ssEnv$keys_anomalies))>0)
-            {
-              filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
-              grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
-              graphics::par(mfrow = c(1,3))
-              graphics::boxplot(MUTATIONS_HYPO~ study_summaryToPlot[,independent_variable],main = "Hypo Mutations", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(MUTATIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Mutations", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(MUTATIONS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper Mutations", data  =  study_summaryToPlot, cex = 2)
-              grDevices::dev.off()
-            }
-
-            if(sum(grepl(pattern = "LESIONS",x  =  ssEnv$keys_anomalies))>0)
-            {
-              filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
-              grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
-              graphics::par(mfrow = c(1,3))
-              graphics::boxplot(LESIONS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo Lesions", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(LESIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Lesions", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(LESIONS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper Lesions", data  =  study_summaryToPlot, cex = 2)
-              grDevices::dev.off()
-            }
-
-            if(sum(grepl(pattern = "DELTAS",x  =  ssEnv$keys_anomalies))>0)
-            {
-              study_summaryToPlot$DELTAS_HYPO <- as.numeric(study_summaryToPlot$DELTAS_HYPO)
-              study_summaryToPlot$DELTAS_BOTH <- as.numeric(study_summaryToPlot$DELTAS_BOTH)
-              study_summaryToPlot$DELTAS_HYPER <- as.numeric(study_summaryToPlot$DELTAS_HYPER)
-              filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAS"),"png")
-              grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
-              graphics::par(mfrow = c(1,3))
-              graphics::boxplot(DELTAS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAS Mean", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(DELTAS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAS", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(DELTAS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper DELTAS Mean", data  =  study_summaryToPlot, cex = 2)
-              grDevices::dev.off()
-            }
-
-            if(sum(grepl(pattern = "DELTAQ",x  =  ssEnv$keys_anomalies))>0)
-            {
-              filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
-              grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
-              graphics::par(mfrow = c(1,3))
-              graphics::boxplot(DELTAQ_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAQ Mean", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(DELTAQ_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAQ", data  =  study_summaryToPlot, cex = 2)
-              graphics::boxplot(DELTAQ_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper DELTAQ Mean", data  =  study_summaryToPlot, cex = 2)
-              grDevices::dev.off()
-            }
-          }
-
-
-          if(depth_analysis >1)
-          {
-
-            keys <- ssEnv$keys_anomalies_figures_areas
             # clean keys from already done association
             if(file.exists(fileNameResults))
             {
@@ -333,74 +256,157 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
             }
 
-            nkeys <- nrow(keys)
-            variables_to_export_nested <- c("variables_to_export", "keys", "result_folderPivot", "sample_names", "independent_variable", "covariates",
-              "family_test", "transformation", "ssEnv", "depth_analysis","file_path_build", "apply_stat_model")
             if(nrow(keys)>0)
-              # result_temp_foreach <- foreach::foreach(k  =  1:nkeys, .combine  =  rbind, .export  =  variables_to_export_nested) %dorng%
-              for (k in 1:nkeys)
+              for(j in seq_along(nrow(keys)))
               {
-                if(exists("tempDataFrame"))
-                  rm(list  =  c("tempDataFrame"))
-                key <- keys [k,]
-                pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
-                fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
-                if (file.exists(fname))
-                {
-                  message("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
-                  tempDataFrame <- utils::read.csv(fname, sep  =  ";")
-                  #assign the area name (eg gene...) to the rows
-                  # has SAMPLEID as name but is the genomic area
-                  row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
-                  if(length(areas_selection)>0)
-                    tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection, ]
-                  #removes area name (eg. gene...)
-                  tempDataFrame <- tempDataFrame[,-1]
-                  if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
-                    next
-                  # max_row_count <- ceiling(10^6/ncol(tempDataFrame))
-                  # batch_count <- ceiling(nrow(tempDataFrame)/max_row_count)
-                  # for(h in 0:batch_count)
-                  # {
-                  # tempDataFrameBatch <- tempDataFrame[ (1+h*max_row_count):min((h+1)*max_row_count,nrow(tempDataFrame)), ]
-                  tempDataFrameBatch <- tempDataFrame
-                  tempDataFrameBatch <- t(tempDataFrameBatch)
-                  tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                  tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
-                  message("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
-                  if(nrow(tempDataFrameBatch)>1)
-                  {
-                    tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   "Reference")
-                    tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   0)
-                    tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
-                    tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                    tempDataFrameBatch$POPULATION <- sample_names[, independent_variable]
-                    tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
-                    tempDataFrameBatch[, independent_variable] <- sample_names[, independent_variable]
-                    tempDataFrameBatch <- tempDataFrameBatch[, !(names(tempDataFrameBatch) %in% c("POPULATION","Sample_ID"))]
-                    cols <- (gsub(" ", "_", colnames(tempDataFrameBatch)))
-                    cols <- (gsub("-", "_", cols))
-                    cols <- (gsub(":", "_", cols))
-                    cols <- (gsub("/", "_", cols))
-                    cols <- (gsub("'", "_", cols))
-                    tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                    if(length(colnames(tempDataFrameBatch)) !=  length(cols))
-                      browser()
-                    colnames(tempDataFrameBatch) <- cols
-                    g_start <- 2 + length(covariates)
-                    result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
-                                                                key  =  key, transformation =  transformation, dototal  =  TRUE,
-                                                                session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
-
-                    if(!exists("result_temp_foreach"))
-                      result_temp_foreach <- result_temp_local_batch
-                    else
-                      result_temp_foreach <- rbind(result_temp_local_batch, result_temp_foreach)
-                    # result_temp_local_batch
-                  }
-                  # }
-                }
+                g_start <- 2 + length(covariates)
+                result_temp <- apply_stat_model(tempDataFrame  =  study_summary[, c(independent_variable, covariates, cols[j])], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
+                  key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
+                result <- rbind(result, result_temp)
               }
+
+            result <- result[order(result$PVALUEADJ),]
+
+            study_summaryToPlot <- study_summary
+
+            if(independent_variable  ==  "Sample_Group")
+              study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
+
+            if(family_test  ==  "binomial" || family_test  ==  "wilcoxon")
+            {
+
+              chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"POPULATION_COMPARISON")
+
+              if(sum(grepl(pattern = "MUTATIONS",x  =  ssEnv$keys_anomalies))>0)
+              {
+                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                graphics::par(mfrow = c(1,3))
+                graphics::boxplot(MUTATIONS_HYPO~ study_summaryToPlot[,independent_variable],main = "Hypo Mutations", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(MUTATIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Mutations", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(MUTATIONS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper Mutations", data  =  study_summaryToPlot, cex = 2)
+                grDevices::dev.off()
+              }
+
+              if(sum(grepl(pattern = "LESIONS",x  =  ssEnv$keys_anomalies))>0)
+              {
+                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                graphics::par(mfrow = c(1,3))
+                graphics::boxplot(LESIONS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo Lesions", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(LESIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Lesions", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(LESIONS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper Lesions", data  =  study_summaryToPlot, cex = 2)
+                grDevices::dev.off()
+              }
+
+              if(sum(grepl(pattern = "DELTAS",x  =  ssEnv$keys_anomalies))>0)
+              {
+                study_summaryToPlot$DELTAS_HYPO <- as.numeric(study_summaryToPlot$DELTAS_HYPO)
+                study_summaryToPlot$DELTAS_BOTH <- as.numeric(study_summaryToPlot$DELTAS_BOTH)
+                study_summaryToPlot$DELTAS_HYPER <- as.numeric(study_summaryToPlot$DELTAS_HYPER)
+                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAS"),"png")
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                graphics::par(mfrow = c(1,3))
+                graphics::boxplot(DELTAS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAS Mean", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(DELTAS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAS", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(DELTAS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper DELTAS Mean", data  =  study_summaryToPlot, cex = 2)
+                grDevices::dev.off()
+              }
+
+              if(sum(grepl(pattern = "DELTAQ",x  =  ssEnv$keys_anomalies))>0)
+              {
+                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                graphics::par(mfrow = c(1,3))
+                graphics::boxplot(DELTAQ_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAQ Mean", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(DELTAQ_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAQ", data  =  study_summaryToPlot, cex = 2)
+                graphics::boxplot(DELTAQ_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper DELTAQ Mean", data  =  study_summaryToPlot, cex = 2)
+                grDevices::dev.off()
+              }
+            }
+
+
+            if(depth_analysis >1)
+            {
+
+              keys <- ssEnv$keys_anomalies_figures_areas
+              # clean keys from already done association
+              if(file.exists(fileNameResults))
+              {
+                old_results <- utils::read.csv2(fileNameResults, header  =  T)
+                keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
+              }
+
+              nkeys <- nrow(keys)
+              variables_to_export_nested <- c("variables_to_export", "keys", "result_folderPivot", "sample_names", "independent_variable", "covariates",
+                "family_test", "transformation", "ssEnv", "depth_analysis","file_path_build", "apply_stat_model")
+              if(nrow(keys)>0)
+                # result_temp_foreach <- foreach::foreach(k  =  1:nkeys, .combine  =  rbind, .export  =  variables_to_export_nested) %dorng%
+                for (k in 1:nkeys)
+                {
+                  if(exists("tempDataFrame"))
+                    rm(list  =  c("tempDataFrame"))
+                  key <- keys [k,]
+                  pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
+                  fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+                  if (file.exists(fname))
+                  {
+                    message("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
+                    tempDataFrame <- utils::read.csv2(fname, sep  =  ";")
+                    #assign the area name (eg gene...) to the rows
+                    # has SAMPLEID as name but is the genomic area
+                    row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+                    if(length(areas_selection)>0)
+                      tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection, ]
+                    #removes area name (eg. gene...)
+                    tempDataFrame <- tempDataFrame[,-1]
+                    if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
+                      next
+                    # max_row_count <- ceiling(10^6/ncol(tempDataFrame))
+                    # batch_count <- ceiling(nrow(tempDataFrame)/max_row_count)
+                    # for(h in 0:batch_count)
+                    # {
+                    # tempDataFrameBatch <- tempDataFrame[ (1+h*max_row_count):min((h+1)*max_row_count,nrow(tempDataFrame)), ]
+                    tempDataFrameBatch <- tempDataFrame
+                    tempDataFrameBatch <- t(tempDataFrameBatch)
+                    tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                    tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
+                    message("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
+                    if(nrow(tempDataFrameBatch)>1)
+                    {
+                      tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   "Reference")
+                      tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   0)
+                      tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
+                      tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                      tempDataFrameBatch$POPULATION <- sample_names[, independent_variable]
+                      tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
+                      tempDataFrameBatch[, independent_variable] <- sample_names[, independent_variable]
+                      tempDataFrameBatch <- tempDataFrameBatch[, !(names(tempDataFrameBatch) %in% c("POPULATION","Sample_ID"))]
+                      cols <- (gsub(" ", "_", colnames(tempDataFrameBatch)))
+                      cols <- (gsub("-", "_", cols))
+                      cols <- (gsub(":", "_", cols))
+                      cols <- (gsub("/", "_", cols))
+                      cols <- (gsub("'", "_", cols))
+                      tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                      if(length(colnames(tempDataFrameBatch)) !=  length(cols))
+                        stop("ERROR: I'm stopping here data t associate are not correct, file a bug!")
+                      colnames(tempDataFrameBatch) <- cols
+                      g_start <- 2 + length(covariates)
+                      result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
+                        key  =  key, transformation =  transformation, dototal  =  TRUE,
+                        session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
+
+                      if(!exists("result_temp_foreach"))
+                        result_temp_foreach <- result_temp_local_batch
+                      else
+                        result_temp_foreach <- rbind(result_temp_local_batch, result_temp_foreach)
+                      # result_temp_local_batch
+                    }
+                  }
+                }
+            }
           }
         }
       }

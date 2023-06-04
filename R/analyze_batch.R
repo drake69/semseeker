@@ -45,21 +45,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
     stop(population_checkResult)
   }
 
-  # # save beta as rds and as pivot
-  # sample_info <- sample_sheet[,c("Sample_ID","Sample_Group")]
-  # colnames(sample_info) <- c("SAMPLEID","POPULATION")
-  # methylation_data_to_save <- data.frame("SAMPLEID"=rownames(methylation_data), methylation_data[, sample_sheet$Sample_ID])
-  # sample_info <- as.data.frame(t(sample_info))
-  # colnames(sample_info) <- sample_info[1,]
-  # sample_info <- cbind(data.frame("SAMPLEID"="POPULATION"), sample_info[-1,])
-  # methylation_data_to_save <- rbind(sample_info, methylation_data_to_save )
-  # pivot_subfolder <- dir_check_and_create(ssEnv$result_folderData, "BETA")
-  # fileName <- file_path_build(pivot_subfolder,c("BETA","BETA","PROBE","PROBE"),"csv")
-  # # fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
-  # utils::write.table(methylation_data_to_save, fileName, row.names = T, col.names = T, sep=";")
-  # rm(methylation_data_to_save)
-  # rm(sample_info)
-  # saveRDS(methylation_data,file_path_build(ssEnv$result_folderData, c(batch_id,"_methylation_data"),"rds"))
+  beta_save(methylation_data, sample_sheet, batch_id)
 
   # reference population
   referencePopulationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == "Reference", ]
