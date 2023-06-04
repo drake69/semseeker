@@ -27,26 +27,35 @@ annotate_bed <- function (
   final_bed <- NULL
   bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
 
-  if(file.exists(bedFileName))
-  {
-    if(file.info(bedFileName)$size < 10)
-    {
-      final_bed <- NULL
-      message("WARNING: ", Sys.time(), " Given up file:", final_bed, " is empty!")
-    }
-    else
-    {
-      # final_bed <- utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
-      final_bed <- fst::fst(path = bedFileName)
-      final_bed$VALUE = as.numeric(final_bed$VALUE)
-    }
+  if("BETA" %in% anomalies)
+    figures <- c(figures,"MEAN")
 
-    final_bed_temp <- final_bed[final_bed$ANOMALY %in% anomalies & final_bed$FIGURE %in% figures,]
-    if(!plyr::empty(final_bed_temp))
-      return(final_bed_temp)
-    else
-      final_bed_temp <- as.data.frame(final_bed)
-  }
+  anomalies <- anomalies[(anomalies !="BETA")]
+  figures <- figures[(figures!="MEAN")]
+
+  # if(file.exists(bedFileName))
+  # {
+  #   if(file.info(bedFileName)$size < 10)
+  #   {
+  #     final_bed <- NULL
+  #     message("WARNING: ", Sys.time(), " Given up file:", final_bed, " is empty!")
+  #   }
+  #   else
+  #   {
+  #     # final_bed <- utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
+  #     final_bed <- fst::fst(path = bedFileName)
+  #     final_bed$VALUE = as.numeric(final_bed$VALUE)
+  #   }
+  #
+  #   final_bed_temp <- unique(final_bed[final_bed$ANOMALY %in% anomalies & final_bed$FIGURE %in% figures,])
+  #   if(!plyr::empty(final_bed_temp)
+  #     & any(!(anomalies %in% unique(final_bed$ANOMALY)))
+  #     & any(!(figures %in% unique(final_bed$FIGURE)))
+  #     )
+  #     return(final_bed_temp)
+  #   else
+  #     final_bed_temp <- as.data.frame(final_bed)
+  # }
 
   ssEnv$keysLocal <-
     expand.grid(
@@ -66,10 +75,10 @@ annotate_bed <- function (
   # for(i in 1:nrow(ssEnv$keysLocal))
   final_bed <- foreach::foreach(i=1:nrow(ssEnv$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
     {
-      anomal <- ssEnv$keysLocal[i,"ANOMALY"]
-      pop <- ssEnv$keysLocal[i,"POPULATION"]
-      fig <- ssEnv$keysLocal[i,"FIGURE"]
-      grp <- ssEnv$keysLocal[i,"GROUP"]
+      anomal <- as.character(ssEnv$keysLocal[i,"ANOMALY"])
+      pop <- as.character(ssEnv$keysLocal[i,"POPULATION"])
+      fig <- as.character(ssEnv$keysLocal[i,"FIGURE"])
+      grp <- as.character(ssEnv$keysLocal[i,"GROUP"])
 
       probes <- probes_get(probes_prefix, grp)
 
@@ -83,11 +92,13 @@ annotate_bed <- function (
 
   # colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
   colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","k27","k450","k850"))
-  final_bed <- final_bed[, colname_to_preserve]
+  final_bed <- unique(final_bed[, colname_to_preserve])
 
-  if(exists("final_bed_temp"))
-    if(!plyr::empty(final_bed_temp))
-      final_bed <- rbind(final_bed, final_bed_temp)
+  # if(exists("final_bed_temp"))
+  #   if(!plyr::empty(final_bed_temp))
+  #   {
+  #     final_bed <- unique(rbind(final_bed, final_bed_temp))
+  #   }
 
   if(exists("final_bed"))
   {
