@@ -1,14 +1,13 @@
 test_that("annotate_bed", {
 
-
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
   figures <- c( "BOTH")
   anomalies <- c("DELTAS","DELTAQ","DELTAR","DELTARQ")
+  # anomalies <- c("BETA")
   metaareas <- c("GENE")
-  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90,
-    figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
+  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90)
 
 
   ####################################################################################
@@ -73,14 +72,13 @@ test_that("annotate_bed", {
   testthat::expect_true( nrow(final_bed)>0)
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd")
   probes_prefix = "PROBES_Gene_"
   columnLabel =  "GENE"
   groupingColumnLabel="GROUP"
 
   # create and read
   final_bed <- semseeker:::annotate_bed (
-
     populations ,
     figures ,
     anomalies ,
@@ -89,9 +87,28 @@ test_that("annotate_bed", {
     columnLabel ,
     groupingColumnLabel)
 
-  bedFileName <- semseeker:::file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
-
+  # bedFileName <- semseeker:::file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
+
+  old_nrow <- nrow(unique(final_bed))
+  # testing when added a subarea
+  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  probes_prefix = "PROBES_Gene_"
+  columnLabel =  "GENE"
+  groupingColumnLabel="GROUP"
+
+  # create and read
+  final_bed <- semseeker:::annotate_bed (
+    populations ,
+    figures ,
+    anomalies ,
+    groups ,
+    probes_prefix ,
+    columnLabel ,
+    groupingColumnLabel)
+
+  # bedFileName <- semseeker:::file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  testthat::expect_true(nrow(final_bed)>old_nrow)
 
   anomalies <- c("DELTAQ")
   # create and read
