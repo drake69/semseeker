@@ -99,10 +99,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         independent_variableData2ndLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable2ndLevel,burdenValue])
         local_result <- data.frame (
           "INDIPENDENT.VARIABLE"= independent_variable,
-          "ANOMALY" = key$ANOMALY,
+          "MARKER" = key$MARKER,
           "FIGURE" = key$FIGURE,
-          "GROUP" = key$GROUP,
-          "SUBGROUP" = key$SUBGROUP,
+          "AREA" = key$AREA,
+          "SUBAREA" = key$SUBAREA,
           "AREA_OF_TEST" = burdenValue,
           "PVALUE" = (model_result$pvalue),
           "PVALUEADJ" = pvalueadjusted,
@@ -146,10 +146,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
         local_result <- data.frame (
           "INDIPENDENT.VARIABLE"= independent_variable,
-          "ANOMALY" = key$ANOMALY,
+          "MARKER" = key$MARKER,
           "FIGURE" = key$FIGURE,
-          "GROUP" = key$GROUP,
-          "SUBGROUP" = key$SUBGROUP,
+          "AREA" = key$AREA,
+          "SUBAREA" = key$SUBAREA,
           "AREA_OF_TEST" = burdenValue,
           "PVALUE" = (model_result$pvalue),
           "PVALUEADJ" = pvalueadjusted,
@@ -192,10 +192,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     {
       # local_result <- data.frame (
       #   "INDIPENDENT.VARIABLE"= independent_variable,
-      #   "ANOMALY" = key$ANOMALY,
+      #   "MARKER" = key$MARKER,
       #   "FIGURE" = key$FIGURE,
-      #   "GROUP" = key$GROUP,
-      #   "SUBGROUP" = key$SUBGROUP,
+      #   "AREA" = key$AREA,
+      #   "SUBAREA" = key$SUBAREA,
       #   "AREA_OF_TEST" = burdenValue,
       #   "PVALUE" = NA,
       #   "PVALUEADJ" = NA,

@@ -5,7 +5,7 @@ test_that("association_analysis", {
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="PROBE")
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", markers="DELTAS", areas="PROBE")
 
   #todo: test incremental association analysis
   # inference_details <- expand.grid("independent_variable"= "Phenotest",
@@ -31,7 +31,7 @@ test_that("association_analysis", {
   #                                  "filter_p_value" = FALSE)
   #
   # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", markers=c("DELTAS","DELTAQ"), areas="PROBE")
 
   # inference_details <- expand.grid("independent_variable"= "Phenotest",
   #                                  "covariates"=c("Covariates1+Covariates2"),
@@ -41,7 +41,7 @@ test_that("association_analysis", {
   #                                  "filter_p_value" = FALSE)
   #
   # # inference_details,result_folder, maxResources, parallel_strategy
-  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  # association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", markers=c("DELTAS","DELTAQ"), areas="PROBE")
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates"=c("Covariates1+Covariates2"),
@@ -52,7 +52,7 @@ test_that("association_analysis", {
 
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential",
-    figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+    figures="BOTH", markers=c("DELTAS","DELTAQ"), areas="PROBE")
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
                                    "covariates"=c("Covariates1+Covariates2"),
@@ -62,7 +62,7 @@ test_that("association_analysis", {
                                    "filter_p_value" = FALSE)
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", markers=c("DELTAS","DELTAQ"), areas="PROBE")
 
   inference_details <- expand.grid("independent_variable"= "Phenotest",
     "covariates"=c("Covariates1+Covariates2"),
@@ -72,10 +72,10 @@ test_that("association_analysis", {
     "filter_p_value" = FALSE)
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="PROBE")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", markers=c("DELTAS","DELTAQ"), areas="PROBE")
 
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", anomalies="DELTAS", metaareas="CHR")
+  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", markers="DELTAS", areas="CHR")
   inferenceFolder <- file.path(tempFolder,"Inference")
 
 
@@ -90,7 +90,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", anomalies=c("DELTAS","DELTAQ"), metaareas="CHR")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", markers=c("DELTAS","DELTAQ"), areas="CHR")
 
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -98,7 +98,7 @@ test_that("association_analysis", {
   testthat::expect_true(nrow(localFileRes)>0)
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="CHR")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", markers="DELTAS", areas="CHR")
 
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg_0.5_1000_15000_0.9_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -114,7 +114,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", markers="DELTAS", areas="GENE")
 
   fileToRead <- file_path_build(inferenceFolder, "1_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -129,7 +129,7 @@ test_that("association_analysis", {
 
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", markers="DELTAS", areas="GENE")
 
   fileToRead <- file_path_build(inferenceFolder, "3_Phenotest_scale_gaussian_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
@@ -189,7 +189,7 @@ test_that("association_analysis", {
                                    "filter_p_value" = FALSE)
 
   # inference_details,result_folder, maxResources, parallel_strategy
-  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", anomalies="DELTAS", metaareas="GENE")
+  association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="HYPER", markers="DELTAS", areas="GENE")
   fileToRead <- file_path_build(inferenceFolder, "3_Group_quantile_5_wilcoxon_", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)

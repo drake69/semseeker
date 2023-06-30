@@ -24,26 +24,26 @@ test_that("semseeker:::read_multiple_bed", {
   semseeker:::create_multiple_bed(mySampleSheet)
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS","DELTAR","DELTAQ","DELTARQ")
+  markers <- c("MUTATIONS","LESIONS","DELTAS","DELTAR","DELTAQ","DELTARQ")
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
-  populationName <- "Case"
+  area =  "GENE"
+  groupingColumnLabel="AREA"
+  sample_group <- "Case"
 
-  probe_features <- probes_get(probes_prefix,"Whole")
+  probe_features <- probe_features_get(probes_prefix,"WHOLE")
 
 
-  res <-semseeker:::read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  res <-semseeker:::read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
   testthat::expect_true(nrow(res)>0)
 
-  res <-semseeker:::read_multiple_bed ( "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  res <-semseeker:::read_multiple_bed ( "DELTAS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
   testthat::expect_true(nrow(res)>0)
   ####################################################################################
 
-  # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
-  # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPO", probe_features, area, sample_group, groupingColumnLabel)
+  # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPER", probe_features, area, sample_group, groupingColumnLabel)
   # testthat::expect_true(nrow(res)>0)
   semseeker:::close_env()
 }

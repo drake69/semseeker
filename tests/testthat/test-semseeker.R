@@ -8,7 +8,7 @@ test_that("semeeker", {
   ####################################################################################
 
   semseeker( sample_sheet =  mySampleSheet_batch,methylation_data =  methylation_data_batch, result_folder = tempFolder,
-             parallel_strategy = parallel_strategy, metaareas="GENE", figures="BOTH")
+             parallel_strategy = parallel_strategy, areas="GENE", figures="BOTH")
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")
   fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "fst")

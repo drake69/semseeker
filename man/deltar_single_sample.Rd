@@ -24,7 +24,7 @@ deltar_single_sample(
 
 \item{iqr}{interqurtile ratio used to calculate the beta range}
 
-\item{probe_features}{genomic position of probes}
+\item{probe_features}{genomic position of probe_features}
 }
 \value{
 summary detail about the analysis

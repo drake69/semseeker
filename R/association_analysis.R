@@ -38,16 +38,16 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
 
   figures <- ssEnv$keys_figures[,1]
-  anomalies <- ssEnv$keys_anomalies[,1]
-  populations <- c("Reference","Control","Case")
+  markers <- ssEnv$keys_markers[,1]
+  sample_groups <- c("Reference","Control","Case")
 
   if(sum(ssEnv$keys_metaareas[,1]  ==  "PROBE")  ==  1)
   {
     subGroups <- c("")
     probes_prefix <- "PROBES"
     mainGroupLabel <-  "PROBE"
-    subGroupLabel <- "GROUP"
-    create_excel_pivot ( populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
+    subGroupLabel <- "AREA"
+    create_excel_pivot ( sample_groups  =   sample_groups, figures  =   figures,markers  =   markers, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
   }
 
   if(sum(ssEnv$keys_metaareas[,1]  ==  "CHR")  ==  1)
@@ -55,8 +55,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     subGroups <- c("CHR")
     probes_prefix <- "PROBES_CHR_"
     mainGroupLabel <-  "CHR"
-    subGroupLabel <- "GROUP"
-    create_excel_pivot ( populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
+    subGroupLabel <- "AREA"
+    create_excel_pivot ( sample_groups  =   sample_groups, figures  =   figures,markers  =   markers, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
   }
 
   if(sum(ssEnv$keys_metaareas[,1]  ==  "GENE")  ==  1)
@@ -64,9 +64,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     subGroups <- ssEnv$gene_subareas[,1]
     probes_prefix  =  "PROBES_Gene_"
     mainGroupLabel  =   "GENE"
-    subGroupLabel = "GROUP"
+    subGroupLabel = "AREA"
 
-    create_excel_pivot ( populations  =   populations, figures  =   figures,anomalies  =   anomalies, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
+    create_excel_pivot ( sample_groups  =   sample_groups, figures  =   figures,markers  =   markers, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
   }
 
 
@@ -76,7 +76,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     subGroups <- ssEnv$island_subareas[,1]
     mainGroupLabel <- "ISLAND"
     subGroupLabel <- "RELATION_TO_CPGISLAND"
-    create_excel_pivot ( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+    create_excel_pivot ( sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
   }
 
   if(sum(ssEnv$keys_metaareas[,1]  ==  "DMR")  ==  1)
@@ -84,11 +84,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     subGroups <- c("DMR")
     probes_prefix  =  "PROBES_DMR_"
     mainGroupLabel  =   "DMR"
-    subGroupLabel = "GROUP"
-    create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+    subGroupLabel = "AREA"
+    create_excel_pivot (sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
   }
 
-  # if(exists("figures")) figures,  if(exists("anomalies"))  anomalies,if(exists("metaareas"))  metaareas
+  # if(exists("figures")) figures,  if(exists("markers"))  markers,if(exists("areas"))  areas
 
   inference_details <- unique(inference_details)
   # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
@@ -177,10 +177,10 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
           result  =  data.frame (
             "INDIPENDENT.VARIABLE" = "",
-            "ANOMALY"  =  "",
+            "MARKER"  =  "",
             "FIGURE"  =  "",
-            "GROUP"  =  "",
-            "SUBGROUP"  =  "",
+            "AREA"  =  "",
+            "SUBAREA"  =  "",
             "AREA_OF_TEST"  =  "",
             "PVALUE"  =  "",
             "PVALUEADJ"  =  "",
@@ -228,32 +228,32 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # binomiale che si vuole usare per la regressione logistica
 
 
-          for (a in length(anomalies))
+          for (a in length(markers))
           {
-            keys <- expand.grid("ANOMALY" =  anomalies[a], "FIGURE" =  figures)
+            keys <- expand.grid("MARKER" =  markers[a], "FIGURE" =  figures)
             # aggiungiamo temporaneamente BETA MEAN
             levels(keys$FIGURE) <- c(levels(keys$FIGURE), "MEAN")
-            keys$FIGURE[keys$ANOMALY=="BETA"] <- "MEAN"
+            keys$FIGURE[keys$MARKER=="BETA"] <- "MEAN"
             keys <- unique(keys)
-            cols <- paste0(keys$ANOMALY,"_",keys$FIGURE, sep = "")
+            cols <- paste0(keys$MARKER,"_",keys$FIGURE, sep = "")
             # temporaneamente filtriamo per le colonne esistenti
             cols <- cols[cols %in% colnames(study_summary)]
-            keys$GROUP  =  "POPULATION"
-            keys$SUBGROUP  =  "SAMPLE"
+            keys$AREA  =  "SAMPLE_GROUP"
+            keys$SUBAREA  =  "SAMPLE"
             iters <- length(cols)
 
             if(!is.null(covariates) && !length(covariates)  ==  0)
               study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
-            fileNameResults <- inference_file_name(inference_detail, anomalies[a])
+            fileNameResults <- inference_file_name(inference_detail, markers[a])
 
             # clean keys from already done association
             if(file.exists(fileNameResults))
             {
               old_results <- utils::read.csv2(fileNameResults, header  =  T)
-              keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-              keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-              keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
+              keys_markers_figures_areas_done <- unlist(apply(unique(old_results [, c("MARKER","FIGURE","AREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+              keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+              keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
             }
 
             if(nrow(keys)>0)
@@ -275,9 +275,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             if(family_test  ==  "binomial" || family_test  ==  "wilcoxon")
             {
 
-              chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"POPULATION_COMPARISON")
+              chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"sample_group_COMPARISON")
 
-              if(sum(grepl(pattern = "MUTATIONS",x  =  ssEnv$keys_anomalies))>0)
+              if(sum(grepl(pattern = "MUTATIONS",x  =  ssEnv$keys_markers))>0)
               {
                 filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
                 grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
@@ -288,7 +288,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 grDevices::dev.off()
               }
 
-              if(sum(grepl(pattern = "LESIONS",x  =  ssEnv$keys_anomalies))>0)
+              if(sum(grepl(pattern = "LESIONS",x  =  ssEnv$keys_markers))>0)
               {
                 filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
                 grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
@@ -299,7 +299,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 grDevices::dev.off()
               }
 
-              if(sum(grepl(pattern = "DELTAS",x  =  ssEnv$keys_anomalies))>0)
+              if(sum(grepl(pattern = "DELTAS",x  =  ssEnv$keys_markers))>0)
               {
                 study_summaryToPlot$DELTAS_HYPO <- as.numeric(study_summaryToPlot$DELTAS_HYPO)
                 study_summaryToPlot$DELTAS_BOTH <- as.numeric(study_summaryToPlot$DELTAS_BOTH)
@@ -313,7 +313,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 grDevices::dev.off()
               }
 
-              if(sum(grepl(pattern = "DELTAQ",x  =  ssEnv$keys_anomalies))>0)
+              if(sum(grepl(pattern = "DELTAQ",x  =  ssEnv$keys_markers))>0)
               {
                 filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
                 grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
@@ -329,14 +329,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             if(depth_analysis >1)
             {
 
-              keys <- ssEnv$keys_anomalies_figures_areas
+              keys <- ssEnv$keys_markers_figures_areas
               # clean keys from already done association
               if(file.exists(fileNameResults))
               {
                 old_results <- utils::read.csv2(fileNameResults, header  =  T)
-                keys_anomalies_figures_areas_done <- unlist(apply(unique(old_results [, c("ANOMALY","FIGURE","GROUP")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-                keys_to_be_done <- unlist(apply(keys[, c("ANOMALY","FIGURE","GROUP")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-                keys <- keys[!( keys_to_be_done %in% keys_anomalies_figures_areas_done), ]
+                keys_markers_figures_areas_done <- unlist(apply(unique(old_results [, c("MARKER","FIGURE","AREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
               }
 
               nkeys <- nrow(keys)
@@ -349,8 +349,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   if(exists("tempDataFrame"))
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
-                  pivot_subfolder <- dir_check_and_create(result_folderPivot, key$ANOMALY)
-                  fname <-file_path_build( pivot_subfolder ,c(key$ANOMALY, key$FIGURE, key$GROUP,key$SUBGROUP),"csv")
+                  pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
+                  fname <-file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv")
                   if (file.exists(fname))
                   {
                     message("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
@@ -376,14 +376,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     message("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
                     if(nrow(tempDataFrameBatch)>1)
                     {
-                      tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   "Reference")
-                      tempDataFrameBatch <- subset(tempDataFrameBatch, "POPULATION"  !=   0)
+                      tempDataFrameBatch <- subset(tempDataFrameBatch, "SAMPLE_GROUP"  !=   "Reference")
+                      tempDataFrameBatch <- subset(tempDataFrameBatch, "SAMPLE_GROUP"  !=   0)
                       tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
                       tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                      tempDataFrameBatch$POPULATION <- sample_names[, independent_variable]
+                      tempDataFrameBatch$SAMPLE_GROUP <- sample_names[, independent_variable]
                       tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
                       tempDataFrameBatch[, independent_variable] <- sample_names[, independent_variable]
-                      tempDataFrameBatch <- tempDataFrameBatch[, !(names(tempDataFrameBatch) %in% c("POPULATION","Sample_ID"))]
+                      tempDataFrameBatch <- tempDataFrameBatch[, !(names(tempDataFrameBatch) %in% c("SAMPLE_GROUP","Sample_ID"))]
                       cols <- (gsub(" ", "_", colnames(tempDataFrameBatch)))
                       cols <- (gsub("-", "_", cols))
                       cols <- (gsub(":", "_", cols))

@@ -13,7 +13,7 @@ mutations_get(values, figure, thresholds, probe_features, sampleName)
 
 \item{thresholds}{threshold to use for comparison}
 
-\item{probe_features}{probes features probe, chr, start,end}
+\item{probe_features}{probe_features features probe, chr, start,end}
 
 \item{sampleName}{name of the sample}
 }

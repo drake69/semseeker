@@ -4,7 +4,7 @@
 #' @param high_thresholds highest threshold to use for comparison
 #' @param low_thresholds lowest threshold to use for comparison
 #' @param sample_detail details of sample to analyze
-#' @param probe_features genomic position of probes
+#' @param probe_features genomic position of probe_features
 #' @param iqr interqurtile ratio used to calculate the beta range
 #'
 #' @return summary detail about the analysis

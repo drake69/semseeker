@@ -9,7 +9,7 @@ test_that("semeeker", {
   ###############################################################################################
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
-             parallel_strategy = "sequential", anomalies="DELTAQ", metaareas="GENE", figures="BOTH")
+             parallel_strategy = "sequential", markers="DELTAQ", areas="GENE", figures="BOTH")
 
   # batch_correlation_check(ssEnv)
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")

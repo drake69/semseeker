@@ -6,17 +6,17 @@
 #'   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
 #'   sample_names <- sample_sheet$Sample_ID
 #'   toExport <- c("ssEnv","dir_check_and_create","sample_names","k")
-#'   pivot <- foreach::foreach(k=1:nrow(ssEnv$keys_anomalies_figures_areas), .export = toExport, .combine= rbind , .multicombine=TRUE ) %dorng%
-#'   # for(k in 1:nrow(ssEnv$keys_anomalies_figures_areas))
+#'   pivot <- foreach::foreach(k=1:nrow(ssEnv$keys_markers_figures_areas), .export = toExport, .combine= rbind , .multicombine=TRUE ) %dorng%
+#'   # for(k in 1:nrow(ssEnv$keys_markers_figures_areas))
 #'   {
 #'     # k <- 1
-#'     anomaly <- as.character(ssEnv$keys_anomalies_figures_areas[k,"ANOMALY"])
-#'     figure <- as.character(ssEnv$keys_anomalies_figures_areas[k,"FIGURE"])
-#'     group <- as.character(ssEnv$keys_anomalies_figures_areas[k,"GROUP"])
-#'     subgroup <- as.character(ssEnv$keys_anomalies_figures_areas[k,"SUBGROUP"])
+#'     marker <- as.character(ssEnv$keys_markers_figures_areas[k,"MARKER"])
+#'     figure <- as.character(ssEnv$keys_markers_figures_areas[k,"FIGURE"])
+#'     group <- as.character(ssEnv$keys_markers_figures_areas[k,"AREA"])
+#'     subgroup <- as.character(ssEnv$keys_markers_figures_areas[k,"SUBAREA"])
 #'
-#'     pivot_file_name <- paste(anomaly,"_",figure,"_",  group,"_",subgroup, sep="")
-#'     pivot_subfolder <- dir_check_and_create(reportFolder, anomaly)
+#'     pivot_file_name <- paste(marker,"_",figure,"_",  group,"_",subgroup, sep="")
+#'     pivot_subfolder <- dir_check_and_create(reportFolder, marker)
 #'     fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
 #'     if(file.exists(fileName))
 #'     {
@@ -34,10 +34,10 @@
 #'       tempDataFrame <- tempDataFrame[-1,c("SAMPLEID",sample_names)]
 #'       tempDataFrame <- tempDataFrame[-1,c("SAMPLEID",sample_names)]
 #'       colnames(tempDataFrame) <- c("AREA",sample_names)
-#'       tempDataFrame$ANOMALY <- anomaly
+#'       tempDataFrame$MARKER <- marker
 #'       tempDataFrame$FIGURE <- figure
-#'       tempDataFrame$GROUP <- group
-#'       # tempDataFrame$SUBGROUP <- subgroup
+#'       tempDataFrame$AREA <- group
+#'       # tempDataFrame$SUBAREA <- subgroup
 #'       # if(exists("pivot"))
 #'       #   pivot <- rbind(pivot, tempDataFrame)
 #'       # else

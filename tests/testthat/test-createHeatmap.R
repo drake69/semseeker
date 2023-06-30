@@ -5,10 +5,10 @@ test_that("create_heatmap", {
   # print(tempFolder)
 
   # figures <- c( "BOTH")
-  # anomalies <- c("DELTAS","DELTAR","DELTARQ")
-  # metaareas <- c("GENE")
+  # markers <- c("DELTAS","DELTAR","DELTARQ")
+  # areas <- c("GENE")
 
-  # ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures, anomalies, metaareas)
+  # ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures, markers, areas)
   ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90)
 
   ####################################################################################
@@ -39,85 +39,85 @@ test_that("create_heatmap", {
   sp$Sample_Group <- mySampleSheet$Sample_Group
 
 
-  populations <- c("Control","Case")
+  sample_groups <- c("Control","Case")
   figures <- c("BOTH")
-  anomalies <- c("DELTAS","DELTAR","DELTARQ","MUTATIONS")
+  markers <- c("DELTAS","DELTAR","DELTARQ","MUTATIONS")
 
   subGroups <- c("")
   probes_prefix = "PROBES"
   mainGroupLabel =  "PROBE"
-  subGroupLabel= "GROUP"
+  subGroupLabel= "AREA"
 
-  semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  semseeker:::create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   subGroups <- c("CHR")
   probes_prefix = "PROBES_CHR_"
   mainGroupLabel =  "CHR"
-  subGroupLabel= "GROUP"
+  subGroupLabel= "AREA"
 
-  semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-  chrBed <- semseeker:::annotate_bed(populations ,figures ,anomalies ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-  semseeker:::create_heatmap( inputBedDataFrame =  chrBed,anomalies = anomalies, file_prefix = "CHR", groupColumnLabels = c("CHR"))
+  semseeker:::create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  chrBed <- semseeker:::annotate_bed(sample_groups ,figures ,markers ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
+  semseeker:::create_heatmap( inputBedDataFrame =  chrBed,markers = markers, file_prefix = "CHR", groupColumnLabels = c("CHR"))
 
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/CHR/Control_Vs_Case_CHR_MUTATIONS_BOTH.png")))
 
   ####################################################################################
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
+  area =  "GENE"
+  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- semseeker:::annotate_bed (
 
-    populations ,
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
-  semseeker:::create_heatmap( inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GENE"))
+  semseeker:::create_heatmap( inputBedDataFrame = final_bed,markers = markers, file_prefix = "GENE_AREA", groupColumnLabels = c("GENE"))
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE_AREA/Control_Vs_Case_GENE_AREA_MUTATIONS_BOTH.png")))
 
   ####################################################################################
 
   figures <- c("BOTH")
-  anomalies <- c("DELTAS","DELTAR","DELTARQ","MUTATIONS")
+  markers <- c("DELTAS","DELTAR","DELTARQ","MUTATIONS")
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
+  area =  "GENE"
+  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- semseeker:::annotate_bed (
-    populations,
+    sample_groups,
     figures,
-    anomalies,
-    groups,
+    markers,
+    subareas,
     probes_prefix,
-    columnLabel,
+    area,
     groupingColumnLabel
     )
 
-  semseeker:::create_heatmap( inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnLabels = c("GROUP"))
+  semseeker:::create_heatmap( inputBedDataFrame = final_bed,markers = markers, file_prefix = "GENE_AREA", groupColumnLabels = c("AREA"))
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE_AREA/Control_Vs_Case_GENE_AREA_DELTAS_BOTH.png")))
 
   ####################################################################################
 
-  semseeker:::create_heatmap( inputBedDataFrame =  final_bed,anomalies = anomalies, file_prefix = "GENE", groupColumnLabels = c("GENE"))
+  semseeker:::create_heatmap( inputBedDataFrame =  final_bed,markers = markers, file_prefix = "GENE", groupColumnLabels = c("GENE"))
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE/Control_Vs_Case_GENE_DELTAS_BOTH.png")))
 
   ####################################################################################
 
   # final_bed <- final_bed [1:2,]
-  # semseeker:::create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
+  # semseeker:::create_heatmap(inputBedDataFrame = final_bed,markers = markers, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
   #
   # final_bed <- NULL
-  # semseeker:::create_heatmap(inputBedDataFrame = final_bed,anomalies = anomalies, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
+  # semseeker:::create_heatmap(inputBedDataFrame = final_bed,markers = markers, file_prefix = "GENE_AREA", groupColumnIDs = c(3))
 
   # unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()

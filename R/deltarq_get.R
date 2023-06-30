@@ -7,25 +7,25 @@ deltarq_get <- function( resultPopulation){
   variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "ssEnv", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
     ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
     ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-    ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probes_get")
-  i <- 2
-  localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
-    "FIGURE"=ssEnv$keys_figures_default[,1],
-    "ANOMALY"="DELTAR" ,
-    "EXT"="fst"
-  )
+    ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probe_features_get")
+
+  Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
+  colnames(Sample_Group) <- "SAMPLE_GROUP"
+  localKeys <- reshape2::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
+  localKeys <- subset(localKeys, MARKER=="DELTAR")
+  localKeys$EXT <- "fst"
 
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
-    tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-    fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), as.character(key$EXT))
+    tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
+    fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), as.character(key$EXT))
     if(file.exists(fileToRead))
     {
       deltarq_temp <- fst::read.fst(fileToRead, as.data.table = T)
       colnames(deltarq_temp) <- c("CHR","START","END","VALUE","SAMPLEID")
       deltarq_temp$FIGURE <- key$FIGURE
-      deltarq_temp$POPULATION <- key$POPULATION
+      deltarq_temp$SAMPLE_GROUP <- key$SAMPLE_GROUP
       if(exists("deltarq"))
         deltarq <- rbind(deltarq, deltarq_temp)
       else
@@ -38,13 +38,13 @@ deltarq_get <- function( resultPopulation){
     stop("Something wrong with multiple bed files!")
   }
 
-  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=100))
+  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=4))
 
-  localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
-    "FIGURE"=ssEnv$keys_figures_default[,1],
-    "ANOMALY"="DELTAS" ,
-    "EXT"="fst"
-  )
+  Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
+  colnames(Sample_Group) <- "SAMPLE_GROUP"
+  localKeys <- reshape2::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
+  localKeys <- subset(localKeys, MARKER=="DELTAR")
+  localKeys$EXT <- "fst"
 
   for(i in 1:nrow(localKeys))
   {
@@ -52,14 +52,14 @@ deltarq_get <- function( resultPopulation){
 
     if(exists("deltarq"))
     {
-      localFileRes <- deltarq[ deltarq$POPULATION==as.character(key$POPULATION)
+      localFileRes <- deltarq[ deltarq$SAMPLE_GROUP==as.character(key$SAMPLE_GROUP)
         & deltarq$FIGURE==as.character(key$FIGURE)
         ,c("CHR","START","END","DELTARQ","SAMPLEID")]
       if(!plyr::empty(localFileRes))
       {
         colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
 
-        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste("DELTARQ_",as.character(key$FIGURE),sep="")))
+        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTARQ_",as.character(key$FIGURE),sep="")))
         fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTARQ"), as.character(key$FIGURE)),  as.character(key$EXT))
         fst::write.fst( x= localFileRes, fileToWrite)
         message("INFO: ", Sys.time(), " Created DELTARQ multiple annotated file!", fileToWrite)
@@ -81,8 +81,8 @@ deltarq_get <- function( resultPopulation){
   # for(i in 1:nrow(localKeys))
   # {
   #   key <- localKeys[i,]
-  #   tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-  #   fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)),  as.character(key$EXT))
+  #   tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
+  #   fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)),  as.character(key$EXT))
   #   if(file.exists(fileToRead))
   #   {
   #     localFileRes <- fst::read.fst(fileToRead, as.data.table = T)
@@ -93,7 +93,7 @@ deltarq_get <- function( resultPopulation){
   #       deltarq <- unique(deltarq)
   #       localFileRes[,4] <- deltarq[ deltarq$VALUE %in% localFileRes$VALUE, "DELTARQ"]
   #
-  #       tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste("DELTARQ_",as.character(key$FIGURE),sep="")))
+  #       tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTARQ_",as.character(key$FIGURE),sep="")))
   #       fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTARQ"), as.character(key$FIGURE)),  as.character(key$EXT))
   #       fst::write.fst( x= localFileRes, fileToWrite)
   #       # localFileRes <-fst::read.fst(fileToWrite)

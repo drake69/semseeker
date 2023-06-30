@@ -5,10 +5,10 @@ test_that("annotate_bed", {
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
   figures <- c( "BOTH")
-  anomalies <- c("DELTAS","DELTAQ")
-  metaareas <- c("GENE")
+  markers <- c("DELTAS","DELTAQ")
+  areas <- c("GENE")
 
-  init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", anomalies = "DELTAS", metaareas = "GENE")
+  init_env(result_folder =  tempFolder, parallel_strategy = "sequential", maxResources = 90, figures = "BOTH", markers = "DELTAS", areas = "GENE")
 
   nitem <- 1e4
   nsamples <- 5
@@ -47,40 +47,39 @@ test_that("annotate_bed", {
 
   create_multiple_bed( sample_sheet = sample_sheet)
 
-  populations <- c("Control")
+  sample_groups <- c("Control")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("DELTAS")
+  markers <- c("DELTAS")
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
+  area =  "GENE"
+  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- annotate_bed (
-
-    populations ,
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
 
 
-  anomalies <- c("DELTAQ")
+  markers <- c("DELTAQ")
   # create and read
   final_bed <- annotate_bed (
 
-    populations ,
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
 
@@ -91,66 +90,66 @@ test_that("annotate_bed", {
   testthat::expect_true(nrow(final_bed)>0)
 
   # has the correct header
-  testthat::expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( area %in% colnames(final_bed))
 
   #read again  existent
   final_bed <- annotate_bed (
 
-    populations ,
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
-  testthat::expect_true( columnLabel %in% colnames(final_bed))
+  testthat::expect_true( area %in% colnames(final_bed))
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
 
 
-  groups <- c("CHR")
+  subareas <- c("CHR")
   probes_prefix = "PROBES_CHR_"
-  columnLabel =  "CHR"
-  groupingColumnLabel="GROUP"
+  area =  "CHR"
+  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- annotate_bed (
 
-    populations ,
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
-  # testthat::expect_true( columnLabel %in% colnames(final_bed))
+  # testthat::expect_true( area %in% colnames(final_bed))
   testthat::expect_true( nrow(final_bed)>0)
 
-  # bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
-  groups <- c("")
+  subareas <- c("")
   probes_prefix = "PROBES"
-  columnLabel =  "PROBE"
-  groupingColumnLabel="GROUP"
+  area =  "PROBE"
+  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- annotate_bed (
 
-    populations ,
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
   testthat::expect_true( nrow(final_bed)>0)
-  # testthat::expect_true( columnLabel %in% colnames(final_bed))
-  # bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  # testthat::expect_true( area %in% colnames(final_bed))
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
 })

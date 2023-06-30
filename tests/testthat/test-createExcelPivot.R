@@ -24,39 +24,39 @@ test_that("create_excel_pivot", {
 
   ####################################################################################
 
-  populations <- c("Control","Case")
+  sample_groups <- c("Control","Case")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ","BETA")
+  markers <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ","BETA")
   # figures <- c("HYPO")
-  # anomalies <- c("DELTAR")
+  # markers <- c("DELTAR")
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  # groups <- c("Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
+  # subareas <- c("WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
+  area =  "GENE"
+  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- semseeker:::annotate_bed (
-    populations ,
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
-  populations <- c("Control","Case")
+  sample_groups <- c("Control","Case")
   # figures <- c("HYPO", "HYPER", "BOTH")
-  # anomalies <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ")
+  # markers <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ")
 
-  # subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
-  subGroups <- groups
+  # subGroups <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
+  subGroups <- subareas
   probes_prefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
-  subGroupLabel="GROUP"
-  semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  subGroupLabel="AREA"
+  semseeker:::create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
 
@@ -65,8 +65,8 @@ test_that("create_excel_pivot", {
   subGroups <- c("")
   probes_prefix = "PROBES"
   mainGroupLabel =  "PROBE"
-  subGroupLabel="GROUP"
-  semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  subGroupLabel="AREA"
+  semseeker:::create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/PROBE.xlsx")))
 
   ####################################################################################
@@ -74,24 +74,24 @@ test_that("create_excel_pivot", {
     # subGroups <- c("")
   # probes_prefix = "PROBES_CHR_"
   # mainGroupLabel =  "CHR"
-  # subGroupLabel="GROUP"
-  # semseeker:::create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  # subGroupLabel="AREA"
+  # semseeker:::create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
   # testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/CHR.xlsx")))
 
   #TODO: test incremental pivot
 
 #
 #   probes_prefix <- "PROBES_Island_"
-#   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
+#   subGroups <- c("N_SHORE","S_SHORE","N_SHELF","S_SHELF","WHOLE")
 #   mainGroupLabel <- "ISLAND"
 #   subGroupLabel <- "RELATION_TO_CPGISLAND"
-#   semseeker:::create_excel_pivot ( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+#   semseeker:::create_excel_pivot ( sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 #
 #   subGroups <- c("DMR")
 #   probes_prefix = "PROBES_DMR_"
 #   mainGroupLabel =  "DMR"
-#   subGroupLabel="GROUP"
-#   semseeker:::create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+#   subGroupLabel="AREA"
+#   semseeker:::create_excel_pivot (sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
   semseeker:::close_env()
 })

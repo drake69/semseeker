@@ -1,4 +1,4 @@
-analyze_single_sample_both <- function( sample_detail, anomaly) {
+analyze_single_sample_both <- function( sample_detail, marker) {
 
   ssEnv <- get_session_info()
   start_time_single_sample <- Sys.time()
@@ -8,14 +8,14 @@ analyze_single_sample_both <- function( sample_detail, anomaly) {
 
   data_to_save <- data.frame("CHR"="", "START"="", "END"="")
   data_to_save <- data_to_save[-1,]
-  anomaly <- as.character(anomaly)
+  marker <- as.character(marker)
   figures <- c("HYPER","HYPO")
 
   for( i in 1:length(figures))
   {
     figure <- figures[i]
-    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(anomaly,"_", figure, sep = "")))
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,anomaly,figure),"bed")
+    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
+    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed")
     if(file.exists(fileName))
     {
       data_to_saveTemp <- utils::read.table(fileName, sep="\t", col.names =c("CHR", "START", "END") )
@@ -24,8 +24,8 @@ analyze_single_sample_both <- function( sample_detail, anomaly) {
   }
 
   figure <- "BOTH"
-  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(anomaly,"_", figure, sep = "")))
-  fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,anomaly,figure),"bed")
+  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
+  fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed")
 
   dump_sample_as_bed_file(
     data_to_dump = data_to_save,

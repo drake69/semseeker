@@ -27,10 +27,10 @@ analyze_single_sample(
 
 \item{bonferroni_threshold}{bonferroni threshold to validate pValue}
 
-\item{probe_features}{probes details to be used}
+\item{probe_features}{probe_features details to be used}
 }
 \value{
-list of lesion count  and probes count
+list of lesion count  and probe_features count
 }
 \description{
 analyze_single_sample

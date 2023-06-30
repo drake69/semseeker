@@ -3,7 +3,7 @@
 #' @param values values of methylation
 #' @param figure figure to get Mutaions of HYPO or HYPER methylation
 #' @param thresholds threshold to use for comparison
-#' @param probe_features probes features probe, chr, start,end
+#' @param probe_features probe_features features probe, chr, start,end
 #' @param sampleName name of the sample
 #'
 #' @return mutations

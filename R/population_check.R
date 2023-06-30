@@ -1,5 +1,5 @@
 
-population_check <- function(sample_sheet, methylation_data)
+sample_group_check <- function(sample_sheet, methylation_data)
 {
 
   ssEnv <- get_session_info()
@@ -49,7 +49,7 @@ population_check <- function(sample_sheet, methylation_data)
   # reference population
   sample_sheet$Sample_Group <- R.utils::toCamelCase(tolower(sample_sheet$Sample_Group), capitalize=TRUE)
   sample_sheet$Sample_Group <- as.factor(sample_sheet$Sample_Group)
-  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% ssEnv$keys_populations[,1]
+  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% ssEnv$keys_sample_groups[,1]
   if (is.element(FALSE, matchedPopulation)) {
     result <- paste(result,  " The Sample_Group should contain only: Reference, Control, Case" )
   }
@@ -57,7 +57,9 @@ population_check <- function(sample_sheet, methylation_data)
   refence_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group=="Reference"]
   other_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group!="Reference"]
   if (sum(refence_group %in% other_group)==length(refence_group))
-    ssEnv$keys_populations <-  data.frame("POPULATION"=c("Control","Case"))
+  {
+    ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Control","Case"))
+  }
 
   return(result)
 }

@@ -3,14 +3,14 @@
 #   # "~/Desktop/What_s_going_On/papers_writing/breast_study/TCGA-BRCA/analysis/white_tumor/epimutation/Inference/3_er_status_by_ihc_none_gaussian_test_corrected_result.csv"
 #   results_inference <- read.csv(paste(resultFolder, "/Inference/", inferenceFile, sep = ""), sep = ";", dec = ",")
 #   results_inference <- subset(results_inference, results_inference$PVALUEADJ_ALL_BY < pvalue)
-#   # features <- unique(results_inference[, c("AREA_OF_TEST","GROUP")])
-#   # table(features$GROUP)
+#   # features <- unique(results_inference[, c("AREA_OF_TEST","AREA")])
+#   # table(features$AREA)
 
 #   # results_inference <- read.csv("~/Desktop/What_s_going_On/papers_writing/breast_study/TCGA-BRCA/analysis/white_tumor/epimutation/Inference/gene_3_er_status_by_ihc_none_gaussian_test_corrected_result.csv", sep=";", dec=",")
 #   # results_inference <- results_inference[results_inference$PVALUEADJ_ALL_BH < pvalue,]
-#   results_inference <- subset(results_inference, GROUP == "GENE" & AREA_OF_TEST != "TOTAL")
+#   results_inference <- subset(results_inference, AREA == "GENE" & AREA_OF_TEST != "TOTAL")
 #   # results_inference$PVALUEADJ_ALL_BH <- p.adjust(results_inference$PVALUEADJ)
-#   keys <- unique(results_inference[, c("SUBGROUP", "GROUP", "ANOMALY", "FIGURE")])
+#   keys <- unique(results_inference[, c("SUBAREA", "AREA", "MARKER", "FIGURE")])
 #   seq <- 0
 #   browser()
 #   for (k in 1:length(path_db))
@@ -20,9 +20,9 @@
 #       # k <- 1
 #       # i <- 10
 #       gene_set <- results_inference[
-#         results_inference$SUBGROUP == keys[i, ]$SUBGROUP &
-#           results_inference$GROUP == keys[i, ]$GROUP &
-#           results_inference$ANOMALY == keys[i, ]$ANOMALY &
+#         results_inference$SUBAREA == keys[i, ]$SUBAREA &
+#           results_inference$AREA == keys[i, ]$AREA &
+#           results_inference$MARKER == keys[i, ]$MARKER &
 #           results_inference$FIGURE == keys[i, ]$FIGURE,
 #         c("AREA_OF_TEST", "BETA", "PVALUEADJ_ALL_BH"),
 #       ]
@@ -39,7 +39,7 @@
 #         if (nrow(output_temp) == 0) {
 #           next()
 #         }
-#         output_temp$key <- paste(keys[i, ]$FIGURE, keys[i, ]$ANOMALY, keys[i, ]$GROUP, keys[i, ]$SUBGROUP, sep = "_")
+#         output_temp$key <- paste(keys[i, ]$FIGURE, keys[i, ]$MARKER, keys[i, ]$AREA, keys[i, ]$SUBAREA, sep = "_")
 #         output_temp$seq <- seq
 #         output_temp$gene_count <- nrow(gene_set)
 #         output_temp$source <- path_db[k]

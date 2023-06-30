@@ -13,15 +13,15 @@
 #     fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,"BETAS"),"bed")
 #   )
 #
-#   res <-semseeker:::read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+#   res <-semseeker:::read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
 #   testthat::expect_true(nrow(res)>0)
 #
-#   res <-semseeker:::read_multiple_bed ( "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+#   res <-semseeker:::read_multiple_bed ( "DELTAS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
 #   testthat::expect_true(nrow(res)>0)
 #   ####################################################################################
 #
-#   # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
-#   # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
+#   # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPO", probe_features, area, sample_group, groupingColumnLabel)
+#   # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPER", probe_features, area, sample_group, groupingColumnLabel)
 #   # testthat::expect_true(nrow(res)>0)
 #   semseeker:::close_env()
 # }

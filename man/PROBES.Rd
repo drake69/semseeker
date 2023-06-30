@@ -14,6 +14,6 @@ A data frame with five variables: \code{year}, \code{sex},
 PROBES
 }
 \description{
-Full data set probes as defined by Illumina
+Full data set probe_features as defined by Illumina
 }
 \keyword{datasets}
