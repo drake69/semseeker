@@ -6,8 +6,8 @@
 #' @param sample_detail details of the sample to analyze
 #' @param figure which figure's of sasmple will be analized HYPO or HYPER
 #' @param bonferroni_threshold bonferroni threshold to validate pValue
-#' @param probe_features probes details to be used
-#' @return list of lesion count  and probes count
+#' @param probe_features probe_features details to be used
+#' @return list of lesion count  and probe_features count
 #'
 #' @importFrom doRNG %dorng%
 analyze_single_sample <- function(values, sliding_window_size, thresholds, figure, sample_detail, bonferroni_threshold = 0.05, probe_features) {

@@ -105,6 +105,6 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   #                beta_superior_thresholds = beta_superior_thresholds,
   #                beta_median_values = beta_median_values)
 
-  message("INFO: ", Sys.time(), " Thresholds defined for: ", nrow(result$beta_inferior_thresholds), " probes.")
+  message("INFO: ", Sys.time(), " Thresholds defined for: ", nrow(result$beta_inferior_thresholds), " probe_features.")
   return(result)
 }

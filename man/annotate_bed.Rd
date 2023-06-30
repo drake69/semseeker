@@ -6,29 +6,28 @@
 and annoate with detail about genomic area}
 \usage{
 annotate_bed(
-  populations,
+  sample_groups,
   figures,
-  anomalies,
-  groups,
-  probes_prefix,
-  columnLabel,
+  markers,
+  area,
+  subareas,
   groupingColumnLabel
 )
 }
 \arguments{
-\item{populations}{vector of population to cycle with to build the folder path}
+\item{sample_groups}{vector of population to cycle with to build the folder path}
 
 \item{figures}{vector of hyper /hypo to use to build the folder path}
 
-\item{anomalies}{vector of lesions/mutations to use to build the folder path}
+\item{markers}{vector of lesions/mutations to use to build the folder path}
 
-\item{groups}{vector of genomic area to cycle and group the annotated data}
+\item{area}{vector of genomic area to cycle and group the annotated data}
 
-\item{probes_prefix}{prefix to use to get the annotated probes dataset}
-
-\item{columnLabel}{label of the column of the genomic area gene, island ,dmr etc..}
+\item{subareas}{label of the column of the genomic area gene, island ,dmr etc..}
 
 \item{groupingColumnLabel}{label of the column of the genomic sub area body, tss1500}
+
+\item{probes_prefix}{prefix to use to get the annotated probe_features dataset}
 }
 \value{
 original bed with genomic area infos

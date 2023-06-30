@@ -1,104 +1,124 @@
 #' takes a bed and its location (build with the details of popuationa nd genomic area)
 #' and annoate with detail about genomic area
-#' @param populations vector of population to cycle with to build the folder path
+#' @param sample_groups vector of population to cycle with to build the folder path
 #' @param figures vector of hyper /hypo to use to build the folder path
-#' @param anomalies vector of lesions/mutations to use to build the folder path
-#' @param groups vector of genomic area to cycle and group the annotated data
-#' @param probes_prefix prefix to use to get the annotated probes dataset
-#' @param columnLabel label of the column of the genomic area gene, island ,dmr etc..
+#' @param markers vector of lesions/mutations to use to build the folder path
+#' @param area vector of genomic area to cycle and group the annotated data
+#' @param probes_prefix prefix to use to get the annotated probe_features dataset
+#' @param subarea label of the column of the genomic area gene, island ,dmr etc..
 #' @param groupingColumnLabel label of the column of the genomic sub area body, tss1500
 #'
 #' @return original bed with genomic area infos
 #' @importFrom doRNG %dorng%
 
 annotate_bed <- function (
-    populations,
+    sample_groups,
     figures,
-    anomalies,
-    groups,
-    probes_prefix,
-    columnLabel,
-    groupingColumnLabel)
+    markers,
+    area)
 {
 
   ssEnv <- get_session_info()
 
   i <- 0
   final_bed <- NULL
-  bedFileName <- file_path_build(ssEnv$result_folderData , c(columnLabel, "ANNOTATED"),"fst")
+  bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
 
-  if("BETA" %in% anomalies)
-    figures <- c(figures,"MEAN")
+  colnames(sample_groups) <- "SAMPLE_GROUP"
+  localKeys <- reshape2::expand.grid.df(ssEnv$keys_markers_figures, sample_groups)
+  localKeys <- subset(localKeys,MARKER != "BETA")
 
-  anomalies <- anomalies[(anomalies !="BETA")]
-  figures <- figures[(figures!="MEAN")]
+  if(file.exists(bedFileName))
+  {
+    if(file.info(bedFileName)$size < 10)
+    {
+      final_bed <- NULL
+      message("WARNING: ", Sys.time(), " Given up file:", final_bed, " is empty!")
+    }
+    else
+    {
+      final_bed <- fst::fst(path = bedFileName)
+      final_bed$VALUE = as.numeric(final_bed$VALUE)
+    }
 
-  # if(file.exists(bedFileName))
-  # {
-  #   if(file.info(bedFileName)$size < 10)
-  #   {
-  #     final_bed <- NULL
-  #     message("WARNING: ", Sys.time(), " Given up file:", final_bed, " is empty!")
-  #   }
-  #   else
-  #   {
-  #     # final_bed <- utils::read.table(bedFileName, stringsAsFactors = TRUE, sep="\t", header = TRUE)
-  #     final_bed <- fst::fst(path = bedFileName)
-  #     final_bed$VALUE = as.numeric(final_bed$VALUE)
-  #   }
-  #
-  #   final_bed_temp <- unique(final_bed[final_bed$ANOMALY %in% anomalies & final_bed$FIGURE %in% figures,])
-  #   if(!plyr::empty(final_bed_temp)
-  #     & any(!(anomalies %in% unique(final_bed$ANOMALY)))
-  #     & any(!(figures %in% unique(final_bed$FIGURE)))
-  #     )
-  #     return(final_bed_temp)
-  #   else
-  #     final_bed_temp <- as.data.frame(final_bed)
-  # }
+    final_bed_temp <- as.data.frame(final_bed)
+    # get existing keys from the existing multiple annotated bed file
+    existing_keys <- unique(final_bed_temp[,c("SAMPLE_GROUP","FIGURE","MARKER","AREA","SUBAREA")])
+    existing_keys$pasted <- apply(existing_keys,1, paste , collapse = "-" )
+    ssEnv$keysLocal$pasted <-apply(ssEnv$keysLocal,1, paste , collapse = "-" )
+    ssEnv$keysLocal <- ssEnv$keysLocal[ !( ssEnv$keysLocal$pasted %in%  existing_keys$pasted ),]
+    if(nrow(ssEnv$keysLocal)==0)
+      return(final_bed_temp)
+    rm(final_bed)
+  }
 
-  ssEnv$keysLocal <-
-    expand.grid(
-      "POPULATION" = populations,
-      "FIGURE" = figures,
-      "ANOMALY" = anomalies,
-      "GROUP" = groups
-    )
 
-  message("INFO: ", Sys.time(), " Annotating genomic areas.")
+  message("INFO: ", Sys.time(), " Annotating genomic area.")
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(ssEnv$keysLocal))
 
-  variables_to_export <- c("ssEnv", "probes_prefix", "dir_check_and_create", "read_multiple_bed", "columnLabel",
-                           "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","probes_get")
+  variables_to_export <- c("ssEnv", "dir_check_and_create", "read_multiple_bed", "subarea",
+                            "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid",
+                            "owner_session_uuid", "trace","probe_features_get")
 
-  # for(i in 1:nrow(ssEnv$keysLocal))
-  final_bed <- foreach::foreach(i=1:nrow(ssEnv$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
+  for(i in 1:nrow(localKeys))
+  # final_bed <- foreach::foreach(i=1:nrow(ssEnv$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
     {
-      anomal <- as.character(ssEnv$keysLocal[i,"ANOMALY"])
-      pop <- as.character(ssEnv$keysLocal[i,"POPULATION"])
-      fig <- as.character(ssEnv$keysLocal[i,"FIGURE"])
-      grp <- as.character(ssEnv$keysLocal[i,"GROUP"])
+      marker <- as.character(ssEnv$keysLocal[i,"MARKER"])
+      sample_group <- as.character(ssEnv$keysLocal[i,"SAMPLE_GROUP"])
+      figure <- as.character(ssEnv$keysLocal[i,"FIGURE"])
+      subarea <- as.character(ssEnv$keysLocal[i,subarea])
 
-      probes <- probes_get(probes_prefix, grp)
+      probe_features <- probe_features_get(area_subarea)
 
-      resFolder <- dir_check_and_create(ssEnv$result_folderData,pop)
-      tempFile <- read_multiple_bed(anomalyLabel =  anomal, figureLable =  fig, probe_features =  probes,
-                                    columnLabel =  columnLabel, populationName = pop, groupingColumnLabel= groupingColumnLabel)
+      # annotate file
+      resFolder <- dir_check_and_create(ssEnv$result_folderData,sample_group)
+      tempFile <- read_multiple_bed(area_subarea_marker_figure, sample_group)
+
+      if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
+        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START","END"))
+      else
+        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START"))
+
+      sourceData <-subset(sourceData, !is.na(eval(parse(text=area))))
+
+      sourceData$CHR <- as.factor(sourceData$CHR)
+      probe_features <- probe_features_get(paste0(area_subarea_marker_figure$AREA,"_", area_subarea_marker_figure$SUBAREA, sep=""))
+      if(nrow(probe_features)==0 | nrow(sourceData)==0)
+        return(sourceData)
+
+      probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
+
+      probe_features <- probe_features[(probe_features$CHR %in% unique((sourceData$CHR))), ]
+      droplevels(probe_features$CHR)
+      droplevels(sourceData$CHR)
+
       if(ssEnv$showprogress)
         progress_bar()
-      tempFile
+
+      colname_to_preserve <- !(colnames(tempFile) %in%  c("START","END","K27","K450","K850"))
+      tempFile <- unique(tempFile[, colname_to_preserve])
+
+      # tempFile
+
+      if(length(colnames(final_bed)) != length(colnames(tempFile)))
+        browser()
+
+      if(exists("final_bed"))
+        final_bed <- rbind(final_bed, tempFile)
+      else
+        final_bed <- tempFile
     }
 
   # colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
-  colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","k27","k450","k850"))
+  colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","K27","K450","K850"))
   final_bed <- unique(final_bed[, colname_to_preserve])
 
-  # if(exists("final_bed_temp"))
-  #   if(!plyr::empty(final_bed_temp))
-  #   {
-  #     final_bed <- unique(rbind(final_bed, final_bed_temp))
-  #   }
+  if(exists("final_bed_temp"))
+    if(!plyr::empty(final_bed_temp))
+    {
+      final_bed <- unique(rbind(final_bed, final_bed_temp))
+    }
 
   if(exists("final_bed"))
   {
@@ -108,8 +128,7 @@ annotate_bed <- function (
   }
 
   # utils::write.table(final_bed,bedFileName, row.names = FALSE, sep = "\t", col.names = TRUE)
-
-  # final_bed <- unique(final_bed[, c("SAMPLEID","PROBE",columnLabel,groupingColumnLabel,"FIGURE","ANOMALY","POPULATION","VALUE")])
+  # final_bed <- unique(final_bed[, c("SAMPLEID","PROBE",subarea,groupingColumnLabel,"FIGURE","MARKER","SAMPLE_GROUP","VALUE")])
 
   return(final_bed)
 

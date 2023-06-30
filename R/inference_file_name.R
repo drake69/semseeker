@@ -1,4 +1,4 @@
-inference_file_name <- function(inference_detail, anomaly)
+inference_file_name <- function(inference_detail, marker)
 {
   ssEnv <- get_session_info()
 
@@ -15,6 +15,6 @@ inference_file_name <- function(inference_detail, anomaly)
   else
     file_suffix <- paste(covariates, collapse = "_")
 
-  fileNameResults <- file_path_build(ssEnv$result_folderInference,c( anomaly,file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
+  fileNameResults <- file_path_build(ssEnv$result_folderInference,c( marker,file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
 
 }

@@ -3,11 +3,11 @@
 #'
 #' @param methylation_data whole matrix of data to analyze.
 #' @param sliding_window_size size of the sliding widows to compute epilesions
-#' default 11 probes.
+#' default 11 probe_features.
 #' @param sample_sheet name of samplesheet's column to use as control population
 #' selector followed by selection value,
 #' @param bonferroni_threshold threshold to define which pValue accept for
-#' @param probe_features probes detail from 27 to EPIC illumina dataset
+#' @param probe_features probe_features detail from 27 to EPIC illumina dataset
 #' @param beta_thresholds thresholds defined to calculate epimutations
 #' lesions definition
 #' @return files into the result folder with pivot table and bedgraph.
@@ -100,7 +100,6 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
   rownames(summary_population) <- summary_population$Sample_ID
   message("INFO: ", Sys.time(), " Row count result:", nrow(summary_population))
   rm(methylation_data)
-
 
   message("INFO: ", Sys.time(), " Completed population analysis ")
   end_time <- Sys.time()

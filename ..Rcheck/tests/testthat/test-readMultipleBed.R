@@ -41,24 +41,24 @@ test_that("read_multiple_bed", {
   create_multiple_bed( sample_sheet)
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  markers <- c("MUTATIONS","LESIONS","DELTAS")
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
-  populationName <- unique(Sample_Group)
+  area =  "GENE"
+  groupingColumnLabel="AREA"
+  sample_group <- unique(Sample_Group)
 
-  probe_features <- get(paste0(probes_prefix,"Whole",sep=""), envir=asNamespace("semseeker"))
+  probe_features <- get(paste0(probes_prefix,"WHOLE",sep=""), envir=asNamespace("semseeker"))
 
 
-  res <-read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  res <-read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
   testthat::expect_true(nrow(res)>0)
 
-  res <-read_multiple_bed ( "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  res <-read_multiple_bed ( "DELTAS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
   testthat::expect_true(nrow(res)>0)
-  # res <-read_multiple_bed ( "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
-  # res <-read_multiple_bed ( "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # res <-read_multiple_bed ( "DELTAS", "HYPO", probe_features, area, sample_group, groupingColumnLabel)
+  # res <-read_multiple_bed ( "DELTAS", "HYPER", probe_features, area, sample_group, groupingColumnLabel)
   # testthat::expect_true(nrow(res)>0)
 
 }

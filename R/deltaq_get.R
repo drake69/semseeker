@@ -1,5 +1,5 @@
 #' @importFrom doRNG %dorng%
-deltaq_get <- function( resultPopulation){
+deltaq_get <- function(resultPopulation){
 
   ssEnv <- get_session_info()
 
@@ -7,25 +7,25 @@ deltaq_get <- function( resultPopulation){
   variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "ssEnv", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
                            ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
                            ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-                           ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probes_get")
-  i <- 2
-  localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
-                           "FIGURE"=ssEnv$keys_figures_default[,1],
-                           "ANOMALY"="DELTAS" ,
-                           "EXT"="fst"
-  )
+                           ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probe_features_get")
+
+  Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
+  colnames(Sample_Group) <- "SAMPLE_GROUP"
+  localKeys <- reshape2::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
+  localKeys <- subset(localKeys, MARKER=="DELTAS")
+  localKeys$EXT <- "fst"
 
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
-    tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-    fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), as.character(key$EXT))
+    tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
+    fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), as.character(key$EXT))
     if(file.exists(fileToRead))
     {
       deltaq_temp <- fst::read.fst(fileToRead, as.data.table = T)
       colnames(deltaq_temp) <- c("CHR","START","END","VALUE","SAMPLEID")
       deltaq_temp$FIGURE <- key$FIGURE
-      deltaq_temp$POPULATION <- key$POPULATION
+      deltaq_temp$SAMPLE_GROUP <- key$SAMPLE_GROUP
       if(exists("deltaq"))
         deltaq <- rbind(deltaq, deltaq_temp)
       else
@@ -33,18 +33,16 @@ deltaq_get <- function( resultPopulation){
     }
   }
 
-  if (!exists("deltaq")| plyr::empty(deltaq))
+  if (!exists("deltaq") | plyr::empty(deltaq))
   {
      stop("Something wrong with multiple bed files!")
   }
 
   deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=4))
+  localKeys <- ssEnv$keys_markers_figures
+  localKeys$SAMPLE_GROUP <- unique(resultPopulation$Sample_Group)
+  localKeys$EXT <- "fst"
 
-  localKeys <- expand.grid("POPULATION"=unique(resultPopulation$Sample_Group),
-                           "FIGURE"=ssEnv$keys_figures_default[,1],
-                           "ANOMALY"="DELTAS" ,
-                           "EXT"="fst"
-  )
 
   for(i in 1:nrow(localKeys))
   {
@@ -52,14 +50,14 @@ deltaq_get <- function( resultPopulation){
 
     if(exists("deltaq"))
     {
-      localFileRes <- deltaq[ deltaq$POPULATION==as.character(key$POPULATION)
+      localFileRes <- deltaq[ deltaq$SAMPLE_GROUP==as.character(key$SAMPLE_GROUP)
                               & deltaq$FIGURE==as.character(key$FIGURE)
                               ,c("CHR","START","END","DELTAQ","SAMPLEID")]
       if(!plyr::empty(localFileRes))
       {
         colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
 
-        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
+        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
         fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)),  as.character(key$EXT))
         fst::write.fst( x= localFileRes, fileToWrite)
         message("INFO: ", Sys.time(), " Created DELTAQ multiple annotated file!", fileToWrite)
@@ -81,8 +79,8 @@ deltaq_get <- function( resultPopulation){
   # for(i in 1:nrow(localKeys))
   # {
   #   key <- localKeys[i,]
-  #   tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-  #   fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)),  as.character(key$EXT))
+  #   tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
+  #   fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)),  as.character(key$EXT))
   #   if(file.exists(fileToRead))
   #   {
   #     localFileRes <- fst::read.fst(fileToRead, as.data.table = T)
@@ -93,7 +91,7 @@ deltaq_get <- function( resultPopulation){
   #       deltaq <- unique(deltaq)
   #       localFileRes[,4] <- deltaq[ deltaq$VALUE %in% localFileRes$VALUE, "DELTAQ"]
   #
-  #       tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$POPULATION) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
+  #       tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
   #       fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)),  as.character(key$EXT))
   #       fst::write.fst( x= localFileRes, fileToWrite)
   #       # localFileRes <-fst::read.fst(fileToWrite)

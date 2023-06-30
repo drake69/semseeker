@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 manhattan_plot_per_area(
-  anomaly,
+  marker,
   figure,
   group,
   subgroup,
@@ -16,7 +16,7 @@ manhattan_plot_per_area(
 )
 }
 \arguments{
-\item{anomaly}{investigated anomaly eg. MUTATIONS, DELTAR, DELTAQ}
+\item{marker}{investigated marker eg. MUTATIONS, DELTAR, DELTAQ}
 
 \item{figure}{HYPO, HYPER}
 

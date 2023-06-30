@@ -5,7 +5,7 @@
 #' @param low_thresholds lowest threshold to use for comparison
 #' @param sample_detail details of sample to analyze
 #' @param beta_medians median to use for calculation
-#' @param probe_features genomic position of probes
+#' @param probe_features genomic position of probe_features
 #' @return summary detail about the analysis
 #'
 delta_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {

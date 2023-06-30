@@ -5,7 +5,7 @@
 \title{Get the pivot in long format instead of wide format}
 \usage{
 pivot_to_long_format(
-  anomaly,
+  marker,
   figure,
   group,
   subgroup,
@@ -15,7 +15,7 @@ pivot_to_long_format(
 )
 }
 \arguments{
-\item{anomaly}{anomaly to filer HYPER, HYPO, BOTH}
+\item{marker}{marker to filer HYPER, HYPO, BOTH}
 
 \item{figure}{DELTAS, DELTAQ,DELTAR, MUTATIONS}
 
@@ -30,7 +30,7 @@ pivot_to_long_format(
 \item{areas_selection}{genomic area to select, if NULL all areas will be selected}
 }
 \value{
-the pivot in a long format of 3 columnns, the phontype column with name phenotype, the value of the anomaly and the area investigated
+the pivot in a long format of 3 columnns, the phontype column with name phenotype, the value of the marker and the area investigated
 }
 \description{
 Get the pivot in long format instead of wide format

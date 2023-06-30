@@ -1,6 +1,6 @@
 #' PROBES_CHR_CHR
 #'
-#' Full data set probes as defined by Illumina
+#' Full data set probe_features as defined by Illumina
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
@@ -11,7 +11,7 @@
 
 #' PROBES_CHR_CHR
 #'
-#' Full data set probes as defined by Illumina
+#' Full data set probe_features as defined by Illumina
 #'
 #' @format A data frame with five variables: \code{year}, \code{sex},
 #'   \code{name}, \code{n} and \code{prop} (\code{n} divided by total number

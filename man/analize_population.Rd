@@ -18,7 +18,7 @@ analize_population(
 \item{methylation_data}{whole matrix of data to analyze.}
 
 \item{sliding_window_size}{size of the sliding widows to compute epilesions
-default 11 probes.}
+default 11 probe_features.}
 
 \item{sample_sheet}{name of samplesheet's column to use as control population
 selector followed by selection value,}
@@ -28,7 +28,7 @@ lesions definition}
 
 \item{bonferroni_threshold}{threshold to define which pValue accept for}
 
-\item{probe_features}{probes detail from 27 to EPIC illumina dataset}
+\item{probe_features}{probe_features detail from 27 to EPIC illumina dataset}
 }
 \value{
 files into the result folder with pivot table and bedgraph.
