@@ -24,8 +24,8 @@ annotate_bed <- function (
   final_bed <- NULL
   bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
 
-  colnames(sample_groups) <- "SAMPLE_GROUP"
-  localKeys <- reshape2::expand.grid.df(ssEnv$keys_markers_figures, sample_groups)
+  sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
+  localKeys <- reshape::expand.grid.df(ssEnv$keys_areas_subareas_markers_figures, sample_groups)
   localKeys <- subset(localKeys,MARKER != "BETA")
 
   if(file.exists(bedFileName))
@@ -45,9 +45,9 @@ annotate_bed <- function (
     # get existing keys from the existing multiple annotated bed file
     existing_keys <- unique(final_bed_temp[,c("SAMPLE_GROUP","FIGURE","MARKER","AREA","SUBAREA")])
     existing_keys$pasted <- apply(existing_keys,1, paste , collapse = "-" )
-    ssEnv$keysLocal$pasted <-apply(ssEnv$keysLocal,1, paste , collapse = "-" )
-    ssEnv$keysLocal <- ssEnv$keysLocal[ !( ssEnv$keysLocal$pasted %in%  existing_keys$pasted ),]
-    if(nrow(ssEnv$keysLocal)==0)
+    localKeys$pasted <-apply(localKeys,1, paste , collapse = "-" )
+    localKeys <- localKeys[ !( localKeys$pasted %in%  existing_keys$pasted ),]
+    if(nrow(localKeys)==0)
       return(final_bed_temp)
     rm(final_bed)
   }
@@ -55,39 +55,38 @@ annotate_bed <- function (
 
   message("INFO: ", Sys.time(), " Annotating genomic area.")
   if(ssEnv$showprogress)
-    progress_bar <- progressr::progressor(along = 1:nrow(ssEnv$keysLocal))
+    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
 
   variables_to_export <- c("ssEnv", "dir_check_and_create", "read_multiple_bed", "subarea",
                             "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid",
                             "owner_session_uuid", "trace","probe_features_get")
 
   for(i in 1:nrow(localKeys))
-  # final_bed <- foreach::foreach(i=1:nrow(ssEnv$keysLocal), .combine = rbind, .export = variables_to_export) %dorng%
+  # final_bed <- foreach::foreach(i=1:nrow(localKeys), .combine = rbind, .export = variables_to_export) %dorng%
     {
-      marker <- as.character(ssEnv$keysLocal[i,"MARKER"])
-      sample_group <- as.character(ssEnv$keysLocal[i,"SAMPLE_GROUP"])
-      figure <- as.character(ssEnv$keysLocal[i,"FIGURE"])
-      subarea <- as.character(ssEnv$keysLocal[i,subarea])
+      marker <- as.character(localKeys[i,"MARKER"])
+      sample_group <- as.character(localKeys[i,"SAMPLE_GROUP"])
+      figure <- as.character(localKeys[i,"FIGURE"])
+      subarea <- as.character(localKeys[i,"SUBAREA"])
+      area <- as.character(localKeys[i,"AREA"])
 
+      area_subarea <- paste(area,"_", subarea, sep="")
       probe_features <- probe_features_get(area_subarea)
+      probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
       # annotate file
       resFolder <- dir_check_and_create(ssEnv$result_folderData,sample_group)
-      tempFile <- read_multiple_bed(area_subarea_marker_figure, sample_group)
+      sourceData <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure, area = area)
 
       if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
         sourceData <- merge(sourceData, probe_features, by = c("CHR", "START","END"))
       else
         sourceData <- merge(sourceData, probe_features, by = c("CHR", "START"))
-
       sourceData <-subset(sourceData, !is.na(eval(parse(text=area))))
 
       sourceData$CHR <- as.factor(sourceData$CHR)
-      probe_features <- probe_features_get(paste0(area_subarea_marker_figure$AREA,"_", area_subarea_marker_figure$SUBAREA, sep=""))
       if(nrow(probe_features)==0 | nrow(sourceData)==0)
         return(sourceData)
-
-      probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
       probe_features <- probe_features[(probe_features$CHR %in% unique((sourceData$CHR))), ]
       droplevels(probe_features$CHR)

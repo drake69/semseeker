@@ -7,7 +7,7 @@ create_multiple_bed <- function(sample_sheet){
   i <- 0
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
-  localKeys <- reshape2::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
+  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
   localKeys <- subset(localKeys, MARKER!="BETA")
 
   to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet")

@@ -3,7 +3,7 @@ loadNamespace("stats")
 nitem <- 4e3
 nsamples <- 21
 
-probe_features <- semseeker::pp_tot
+probe_features <- semseeker::PROBES
 probe_features <- probe_features[!is.na(probe_features$START),c("CHR","START","PROBE")]
 probe_features <- unique(probe_features)
 probe_features$END <- probe_features$START

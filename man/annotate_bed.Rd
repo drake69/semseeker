@@ -5,14 +5,7 @@
 \title{takes a bed and its location (build with the details of popuationa nd genomic area)
 and annoate with detail about genomic area}
 \usage{
-annotate_bed(
-  sample_groups,
-  figures,
-  markers,
-  area,
-  subareas,
-  groupingColumnLabel
-)
+annotate_bed(sample_groups, figures, markers, area)
 }
 \arguments{
 \item{sample_groups}{vector of population to cycle with to build the folder path}
@@ -23,11 +16,11 @@ annotate_bed(
 
 \item{area}{vector of genomic area to cycle and group the annotated data}
 
-\item{subareas}{label of the column of the genomic area gene, island ,dmr etc..}
+\item{probes_prefix}{prefix to use to get the annotated probe_features dataset}
+
+\item{subarea}{label of the column of the genomic area gene, island ,dmr etc..}
 
 \item{groupingColumnLabel}{label of the column of the genomic sub area body, tss1500}
-
-\item{probes_prefix}{prefix to use to get the annotated probe_features dataset}
 }
 \value{
 original bed with genomic area infos
