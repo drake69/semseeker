@@ -11,7 +11,7 @@ deltaq_get <- function(resultPopulation){
 
   Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
-  localKeys <- reshape2::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
+  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
   localKeys <- subset(localKeys, MARKER=="DELTAS")
   localKeys$EXT <- "fst"
 

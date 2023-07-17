@@ -4,18 +4,16 @@
 \alias{read_multiple_bed}
 \title{read multiple bed with annotated data as per input parameter}
 \usage{
-read_multiple_bed(area_subarea_marker_figure, sample_group)
+read_multiple_bed(sample_group, marker, figure, area)
 }
 \arguments{
 \item{sample_group}{name of the population used to build the data path}
 
 \item{marker}{marker definition used to label folder and files eg MUTATIONS, LESIONS}
 
-\item{probe_features}{features of probe CHR and START and NAME}
-
 \item{figure}{figures like hypo/hyper to built the data path}
 
-\item{columnLabel}{name of column in the annotation dataset to select genomic area (gene, island etc..)}
+\item{area}{name of column in the annotation dataset to select genomic area (gene, island etc..)}
 }
 \value{
 list of pivot by column identified with column Label and by Sample
