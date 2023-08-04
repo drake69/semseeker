@@ -10,7 +10,7 @@ testthat::test_that(" semseeker:::mutations_get",{
   mutations <-  semseeker:::mutations_get(
                values = methylation_data[,1],
                figure = "HYPO",
-               thresholds = tresholds,
+               thresholds = thresholds,
                probe_features = probe_features,
                sampleName = mySampleSheet[1,"Sample_ID"]
                )

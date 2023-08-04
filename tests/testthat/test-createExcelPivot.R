@@ -20,7 +20,7 @@ test_that("create_excel_pivot", {
   )
 
 
-  semseeker:::create_multiple_bed( sample_sheet = mySampleSheet)
+  semseeker:::create_multiple_bed(sample_sheet = mySampleSheet)
 
   ####################################################################################
 
