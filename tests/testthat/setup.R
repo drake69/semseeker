@@ -32,6 +32,9 @@ methylation_data_batch <<- list(methylation_data, methylation_data, methylation_
 
 beta_superior_thresholds <- data.frame(stats::rnorm(nitem, mean = 1, sd=0.2))
 beta_inferior_thresholds <- data.frame(stats::rnorm(nitem, mean=0.2, sd=0.2))
+colnames(beta_superior_thresholds) <- "HIGH"
+colnames(beta_inferior_thresholds) <- "LOW"
+
 iqr <- data.frame(stats::rnorm(nitem, mean=0.1, sd=0.3))
 row.names(beta_superior_thresholds) <- probe_features$PROBE
 row.names(beta_inferior_thresholds) <- probe_features$PROBE
@@ -49,6 +52,7 @@ methylation_data <<- abs(methylation_data)
 beta_medians <<- beta_medians
 beta_inferior_thresholds <<- abs(beta_inferior_thresholds)
 beta_superior_thresholds <<- abs(beta_superior_thresholds)
+beta_superior_thresholds[beta_superior_thresholds<beta_inferior_thresholds,1] <- beta_inferior_thresholds[beta_superior_thresholds<beta_inferior_thresholds,1] + 0.1
 thresholds <<- abs(thresholds)
 beta_thresholds <- data.frame("beta_median_values"=beta_medians,
                               "beta_inferior_thresholds"=beta_inferior_thresholds,

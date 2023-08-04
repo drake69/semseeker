@@ -35,7 +35,7 @@ test_that("create_heatmap", {
   Sample_Group <- rep("Control",nsamples)
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analize_population(methylation_data=methylation_data,
+  sp <- analyze_population(methylation_data=methylation_data,
     sliding_window_size = 11,
     sliding_window_size = sliding_window_size,
     beta_thresholds = beta_thresholds,

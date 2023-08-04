@@ -10,7 +10,7 @@ test_that("create_excel_pivot", {
 
   ####################################################################################
 
-  sp <- semseeker:::analize_population(methylation_data=methylation_data,
+  sp <- semseeker:::analyze_population(methylation_data=methylation_data,
     sliding_window_size = sliding_window_size,
     beta_thresholds = beta_thresholds,
     sample_sheet = mySampleSheet,
@@ -25,27 +25,18 @@ test_that("create_excel_pivot", {
   ####################################################################################
 
   sample_groups <- c("Control","Case")
-
   figures <- c("HYPO", "HYPER", "BOTH")
-  markers <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ","BETA")
-  # figures <- c("HYPO")
-  # markers <- c("DELTAR")
-
-  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
-  # subareas <- c("WHOLE")
-  probes_prefix = "PROBES_Gene_"
+  markers <- c("DELTAR")
+  subarea <- c("WHOLE")
   area =  "GENE"
-  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- semseeker:::annotate_bed (
-    sample_groups ,
-    figures ,
-    markers ,
-    subareas ,
-    probes_prefix ,
-    area ,
-    groupingColumnLabel)
+    sample_groups =  sample_groups ,
+    figures =  figures ,
+    markers =  markers ,
+    subarea =  subarea ,
+    area = area)
 
   sample_groups <- c("Control","Case")
   # figures <- c("HYPO", "HYPER", "BOTH")
@@ -93,5 +84,6 @@ test_that("create_excel_pivot", {
 #   subGroupLabel="AREA"
 #   semseeker:::create_excel_pivot (sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
+  unlink(temp_folder, recursive=TRUE)
   semseeker:::close_env()
 })

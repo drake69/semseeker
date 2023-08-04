@@ -13,7 +13,7 @@
 #' @return files into the result folder with pivot table and bedgraph.
 #' @importFrom doRNG %dorng%
 #'
-analize_population <- function(methylation_data, sliding_window_size, sample_sheet,beta_thresholds, bonferroni_threshold = 0.05, probe_features) {
+analyze_population <- function(methylation_data, sliding_window_size, sample_sheet,beta_thresholds, bonferroni_threshold = 0.05, probe_features) {
 
   ssEnv <- get_session_info()
   # browser()
@@ -54,9 +54,8 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
   iqr <- beta_thresholds$iqr
   beta_median_values <- beta_thresholds$beta_median_values
 
-  # for(i in 1:nrow(sample_sheet)) {
-  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
-    # summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind") %dofuture% {
+  for(i in 1:nrow(sample_sheet)) {
+  # summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
     local_sample_detail <- sample_sheet[i,]
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
@@ -81,7 +80,7 @@ analize_population <- function(methylation_data, sliding_window_size, sample_she
 
     deltar_result <- deltar_single_sample ( values = beta_values, high_thresholds = beta_superior_thresholds,
       low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail,
-      iqr = iqr, probe_features = probe_features)
+      probe_features = probe_features)
 
     sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result,
       "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions, deltar_result, beta_sample)

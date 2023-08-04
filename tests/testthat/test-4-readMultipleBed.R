@@ -10,7 +10,7 @@ test_that("semseeker:::read_multiple_bed", {
   semseeker:::get_meth_tech(methylation_data)
 
   ####################################################################################
-  sp <- semseeker:::analize_population(methylation_data=methylation_data,
+  sp <- semseeker:::analyze_population(methylation_data=methylation_data,
 
     sliding_window_size = sliding_window_size,
     beta_thresholds = beta_thresholds,

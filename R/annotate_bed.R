@@ -79,7 +79,6 @@ annotate_bed <- function (
       probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
       # annotate file
-      resFolder <- dir_check_and_create(ssEnv$result_folderData,sample_group)
       dataToAnnotate <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
       if(is.null(dataToAnnotate))
         next

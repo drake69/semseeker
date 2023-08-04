@@ -12,6 +12,10 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
 
   ssEnv <- get_session_info()
 
+  if(any(high_thresholds<low_thresholds))
+    stop("ERROR: I'm stopping here the some high have values less than low!")
+
+
   ### get deltas HYPER #########################################################
   deltas_hyper <- data.frame("DELTA"= values - high_thresholds, row.names = probe_features$PROBE)
   colnames(deltas_hyper) <- "DELTA"
