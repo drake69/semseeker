@@ -3,7 +3,7 @@
 \name{annotate_bed}
 \alias{annotate_bed}
 \title{takes a bed and its location (build with the details of population and genomic area)
-and annoate with detail about genomic area}
+and annotate with detail about genomic area, the output file is only for the arean and specified subarea}
 \usage{
 annotate_bed(sample_groups, figures, markers, area, subarea)
 }
@@ -16,16 +16,12 @@ annotate_bed(sample_groups, figures, markers, area, subarea)
 
 \item{area}{vector of genomic area to cycle and group the annotated data}
 
-\item{subarea}{label of the column of the genomic area gene, island ,dmr etc..}
-
-\item{probes_prefix}{prefix to use to get the annotated probe_features dataset}
-
-\item{groupingColumnLabel}{label of the column of the genomic sub area body, tss1500}
+\item{subarea}{subarea of the area to annotate..}
 }
 \value{
 original bed with genomic area infos
 }
 \description{
 takes a bed and its location (build with the details of population and genomic area)
-and annoate with detail about genomic area
+and annotate with detail about genomic area, the output file is only for the arean and specified subarea
 }

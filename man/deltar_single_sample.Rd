@@ -2,14 +2,14 @@
 % Please edit documentation in R/deltar_get.R
 \name{deltar_single_sample}
 \alias{deltar_single_sample}
-\title{deltar_single_sample}
+\title{delta_single_sample}
 \usage{
 deltar_single_sample(
   values,
   high_thresholds,
   low_thresholds,
   sample_detail,
-  iqr,
+  beta_medians,
   probe_features
 )
 }
@@ -22,7 +22,7 @@ deltar_single_sample(
 
 \item{sample_detail}{details of sample to analyze}
 
-\item{iqr}{interqurtile ratio used to calculate the beta range}
+\item{beta_medians}{median to use for calculation}
 
 \item{probe_features}{genomic position of probe_features}
 }
@@ -30,5 +30,5 @@ deltar_single_sample(
 summary detail about the analysis
 }
 \description{
-deltar_single_sample
+delta_single_sample
 }

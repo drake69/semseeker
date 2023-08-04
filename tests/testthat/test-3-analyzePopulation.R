@@ -1,6 +1,4 @@
-test_that("analize_population", {
-
-
+test_that("analyze_population", {
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
@@ -14,7 +12,7 @@ test_that("analize_population", {
 
 
   # browser()
-  sp <- semseeker:::analize_population(methylation_data=methylation_data,
+  sp <- semseeker:::analyze_population(methylation_data=methylation_data,
     sliding_window_size = sliding_window_size,
     beta_thresholds = beta_thresholds,
     sample_sheet = mySampleSheet,

@@ -23,6 +23,8 @@ test_that("range_beta_values", {
   testthat::expect_true(rr$q3[1]!=rr$beta_median_values[1])
   ####################################################################################
 
+  testthat::expect_true(all(rr$beta_inferior_thresholds<rr$beta_superior_thresholds))
+
   unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
 })

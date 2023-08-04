@@ -1,5 +1,5 @@
 #' @importFrom doRNG %dorng%
-deltarq_get <- function( resultPopulation){
+deltarq_get <- function(resultPopulation){
 
   ssEnv <- get_session_info()
 
@@ -33,18 +33,15 @@ deltarq_get <- function( resultPopulation){
     }
   }
 
-  if (!exists("deltarq")| plyr::empty(deltarq))
+  if (!exists("deltarq") | plyr::empty(deltarq))
   {
     stop("Something wrong with multiple bed files!")
   }
 
   deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=4))
-
-  Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
-  colnames(Sample_Group) <- "SAMPLE_GROUP"
-  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
-  localKeys <- subset(localKeys, MARKER=="DELTAR")
+  localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figures, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
+  localKeys <- subset(localKeys, MARKER=="DELTARQ")
 
   for(i in 1:nrow(localKeys))
   {
@@ -76,41 +73,6 @@ deltarq_get <- function( resultPopulation){
       }
     }
   }
-
-
-  # for(i in 1:nrow(localKeys))
-  # {
-  #   key <- localKeys[i,]
-  #   tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
-  #   fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)),  as.character(key$EXT))
-  #   if(file.exists(fileToRead))
-  #   {
-  #     localFileRes <- fst::read.fst(fileToRead, as.data.table = T)
-  #
-  #     if(!plyr::empty(localFileRes))
-  #     {
-  #       colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
-  #       deltarq <- unique(deltarq)
-  #       localFileRes[,4] <- deltarq[ deltarq$VALUE %in% localFileRes$VALUE, "DELTARQ"]
-  #
-  #       tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTARQ_",as.character(key$FIGURE),sep="")))
-  #       fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTARQ"), as.character(key$FIGURE)),  as.character(key$EXT))
-  #       fst::write.fst( x= localFileRes, fileToWrite)
-  #       # localFileRes <-fst::read.fst(fileToWrite)
-  #
-  #       tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",fun.aggregate = sum, drop = TRUE)
-  #       colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
-  #       lbl <- rep(paste("DELTARQ_",as.character(key$FIGURE),sep=""), nrow(tempDataFrame))
-  #       data.frame("LABEL"=lbl, tempDataFrame)
-  #
-  #       if(exists("deltarq_summary"))
-  #         deltarq_summary <- rbind(deltarq_summary,data.frame("LABEL"=lbl, tempDataFrame))
-  #       else
-  #         deltarq_summary <- data.frame("LABEL"=lbl, tempDataFrame)
-  #     }
-  #     rm(localFileRes)
-  #   }
-  # }
 
   if(!plyr::empty(deltarq_summary))
   {

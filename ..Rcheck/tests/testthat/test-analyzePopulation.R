@@ -1,10 +1,10 @@
-  test_that("analize_population", {
+  test_that("analyze_population", {
 
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   init_env(tempFolder, parallel_strategy = "sequential")
 
-  sp <- analize_population(methylation_data=methylation_data,
+  sp <- analyze_population(methylation_data=methylation_data,
                     sliding_window_size = 11,
                     sliding_window_size = sliding_window_size,
                     beta_thresholds = beta_thresholds,

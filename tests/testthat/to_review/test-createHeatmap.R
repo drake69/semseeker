@@ -17,7 +17,7 @@ test_that("create_heatmap", {
 
   ####################################################################################
 
-  # sp <- semseeker:::analize_population(methylation_data=methylation_data,
+  # sp <- semseeker:::analyze_population(methylation_data=methylation_data,
   #
   #   sliding_window_size = sliding_window_size,
   #   beta_thresholds = beta_thresholds,

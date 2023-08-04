@@ -1,18 +1,26 @@
-#' deltar_single_sample
+#' delta_single_sample
 #'
 #' @param values values of methylation
 #' @param high_thresholds highest threshold to use for comparison
 #' @param low_thresholds lowest threshold to use for comparison
 #' @param sample_detail details of sample to analyze
+#' @param beta_medians median to use for calculation
 #' @param probe_features genomic position of probe_features
-#' @param iqr interqurtile ratio used to calculate the beta range
-#'
 #' @return summary detail about the analysis
 #'
-deltar_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, iqr, probe_features) {
+deltar_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
 
   ssEnv <- get_session_info()
+
+
   dividend <- high_thresholds - low_thresholds
+  names(dividend) <- "DIVIDEND"
+  dividend[dividend==0,1] <- 0.000000001
+
+  if(any(dividend<0))
+    stop("ERROR: I'm stopping here the dividend have negative values!")
+
+
   ### get deltar HYPER #########################################################
   deltar_hyper <- data.frame("DELTA"= (values - high_thresholds)/dividend, row.names = probe_features$PROBE)
   colnames(deltar_hyper) <- "DELTA"
@@ -45,15 +53,28 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   dump_sample_as_bed_file(data_to_dump = deltarAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTH"),"bedgraph"))
 
 
+  ### get deltar from medians #########################################################
+
+  # deltar <- data.frame("DELTA"= values - beta_medians, row.names = probe_features$PROBE)
+  # colnames(deltar) <- "DELTA"
+
   result <- ""
   result <- result[-1]
+  if(mean(deltarAnnotated_hypoSorted$DELTA)<0 |
+      mean(deltarAnnotated_hyperSorted$DELTA) <0 |
+      mean(deltarAnnotated_bothSorted$DELTA) <0 )
+  {
+    message(mean(deltarAnnotated_hypoSorted$DELTA))
+    message(mean(deltarAnnotated_hyperSorted$DELTA))
+    message(mean(deltarAnnotated_bothSorted$DELTA))
+    stop("ERROR: I'm stopping here the deltar have negative values!")
+  }
   result["DELTAR_HYPO"] <- mean(deltarAnnotated_hypoSorted$DELTA)
   result["DELTAR_HYPER"] <- mean(deltarAnnotated_hyperSorted$DELTA)
   result["DELTAR_BOTH"] <- mean(deltarAnnotated_bothSorted$DELTA)
 
 
   return(result)
-
 }
 
 
