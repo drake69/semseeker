@@ -20,25 +20,15 @@ test_that("semseeker:::read_multiple_bed", {
 
   )
 
-  sp$Sample_Group <- mySampleSheet$Sample_Group
+  sample_group <- unique(mySampleSheet$Sample_Group)[1]
   semseeker:::create_multiple_bed(mySampleSheet)
 
-  figures <- c("HYPO", "HYPER", "BOTH")
-  markers <- c("MUTATIONS","LESIONS","DELTAS","DELTAR","DELTAQ","DELTARQ")
-
-  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
-  probes_prefix = "PROBES_Gene_"
-  area =  "GENE"
-  groupingColumnLabel="AREA"
-  sample_group <- "Case"
-
-  probe_features <- probe_features_get(probes_prefix,"WHOLE")
 
 
-  res <-semseeker:::read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
+  res <-semseeker:::read_multiple_bed (marker =  "MUTATIONS",figure =  "BOTH", sample_group = sample_group)
   testthat::expect_true(nrow(res)>0)
 
-  res <-semseeker:::read_multiple_bed ( "DELTAS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
+  res <-semseeker:::read_multiple_bed (marker =  "DELTAS",figure =  "BOTH", sample_group = sample_group)
   testthat::expect_true(nrow(res)>0)
   ####################################################################################
 

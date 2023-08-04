@@ -2,10 +2,10 @@
 % Please edit documentation in R/annotate_bed.R
 \name{annotate_bed}
 \alias{annotate_bed}
-\title{takes a bed and its location (build with the details of popuationa nd genomic area)
+\title{takes a bed and its location (build with the details of population and genomic area)
 and annoate with detail about genomic area}
 \usage{
-annotate_bed(sample_groups, figures, markers, area)
+annotate_bed(sample_groups, figures, markers, area, subarea)
 }
 \arguments{
 \item{sample_groups}{vector of population to cycle with to build the folder path}
@@ -16,9 +16,9 @@ annotate_bed(sample_groups, figures, markers, area)
 
 \item{area}{vector of genomic area to cycle and group the annotated data}
 
-\item{probes_prefix}{prefix to use to get the annotated probe_features dataset}
-
 \item{subarea}{label of the column of the genomic area gene, island ,dmr etc..}
+
+\item{probes_prefix}{prefix to use to get the annotated probe_features dataset}
 
 \item{groupingColumnLabel}{label of the column of the genomic sub area body, tss1500}
 }
@@ -26,6 +26,6 @@ annotate_bed(sample_groups, figures, markers, area)
 original bed with genomic area infos
 }
 \description{
-takes a bed and its location (build with the details of popuationa nd genomic area)
+takes a bed and its location (build with the details of population and genomic area)
 and annoate with detail about genomic area
 }

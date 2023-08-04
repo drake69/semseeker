@@ -24,6 +24,7 @@ semseeker <- function(sample_sheet,
                       ... ) {
 
 
+  unlink(result_folder, recursive = TRUE)
   init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
   ssEnv <- get_session_info()
 
@@ -38,7 +39,7 @@ semseeker <- function(sample_sheet,
   } else
   {
     if(is.data.frame(sample_sheet) | is.data.frame(methylation_data))
-      stop("both sample_sheet and methylation_data should be the same type!")
+      stop("both sample_sheet and methylation_data should be data frame!")
     if(length(sample_sheet)!=length(methylation_data))
       stop("both sample_sheet and methylation_data should have been list with the same length!")
   }

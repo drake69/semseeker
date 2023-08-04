@@ -171,22 +171,22 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     message("INFO: ", Sys.time(), " These gene's areas will be investigated:", paste(keys_gene_subareas_default[,1], collapse = " ", sep=" "))
   }
 
-  if (!("DMR" %in% areas))
+  if ("DMR" %in% areas)
   {
     keys_areas_subareas <- rbind( data.frame("AREA"="DMR","SUBAREA"="WHOLE", "COMBINED"="DMR_WHOLE"), keys_areas_subareas)
     ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="DMR","SUBAREA"="WHOLE","MARKER"=markers,"FIGURE"=figures))
   }
 
-  if (!("CHR" %in% areas))
+  if ("CHR" %in% areas)
   {
-    keys_areas_subareas <- rbind( data.frame("AREA"="CHR","SUBAREA"="", "COMBINED"="CHR"), keys_areas_subareas)
-    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="CHR","SUBAREA"="" ,"MARKER"=markers,"FIGURE"=figures))
+    keys_areas_subareas <- rbind( data.frame("AREA"="CHR","SUBAREA"="WHOLE", "COMBINED"="CHR_WHOLE"), keys_areas_subareas)
+    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="CHR","SUBAREA"="WHOLE" ,"MARKER"=markers,"FIGURE"=figures))
   }
 
-  if(!("PROBE" %in% areas))
+  if("PROBE" %in% areas)
   {
-    keys_areas_subareas <- rbind( data.frame("AREA"="PROBE","SUBAREA"="", "COMBINED"=""), keys_areas_subareas)
-    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="PROBE","SUBAREA"="" ,"MARKER"=markers,"FIGURE"=figures))
+    keys_areas_subareas <- rbind( data.frame("AREA"="PROBE","SUBAREA"="WHOLE", "COMBINED"="PROBE_WHOLE"), keys_areas_subareas)
+    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="PROBE","SUBAREA"="WHOLE" ,"MARKER"=markers,"FIGURE"=figures))
   }
 
   # force the only FIGURE of BETA as MEAN

@@ -2842,6 +2842,17 @@
       ],
       "Hash": "4543b8cd233ae25c6aba8548be9e747e"
     },
+    "reshape": {
+      "Package": "reshape",
+      "Version": "0.8.9",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "plyr"
+      ],
+      "Hash": "603d56041d7d4fa3ceb1864b3f6ee6b1"
+    },
     "reshape2": {
       "Package": "reshape2",
       "Version": "1.4.4",

@@ -11,7 +11,7 @@ testthat::test_that("analyze_single_sample",{
 
   sp <- analyze_single_sample( values = methylation_data[,1],
                       sliding_window_size = sliding_window_size,
-                      thresholds = tresholds,
+                      thresholds = thresholds,
                       figure = "HYPO",
                       sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")] ,
                       bonferroni_threshold = bonferroni_threshold,

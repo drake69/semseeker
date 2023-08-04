@@ -2,13 +2,12 @@
 #'
 #' @param marker marker definition used to label folder and files eg MUTATIONS, LESIONS
 #' @param figure figures like hypo/hyper to built the data path
-#' @param area name of column in the annotation dataset to select genomic area (gene, island etc..)
 #' @param sample_group name of the population used to build the data path
 #'
 #' @return list of pivot by column identified with column Label and by Sample
 
 #'
-read_multiple_bed <- function(sample_group, marker, figure, area)
+read_multiple_bed <- function(sample_group, marker, figure)
 {
   ssEnv <- get_session_info()
 

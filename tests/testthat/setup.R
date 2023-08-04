@@ -37,8 +37,8 @@ row.names(beta_superior_thresholds) <- probe_features$PROBE
 row.names(beta_inferior_thresholds) <- probe_features$PROBE
 beta_medians <- (beta_superior_thresholds + beta_inferior_thresholds) / 2
 
-tresholds <- data.frame("tresholds"= stats::rnorm(nitem, mean=0.5, sd= 0.5))
-row.names(tresholds) <- probe_features$PROBE
+thresholds <- data.frame("thresholds"= stats::rnorm(nitem, mean=0.5, sd= 0.5))
+row.names(thresholds) <- probe_features$PROBE
 
 #####
 ### copy as global
@@ -49,7 +49,7 @@ methylation_data <<- abs(methylation_data)
 beta_medians <<- beta_medians
 beta_inferior_thresholds <<- abs(beta_inferior_thresholds)
 beta_superior_thresholds <<- abs(beta_superior_thresholds)
-tresholds <<- abs(tresholds)
+thresholds <<- abs(thresholds)
 beta_thresholds <- data.frame("beta_median_values"=beta_medians,
                               "beta_inferior_thresholds"=beta_inferior_thresholds,
                               "beta_superior_thresholds"=beta_superior_thresholds,

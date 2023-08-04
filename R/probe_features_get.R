@@ -7,17 +7,20 @@ probe_features_get <- function(area_subarea)
 
   probe_features <- semseeker::pp_tot
   probe_features <- probe_features[ probe_features[,ssEnv$tech], ]
-  if(any(area_subarea %in% c("CHR","START")))
-    probe_features <- na.omit(probe_features[ c(ssEnv$tech,"PROBE","CHR","START")])
-  else
-    probe_features <- na.omit(probe_features[ c(ssEnv$tech,"PROBE","CHR","START",area_subarea)])
-
-
-  probe_features <- probe_features[ ,-c(which(colnames(probe_features) %in% ssEnv$tech )) ]
   probe_features$END <- probe_features$START
 
-  probe_features <- unique(probe_features[,c("PROBE", "CHR","START","END",area_subarea)])
-  # colnames(probe_features) <- c("CHR","START","END","AREA")
+  if( grepl("CHR", area_subarea)  || grepl("PROBE",area_subarea))
+    probe_features <- unique(na.omit(probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END")]))
+  else
+    probe_features <- unique(na.omit(probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END",area_subarea)]))
 
+  # needed to avoid special elaboration in other function on chromosome or probe
+  if( grepl("CHR", area_subarea))
+    probe_features$CHR_WHOLE <- paste("chr",probe_features$CHR, sep="")
+
+  if(grepl("PROBE",area_subarea))
+      probe_features$PROBE_WHOLE <- probe_features$PROBE
+
+  probe_features <- probe_features[ ,-c(which(colnames(probe_features) %in% ssEnv$tech )) ]
   return(probe_features)
 }

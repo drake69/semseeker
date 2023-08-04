@@ -1,12 +1,10 @@
-#' takes a bed and its location (build with the details of popuationa nd genomic area)
-#' and annoate with detail about genomic area
+#' takes a bed and its location (build with the details of population and genomic area)
+#' and annotate with detail about genomic area, the output file is only for the arean and specified subarea
 #' @param sample_groups vector of population to cycle with to build the folder path
 #' @param figures vector of hyper /hypo to use to build the folder path
 #' @param markers vector of lesions/mutations to use to build the folder path
 #' @param area vector of genomic area to cycle and group the annotated data
-#' @param probes_prefix prefix to use to get the annotated probe_features dataset
-#' @param subarea label of the column of the genomic area gene, island ,dmr etc..
-#' @param groupingColumnLabel label of the column of the genomic sub area body, tss1500
+#' @param subarea subarea of the area to annotate..
 #'
 #' @return original bed with genomic area infos
 #' @importFrom doRNG %dorng%
@@ -15,25 +13,29 @@ annotate_bed <- function (
     sample_groups,
     figures,
     markers,
-    area)
+    area,
+    subarea)
 {
 
   ssEnv <- get_session_info()
 
+  # area and subarea are defined using the filename
   i <- 0
-  final_bed <- NULL
-  bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
+  bedFileName <- file_path_build(ssEnv$result_folderData , c(area,subarea, "ANNOTATED"),"fst")
 
   sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
   localKeys <- reshape::expand.grid.df(ssEnv$keys_areas_subareas_markers_figures, sample_groups)
-  localKeys <- subset(localKeys,MARKER != "BETA")
+  localKeys <- subset(localKeys,localKeys$MARKER != "BETA")
+  localKeys <- subset(localKeys,localKeys$AREA == area)
+  localKeys <- subset(localKeys,localKeys$SUBAREA == subarea)
+  localKeys <- subset(localKeys,localKeys$FIGURE %in% figures)
+  localKeys <- subset(localKeys,localKeys$MARKER %in%  markers)
 
   if(file.exists(bedFileName))
   {
     if(file.info(bedFileName)$size < 10)
     {
-      final_bed <- NULL
-      message("WARNING: ", Sys.time(), " Given up file:", final_bed, " is empty!")
+      message("WARNING: ", Sys.time(), " Given up file:", bedFileName, " is empty!")
     }
     else
     {
@@ -42,10 +44,11 @@ annotate_bed <- function (
     }
 
     final_bed_temp <- as.data.frame(final_bed)
-    # get existing keys from the existing multiple annotated bed file
-    existing_keys <- unique(final_bed_temp[,c("SAMPLE_GROUP","FIGURE","MARKER","AREA","SUBAREA")])
-    existing_keys$pasted <- apply(existing_keys,1, paste , collapse = "-" )
-    localKeys$pasted <-apply(localKeys,1, paste , collapse = "-" )
+    existing_keys <- unique(final_bed_temp[,c("SAMPLE_GROUP","FIGURE","MARKER")])
+    existing_keys$AREA <- area
+    existing_keys$SUBAREA <- subarea
+    existing_keys$pasted <- apply(existing_keys,1, paste , collapse = "_" )
+    localKeys$pasted <-apply(localKeys[,c("SAMPLE_GROUP","FIGURE","MARKER","AREA","SUBAREA")],1, paste , collapse = "_" )
     localKeys <- localKeys[ !( localKeys$pasted %in%  existing_keys$pasted ),]
     if(nrow(localKeys)==0)
       return(final_bed_temp)
@@ -58,7 +61,7 @@ annotate_bed <- function (
     progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
 
   variables_to_export <- c("ssEnv", "dir_check_and_create", "read_multiple_bed", "subarea",
-                            "groupingColumnLabel", "progress_bar","progression_index", "progression", "progressor_uuid",
+                            "progress_bar","progression_index", "progression", "progressor_uuid",
                             "owner_session_uuid", "trace","probe_features_get")
 
   for(i in 1:nrow(localKeys))
@@ -71,42 +74,51 @@ annotate_bed <- function (
       area <- as.character(localKeys[i,"AREA"])
 
       area_subarea <- paste(area,"_", subarea, sep="")
+
       probe_features <- probe_features_get(area_subarea)
       probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
       # annotate file
       resFolder <- dir_check_and_create(ssEnv$result_folderData,sample_group)
-      sourceData <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure, area = area)
+      dataToAnnotate <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
+      if(is.null(dataToAnnotate))
+        next
 
       if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
-        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START","END"))
+        dataToAnnotate <- merge(dataToAnnotate, probe_features, by = c("CHR", "START","END"))
       else
-        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START"))
-      sourceData <-subset(sourceData, !is.na(eval(parse(text=area))))
+        dataToAnnotate <- merge(dataToAnnotate, probe_features, by = c("CHR", "START"))
 
-      sourceData$CHR <- as.factor(sourceData$CHR)
-      if(nrow(probe_features)==0 | nrow(sourceData)==0)
-        return(sourceData)
+      dataToAnnotate <-subset(dataToAnnotate, !is.na(eval(parse(text=area_subarea))))
 
-      probe_features <- probe_features[(probe_features$CHR %in% unique((sourceData$CHR))), ]
+      if(nrow(dataToAnnotate)==0)
+        next
+      sourceDataColNames <- colnames(dataToAnnotate)
+      sourceDataColNames[which(sourceDataColNames==area_subarea)] <- "AREA"
+      colnames(dataToAnnotate) <- sourceDataColNames
+
+      dataToAnnotate$CHR <- as.factor(dataToAnnotate$CHR)
+
+      probe_features <- probe_features[(probe_features$CHR %in% unique((dataToAnnotate$CHR))), ]
       droplevels(probe_features$CHR)
-      droplevels(sourceData$CHR)
+      droplevels(dataToAnnotate$CHR)
 
       if(ssEnv$showprogress)
         progress_bar()
 
-      colname_to_preserve <- !(colnames(tempFile) %in%  c("START","END","K27","K450","K850"))
-      tempFile <- unique(tempFile[, colname_to_preserve])
+      colname_to_preserve <- !(colnames(dataToAnnotate) %in%  c("START","END","K27","K450","K850"))
+      dataToAnnotate <- unique(dataToAnnotate[, colname_to_preserve])
 
-      # tempFile
-
-      if(length(colnames(final_bed)) != length(colnames(tempFile)))
-        browser()
+      # dataToAnnotate
 
       if(exists("final_bed"))
-        final_bed <- rbind(final_bed, tempFile)
+      {
+        if(length(colnames(final_bed)) != length(colnames(dataToAnnotate)))
+          browser()
+        final_bed <- rbind(final_bed, dataToAnnotate)
+        }
       else
-        final_bed <- tempFile
+        final_bed <- dataToAnnotate
     }
 
   # colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","PROBE"))
