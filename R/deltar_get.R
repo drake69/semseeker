@@ -15,7 +15,7 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
 
   dividend <- high_thresholds - low_thresholds
   names(dividend) <- "DIVIDEND"
-  dividend[dividend==0,1] <- 0.000000001
+  dividend[dividend==0] <- 0.000000001
 
   if(any(dividend<0))
     stop("ERROR: I'm stopping here the dividend have negative values!")
