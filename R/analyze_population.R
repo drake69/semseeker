@@ -54,8 +54,8 @@ analyze_population <- function(methylation_data, sliding_window_size, sample_she
   iqr <- beta_thresholds$iqr
   beta_median_values <- beta_thresholds$beta_median_values
 
-  for(i in 1:nrow(sample_sheet)) {
-  # summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
+  # for(i in 1:nrow(sample_sheet)) {
+  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
     local_sample_detail <- sample_sheet[i,]
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]

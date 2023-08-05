@@ -39,10 +39,6 @@ test_that("create_excel_pivot", {
     area = area)
 
   sample_groups <- c("Control","Case")
-  # figures <- c("HYPO", "HYPER", "BOTH")
-  # markers <- c("DELTAR","DELTARQ","MUTATIONS","LESIONS","DELTAS","DELTAQ")
-
-  # subGroups <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   subGroups <- subareas
   probes_prefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
