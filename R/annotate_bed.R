@@ -30,8 +30,10 @@ annotate_bed <- function ()
   # for(i in 1:nrow(localKeys))
   foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export) %dorng%
     {
+      # i <- 1
       for (g in 1:length(ssEnv$keys_sample_groups))
       {
+        # g <- 1
         marker <- as.character(localKeys[i,"MARKER"])
         sample_group <- as.character(ssEnv$keys_sample_groups[g,"SAMPLE_GROUP"])
         figure <- as.character(localKeys[i,"FIGURE"])

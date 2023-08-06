@@ -8,7 +8,7 @@ create_multiple_bed <- function(sample_sheet){
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
   localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
-  localKeys <- subset(localKeys, MARKER!="BETA")
+  # localKeys <- subset(localKeys, MARKER!="BETA")
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
@@ -21,6 +21,7 @@ create_multiple_bed <- function(sample_sheet){
   foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
   # for(i in 1:nrow(localKeys))
   {
+    # i <- 1
     key <- localKeys[i,]
     marker <- as.character(key$MARKER)
     figure <- as.character(key$FIGURE)
@@ -33,6 +34,7 @@ create_multiple_bed <- function(sample_sheet){
       j <- 0
       for ( j in 1:nrow(sample_sheet))
       {
+        # j <- 1
         sample <- sample_sheet[j,]
         fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(marker), as.character(figure)), key$EXT)
         if(file.exists(fileToRead))
