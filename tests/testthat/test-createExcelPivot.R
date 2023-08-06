@@ -1,6 +1,6 @@
 test_that("create_excel_pivot", {
 
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas=c("GENE","PROBE"), subareas=("WHOLE"), markers="MUTATIONS")
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas=c("PROBE","GENE"), subareas=("WHOLE"), markers="BETA")
 
   ####################################################################################
 
@@ -27,6 +27,6 @@ test_that("create_excel_pivot", {
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/PROBE.xlsx")))
 
-  unlink(temp_folder, recursive=TRUE)
+  unlink(tempFolder, recursive=TRUE)
   semseeker:::close_env()
 })

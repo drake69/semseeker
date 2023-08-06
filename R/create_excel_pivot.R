@@ -14,7 +14,7 @@ create_excel_pivot <-  function() {
   else
     progress_bar <- ""
 
-  for (a in length(areas))
+  for (a in 1:length(areas))
   {
 
     area <- as.character(areas[a])
@@ -44,7 +44,6 @@ create_excel_pivot <-  function() {
 
       annotatedData <-  read_annotated_bed(figure,marker,area,subarea)
       annotatedData <- subset(annotatedData, annotatedData$VALUE != 0 )
-      annotatedData$KEY <- area
 
       if (is.null(annotatedData) | plyr::empty(annotatedData) | nrow(annotatedData)==0)
        next
@@ -53,11 +52,11 @@ create_excel_pivot <-  function() {
       {
           if(marker=="BETA")
           {
-            annotatedData <- reshape2::dcast(data = annotatedData, formula = SAMPLEID + SAMPLE_GROUP ~ KEY, value.var = "VALUE",
+            annotatedData <- reshape2::dcast(data = annotatedData, formula = SAMPLEID + SAMPLE_GROUP ~ AREA, value.var = "VALUE",
               fun.aggregate = mean, drop = TRUE)
           }
           else
-            annotatedData <- reshape2::dcast(data = annotatedData, formula =  SAMPLEID + SAMPLE_GROUP ~ KEY, value.var = "VALUE",
+            annotatedData <- reshape2::dcast(data = annotatedData, formula =  SAMPLEID + SAMPLE_GROUP ~ AREA, value.var = "VALUE",
               fun.aggregate = sum, drop = TRUE)
 
           pivot_subfolder <- dir_check_and_create(reportFolder, marker)
@@ -70,9 +69,14 @@ create_excel_pivot <-  function() {
           temp_list <- list(annotatedData)
 
           stats::setNames(temp_list, sheet_name)
+          if(ssEnv$showprogress)
+            progress_bar(sprintf("Creating pivot table."))
+          temp_list
       }
-      if(ssEnv$showprogress)
-        progress_bar(sprintf("Creating pivot table."))
+      else
+        if(ssEnv$showprogress)
+          progress_bar(sprintf("Creating pivot table."))
+
     }
 
     if(exists("old_sheet_list") & length(sheetList)!=0)
@@ -84,25 +88,26 @@ create_excel_pivot <-  function() {
         openxlsx::writeData(old_workbook,names(sheetList[t]),sheetList[t])
       }
       openxlsx::saveWorkbook(old_workbook,fileNameXLS,overwrite = TRUE)
-    } else if(length(sheetList)!=0)
-    {
-      try(
-        {
-          openxlsx::write.xlsx(
-            x = sheetList,
-            file = fileNameXLS,
-            asTable = TRUE,
-            overwrite = TRUE
-          )
-          message("INFO: ", Sys.time(), " Saved spreadsheet file:", fileNameXLS)
-        }
-      )
-    }
-    else
-    {
-      if(!exists("old_sheet_list"))
-        message("INFO: ", Sys.time(), " No pivot tables to save.")
-    }
+    } else
+      if(length(sheetList)!=0)
+      {
+        try(
+          {
+            openxlsx::write.xlsx(
+              x = sheetList,
+              file = fileNameXLS,
+              asTable = TRUE,
+              overwrite = TRUE
+            )
+            message("INFO: ", Sys.time(), " Saved spreadsheet file:", fileNameXLS)
+          }
+        )
+      }
+      else
+      {
+        if(!exists("old_sheet_list"))
+          message("INFO: ", Sys.time(), " No pivot tables to save.")
+      }
   }
 
 }
