@@ -5,10 +5,10 @@
 \title{create_heatmap load the multiple bed resulting from
 analysis organized into files and folders per marker and produce a pivot}
 \usage{
-create_heatmap(inputBedDataFrame, markers, file_prefix, groupColumnLabels)
+create_heatmap()
 }
 \arguments{
-\item{inputBedDataFrame}{data frame to chart}
+\item{annotatedData}{data frame to chart}
 
 \item{markers}{vector of markers to manage}
 

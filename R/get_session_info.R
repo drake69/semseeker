@@ -8,6 +8,7 @@ get_session_info <- function(result_folder=NULL)
     ssEnv <- list()
     if(file.exists(file.path(session_folder,"session_info.rds")))
       ssEnv <- readRDS( file.path(session_folder,"session_info.rds"))
+    ssEnv$session_folder <- session_folder
     assign("ssEnv", ssEnv, envir=.pkgglobalenv)
   }
   return(ssEnv)

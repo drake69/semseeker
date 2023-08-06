@@ -1,115 +1,108 @@
 #' @importFrom doRNG %dorng%
-create_excel_pivot <-  function( sample_groups, markers, figures, areas) {
+create_excel_pivot <-  function() {
 
   ssEnv <- get_session_info()
 
   i <- 0
   k <- 0
+
   reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
+  localKeys <- ssEnv$keys_areas_subareas_markers_figures
+  areas <- ssEnv$keys_areas
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
+  else
+    progress_bar <- ""
 
-  final_bed <-  annotate_bed(sample_groups, figures, markers, area, subarea)
-  if (is.null(final_bed) | plyr::empty(final_bed) | nrow(final_bed)==0)
-    return()
-  final_bed <- data.frame(final_bed, "KEY" = final_bed[,area])
-  final_bed[,area] <- as.factor(final_bed[,area])
-  final_bed[,"KEY"] <- as.factor(final_bed[,"KEY"])
-  final_bed[,"FIGURE"] <- as.factor(final_bed[,"FIGURE"])
-  final_bed[,"SAMPLE_GROUP"] <- as.factor(final_bed[,"SAMPLE_GROUP"])
-  final_bed[,"VALUE"] <- as.numeric(final_bed[,"VALUE"])
-
-  tempPopData <- subset(final_bed, final_bed$VALUE != 0 )
-
-  sheetList <- vector(mode="list")
-  fileNameXLS <- paste0(reportFolder,"/", area,".xlsx" , sep="")
-
-  ssEnv$keys <- unique(tempPopData[,c(subGroupLabel,"MARKER","FIGURE")])
-  colnames(ssEnv$keys) <- c("subareas","markers","figures")
-  # ssEnv$keys <- expand.grid("subareas"= unique(tempPopData[,subGroupLabel]), "markers"= markers, "figures"=figures)
-  ssEnv$keys$future_shee_list <-  unique(paste(final_bed$MARKER,"_",final_bed$FIGURE,"_",  area,"_",final_bed$AREA, sep=""))
-
-  if(file.exists(fileNameXLS))
+  for (a in length(areas))
   {
-    old_sheet_list <- readxl::excel_sheets(fileNameXLS)
-    ssEnv$keys <- ssEnv$keys[!(ssEnv$keys$future_shee_list %in% old_sheet_list), ]
-  }
 
+    area <- as.character(areas[a])
+    tempKeys <- unique(subset(localKeys,AREA==area))
+    tempKeys$future_shee_list <-  unique(paste(tempKeys$MARKER,"_",tempKeys$FIGURE,"_",tempKeys$AREA,"_",tempKeys$SUBAREA, sep=""))
 
-  toExport <- c("ssEnv", "tempPopData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "area","sheetList","dir_check_and_create")
-  sheetList <- foreach::foreach(k=1:nrow(ssEnv$keys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
-  # for(k in 1:nrow(ssEnv$keys))
+    sheetList <- vector(mode="list")
+    fileNameXLS <- paste0(reportFolder,"/", area,".xlsx" , sep="")
+
+    if(file.exists(fileNameXLS))
+    {
+      old_sheet_list <- readxl::excel_sheets(fileNameXLS)
+      ssEnv$keys <- ssEnv$keys[!(ssEnv$keys$future_shee_list %in% old_sheet_list), ]
+    }
+
+    toExport <- c("ssEnv", "annotatedData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "area","sheetList","dir_check_and_create","tempKeys", "progress_bar","progression_index", "progression", "progressor_uuid",
+      "owner_session_uuid", "trace")
+    sheetList <- foreach::foreach(k=1:nrow(tempKeys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
+    # for(k in 1:nrow(tempKeys))
     {
       # browser()
       # k <- 1
-      subarea <- as.character(ssEnv$keys[k,"subareas"])
-      marker <- as.character(ssEnv$keys[k,"markers"])
-      pivot_file_name <- ssEnv$keys$future_shee_list[k]
-      temp <- subset(tempPopData, tempPopData[,subGroupLabel]==subarea)
+      subarea <-  as.character(tempKeys[k,"SUBAREA"])
+      marker <- as.character(tempKeys[k,"MARKER"])
+      figure <-  as.character(tempKeys[k,"FIGURE"])
+      pivot_file_name <- tempKeys$future_shee_list[k]
 
-      if(!plyr::empty(temp))
+      annotatedData <-  read_annotated_bed(figure,marker,area,subarea)
+      annotatedData <- subset(annotatedData, annotatedData$VALUE != 0 )
+      annotatedData$KEY <- area
+
+      if (is.null(annotatedData) | plyr::empty(annotatedData) | nrow(annotatedData)==0)
+       next
+
+      if(!plyr::empty(annotatedData))
       {
-        marker <- as.character(ssEnv$keys[k,"markers"])
-        tempAnomaly <- subset(temp, temp$MARKER == as.character(marker))
-        if(!plyr::empty(tempAnomaly))
-        {
-          figure <- as.character(ssEnv$keys[k,"figures"])
           if(marker=="BETA")
-            figure <- "MEAN"
-          tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
-          if(!plyr::empty(tempDataFrame))
           {
-            # if(marker=="DELTAS")
-            #   browser()
-            if(marker=="BETA")
-            {
-              tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + SAMPLE_GROUP ~ KEY, value.var = "VALUE",
-                fun.aggregate = mean, drop = TRUE)
-            }
-            else
-              tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula =  SAMPLEID + SAMPLE_GROUP ~ KEY, value.var = "VALUE",
-                                               fun.aggregate = sum, drop = TRUE)
-
-            pivot_subfolder <- dir_check_and_create(reportFolder, marker)
-            fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
-            utils::write.table(t(tempDataFrame), fileName, row.names = T, col.names = F, sep=";")
-            tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))
-            colnames(tempDataFrame) <- tempDataFrame[1,]
-
-            sheet_name <- gsub(" ","", paste0( marker,"_",figure,"_", area,"_", subarea, sep=""), fixed=TRUE)
-            temp_list <- list(tempDataFrame)
-
-            stats::setNames(temp_list, sheet_name)
+            annotatedData <- reshape2::dcast(data = annotatedData, formula = SAMPLEID + SAMPLE_GROUP ~ KEY, value.var = "VALUE",
+              fun.aggregate = mean, drop = TRUE)
           }
-        }
+          else
+            annotatedData <- reshape2::dcast(data = annotatedData, formula =  SAMPLEID + SAMPLE_GROUP ~ KEY, value.var = "VALUE",
+              fun.aggregate = sum, drop = TRUE)
+
+          pivot_subfolder <- dir_check_and_create(reportFolder, marker)
+          fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
+          utils::write.table(t(annotatedData), fileName, row.names = T, col.names = F, sep=";")
+          annotatedData <- as.data.frame( cbind(colnames(annotatedData), t(annotatedData)))
+          colnames(annotatedData) <- annotatedData[1,]
+
+          sheet_name <- gsub(" ","", paste0( marker,"_",figure,"_", area,"_", subarea, sep=""), fixed=TRUE)
+          temp_list <- list(annotatedData)
+
+          stats::setNames(temp_list, sheet_name)
       }
+      if(ssEnv$showprogress)
+        progress_bar(sprintf("Creating pivot table."))
     }
 
-  if(exists("old_sheet_list") & length(sheetList)!=0)
-  {
-    old_workbook <- openxlsx::loadWorkbook(fileNameXLS)
-    for(t in 1:length(sheetList))
+    if(exists("old_sheet_list") & length(sheetList)!=0)
     {
-      openxlsx::addWorksheet(old_workbook,names(sheetList[t]))
-      openxlsx::writeData(old_workbook,names(sheetList[t]),sheetList[t])
-    }
-    openxlsx::saveWorkbook(old_workbook,fileNameXLS,overwrite = TRUE)
-  } else if(length(sheetList)!=0)
-  {
-    try(
+      old_workbook <- openxlsx::loadWorkbook(fileNameXLS)
+      for(t in 1:length(sheetList))
       {
-        openxlsx::write.xlsx(
-          x = sheetList,
-          file = fileNameXLS,
-          asTable = TRUE,
-          overwrite = TRUE
-        )
-        message("INFO: ", Sys.time(), " Saved spreadsheet file:", fileNameXLS)
+        openxlsx::addWorksheet(old_workbook,names(sheetList[t]))
+        openxlsx::writeData(old_workbook,names(sheetList[t]),sheetList[t])
       }
-    )
-  }
-  else
-  {
-    if(!exists("old_sheet_list"))
-      message("INFO: ", Sys.time(), " No pivot tables to save.")
+      openxlsx::saveWorkbook(old_workbook,fileNameXLS,overwrite = TRUE)
+    } else if(length(sheetList)!=0)
+    {
+      try(
+        {
+          openxlsx::write.xlsx(
+            x = sheetList,
+            file = fileNameXLS,
+            asTable = TRUE,
+            overwrite = TRUE
+          )
+          message("INFO: ", Sys.time(), " Saved spreadsheet file:", fileNameXLS)
+        }
+      )
+    }
+    else
+    {
+      if(!exists("old_sheet_list"))
+        message("INFO: ", Sys.time(), " No pivot tables to save.")
+    }
   }
 
 }

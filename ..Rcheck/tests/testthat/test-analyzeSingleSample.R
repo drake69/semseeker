@@ -1,8 +1,5 @@
 testthat::test_that("analyze_single_sample",{
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv <-  init_env(tempFolder, parallel_strategy = "sequential")
   ssEnv <- get_session_info()
 

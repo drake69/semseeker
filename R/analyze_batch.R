@@ -100,7 +100,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
 
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- sample_group
-      create_multiple_bed( resultPopulation)
+      create_multiple_bed(resultPopulation)
 
       # resultPopulation
       # resultPopulation

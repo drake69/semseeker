@@ -77,101 +77,16 @@ semseeker <- function(sample_sheet,
   utils::write.csv2(sample_sheet, file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), row.names = F)
   message("INFO: ", Sys.time(), " Saving Sample Sheet with Results! ", Sys.time())
 
-
   if(length(sample_sheet$Sample_Group=="Reference")>0)
     sample_groups <- c("Reference","Control","Case")
   else
     sample_groups <- c("Control","Case")
 
-  figures <- ssEnv$keys_figures[,1]
-  markers <- ssEnv$keys_markers[,1]
+  ssEnv$keys_sample_groups <- sample_groups
+  update_session_info(ssEnv)
 
-  if(sum(ssEnv$keys_metaareas[,1]=="PROBE")==1)
-  {
-    subGroups <- c("")
-    probes_prefix = "PROBES"
-    mainGroupLabel =  "PROBE"
-    subGroupLabel= "AREA"
-
-    create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-    chrBed <- annotate_bed(sample_groups ,figures ,markers ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-    create_heatmap( inputBedDataFrame =  chrBed,markers = markers, file_prefix = "PROBES", groupColumnLabels = c("PROBE"))
-  }
-
-  if(sum(ssEnv$keys_metaareas[,1]=="CHR")==1)
-  {
-    subGroups <- c("CHR")
-    probes_prefix = "PROBES_CHR_"
-    mainGroupLabel =  "CHR"
-    subGroupLabel= "AREA"
-
-    create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-    chrBed <- annotate_bed(sample_groups ,figures ,markers ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-    create_heatmap( inputBedDataFrame =  chrBed,markers = markers, file_prefix = "CHR", groupColumnLabels = c("CHR"))
-  }
-
-  if(sum(ssEnv$keys_metaareas[,1]=="GENE")==1)
-  {
-    subGroups <- ssEnv$gene_subareas[,1]
-    probes_prefix = "PROBES_Gene_"
-    mainGroupLabel =  "GENE"
-    subGroupLabel="AREA"
-
-    create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-
-    geneBed <- annotate_bed(sample_groups ,figures ,markers ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-    create_heatmap( inputBedDataFrame =  geneBed,markers = markers, file_prefix = "GENE_AREA", groupColumnLabels = c("AREA"))
-    create_heatmap( inputBedDataFrame =  geneBed,markers = markers, file_prefix = "GENE", groupColumnLabels = c("GENE"))
-    create_heatmap( inputBedDataFrame =  geneBed,markers = markers, file_prefix = "GENE_PARTS", groupColumnLabels = c("GENE","AREA"))
-  }
-
-
-  if(sum(ssEnv$keys_metaareas[,1]=="ISLAND")==1)
-  {
-    probes_prefix <- "PROBES_Island_"
-    subGroups <- ssEnv$island_subareas[,1]
-    mainGroupLabel <- "ISLAND"
-    subGroupLabel <- "RELATION_TO_CPGISLAND"
-    create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-
-    islandBed <- annotate_bed(sample_groups ,figures ,markers ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-    create_heatmap( inputBedDataFrame =  islandBed,markers = markers, file_prefix = "RELATION_TO_CPGISLAND", groupColumnLabels = "RELATION_TO_CPGISLAND")
-    create_heatmap( inputBedDataFrame =  islandBed,markers = markers, file_prefix = "ISLAND", groupColumnLabels = "ISLAND")
-    create_heatmap( inputBedDataFrame =  islandBed,markers = markers, file_prefix = "ISLAND_PARTS", groupColumnLabels = c("ISLAND","RELATION_TO_CPGISLAND"))
-  }
-
-  if(sum(ssEnv$keys_metaareas[,1]=="DMR")==1)
-  {
-    subGroups <- c("DMR")
-    probes_prefix = "PROBES_DMR_"
-    mainGroupLabel =  "DMR"
-    subGroupLabel="AREA"
-    create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
-
-    dmrBed <- annotate_bed(sample_groups ,figures ,markers ,subGroups ,probes_prefix ,mainGroupLabel,subGroupLabel)
-    create_heatmap( inputBedDataFrame =  dmrBed,markers = markers, file_prefix = mainGroupLabel, groupColumnLabels = "DMR" )
-  }
-
-  # if (!is.null(geneBed))
-  # {
-  #    geneBed <- geneBed[,c("MAINGROUP","SAMPLEID","SUBAREA","VALUE","FIGURE","MARKER","SAMPLE_GROUP")]
-  # }
-  #
-  # if (!is.null(dmrBed))
-  # {
-  #   dmrBed <- dmrBed[,c("MAINGROUP","SAMPLEID","SUBAREA","VALUE","FIGURE","MARKER","SAMPLE_GROUP")]
-  # }
-  #
-  # if (!is.null(islandBed))
-  # {
-  #   islandBed <- islandBed[,c("MAINGROUP","SAMPLEID","SUBAREA","VALUE","FIGURE","MARKER","SAMPLE_GROUP")]
-  # }
-  #
-  # totalBed <- rbind(geneBed, dmrBed, islandBed)
-  # if (!is.null(totalBed) && nrow(totalBed)>0)
-  #   create_heatmap( inputBedDataFrame =  totalBed,markers = markers, file_prefix = "GENOMIC_AREA", groupColumnLabels = 3)
-  #
-  # rm(populationControlRangeBetaValues)
+  annotate_bed()
+  create_excel_pivot()
 
   # message("Starting inference Analysis.")
   # inferenceAnalysis(ssEnv$result_folderData = ssEnv$result_folderData, ssEnv$session_folder= ssEnv$session_folder, inferenceDetails)

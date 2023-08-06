@@ -1,9 +1,5 @@
 test_that("create_heatmap", {
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-
   figures <- c( "BOTH")
   markers <- c("DELTAS")
   areas <- c("GENE")
