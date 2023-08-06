@@ -1,7 +1,5 @@
   test_that("analyze_population", {
 
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   init_env(tempFolder, parallel_strategy = "sequential")
 
   sp <- analyze_population(methylation_data=methylation_data,

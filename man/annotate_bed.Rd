@@ -2,10 +2,9 @@
 % Please edit documentation in R/annotate_bed.R
 \name{annotate_bed}
 \alias{annotate_bed}
-\title{takes a bed and its location (build with the details of population and genomic area)
-and annotate with detail about genomic area, the output file is only for the arean and specified subarea}
+\title{create an annotated file for each marker, figure, area and subarea, each file has all the sample_groups used to calculate epimutation}
 \usage{
-annotate_bed(sample_groups, figures, markers, area, subarea)
+annotate_bed()
 }
 \arguments{
 \item{sample_groups}{vector of population to cycle with to build the folder path}
@@ -22,6 +21,5 @@ annotate_bed(sample_groups, figures, markers, area, subarea)
 original bed with genomic area infos
 }
 \description{
-takes a bed and its location (build with the details of population and genomic area)
-and annotate with detail about genomic area, the output file is only for the arean and specified subarea
+create an annotated file for each marker, figure, area and subarea, each file has all the sample_groups used to calculate epimutation
 }

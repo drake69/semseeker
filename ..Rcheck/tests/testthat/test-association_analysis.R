@@ -1,9 +1,5 @@
 test_that("association_analysis", {
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", markers="DELTAS", areas="PROBE")
 

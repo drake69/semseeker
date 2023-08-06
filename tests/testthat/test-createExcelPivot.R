@@ -1,6 +1,6 @@
-test_that("analyze_population", {
+test_that("create_excel_pivot", {
 
-  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas=c("GENE","PROBE"), subareas=("WHOLE"), markers="MUTATIONS")
 
   ####################################################################################
 
@@ -8,25 +8,25 @@ test_that("analyze_population", {
 
   ####################################################################################
 
-
-  # browser()
   sp <- semseeker:::analyze_population(methylation_data=methylation_data,
     sliding_window_size = sliding_window_size,
     beta_thresholds = beta_thresholds,
     sample_sheet = mySampleSheet,
     bonferroni_threshold = bonferroni_threshold,
     probe_features = probe_features
+
   )
 
-  sp$Sample_Group <- mySampleSheet$Sample_Group
-
-  testthat::expect_true(nrow(sp)==nrow(mySampleSheet))
-
+  semseeker:::create_multiple_bed(sample_sheet = mySampleSheet)
+  semseeker:::annotate_bed()
 
   ####################################################################################
 
-  unlink(tempFolder,recursive = TRUE)
+  # create and read
+  semseeker:::create_excel_pivot ()
+  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
+  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/PROBE.xlsx")))
+
+  unlink(temp_folder, recursive=TRUE)
   semseeker:::close_env()
-
 })
-

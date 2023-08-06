@@ -93,6 +93,20 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     message("INFO: ", Sys.time(), " I will work in sequential mode")
   }
 
+  ssEnvTemp <- get_session_info(result_folder)
+  if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
+  {
+    # we had to return aold session info this init could be calles by other than semseeker function, it means
+    # we don't know which marker or figure were calculated
+    message("Reusing old session info !")
+    message("INFO: ", Sys.time(), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
+      paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
+      " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
+      " for ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"SUBAREA"]), collapse = " ", sep =" "))
+    update_session_info(ssEnvTemp)
+    return(ssEnvTemp)
+  }
+
   # set default values
   keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
   keys_markers_default <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ","BETA"))
@@ -206,6 +220,8 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$keys_markers_figures$COMBINED <- apply(ssEnv$keys_markers_figures[,c("MARKER","FIGURE")], 1, combine_not_empty )
   ssEnv$keys_markers_figures <- merge(ssEnv$keys_markers_figures,keys_markers_default, by="MARKER")
 
+  ssEnv$keys_areas <- unique(ssEnv$keys_areas_subareas_markers_figures[,"AREA"])
+
   ssEnv$functionToExport <- c( "analyze_single_sample","deltar_single_sample",
                                "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
                                "file_path_build","analyze_single_sample_both",
@@ -216,8 +232,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   # to manage progress bar
   if(ssEnv$showprogress)
   {
-    progressr::handlers(global = TRUE)
-    progressr::handlers("progress")
+    handler_settings <- progressr::handlers()
+    if ((exists("progress", mode = "function", inherits = TRUE)))
+    {
+      progressr::handlers(global = TRUE)
+      progressr::handlers("progress")
+    }
   }
 
   update_session_info(ssEnv)

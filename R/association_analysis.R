@@ -231,9 +231,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           for (a in length(markers))
           {
             keys <- expand.grid("MARKER" =  markers[a], "FIGURE" =  figures)
-            # aggiungiamo temporaneamente BETA MEAN
-            levels(keys$FIGURE) <- c(levels(keys$FIGURE), "MEAN")
-            keys$FIGURE[keys$MARKER=="BETA"] <- "MEAN"
+            # # aggiungiamo temporaneamente BETA MEAN
+            # levels(keys$FIGURE) <- c(levels(keys$FIGURE), "MEAN")
+            # keys$FIGURE[keys$MARKER=="BETA"] <- "MEAN"
             keys <- unique(keys)
             cols <- paste0(keys$MARKER,"_",keys$FIGURE, sep = "")
             # temporaneamente filtriamo per le colonne esistenti

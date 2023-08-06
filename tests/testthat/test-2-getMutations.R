@@ -1,8 +1,5 @@
 testthat::test_that(" semseeker:::mutations_get",{
 
-
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv <- semseeker:::init_env(tempFolder)
 
   ####################################################################################

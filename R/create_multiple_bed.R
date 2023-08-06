@@ -2,7 +2,7 @@
 create_multiple_bed <- function(sample_sheet){
 
   ssEnv <- get_session_info()
-  message("INFO: ", Sys.time(), " Started multiple annotated file creation!")
+  message("INFO: ", Sys.time(), " Started multiple file creation!")
   #create multiple file bed
   i <- 0
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
@@ -10,10 +10,16 @@ create_multiple_bed <- function(sample_sheet){
   localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
   localKeys <- subset(localKeys, MARKER!="BETA")
 
-  to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet")
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
+  else
+    progress_bar <- ""
+
+  to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet","progress_bar",
+    "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
   # future::plan( future::sequential)
-  # foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
-  for(i in 1:nrow(localKeys))
+  foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
+  # for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
     marker <- as.character(key$MARKER)
@@ -48,6 +54,8 @@ create_multiple_bed <- function(sample_sheet){
         message("INFO: ", Sys.time(), " Created multiple annotated file!", fileToWrite)
       }
     }
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("Creating multiple file."))
   }
   # future::plan(ssEnv$parallel_strategy)
 }
