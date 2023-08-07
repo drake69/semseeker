@@ -30,6 +30,7 @@ Imports:
     progressr,
     quantreg,
     readxl,
+    reshape,
     reshape2,
     R.utils,
     rlang,
