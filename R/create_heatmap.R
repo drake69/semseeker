@@ -3,10 +3,9 @@
 #'
 #' @param annotatedData data frame to chart
 #' @param markers vector of markers to manage
-#' @param file_prefix main genomic area to char eg: gene
 #' @param groupColumnLabels positions of the group coplumn id
 #'
-#' @return list of pivot by column identified with file_prefix and by Sample
+#' @return nothing
 #' @importFrom doRNG %dorng%
 create_heatmap <- function() {
 
@@ -15,14 +14,14 @@ create_heatmap <- function() {
   for (g in 1:sample_group_comb)
   {
     localKeys <- reshape::expand.grid.df(ssEnv$keys_areas_subareas_markers_figures, sample_group_comb )
-    variables_to_export <- c("markers", "annotatedData", "sample_group_comb", "file_prefix", "chartFolder", "figures",
+    variables_to_export <- c("markers", "annotatedData", "sample_group_comb", "chartFolder", "figures",
       "%dorng%", "j", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName",
       "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
       ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger",
       "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider", ".RNGkind_length",
       "tail", "RNGstr", "localKeys","doRNGseq", "%dopar%", "getDoPar","variables_to_export_nested","get_probes")
 
-    variables_to_export_nested <- c(variables_to_export, "markers", "annotatedData", "sample_group_comb", "file_prefix", "chartFolder","g","figures","variables_to_export")
+    variables_to_export_nested <- c(variables_to_export, "markers", "annotatedData", "sample_group_comb", "chartFolder","g","figures","variables_to_export")
     # g <- 0
     i <- 0
     j <- 0
@@ -55,7 +54,7 @@ create_heatmap <- function() {
           annotatedData <- reshape2::dcast(data = annotatedData, SAMPLEID + SAMPLE_GROUP ~ SUBAREA, value.var = "VALUE", sum)
           row.names(annotatedData) <- annotatedData$SAMPLEID
 
-          mainTitle <- paste0( paste0( sample_group_comb, collapse ="_Vs_")," ", file_prefix," ",marker, sep="")
+          mainTitle <- paste0( paste0( sample_group_comb, collapse ="_Vs_")," ",marker, sep="")
           if(ncol(annotatedData)>1000)
           {
             annotatedData <- annotatedData[,1:min(ncol(annotatedData),1005)]
@@ -68,7 +67,7 @@ create_heatmap <- function() {
           if (!plyr::empty(tt))
             if(nrow(tt) > 2 & ncol(tt) > 2)
             {
-              filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_", file_prefix,"_",marker,"_",figure, ".png",sep="")
+              filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".png",sep="")
               grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
               stats::heatmap(as.matrix(annotatedData[,3:ncol(annotatedData)]),
                 col = grDevices::cm.colors(256),
@@ -85,5 +84,4 @@ create_heatmap <- function() {
     message("INFO: ", Sys.time(), " Heatmap created." )
 
   }
-
-  }
+}
