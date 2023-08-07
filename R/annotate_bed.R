@@ -14,7 +14,7 @@ annotate_bed <- function ()
   # area and subarea are defined using the filename
   i <- 0
   dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("ANNOTATED"))
-  localKeys <- reshape::expand.grid.df(ssEnv$keys_areas_subareas_markers_figures)
+  localKeys <-ssEnv$keys_areas_subareas_markers_figures
   message("INFO: ", Sys.time(), " Annotating genomic area.")
 
   total_cycles <- nrow(localKeys)* length(ssEnv$keys_sample_groups)
@@ -86,11 +86,11 @@ annotate_bed <- function ()
           progress_bar(sprintf("Annotating multiple files."))
       }
 
-      colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","K27","K450","K850"))
-      final_bed <- unique(final_bed[, colname_to_preserve])
 
       if(exists("final_bed"))
       {
+        colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","K27","K450","K850"))
+        final_bed <- unique(final_bed[, colname_to_preserve])
         final_bed <- as.data.frame(final_bed)
         if(!plyr::empty(final_bed))
         {

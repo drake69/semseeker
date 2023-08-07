@@ -12,12 +12,10 @@ create_heatmap()
 
 \item{markers}{vector of markers to manage}
 
-\item{file_prefix}{main genomic area to char eg: gene}
-
 \item{groupColumnLabels}{positions of the group coplumn id}
 }
 \value{
-list of pivot by column identified with file_prefix and by Sample
+nothing
 }
 \description{
 create_heatmap load the multiple bed resulting from
