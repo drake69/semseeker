@@ -19,7 +19,7 @@ create_excel_pivot <-  function() {
 
     area <- as.character(areas[a])
     tempKeys <- unique(subset(localKeys,AREA==area))
-    tempKeys$future_shee_list <-  unique(paste(tempKeys$MARKER,"_",tempKeys$FIGURE,"_",tempKeys$AREA,"_",tempKeys$SUBAREA, sep=""))
+    # tempKeys$COMBINED <-  unique(paste(tempKeys$MARKER,"_",tempKeys$FIGURE,"_",tempKeys$AREA,"_",tempKeys$SUBAREA, sep=""))
 
     sheetList <- vector(mode="list")
     fileNameXLS <- paste0(reportFolder,"/", area,".xlsx" , sep="")
@@ -27,7 +27,7 @@ create_excel_pivot <-  function() {
     if(file.exists(fileNameXLS))
     {
       old_sheet_list <- readxl::excel_sheets(fileNameXLS)
-      ssEnv$keys <- ssEnv$keys[!(ssEnv$keys$future_shee_list %in% old_sheet_list), ]
+      tempKeys <- tempKeys[!(tempKeys$COMBINED %in% old_sheet_list), ]
     }
 
     toExport <- c("ssEnv", "annotatedData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "area","sheetList","dir_check_and_create","tempKeys", "progress_bar","progression_index", "progression", "progressor_uuid",
@@ -40,14 +40,17 @@ create_excel_pivot <-  function() {
       subarea <-  as.character(tempKeys[k,"SUBAREA"])
       marker <- as.character(tempKeys[k,"MARKER"])
       figure <-  as.character(tempKeys[k,"FIGURE"])
-      pivot_file_name <- tempKeys$future_shee_list[k]
+      pivot_file_name <- tempKeys$COMBINED[k]
 
       annotatedData <-  read_annotated_bed(figure,marker,area,subarea)
       annotatedData <- subset(annotatedData, annotatedData$VALUE != 0 )
 
-      if (is.null(annotatedData) | plyr::empty(annotatedData) | nrow(annotatedData)==0)
-       next
+      # if (is.null(annotatedData) | plyr::empty(annotatedData))
+      #  next
 
+      # if (nrow(annotatedData)==0)
+      #   next
+      #
       if(!plyr::empty(annotatedData))
       {
           if(marker=="BETA")
@@ -65,13 +68,16 @@ create_excel_pivot <-  function() {
           annotatedData <- as.data.frame( cbind(colnames(annotatedData), t(annotatedData)))
           colnames(annotatedData) <- annotatedData[1,]
 
-          sheet_name <- gsub(" ","", paste0( marker,"_",figure,"_", area,"_", subarea, sep=""), fixed=TRUE)
-          temp_list <- list(annotatedData)
 
-          stats::setNames(temp_list, sheet_name)
+          if(ssEnv$showprogress)
+            progress_bar(sprintf("Creating pivot table."))
+
+          temp_list <- list(annotatedData)
+          names(temp_list) <- c(pivot_file_name)
           if(ssEnv$showprogress)
             progress_bar(sprintf("Creating pivot table."))
           temp_list
+          # sheetList <- c(sheetList, temp_list)
       }
       else
         if(ssEnv$showprogress)

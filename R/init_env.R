@@ -103,8 +103,11 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
       paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
       " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
       " for ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"SUBAREA"]), collapse = " ", sep =" "))
-    update_session_info(ssEnvTemp)
-    return(ssEnvTemp)
+    if(dir.exists(ssEnv$session_folder))
+    {
+      update_session_info(ssEnvTemp)
+      return(ssEnvTemp)
+    }
   }
 
   # set default values

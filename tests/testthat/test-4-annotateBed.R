@@ -18,7 +18,7 @@ test_that("annotate_bed", {
 
   # semseeker:::create_multiple_bed( sample_sheet = mySampleSheet)
   semseeker:::annotate_bed ()
-  dir_bed <- dir_check_and_create(ssEnv$result_folderData,c("ANNOTATED"))
+  dir_bed <- dir_check_and_create(ssEnv$result_folderData,c("Annotated"))
 
   marker <- "MUTATIONS"
   figure <- "HYPO"
@@ -39,7 +39,7 @@ test_that("annotate_bed", {
   subarea <- "BODY"
   ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90)
 
-  bedFileName <- semseeker:::file_path_build(dir_bed , c(area, "ANNOTATED"),"fst")
+  bedFileName <- semseeker:::file_path_build(dir_bed , c(area, "Annotated"),"fst")
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   area =  "GENE"

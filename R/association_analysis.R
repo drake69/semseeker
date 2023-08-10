@@ -36,57 +36,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     areas_selection <-arguments$areas_selection
   }
 
-
   figures <- ssEnv$keys_figures[,1]
   markers <- ssEnv$keys_markers[,1]
   sample_groups <- c("Reference","Control","Case")
 
-  if(sum(ssEnv$keys_metaareas[,1]  ==  "PROBE")  ==  1)
-  {
-    subGroups <- c("")
-    probes_prefix <- "PROBES"
-    mainGroupLabel <-  "PROBE"
-    subGroupLabel <- "AREA"
-    create_excel_pivot ( sample_groups  =   sample_groups, figures  =   figures,markers  =   markers, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
-  }
-
-  if(sum(ssEnv$keys_metaareas[,1]  ==  "CHR")  ==  1)
-  {
-    subGroups <- c("CHR")
-    probes_prefix <- "PROBES_CHR_"
-    mainGroupLabel <-  "CHR"
-    subGroupLabel <- "AREA"
-    create_excel_pivot ( sample_groups  =   sample_groups, figures  =   figures,markers  =   markers, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
-  }
-
-  if(sum(ssEnv$keys_metaareas[,1]  ==  "GENE")  ==  1)
-  {
-    subGroups <- ssEnv$gene_subareas[,1]
-    probes_prefix  =  "PROBES_Gene_"
-    mainGroupLabel  =   "GENE"
-    subGroupLabel = "AREA"
-
-    create_excel_pivot ( sample_groups  =   sample_groups, figures  =   figures,markers  =   markers, subGroups  =   subGroups, probes_prefix  =    probes_prefix, mainGroupLabel  =   mainGroupLabel, subGroupLabel  =   subGroupLabel)
-  }
-
-
-  if(sum(ssEnv$keys_metaareas[,1]  ==  "ISLAND")  ==  1)
-  {
-    probes_prefix <- "PROBES_Island_"
-    subGroups <- ssEnv$island_subareas[,1]
-    mainGroupLabel <- "ISLAND"
-    subGroupLabel <- "RELATION_TO_CPGISLAND"
-    create_excel_pivot ( sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
-  }
-
-  if(sum(ssEnv$keys_metaareas[,1]  ==  "DMR")  ==  1)
-  {
-    subGroups <- c("DMR")
-    probes_prefix  =  "PROBES_DMR_"
-    mainGroupLabel  =   "DMR"
-    subGroupLabel = "AREA"
-    create_excel_pivot (sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
-  }
+  create_excel_pivot()
 
   # if(exists("figures")) figures,  if(exists("markers"))  markers,if(exists("areas"))  areas
 

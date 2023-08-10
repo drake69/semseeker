@@ -64,7 +64,7 @@ test_that("annotate_bed", {
     area ,
     groupingColumnLabel)
 
-  bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
+  bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "Annotated"),"fst")
 
 
   markers <- c("DELTAQ")
@@ -125,7 +125,7 @@ test_that("annotate_bed", {
   # testthat::expect_true( area %in% colnames(final_bed))
   testthat::expect_true( nrow(final_bed)>0)
 
-  # bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "Annotated"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
   subareas <- c("")
@@ -146,7 +146,7 @@ test_that("annotate_bed", {
 
   testthat::expect_true( nrow(final_bed)>0)
   # testthat::expect_true( area %in% colnames(final_bed))
-  # bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "ANNOTATED"),"fst")
+  # bedFileName <- file_path_build(ssEnv$result_folderData , c(area, "Annotated"),"fst")
   # tt <- fst::read.fst(bedFileName)
 
 })
