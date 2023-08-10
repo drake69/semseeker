@@ -13,7 +13,7 @@ annotate_bed <- function ()
   ssEnv <- get_session_info()
   # area and subarea are defined using the filename
   i <- 0
-  dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("ANNOTATED"))
+  dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
   message("INFO: ", Sys.time(), " Annotating genomic area.")
 
@@ -41,7 +41,7 @@ annotate_bed <- function ()
         area <- as.character(localKeys[i,"AREA"])
         area_subarea <- paste(area,"_", subarea, sep="")
 
-        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "ANNOTATED"),"fst")
+        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
         if (file.exists(bedFileName))
           next
 
