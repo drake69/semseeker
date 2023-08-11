@@ -30,8 +30,9 @@ create_excel_pivot <-  function() {
       tempKeys <- tempKeys[!(tempKeys$COMBINED %in% old_sheet_list), ]
     }
 
-    toExport <- c("ssEnv", "annotatedData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "area","sheetList","dir_check_and_create","tempKeys", "progress_bar","progression_index", "progression", "progressor_uuid",
-      "owner_session_uuid", "trace")
+    toExport <- c("ssEnv", "annotatedData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "area","sheetList","dir_check_and_create","tempKeys",
+      "progress_bar","progression_index", "progression", "progressor_uuid",
+      "owner_session_uuid", "trace","file_path_build", "read_annotated_bed")
     sheetList <- foreach::foreach(k=1:nrow(tempKeys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
     # for(k in 1:nrow(tempKeys))
     {

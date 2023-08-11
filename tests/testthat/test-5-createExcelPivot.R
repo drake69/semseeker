@@ -1,5 +1,8 @@
 test_that("create_excel_pivot", {
 
+
+  tempFolder <- tempFolders[1]
+  tempFolders <- tempFolders[-1]
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
   ####################################################################################

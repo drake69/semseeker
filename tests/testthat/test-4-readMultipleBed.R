@@ -1,6 +1,8 @@
 test_that("semseeker:::read_multiple_bed", {
 
 
+  tempFolder <- tempFolders[1]
+  tempFolders <- tempFolders[-1]
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
   ####################################################################################
