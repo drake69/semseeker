@@ -63,10 +63,12 @@ sliding_window_size <<- 11
 bonferroni_threshold <<- 0.1
 batch_id <<- 1
 iqrTimes <<- 3
+# multisession
+# sequential
 parallel_strategy <<- "sequential"
 
 # TODO
 # recover session stored
 #
 tmp <- tempdir()
-tempFolder <<- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+tempFolders <<- paste(tmp,"/semseeker/",stringi::stri_rand_strings(50, 7, pattern = "[A-Za-z0-9]"),sep="")

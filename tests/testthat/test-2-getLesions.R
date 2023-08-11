@@ -1,6 +1,8 @@
 testthat::test_that("lesions_get",{
 
 
+  tempFolder <- tempFolders[1]
+  tempFolders <- tempFolders[-1]
   Sample_ID <- mySampleSheet[1,"Sample_ID"]
   bonferroni_threshold <- 5
 

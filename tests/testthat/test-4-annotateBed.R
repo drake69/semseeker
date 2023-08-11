@@ -1,6 +1,8 @@
 test_that("annotate_bed", {
 
   # unlink(tempFolder, recursive = T)
+  tempFolder <- tempFolders[1]
+  tempFolders <- tempFolders[-1]
   ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, showprogress= TRUE)
 
   ####################################################################################
@@ -18,13 +20,13 @@ test_that("annotate_bed", {
 
   # semseeker:::create_multiple_bed( sample_sheet = mySampleSheet)
   semseeker:::annotate_bed ()
-  dir_bed <- dir_check_and_create(ssEnv$result_folderData,c("Annotated"))
+  dir_bed <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c("Annotated"))
 
   marker <- "MUTATIONS"
   figure <- "HYPO"
   area <- c("GENE")
   subarea <- c("BODY")
-  final_bed <- read_annotated_bed(figure,marker,area,subarea)
+  final_bed <- semseeker:::read_annotated_bed(figure,marker,area,subarea)
   testthat::expect_true( nrow(final_bed)>0)
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
   # testthat::expect_true( nrow(final_bed$SAMPLE_GROUP)>1)
@@ -50,19 +52,19 @@ test_that("annotate_bed", {
   area =  "GENE"
   subarea = "WHOLE"
   markers <- c("DELTAQ")
-  final_bed <- read_annotated_bed(figure,marker,area,subarea)
+  final_bed <- semseeker:::read_annotated_bed(figure,marker,area,subarea)
   testthat::expect_true(nrow(final_bed)>0)
 
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
-  final_bed <- read_annotated_bed(figure,marker,area,subarea)
+  final_bed <- semseeker:::read_annotated_bed(figure,marker,area,subarea)
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
-  final_bed <- read_annotated_bed(figure,marker,area,subarea)
+  final_bed <- semseeker:::read_annotated_bed(figure,marker,area,subarea)
   testthat::expect_true(nrow(final_bed)>0)
 
   markers <- c("DELTAR")
-  final_bed <- read_annotated_bed(figure,marker,area,subarea)
+  final_bed <- semseeker:::read_annotated_bed(figure,marker,area,subarea)
   testthat::expect_true(nrow(final_bed)>0)
 
   unlink(tempFolder,recursive = TRUE)

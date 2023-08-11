@@ -1,5 +1,7 @@
 testthat::test_that("delta_single_sample",{
 
+  tempFolder <- tempFolders[1]
+  tempFolders <- tempFolders[-1]
   ssEnv <- semseeker:::init_env(tempFolder)
 
   ####################################################################################

@@ -1,5 +1,7 @@
 testthat::test_that(" semseeker:::mutations_get",{
 
+  tempFolder <- tempFolders[1]
+  tempFolders <- tempFolders[-1]
   ssEnv <- semseeker:::init_env(tempFolder)
 
   ####################################################################################
