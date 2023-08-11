@@ -4,7 +4,7 @@ beta_save <- function(methylation_data, sample_sheet, batch_id )
 
 
   # save beta as rds and as pivot
-  sample_sheet <- subset(sample_sheet, Sample_Group != "Reference")
+  sample_sheet <- subset(sample_sheet, sample_sheet$Sample_Group != "Reference")
   sample_info <- sample_sheet[,c("Sample_ID","Sample_Group")]
   colnames(sample_info) <- c("SAMPLEID","SAMPLE_GROUP")
   methylation_data <- data.frame("SAMPLEID"=rownames(methylation_data), methylation_data[, sample_info$SAMPLEID])

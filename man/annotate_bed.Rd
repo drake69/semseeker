@@ -6,19 +6,8 @@
 \usage{
 annotate_bed()
 }
-\arguments{
-\item{sample_groups}{vector of population to cycle with to build the folder path}
-
-\item{figures}{vector of hyper /hypo to use to build the folder path}
-
-\item{markers}{vector of lesions/mutations to use to build the folder path}
-
-\item{area}{vector of genomic area to cycle and group the annotated data}
-
-\item{subarea}{subarea of the area to annotate..}
-}
 \value{
-original bed with genomic area infos
+nothing
 }
 \description{
 create an annotated file for each marker, figure, area and subarea, each file has all the sample_groups used to calculate epimutation

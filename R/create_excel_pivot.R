@@ -18,7 +18,7 @@ create_excel_pivot <-  function() {
   {
 
     area <- as.character(areas[a])
-    tempKeys <- unique(subset(localKeys,AREA==area))
+    tempKeys <- unique(subset(localKeys,localKeys$AREA==area))
     # tempKeys$COMBINED <-  unique(paste(tempKeys$MARKER,"_",tempKeys$FIGURE,"_",tempKeys$AREA,"_",tempKeys$SUBAREA, sep=""))
 
     sheetList <- vector(mode="list")
@@ -30,7 +30,8 @@ create_excel_pivot <-  function() {
       tempKeys <- tempKeys[!(tempKeys$COMBINED %in% old_sheet_list), ]
     }
 
-    toExport <- c("ssEnv", "annotatedData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "area","sheetList","dir_check_and_create","tempKeys",
+    toExport <- c("ssEnv", "annotatedData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "area",
+      "sheetList","dir_check_and_create","tempKeys",
       "progress_bar","progression_index", "progression", "progressor_uuid",
       "owner_session_uuid", "trace","file_path_build", "read_annotated_bed")
     sheetList <- foreach::foreach(k=1:nrow(tempKeys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
