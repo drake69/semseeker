@@ -7,13 +7,6 @@ analysis organized into files and folders per marker and produce a pivot}
 \usage{
 create_heatmap()
 }
-\arguments{
-\item{annotatedData}{data frame to chart}
-
-\item{markers}{vector of markers to manage}
-
-\item{groupColumnLabels}{positions of the group coplumn id}
-}
 \value{
 nothing
 }

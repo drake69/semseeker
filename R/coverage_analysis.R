@@ -71,7 +71,7 @@ coverage_analysis <- function(methylation_data)
   chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
   filename = paste0( chartFolder,"/","EACH_AREA_COVERAGE_ANALYSIS.png",sep="")
 
-  temp_cov_result <- subset(cov_result,SUBAREA !="WHOLE")
+  temp_cov_result <- subset(cov_result,cov_result$SUBAREA !="WHOLE")
   number_areas <- stats::aggregate(temp_cov_result$COUNT, list(temp_cov_result$AREA,temp_cov_result$SUBAREA), FUN=sum)
   colnames(number_areas) <- c("AREA","SUBAREA","TOTAL_AREAS")
   temp_cov_result <- merge(temp_cov_result, number_areas, by=c("AREA","SUBAREA"), all.x = T)
@@ -98,7 +98,7 @@ coverage_analysis <- function(methylation_data)
   )
 
 
-  temp_cov_result <- subset(cov_result, SUBAREA !="WHOLE" & SUBAREA !="CHR" & SUBAREA !="PROBE" & cov_result$AREA != "PROBE")
+  temp_cov_result <- subset(cov_result, cov_result$SUBAREA !="WHOLE" & cov_result$SUBAREA !="CHR" & cov_result$SUBAREA !="PROBE" & cov_result$AREA != "PROBE")
   total_areas <- sum(number_areas$TOTAL_AREAS)
   temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$AREA, temp_cov_result$SUBAREA, sep=" ")
   temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / total_areas,2)

@@ -12,7 +12,7 @@ deltaq_get <- function(resultPopulation){
   Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
   localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
-  localKeys <- subset(localKeys, MARKER=="DELTAS")
+  localKeys <- subset(localKeys, localKeys$MARKER=="DELTAS")
   localKeys$EXT <- "fst"
 
   for(i in 1:nrow(localKeys))
@@ -41,7 +41,7 @@ deltaq_get <- function(resultPopulation){
   deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=4))
   localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figures, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
-  localKeys <- subset(localKeys, MARKER=="DELTAQ")
+  localKeys <- subset(localKeys, localKeys$MARKER=="DELTAQ")
 
   for(i in 1:nrow(localKeys))
   {

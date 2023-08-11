@@ -1,11 +1,6 @@
 #' @title create an annotated file for each marker, figure, area and subarea, each file has all the sample_groups used to calculate epimutation
-#' @param sample_groups vector of population to cycle with to build the folder path
-#' @param figures vector of hyper /hypo to use to build the folder path
-#' @param markers vector of lesions/mutations to use to build the folder path
-#' @param area vector of genomic area to cycle and group the annotated data
-#' @param subarea subarea of the area to annotate..
 #'
-#' @return original bed with genomic area infos
+#' @return nothing
 #' @importFrom doRNG %dorng%
 
 annotate_bed <- function ()
@@ -25,7 +20,8 @@ annotate_bed <- function ()
 
   variables_to_export <- c("ssEnv", "dir_check_and_create", "read_multiple_bed", "subarea",
                             "progress_bar","progression_index", "progression", "progressor_uuid",
-                            "owner_session_uuid", "trace","probe_features_get","dest_folder", "localKeys")
+                            "owner_session_uuid", "trace","probe_features_get","dest_folder", "localKeys",
+                            "file_path_build")
 
   # for(i in 1:nrow(localKeys))
   foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export) %dorng%

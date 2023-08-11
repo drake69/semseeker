@@ -1,10 +1,6 @@
 #' create_heatmap load the multiple bed resulting from
 #' analysis organized into files and folders per marker and produce a pivot
 #'
-#' @param annotatedData data frame to chart
-#' @param markers vector of markers to manage
-#' @param groupColumnLabels positions of the group coplumn id
-#'
 #' @return nothing
 #' @importFrom doRNG %dorng%
 create_heatmap <- function() {
@@ -36,7 +32,7 @@ create_heatmap <- function() {
       chartFolder <- dir_check_and_create(ssEnv$result_folderChart, area)
 
       annotatedData <-  read_annotated_bed(figure,marker,area,subarea)
-      annotatedData <- subset(annotatedData, SAMPLE_GROUP %in% sample_group_comb)
+      annotatedData <- subset(annotatedData, annotatedData$SAMPLE_GROUP %in% sample_group_comb)
       annotatedData <- subset(annotatedData, annotatedData$VALUE != 0 )
       annotatedData$SAMPLEID <- as.factor(annotatedData$SAMPLEID)
       annotatedData$FIGURE <- as.factor(annotatedData$FIGURE)
