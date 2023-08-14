@@ -21,9 +21,9 @@ jobs:
           - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           # - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          # - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
           # - {os: fedora-latest,   r: 'release'}
-          - {os: debian-latest,   r: 'release'}
+          # - {os: debian-latest,   r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
