@@ -15,7 +15,7 @@ local({
     if (!is.null(override))
       return(override)
 
-    # next, check ssEnvonment variables
+    # next, check environment variables
     # TODO: prefer using the configuration one in the future
     envvars <- c(
       "RENV_CONFIG_AUTOLOADER_ENABLED",
@@ -60,7 +60,7 @@ local({
 
   # load bootstrap tools   
   `%||%` <- function(x, y) {
-    if (is.ssEnvonment(x) || length(x)) x else y
+    if (is.environment(x) || length(x)) x else y
   }
   
   `%??%` <- function(x, y) {
@@ -353,7 +353,7 @@ local({
   renv_bootstrap_download_tarball <- function(version) {
   
     # if the user has provided the path to a tarball via
-    # an ssEnvonment variable, then use it
+    # an environment variable, then use it
     tarball <- Sys.getenv("RENV_BOOTSTRAP_TARBALL", unset = NA)
     if (is.na(tarball))
       return()
@@ -947,7 +947,7 @@ local({
     remapped <- renv_json_remap(json, map)
   
     # evaluate
-    eval(remapped, ssEnv = baseenv())
+    eval(remapped, envir = baseenv())
   
   }
   

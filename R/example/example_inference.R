@@ -11,10 +11,10 @@ result_folder <- file.path(getwd(),"/tmp/GSE186766")
 # depth analysis
 # 1: sample level
 # 2: type level (gene, DMR, cpgisland) (includes 1)
-# 3: genomica area: gene, body, gene tss1550, gene whole, gene tss200,  (includes 1 and 2)
+# 3: genomic area: gene, body, gene tss1550, gene whole, gene tss200,  (includes 1 and 2)
 # filter_p_value report after adjusting saves only significative nominal p-value
-# "Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole"
-# "N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole"
+# "BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE"
+# "N_SHORE","S_SHORE","N_SHELF","S_SHELF","WHOLE"
 
 inference_details <- expand.grid("independent_variable"= c("tcdd_mother"),
                                 "covariates"=c("exam_age+tcdd_father","breast_feeding"),

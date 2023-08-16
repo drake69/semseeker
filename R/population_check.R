@@ -1,11 +1,11 @@
 
-population_check <- function(sample_sheet, methylation_data)
+sample_group_check <- function(sample_sheet, methylation_data)
 {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   sample_sheet <- as.data.frame(sample_sheet)
-  sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", "MUTATIONS_HYPER", "LESIONS_HYPER", "MUTATIONS_HYPO", "LESIONS_HYPO", "MUTATIONS_BOTH", "LESIONS_BOTH"))]
+  sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", ssEnv$keys$pasted))]
 
   result <- NULL
 
@@ -49,9 +49,16 @@ population_check <- function(sample_sheet, methylation_data)
   # reference population
   sample_sheet$Sample_Group <- R.utils::toCamelCase(tolower(sample_sheet$Sample_Group), capitalize=TRUE)
   sample_sheet$Sample_Group <- as.factor(sample_sheet$Sample_Group)
-  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% ssEnv$keys_populations[,1]
+  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% ssEnv$keys_sample_groups[,1]
   if (is.element(FALSE, matchedPopulation)) {
     result <- paste(result,  " The Sample_Group should contain only: Reference, Control, Case" )
+  }
+
+  refence_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group=="Reference"]
+  other_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group!="Reference"]
+  if (sum(refence_group %in% other_group)==length(refence_group))
+  {
+    ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Control","Case"))
   }
 
   return(result)

@@ -1,8 +1,5 @@
 test_that("read_multiple_bed", {
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
   nitem <- 1e4
@@ -27,38 +24,38 @@ test_that("read_multiple_bed", {
   Sample_Group <- rep("Control",nsamples)
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analize_population(methylation_data=methylation_data,
-                           sliding_window_size = 11,
-                           beta_superior_thresholds = beta_superior_thresholds,
-                           beta_inferior_thresholds = beta_inferior_thresholds,
-                           sample_sheet = sample_sheet,
-                           beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
-                           bonferroni_threshold = 0.01,
-                           probe_features = probe_features
+  sp <- analyze_population(methylation_data=methylation_data,
+    sliding_window_size = 11,
+    sliding_window_size = sliding_window_size,
+    beta_thresholds = beta_thresholds,
+    sample_sheet = mySampleSheet,
+    bonferroni_threshold = bonferroni_threshold,
+    probe_features = probe_features,
+    bonferroni_threshold = 0.01,
   )
 
   sp$Sample_Group <- sample_sheet$Sample_Group
   create_multiple_bed( sample_sheet)
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  markers <- c("MUTATIONS","LESIONS","DELTAS")
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
-  populationName <- unique(Sample_Group)
+  area =  "GENE"
+  groupingColumnLabel="AREA"
+  sample_group <- unique(Sample_Group)
 
-  probe_features <- get(paste0(probes_prefix,"Whole",sep=""), envir=asNamespace("semseeker"))
+  probe_features <- get(paste0(probes_prefix,"WHOLE",sep=""), envir=asNamespace("semseeker"))
 
 
-  res <-read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  res <-read_multiple_bed ( "MUTATIONS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
   testthat::expect_true(nrow(res)>0)
 
-  res <-read_multiple_bed ( "DELTAS", "BOTH", probe_features, columnLabel, populationName, groupingColumnLabel)
+  res <-read_multiple_bed ( "DELTAS", "BOTH", probe_features, area, sample_group, groupingColumnLabel)
   testthat::expect_true(nrow(res)>0)
-  # res <-read_multiple_bed ( "DELTAS", "HYPO", probe_features, columnLabel, populationName, groupingColumnLabel)
-  # res <-read_multiple_bed ( "DELTAS", "HYPER", probe_features, columnLabel, populationName, groupingColumnLabel)
+  # res <-read_multiple_bed ( "DELTAS", "HYPO", probe_features, area, sample_group, groupingColumnLabel)
+  # res <-read_multiple_bed ( "DELTAS", "HYPER", probe_features, area, sample_group, groupingColumnLabel)
   # testthat::expect_true(nrow(res)>0)
 
 }

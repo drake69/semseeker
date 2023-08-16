@@ -1,15 +1,12 @@
 test_that("semeeker", {
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
   ###############################################################################################
   ###############################################################################################
 
   semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
-             parallel_strategy = "sequential", anomalies="DELTAQ", metaareas="GENE", figures="BOTH")
+             parallel_strategy = "sequential", markers="DELTAQ", areas="GENE", figures="BOTH")
 
   # batch_correlation_check(ssEnv)
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")

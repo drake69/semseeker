@@ -1,8 +1,5 @@
 test_that("range_beta_values", {
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
   nitem <- 1e4
@@ -31,7 +28,7 @@ test_that("range_beta_values", {
   iqrTimes <- 3
 
   rr <- range_beta_values(methylation_data)
-  # sp <- analyze_batch(  
+  # sp <- analyze_batch(
   #                       methylation_data =  methylation_data,
   #                       sample_sheet =  sample_sheet,
   #                       sliding_window_size = sliding_window_size,

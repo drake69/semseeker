@@ -1,17 +1,14 @@
 testthat::test_that("analyze_single_sample",{
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv <-  init_env(tempFolder, parallel_strategy = "sequential")
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
 
   get_meth_tech(methylation_data)
 
   sp <- analyze_single_sample( values = methylation_data[,1],
                       sliding_window_size = sliding_window_size,
-                      thresholds = tresholds,
+                      thresholds = thresholds,
                       figure = "HYPO",
                       sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")] ,
                       bonferroni_threshold = bonferroni_threshold,

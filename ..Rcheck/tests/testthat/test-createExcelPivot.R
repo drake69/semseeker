@@ -1,8 +1,5 @@
 test_that("create_excel_pivot", {
 
-  library(stringi)
-  tmp <- tempdir()
-  tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
   nitem <- 1e4
@@ -27,78 +24,78 @@ test_that("create_excel_pivot", {
   Sample_Group <- c(rep("Control",nsamples/2), rep("Case",nsamples/2))
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
-  sp <- analize_population(methylation_data=methylation_data,
-                          sliding_window_size = 11,
-                          beta_superior_thresholds = beta_superior_thresholds,
-                          beta_inferior_thresholds = beta_inferior_thresholds,
-                          sample_sheet = sample_sheet,
-                          beta_medians = beta_superior_thresholds - beta_inferior_thresholds,
-                          bonferroni_threshold = 0.01,
-                          probe_features = probe_features
+  sp <- analyze_population(methylation_data=methylation_data,
+    sliding_window_size = 11,
+    sliding_window_size = sliding_window_size,
+    beta_thresholds = beta_thresholds,
+    sample_sheet = mySampleSheet,
+    bonferroni_threshold = bonferroni_threshold,
+    probe_features = probe_features,
+    bonferroni_threshold = 0.01,
   )
   sp$Sample_Group <- sample_sheet$Sample_Group
 
   create_multiple_bed( sample_sheet = sample_sheet)
 
-  populations <- c("Control","Case")
+  sample_groups <- c("Control","Case")
 
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  markers <- c("MUTATIONS","LESIONS","DELTAS")
 
-  groups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subareas <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
-  columnLabel =  "GENE"
-  groupingColumnLabel="GROUP"
+  area =  "GENE"
+  groupingColumnLabel="AREA"
 
   # create and read
   final_bed <- annotate_bed (
-    
-    populations ,
+
+    sample_groups ,
     figures ,
-    anomalies ,
-    groups ,
+    markers ,
+    subareas ,
     probes_prefix ,
-    columnLabel ,
+    area ,
     groupingColumnLabel)
 
-  populations <- c("Control","Case")
+  sample_groups <- c("Control","Case")
   figures <- c("HYPO", "HYPER", "BOTH")
-  anomalies <- c("MUTATIONS","LESIONS","DELTAS")
+  markers <- c("MUTATIONS","LESIONS","DELTAS")
 
-  subGroups <- c("Body","TSS1500","5UTR","TSS200","1stExon","3UTR","ExonBnd","Whole")
+  subGroups <- c("BODY","TSS1500","5UTR","TSS200","1STEXON","3UTR","EXNBND","WHOLE")
   probes_prefix = "PROBES_Gene_"
   mainGroupLabel =  "GENE"
-  subGroupLabel="GROUP"
-  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  subGroupLabel="AREA"
+  create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
 
   subGroups <- c("")
   probes_prefix = "PROBES_CHR_"
   mainGroupLabel =  "CHR"
-  subGroupLabel="GROUP"
-  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  subGroupLabel="AREA"
+  create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   subGroups <- c("")
   probes_prefix = "PROBES"
   mainGroupLabel =  "PROBE"
-  subGroupLabel="GROUP"
-  create_excel_pivot ( populations =  populations, figures =  figures,anomalies =  anomalies, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
+  subGroupLabel="AREA"
+  create_excel_pivot ( sample_groups =  sample_groups, figures =  figures,markers =  markers, subGroups =  subGroups, probes_prefix =   probes_prefix, mainGroupLabel =  mainGroupLabel, subGroupLabel =  subGroupLabel)
 
   #TODO: test incremental pivot
 
 #
 #   probes_prefix <- "PROBES_Island_"
-#   subGroups <- c("N_Shore","S_Shore","N_Shelf","S_Shelf","Island", "Whole")
+#   subGroups <- c("N_SHORE","S_SHORE","N_Shelf","S_SHELF", "WHOLE")
 #   mainGroupLabel <- "ISLAND"
 #   subGroupLabel <- "RELATION_TO_CPGISLAND"
-#   create_excel_pivot ( populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+#   create_excel_pivot ( sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 #
 #   subGroups <- c("DMR")
 #   probes_prefix = "PROBES_DMR_"
 #   mainGroupLabel =  "DMR"
-#   subGroupLabel="GROUP"
-#   create_excel_pivot (populations, figures, anomalies, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
+#   subGroupLabel="AREA"
+#   create_excel_pivot (sample_groups, figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel)
 
 
 })

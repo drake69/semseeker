@@ -1,6 +1,6 @@
-inference_file_name <- function(inference_detail)
+inference_file_name <- function(inference_detail, marker)
 {
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   covariates <- inference_detail$covariates
   covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
@@ -15,6 +15,6 @@ inference_file_name <- function(inference_detail)
   else
     file_suffix <- paste(covariates, collapse = "_")
 
-  fileNameResults <- file_path_build(ssEnv$result_folderInference,c(file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
+  fileNameResults <- file_path_build(ssEnv$result_folderInference,c( marker,file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
 
 }

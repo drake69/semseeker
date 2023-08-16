@@ -12,13 +12,19 @@
 data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
 {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   transformation <- as.character(transformation)
   originalDataFrame <- tempDataFrame
+  tempDataFrame <- as.data.frame(sapply(tempDataFrame, as.numeric))
 
   independent_variable1stLevel <- NA
   independent_variable2ndLevel <- NA
+  test_factor <- as.factor(tempDataFrame[, independent_variable])
+  if(length(levels(test_factor))<4)
+  {
+    tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
+    }
   if(is.factor(tempDataFrame[, independent_variable]))
   {
     independent_variable1stLevel <- levels(tempDataFrame[, independent_variable])[1]
@@ -26,6 +32,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   }
 
   df_head <- tempDataFrame[,1:(g_start-1)]
+
   burden_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)
 
 
@@ -45,7 +52,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
     }
   }
 
-  if(family_test != "poisson")
+  if(family_test == "log")
     burden_values <- burden_values + 0.001
 
   transformation <- as.character(transformation)
@@ -131,7 +138,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
 
   tempDataFrame <- data.frame(df_head, burden_values)
   if(ncol(tempDataFrame)!=length(df_colnames))
-    browser()
+    stop("ERROR: I'm stopping here data are not the same size, file a bug!")
 
   colnames(tempDataFrame) <- df_colnames
   # after the transformation some data could be missed

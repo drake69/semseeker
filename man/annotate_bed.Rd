@@ -2,38 +2,13 @@
 % Please edit documentation in R/annotate_bed.R
 \name{annotate_bed}
 \alias{annotate_bed}
-\title{takes a bed and its location (build with the details of popuationa nd genomic area)
-and annoate with detail about genomic area}
+\title{create an annotated file for each marker, figure, area and subarea, each file has all the sample_groups used to calculate epimutation}
 \usage{
-annotate_bed(
-  populations,
-  figures,
-  anomalies,
-  groups,
-  probes_prefix,
-  columnLabel,
-  groupingColumnLabel
-)
-}
-\arguments{
-\item{populations}{vector of population to cycle with to build the folder path}
-
-\item{figures}{vector of hyper /hypo to use to build the folder path}
-
-\item{anomalies}{vector of lesions/mutations to use to build the folder path}
-
-\item{groups}{vector of genomic area to cycle and group the annotated data}
-
-\item{probes_prefix}{prefix to use to get the annotated probes dataset}
-
-\item{columnLabel}{label of the column of the genomic area gene, island ,dmr etc..}
-
-\item{groupingColumnLabel}{label of the column of the genomic sub area body, tss1500}
+annotate_bed()
 }
 \value{
-original bed with genomic area infos
+nothing
 }
 \description{
-takes a bed and its location (build with the details of popuationa nd genomic area)
-and annoate with detail about genomic area
+create an annotated file for each marker, figure, area and subarea, each file has all the sample_groups used to calculate epimutation
 }

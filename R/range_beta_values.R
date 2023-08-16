@@ -73,11 +73,16 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
     betaValuesIQR <- stats::IQR(b_values)
 
     beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
+    # beta_inferior_thresholds[beta_inferior_thresholds<0] <- 0
+
     beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
 
     temp_result <- c("beta_inferior_thresholds"= beta_inferior_thresholds,
       "beta_superior_thresholds"= beta_superior_thresholds,
-      "beta_median_values"= beta_median_values)
+      "beta_median_values"= beta_median_values,
+      "iqr" = betaValuesIQR,
+      "q1" = betaQ1Values,
+      "q3" = betaQ3Values)
     names(temp_result) <- names(b_values)
     # if(attr(beta_row, "nb_cycles") %% 10 == 0)
     #   progress_bar_2()
@@ -90,7 +95,7 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
 
 
   result <- as.data.frame(t(th))
-  colnames(result) <- c("beta_inferior_thresholds","beta_superior_thresholds", "beta_median_values")
+  colnames(result) <- c("beta_inferior_thresholds","beta_superior_thresholds", "beta_median_values","iqr","q1","q3")
   # message("\n")
   # colnames(values) <- c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values")
   # row.names(values) <- row.names(beta_median_values)
@@ -100,6 +105,6 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
   #                beta_superior_thresholds = beta_superior_thresholds,
   #                beta_median_values = beta_median_values)
 
-  message("INFO: ", Sys.time(), " Thresholds defined for: ", nrow(result$beta_inferior_thresholds), " probes.")
+  message("INFO: ", Sys.time(), " Thresholds defined for: ", nrow(result$beta_inferior_thresholds), " probe_features.")
   return(result)
 }

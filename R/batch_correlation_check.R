@@ -1,10 +1,10 @@
 batch_correlation_check <- function() {
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
   y <- g <- 1
   i <- 1
   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
-  localKeys <- expand.grid("FIGURE"=ssEnv$keys_figures_default[,1],"ANOMALY"= ssEnv$keys_anomalies[,1])
+  localKeys <- expand.grid("FIGURE"=ssEnv$keys_figures_default[,1],"MARKER"= ssEnv$keys_markers[,1])
 
   batch_analysis_folder <-dir_check_and_create(ssEnv$result_folderData,"Batch_Analysis")
   chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"BATCH")
@@ -19,18 +19,18 @@ batch_correlation_check <- function() {
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
-    populations <- unique(sample_sheet$Sample_Group)
-    sub_export <- c(to_export,"populations", "ssEnv","key")
-    total_data_for <- foreach::foreach(g = 1:length(populations), .combine = rbind, .export = sub_export ) %dorng%
-      # for(g in 1:length(populations))
+    sample_groups <- as.data.frame(unique(sample_sheet$Sample_Group))
+    sub_export <- c(to_export,"sample_groups", "ssEnv","key")
+    total_data_for <- foreach::foreach(g = 1:length(sample_groups), .combine = rbind, .export = sub_export ) %dorng%
+      # for(g in 1:length(sample_groups))
       {
-        pop <- populations[g]
-        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(pop) ,paste(as.character(key$ANOMALY),"_",as.character(key$FIGURE),sep="")))
-        file_to_read <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$ANOMALY), as.character(key$FIGURE)), "fst")
+        pop <- sample_groups[g]
+        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(pop) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
+        file_to_read <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), "fst")
         if(file.exists(file_to_read))
         {
           temp <- fst::read_fst(file_to_read, as.data.table = T)
-          if(key$ANOMALY=="MUTATIONS" | key$ANOMALY=="LESIONS")
+          if(key$MARKER=="MUTATIONS" | key$MARKER=="LESIONS")
             temp$VALUE <- 1
           # if(exists("total_data_for"))
           #   total_data_for <- rbind(total_data_for,temp)
@@ -59,7 +59,7 @@ batch_correlation_check <- function() {
 
     tempDataFrame[is.na(tempDataFrame)] <-0
 
-    if(key$ANOMALY!="DELTAS" & key$ANOMALY!="DELTAQ")
+    if(key$MARKER!="DELTAS" & key$MARKER!="DELTAQ")
     {
       tempDataFrame <- as.data.frame(apply(tempDataFrame, 2, as.factor))
       rownames(tempDataFrame) <- tempDataFrame$SAMPLEID
@@ -104,7 +104,7 @@ batch_correlation_check <- function() {
       pca_contrib$Batch_ID <- as.factor(pca_contrib$Batch_ID)
     }
     pca_contrib <- as.data.frame(pca_contrib)
-    result_file <- file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$ANOMALY), as.character(key$FIGURE)), "csv")
+    result_file <- file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$MARKER), as.character(key$FIGURE)), "csv")
     utils::write.csv2(pca_contrib,result_file,row.names = F)
 
     if(length(unique(t(unique(stats::na.omit(pca_contrib[,!(colnames(pca_contrib) %in% c("Batch_ID"))])))))==1
@@ -115,12 +115,12 @@ batch_correlation_check <- function() {
     pca_contrib_to_plot <- pca_contrib
     pca_contrib_to_plot$Batch_ID <- as.factor(paste("Batch",pca_contrib$Batch_ID, sep=""))
 
-    filename = paste0( chartFolder ,"/","scatterplot_",key$ANOMALY,"_",key$FIGURE, ".png",sep="")
+    filename = paste0( chartFolder ,"/","scatterplot_",key$MARKER,"_",key$FIGURE, ".png",sep="")
     # print(filename)
     # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
     ggplot2::qplot("Dim.1", "Dim.2", data= as.data.frame(pca_contrib_to_plot),
       col = "Batch_ID", xlab="Dimension 1", ylab="Dimension 2",
-      main = paste(key$ANOMALY, " ", key$FIGURE, sep="") ) + ggplot2::labs( colour= "Batch_ID") + ggplot2::theme(legend.position = "bottom")
+      main = paste(key$MARKER, " ", key$FIGURE, sep="") ) + ggplot2::labs( colour= "Batch_ID") + ggplot2::theme(legend.position = "bottom")
     # grDevices::dev.off()
     ggplot2::ggsave(
       filename,
@@ -167,14 +167,14 @@ batch_correlation_check <- function() {
     result_cor <- merge(result_cor, dunn.results, by="dim")
     rm(dunn.results)
 
-    result_file <- file_path_build(batch_analysis_folder, c("batch_cor", as.character(key$ANOMALY), as.character(key$FIGURE)), "csv")
+    result_file <- file_path_build(batch_analysis_folder, c("batch_cor", as.character(key$MARKER), as.character(key$FIGURE)), "csv")
     utils::write.csv2(result_cor,result_file,row.names = F)
 
     result_cor <- subset(result_cor, result_cor$p.value < 0.05)
     result_cor <- subset(result_cor, result_cor$proportion < 0.7)
     if(!plyr::empty(result_cor))
     {
-      result_cor$anomaly <- key$ANOMALY
+      result_cor$marker <- key$MARKER
       result_cor$figure <- key$FIGURE
     }
 

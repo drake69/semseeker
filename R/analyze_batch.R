@@ -2,7 +2,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
 {
   message("INFO: ", Sys.time(), " working on batch:", batch_id)
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  ssEnv <- get_session_info()
 
   # browser()
   methylation_data <- as.data.frame(methylation_data)
@@ -16,14 +16,14 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
 
   message("INFO: ", Sys.time(), " I will work on:", nrow(methylation_data), " PROBES.")
 
-  probes <- semseeker::PROBES
-  message("DEBUG: ", Sys.time(), " loaded probes: PROBES")
-  probes <- probes[(probes$PROBE %in% rownames(methylation_data)),]
-  methylation_data <- methylation_data[rownames(methylation_data) %in% probes$PROBE, ]
+  probe_features <- probe_features_get("PROBE")
+  message("DEBUG: ", Sys.time(), " loaded probe_features: PROBES")
+  probe_features <- probe_features[(probe_features$PROBE %in% rownames(methylation_data)),]
+  methylation_data <- methylation_data[rownames(methylation_data) %in% probe_features$PROBE, ]
   methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
 
-  # probes <- sort_by_chr_and_start(probes)
-  if (!test_match_order(row.names(methylation_data), probes$PROBE)) {
+  # probe_features <- sort_by_chr_and_start(probe_features)
+  if (!test_match_order(row.names(methylation_data), probe_features$PROBE)) {
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
 
@@ -39,11 +39,13 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   # }
 
 
-  population_checkResult <- population_check(sample_sheet, methylation_data)
-  if(!is.null(population_checkResult))
+  sample_group_checkResult <- sample_group_check(sample_sheet, methylation_data)
+  if(!is.null(sample_group_checkResult))
   {
-    stop(population_checkResult)
+    stop(sample_group_checkResult)
   }
+
+  beta_save(methylation_data, sample_sheet, batch_id)
 
   # reference population
   referencePopulationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == "Reference", ]
@@ -71,54 +73,54 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  # variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analize_population", "sliding_window_size", "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed")
-  # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_populations[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  for (i in 1:length(ssEnv$keys_populations[,1]))
+  variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analyze_population", "sliding_window_size",
+    "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed","probe_features")
+  resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  # for (i in 1:length(ssEnv$keys_sample_groups[,1]))
   {
 
     #
-    populationName <- ssEnv$keys_populations[i,1]
-    populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == populationName, ]
+    sample_group <- ssEnv$keys_sample_groups[i,1]
+    populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == sample_group, ]
     populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
 
     if (length(populationMatrixColumns)==0) {
-      message("WARNING: ", Sys.time(), "  Population ",populationName, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
+      message("WARNING: ", Sys.time(), "  Population ",sample_group, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
     }
     else
     {
-      # browser()
-      resultPopulation <- analize_population(
-        methylation_data = methylation_data[, populationMatrixColumns] ,
+      resultPopulation <- analyze_population(
+        methylation_data = methylation_data[, populationMatrixColumns],
         sliding_window_size = sliding_window_size,
-        beta_superior_thresholds = populationControlRangeBetaValues$beta_superior_thresholds,
-        beta_inferior_thresholds = populationControlRangeBetaValues$beta_inferior_thresholds,
         sample_sheet = populationSampleSheet,
-        beta_medians = populationControlRangeBetaValues$beta_median_values,
+        beta_thresholds = populationControlRangeBetaValues,
         bonferroni_threshold = bonferroni_threshold,
-        probe_features = probes
+        probe_features = probe_features
       )
 
       resultPopulation <- as.data.frame(resultPopulation)
-      resultPopulation$Sample_Group <- populationName
-      create_multiple_bed( resultPopulation)
+      resultPopulation$Sample_Group <- sample_group
+      create_multiple_bed(resultPopulation)
 
       # resultPopulation
       # resultPopulation
       # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
       # #   browser()
 
-      if(!exists("resultSampleSheet"))
-        resultSampleSheet <- resultPopulation
-      else
-        resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
+      # if(!exists("resultSampleSheet"))
+      #   resultSampleSheet <- resultPopulation
+      # else
+      #   resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
 
       # rm(populationSampleSheet)
       gc()
-
+      resultPopulation
     }
   }
 
-  resultSampleSheet <- create_deltaq( resultSampleSheet)
+  # resultSampleSheet <- as.data.frame(resultSampleSheet)
+  resultSampleSheet <- deltaq_get(resultSampleSheet)
+  resultSampleSheet <- deltarq_get(resultSampleSheet)
 
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)

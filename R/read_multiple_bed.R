@@ -1,79 +1,48 @@
 #' read multiple bed with annotated data as per input parameter
 #'
-#' @param anomalyLabel anomaly definition used to label folder and files eg MUTATIONS, LESIONS
-#' @param probe_features features of probe CHR and START and NAME
-#' @param figureLable figures like hypo/hyper to built the data path
-#' @param columnLabel name of column in the annotation dataset to select genomic area (gene, island etc..)
-#' @param populationName name of the population used to build the data path
-#' @param groupingColumnLabel name of the genomic sub area
+#' @param marker marker definition used to label folder and files eg MUTATIONS, LESIONS
+#' @param figure figures like hypo/hyper to built the data path
+#' @param sample_group name of the population used to build the data path
 #'
 #' @return list of pivot by column identified with column Label and by Sample
 
 #'
-read_multiple_bed <- function( anomalyLabel, figureLable, probe_features, columnLabel, populationName, groupingColumnLabel)
+read_multiple_bed <- function(sample_group, marker, figure)
 {
+  ssEnv <- get_session_info()
 
-  ssEnv <- .pkgglobalenv$ssEnv
+  f <- paste0(marker,"_", figure, sep="")
+  souceFolder <- dir_check_and_create(ssEnv$result_folderData, c(as.character(sample_group),f))
 
-  f <- paste0(anomalyLabel,"_", figureLable, sep="")
-  souceFolder <- dir_check_and_create(ssEnv$result_folderData, c(as.character(populationName),f))
-
-  if(as.character(anomalyLabel)=="DELTAS" | as.character(anomalyLabel)=="DELTAQ")
+  if(as.character(marker)=="DELTAS" | as.character(marker)=="DELTAQ"
+    | as.character(marker)=="DELTAR" | as.character(marker)=="DELTARQ"
+    | as.character(marker)=="BETA")
   {
-    file_extension <- "bedgraph"
     col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
   }
   else
   {
-    file_extension <- "bed"
     col_names <- c("CHR", "START", "END", "SAMPLEID")
   }
 
-
-  # browser()
-  fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(anomalyLabel),as.character(figureLable)),"fst")
+  fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(marker),as.character(figure)),"fst")
 
   if(file.exists(fileName))
   {
-    # sourceData <- utils::read.table(fileName, sep = "\t", blank.lines.skip = TRUE, fill = FALSE, col.names = col_names, header = FALSE)
-    sourceData <- fst::read_fst(fileName, as.data.table = T)
-    colnames(sourceData) <- col_names
-
-    sourceData$CHR <- as.factor(sourceData$CHR)
-    if(nrow(probe_features)==0 | nrow(sourceData)==0)
-      return(sourceData)
-
-    probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
-
-    probe_features <- probe_features[(probe_features$CHR %in% unique((sourceData$CHR))), ]
-    droplevels(probe_features$CHR)
-    droplevels(sourceData$CHR)
-
-    if(!plyr::empty(sourceData))
+    multiple_bed <- fst::read_fst(fileName, as.data.table = T)
+    colnames(multiple_bed) <- col_names
+    # just read the multiple bed
+    if(!plyr::empty(multiple_bed))
     {
-      if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
-        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START","END"))
-      else
-        sourceData <- merge(sourceData, probe_features, by = c("CHR", "START"))
+      multiple_bed[is.na(multiple_bed)] <- 0
+      if(marker!="BETA" & marker!="DELTAR" & marker!="DELTAS" & marker!="DELTAQ" & !plyr::empty(multiple_bed))
+        multiple_bed$VALUE <- 1
 
-      sourceData <-subset(sourceData, !is.na(eval(parse(text=columnLabel))))
-
-      # output with column VALUE
-      # message("multiple nrow data", nrow(sourceData))
-
-      if(!plyr::empty(sourceData))
-      {
-        sourceData[is.na(sourceData)] <- 0
-        if(anomalyLabel!="DELTAS" & anomalyLabel!="DELTAQ" & !plyr::empty(sourceData))
-          sourceData$VALUE <- 1
-
-        sourceData <- data.frame(sourceData,"FIGURE" = as.character(figureLable), "ANOMALY" = as.character(anomalyLabel), "POPULATION" = as.character(populationName))
-        sourceData$POPULATION <- as.factor(sourceData$POPULATION)
-        sourceData$ANOMALY <- as.factor(sourceData$ANOMALY)
-        sourceData$FIGURE <- as.factor(sourceData$FIGURE)
-        # message("read multiple nrow data", nrow(sourceData))
-        return(sourceData)
-      }
+      multiple_bed <- data.frame(multiple_bed,"FIGURE" = as.character(figure), "MARKER" = as.character(marker), "SAMPLE_GROUP" = as.character(sample_group))
+      multiple_bed$SAMPLE_GROUP <- as.factor(multiple_bed$SAMPLE_GROUP)
+      multiple_bed$MARKER <- as.factor(multiple_bed$MARKER)
+      multiple_bed$FIGURE <- as.factor(multiple_bed$FIGURE)
+      return(multiple_bed)
     }
   }
 }

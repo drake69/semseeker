@@ -1,7 +1,7 @@
 Package: semseeker
 Type: Package
 Title: Stochastic Epigenetic Mutations SEM Seeker
-Version: 0.8.6
+Version: 0.9.7
 Author: Luigi Corsaro, Davide Sacco
 Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
 Description: Stochastic epimutation and enriched region upstream and downstream tool for EWAS.
@@ -22,6 +22,7 @@ Imports:
     future,
     future.apply,
     ggplot2,
+    gtools,
     Hmisc,
     lqmm,
     openxlsx,
@@ -29,8 +30,8 @@ Imports:
     progressr,
     quantreg,
     readxl,
+    reshape,
     reshape2,
-    Rfast,
     R.utils,
     rlang,
     stats,
@@ -42,11 +43,12 @@ RoxygenNote: 7.2.3
 Suggests: 
     pathfindR,
     GEOquery,
-    gtools,
     stringi,
     testthat
 Depends: 
-    R (>= 4.2.0)
+    R (>= 4.3.0)
 LazyData: true
 LazyDataCompression: gzip
 SysDataCompression: bzip2
+Config/testthat/parallel: false
+Config/testthat/edition: 3
