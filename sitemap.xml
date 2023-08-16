@@ -19,7 +19,7 @@
     <loc>/reference/PROBES_CHR_CHR.html</loc>
   </url>
   <url>
-    <loc>/reference/analize_population.html</loc>
+    <loc>/reference/analyze_population.html</loc>
   </url>
   <url>
     <loc>/reference/analyze_single_sample.html</loc>
@@ -52,6 +52,9 @@
     <loc>/reference/delta_single_sample.html</loc>
   </url>
   <url>
+    <loc>/reference/deltar_single_sample.html</loc>
+  </url>
+  <url>
     <loc>/reference/dir_check_and_create.html</loc>
   </url>
   <url>
@@ -67,7 +70,16 @@
     <loc>/reference/init_env.html</loc>
   </url>
   <url>
+    <loc>/reference/manhattan_plot_per_area.html</loc>
+  </url>
+  <url>
     <loc>/reference/mutations_get.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pivot_to_long_format.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pp_tot.html</loc>
   </url>
   <url>
     <loc>/reference/quantreg_model.html</loc>
