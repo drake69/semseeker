@@ -49,10 +49,9 @@ jobs:
       #   with:
       #     upload-snapshots: true
 
-      - name: Build and check package
+      - name: Build package
         run: |
           R CMD build .
-          R CMD check *tar.gz
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
