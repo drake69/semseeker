@@ -96,6 +96,8 @@ nprobes <<- nprobes
 # sequential
 parallel_strategy <<- "sequential"
 probe_features <<- probe_features
+markers <<- c("MUTATIONS","DELTAQ")
+
 
 # TODO
 # recover session stored
