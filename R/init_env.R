@@ -100,21 +100,21 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   }
 
   ssEnvTemp <- get_session_info(result_folder)
-  if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
-  {
-    # we had to return aold session info this init could be calles by other than semseeker function, it means
-    # we don't know which marker or figure were calculated
-    message("Reusing old session info !")
-    message("INFO: ", Sys.time(), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
-      paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
-      " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
-      " for ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"SUBAREA"]), collapse = " ", sep =" "))
-    if(dir.exists(ssEnv$session_folder))
-    {
-      update_session_info(ssEnvTemp)
-      return(ssEnvTemp)
-    }
-  }
+  # if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
+  # {
+  #   # we had to return aold session info this init could be calles by other than semseeker function, it means
+  #   # we don't know which marker or figure were calculated
+  #   message("Reusing old session info !")
+  #   message("INFO: ", Sys.time(), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
+  #     paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
+  #     " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
+  #     " for ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"SUBAREA"]), collapse = " ", sep =" "))
+  #   if(dir.exists(ssEnv$session_folder))
+  #   {
+  #     update_session_info(ssEnvTemp)
+  #     return(ssEnvTemp)
+  #   }
+  # }
 
   # set default values
   keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))

@@ -23,6 +23,10 @@ test_that("semeeker", {
   testthat::expect_true(nrow(localFileRes_both)>0)
 
   ####################################################################################
+  # expect the count of mutations is not less than 80% of total added mutations
+  expect_true(nrow(localFileRes_both) > 0.8 * perc_epimutation * nprobes * nsamples)
+
+  ####################################################################################
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAQ_BOTH")
   fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "DELTAQ" ,"BOTH" ), "fst")

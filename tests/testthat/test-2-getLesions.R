@@ -9,7 +9,7 @@ testthat::test_that("lesions_get",{
   mutations <-  semseeker:::mutations_get(
     values = methylation_data[,1],
     figure = "HYPO",
-    thresholds = thresholds,
+    thresholds = beta_inferior_thresholds,
     probe_features = probe_features,
     sampleName = Sample_ID
   )
@@ -26,7 +26,7 @@ testthat::test_that("lesions_get",{
   mutations <-  semseeker:::mutations_get(
     values = methylation_data[,1],
     figure = "HYPER",
-    thresholds = thresholds,
+    thresholds = beta_superior_thresholds,
     probe_features = probe_features,
     sampleName = Sample_ID
   )

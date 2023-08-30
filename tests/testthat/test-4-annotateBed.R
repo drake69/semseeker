@@ -3,7 +3,8 @@ test_that("annotate_bed", {
   # unlink(tempFolder, recursive = T)
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, showprogress= TRUE)
+  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90,
+    showprogress= TRUE, markers = markers)
 
   ####################################################################################
 
