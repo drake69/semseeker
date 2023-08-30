@@ -38,6 +38,7 @@ coverage_analysis <- function(methylation_data)
       # coverage <- merge(total_count, covered_count, by=area_subarea, all.x = TRUE)
     }
 
+    coverage[is.na(coverage)] <- 0
     if(nrow(coverage)<2)
       next
 
@@ -72,71 +73,78 @@ coverage_analysis <- function(methylation_data)
   filename = paste0( chartFolder,"/","EACH_AREA_COVERAGE_ANALYSIS.png",sep="")
 
   temp_cov_result <- subset(cov_result,cov_result$SUBAREA !="WHOLE")
-  number_areas <- stats::aggregate(temp_cov_result$COUNT, list(temp_cov_result$AREA,temp_cov_result$SUBAREA), FUN=sum)
-  colnames(number_areas) <- c("AREA","SUBAREA","TOTAL_AREAS")
-  temp_cov_result <- merge(temp_cov_result, number_areas, by=c("AREA","SUBAREA"), all.x = T)
-  temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$AREA, temp_cov_result$SUBAREA, sep=" ")
-  temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / temp_cov_result$TOTAL_AREAS,2)
+  if(nrow(temp_cov_result)>2)
+  {
+    number_areas <- stats::aggregate(temp_cov_result$COUNT, list(temp_cov_result$AREA,temp_cov_result$SUBAREA), FUN=sum)
+    colnames(number_areas) <- c("AREA","SUBAREA","TOTAL_AREAS")
+    temp_cov_result <- merge(temp_cov_result, number_areas, by=c("AREA","SUBAREA"), all.x = T)
+    temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$AREA, temp_cov_result$SUBAREA, sep=" ")
+    temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / temp_cov_result$TOTAL_AREAS,2)
 
-  ggp <- ggplot2::ggplot(temp_cov_result, ggplot2::aes(.data$GENOMIC_AREA, .data$COV_PERC)) +    # Create default ggplot2 heatmap
-    ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC)) +
-    ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
-    ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
-    ggplot2::labs(fill  = "Percentage\nover\neach\narea") +
-    ggplot2::scale_y_continuous(breaks = seq(0,100, by=5))
+    ggp <- ggplot2::ggplot(temp_cov_result, ggplot2::aes(.data$GENOMIC_AREA, .data$COV_PERC)) +    # Create default ggplot2 heatmap
+      ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
+      ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC)) +
+      ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
+      ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
+      ggplot2::labs(fill  = "Percentage\nover\neach\narea") +
+      ggplot2::scale_y_continuous(breaks = seq(0,100, by=5))
 
-  ggplot2::ggsave(
-    filename,
-    plot = ggp,
-    scale = 1,
-    width = 1240,
-    height = 1240,
-    units = c("px"),
-    dpi = 144
-  )
+    ggplot2::ggsave(
+      filename,
+      plot = ggp,
+      scale = 1,
+      width = 1240,
+      height = 1240,
+      units = c("px"),
+      dpi = 144
+    )
+  }
 
 
   temp_cov_result <- subset(cov_result, cov_result$SUBAREA !="WHOLE" & cov_result$SUBAREA !="CHR" & cov_result$SUBAREA !="PROBE" & cov_result$AREA != "PROBE")
-  total_areas <- sum(number_areas$TOTAL_AREAS)
-  temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$AREA, temp_cov_result$SUBAREA, sep=" ")
-  temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / total_areas,2)
-  filename = paste0( chartFolder,"/","WHOLE_GENOME_COVERAGE_ANALYSIS.png",sep="")
-  # temp_cov_result$COV_PERC <- sprintf('%02d', str_pad(temp_cov_result$COV_PERC, 3, pad = "0"))
-  temp_cov_result$COV_PERC <- sprintf('%03d', temp_cov_result$COV_PERC)
-  temp_cov_result$AREA_PERC <-  round(temp_cov_result$AREA_PERC,2)
-  h_total <- temp_cov_result %>%
-    dplyr::group_by(.data$GENOMIC_AREA) %>%
-    dplyr::summarise(AREA_PERC = sum(.data$AREA_PERC)) %>%
-    dplyr::mutate(COV_PERC = 'Total')
-  v_total <- temp_cov_result %>%
-    dplyr::group_by(.data$COV_PERC) %>%
-    dplyr::summarise(AREA_PERC = sum(.data$AREA_PERC)) %>%
-    dplyr::mutate(GENOMIC_AREA = 'Total')
+  if(nrow(temp_cov_result>2))
+  {
+    total_areas <- sum(number_areas$TOTAL_AREAS)
+    temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$AREA, temp_cov_result$SUBAREA, sep=" ")
+    temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / total_areas,2)
+    filename = paste0( chartFolder,"/","WHOLE_GENOME_COVERAGE_ANALYSIS.png",sep="")
+    # temp_cov_result$COV_PERC <- sprintf('%02d', str_pad(temp_cov_result$COV_PERC, 3, pad = "0"))
+    temp_cov_result$COV_PERC <- sprintf('%03d', temp_cov_result$COV_PERC)
+    temp_cov_result$AREA_PERC <-  round(temp_cov_result$AREA_PERC,2)
+    h_total <- temp_cov_result %>%
+      dplyr::group_by(.data$GENOMIC_AREA) %>%
+      dplyr::summarise(AREA_PERC = sum(.data$AREA_PERC)) %>%
+      dplyr::mutate(COV_PERC = 'Total')
+    v_total <- temp_cov_result %>%
+      dplyr::group_by(.data$COV_PERC) %>%
+      dplyr::summarise(AREA_PERC = sum(.data$AREA_PERC)) %>%
+      dplyr::mutate(GENOMIC_AREA = 'Total')
 
-  ggp <- ggplot2::ggplot(data = temp_cov_result, ggplot2::aes( x =.data$GENOMIC_AREA, y=.data$COV_PERC )) +    # Create default ggplot2 heatmap
-    ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC), size=3) +
-    ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
-    ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
-    ggplot2::labs(fill  = "Percentage\nover\nwhole\ngenome", color="% Covered\narea\nover\nstudied") +
-    ggplot2::geom_point(data = h_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
-    ggplot2::geom_point(data = v_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
-    ggplot2::scale_color_gradient2(low = "white",high = "grey",midpoint = 0) +
-    ggplot2::geom_text(data = h_total, size = 3, ggplot2::aes(label = .data$AREA_PERC)) +
-    ggplot2::geom_text(data = v_total, size = 3, ggplot2::aes(label = .data$AREA_PERC))
+    ggp <- ggplot2::ggplot(data = temp_cov_result, ggplot2::aes( x =.data$GENOMIC_AREA, y=.data$COV_PERC )) +    # Create default ggplot2 heatmap
+      ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
+      ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC), size=3) +
+      ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
+      ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
+      ggplot2::labs(fill  = "Percentage\nover\nwhole\ngenome", color="% Covered\narea\nover\nstudied") +
+      ggplot2::geom_point(data = h_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
+      ggplot2::geom_point(data = v_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
+      ggplot2::scale_color_gradient2(low = "white",high = "grey",midpoint = 0) +
+      ggplot2::geom_text(data = h_total, size = 3, ggplot2::aes(label = .data$AREA_PERC)) +
+      ggplot2::geom_text(data = v_total, size = 3, ggplot2::aes(label = .data$AREA_PERC))
 
-  ggplot2::ggsave(
-    filename,
-    plot = ggp,
-    scale = 1,
-    width = 1240,
-    height = 1240,
-    units = c("px"),
-    dpi = 144
-  )
+    ggplot2::ggsave(
+      filename,
+      plot = ggp,
+      scale = 1,
+      width = 1240,
+      height = 1240,
+      units = c("px"),
+      dpi = 144
+    )
+
+  }
 
   #show total count of probe_features per area
   # temp_cov_result <- subset(cov_result, SUBAREA !="WHOLE" & SUBAREA !="CHR" & SUBAREA !="PROBE")
@@ -187,7 +195,7 @@ coverage_analysis <- function(methylation_data)
   #   if(nrow(tt) > 2 & ncol(tt) > 2)
   #   {
   #     filename = paste0( chartFolder,"/","COVERAGE_ANALYSIS.png",sep="")
-  #     grDevices::png(file= filename, width=1240, height = 1240, pointsize = 15, res = 144)
+  #     grDevices::png(file= filename, width=1240, height = 1240, pointsize = 15, res = 300)
   #     stats::heatmap(
   #       x =  as.matrix(tt),
   #       col = colors,

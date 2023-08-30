@@ -117,7 +117,7 @@ batch_correlation_check <- function() {
 
     filename = paste0( chartFolder ,"/","scatterplot_",key$MARKER,"_",key$FIGURE, ".png",sep="")
     # print(filename)
-    # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
+    # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 300)
     ggplot2::qplot("Dim.1", "Dim.2", data= as.data.frame(pca_contrib_to_plot),
       col = "Batch_ID", xlab="Dimension 1", ylab="Dimension 2",
       main = paste(key$MARKER, " ", key$FIGURE, sep="") ) + ggplot2::labs( colour= "Batch_ID") + ggplot2::theme(legend.position = "bottom")

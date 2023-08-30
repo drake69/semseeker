@@ -4,6 +4,11 @@ sample_group_check <- function(sample_sheet, methylation_data)
 
   ssEnv <- get_session_info()
 
+  # count rows of sample sheet and column of methylation
+  # n_sample <- nrow(sample_sheet)
+  # if ( nrow(unique(sample_sheet))!=n_sample)
+  #   stop("")
+
   sample_sheet <- as.data.frame(sample_sheet)
   sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", ssEnv$keys$pasted))]
 
@@ -49,7 +54,7 @@ sample_group_check <- function(sample_sheet, methylation_data)
   # reference population
   sample_sheet$Sample_Group <- R.utils::toCamelCase(tolower(sample_sheet$Sample_Group), capitalize=TRUE)
   sample_sheet$Sample_Group <- as.factor(sample_sheet$Sample_Group)
-  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% ssEnv$keys_sample_groups[,1]
+  matchedPopulation <- levels(sample_sheet$Sample_Group) %in% ssEnv$keys_sample_groups
   if (is.element(FALSE, matchedPopulation)) {
     result <- paste(result,  " The Sample_Group should contain only: Reference, Control, Case" )
   }

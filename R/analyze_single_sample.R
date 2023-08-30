@@ -36,8 +36,10 @@ analyze_single_sample <- function(values, sliding_window_size, thresholds, figur
   )
 
   result[paste("LESIONS_", figure, sep="")] <- if (!is.null(lesionWeighted)) dim(lesionWeighted)[1] else 0
+
+  # count the real values available for the sample
   if(figure=="HYPER")
-     result["PROBES_COUNT"] <- dim(probe_features)[1]
+     result["PROBES_COUNT"] <- length(stats::na.omit(values))
 
   return(result)
 }
