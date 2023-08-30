@@ -34,6 +34,19 @@ test_that(" semseeker:::sample_group_check", {
 
   ####################################################################################
 
+  #Duplicated Samnple Rows
+  mySampleSheet <- rbind(mySampleSheet,mySampleSheet)
+  expect_error( semseeker:::sample_group_check(mySampleSheet, methylation_data), "I'm STOPPING HERE!")
+  # testthat::expect_true(!is.null( semseeker:::sample_group_check(mySampleSheet, methylation_data)))
+
+  ####################################################################################
+
+  #Duplicated Samnple Rows
+
+  expect_error( semseeker:::sample_group_check(mySampleSheet, methylation_data), "I'm STOPPING HERE!")
+
+  ####################################################################################
+
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
   unlink(tempFolder,recursive = TRUE)

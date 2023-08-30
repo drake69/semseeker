@@ -5,24 +5,27 @@ test_that("range_beta_values", {
   semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
   ####################################################################################
-  rr <- semseeker:::range_beta_values(methylation_data, iqrTimes = iqrTimes)
-  testthat::expect_true(sum(colnames(rr)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values"))==3)
+  beta_thresholds_local <- semseeker:::range_beta_values(methylation_data, iqrTimes = iqrTimes)
+  testthat::expect_true(sum(colnames(beta_thresholds_local)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values"))==3)
 
   ####################################################################################
-  testthat::expect_true(nrow(rr)==nrow(methylation_data))
+  testthat::expect_true(nrow(beta_thresholds_local)==nrow(methylation_data))
   ####################################################################################
-  testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_superior_thresholds[1])
+  testthat::expect_true(beta_thresholds_local$beta_inferior_thresholds[1]!=beta_thresholds_local$beta_superior_thresholds[1])
   ####################################################################################
-  testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_median_values[1])
+  testthat::expect_true(beta_thresholds_local$beta_inferior_thresholds[1]!=beta_thresholds_local$beta_median_values[1])
   ####################################################################################
-  testthat::expect_true(rr$iqr[1]!=rr$beta_median_values[1])
+  testthat::expect_true(beta_thresholds_local$iqr[1]!=beta_thresholds_local$beta_median_values[1])
   ####################################################################################
-  testthat::expect_true(rr$q1[1]!=rr$beta_median_values[1])
+  testthat::expect_true(beta_thresholds_local$q1[1]!=beta_thresholds_local$beta_median_values[1])
   ####################################################################################
-  testthat::expect_true(rr$q3[1]!=rr$beta_median_values[1])
+  testthat::expect_true(beta_thresholds_local$q3[1]!=beta_thresholds_local$beta_median_values[1])
   ####################################################################################
+  testthat::expect_true(all(beta_thresholds_local$beta_inferior_thresholds<beta_thresholds_local$beta_superior_thresholds))
 
-  testthat::expect_true(all(rr$beta_inferior_thresholds<rr$beta_superior_thresholds))
+  ####################################################################################
+  testthat::expect_true( nrow(beta_thresholds_local)==nprobes)
+
 
   unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()

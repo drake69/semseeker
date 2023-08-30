@@ -11,7 +11,7 @@ testthat::test_that("analyze_single_sample",{
 
   sp <- semseeker:::analyze_single_sample( values = methylation_data[,1],
                       sliding_window_size = sliding_window_size,
-                      thresholds = rep(1,nrow(methylation_data)),
+                      thresholds = beta_inferior_thresholds,
                       figure = "HYPO",
                       sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")] ,
                       bonferroni_threshold = 0.05,

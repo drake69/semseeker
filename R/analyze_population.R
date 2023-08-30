@@ -49,6 +49,7 @@ analyze_population <- function(methylation_data, sliding_window_size, sample_she
                            "bt","bonferroni_threshold", "probe_features", "analyze_single_sample_both", "delta_single_sample", "progress_bar",
                            "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_single_sample")
   i <- 1
+
   beta_superior_thresholds <- beta_thresholds$beta_superior_thresholds
   beta_inferior_thresholds <- beta_thresholds$beta_inferior_thresholds
   iqr <- beta_thresholds$iqr
@@ -61,6 +62,20 @@ analyze_population <- function(methylation_data, sliding_window_size, sample_she
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
 
     beta_sample <- beta_single_sample( beta_values,local_sample_detail,probe_features)
+    if (ssEnv$beta_intrasample )
+    {
+      q <- stats::quantile(values)
+      q1 <- as.numeric(q[2])
+      q3 <- as.numeric(q[4])
+      y_med <- as.numeric(q[3])
+      iqr <- stats::IQR(values)
+      iqrmult <- 3
+      y_sup <- q3 + iqrmult * iqr
+      y_inf <- q1 - iqrmult * iqr
+      beta_superior_thresholds <- rep(y_sup,length(values))
+      beta_inferior_thresholds <- rep(y_inf,length(values))
+      beta_median_values <- rep(y_med,length(values))
+    }
 
     hyper_result <- analyze_single_sample( values = beta_values, sliding_window_size = sliding_window_size,
       thresholds = beta_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,

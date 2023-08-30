@@ -12,7 +12,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   if( is.null(mutation_annotated_sorted))
     return (mutation_annotated_sorted)
 
-  if(nrow(mutation_annotated_sorted)==0)
+  if(nrow(mutation_annotated_sorted) == 0)
     return (mutation_annotated_sorted)
 
     # browser()
@@ -31,9 +31,9 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
     missedWindowLength <- ((lags - 1) / 2)
     y <- c(rep(0,missedWindowLength))
     tmp <- c(y,x,y)
-    tmp=zoo::rollsum( tmp, lags, align = "center", fill = 0)
-    tmp <- tmp[(missedWindowLength+1):(missedWindowLength+ length(x))]
-    tmp=as.numeric(tmp)
+    tmp <- zoo::rollsum( tmp, lags, align  =  "center", fill = 0)
+    tmp <- tmp[(missedWindowLength+1):(missedWindowLength+length(x))]
+    tmp <- as.numeric(tmp)
     return(tmp)
   }
 
@@ -41,19 +41,19 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   # calculate enrichment for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
     dplyr::mutate(ENRICHMENT = stats::ave( .data$MUTATIONS, eval(parse(text = grouping_column)),
-                                           FUN = function(x) enrichement_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
+                                           FUN  = function(x) enrichement_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
 
   basepair_calculator<-function(x,lags){
-    tmp_min=-zoo::rollmax( -x, lags, align = "center", fill = 0)
-    tmp_max=zoo::rollmax( x, lags, align = "center", fill = 0)
-    tmp= tmp_max - tmp_min
-    tmp=as.numeric(tmp)
+    tmp_min <- -zoo::rollmax( -x, lags, align="center", fill  <-  0)
+    tmp_max <- zoo::rollmax( x, lags, align="center", fill  <-  0)
+    tmp <-  tmp_max - tmp_min
+    tmp <- as.numeric(tmp)
     return(tmp)
   }
   #calculate the base pair count for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
     dplyr::mutate(BASEPAIR_COUNT = stats::ave( .data$START, eval(parse(text = grouping_column)),
-                                              FUN = function(x) basepair_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
+                                              FUN  =  function(x) basepair_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 
@@ -69,7 +69,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   table(lesionWeighted)
   rm(tt)
 
-  lesionWeighted <- data.frame(as.data.frame(mutationAnnotatedSortedLocal), "LESIONS" = lesionWeighted)
+  lesionWeighted <- data.frame(as.data.frame(mutationAnnotatedSortedLocal), "LESIONS"  =  lesionWeighted)
 
   lesionWeighted <- sort_by_chr_and_start(lesionWeighted)
   lesionWeighted <- subset(lesionWeighted, lesionWeighted$LESIONS == TRUE)[, c("CHR", "START", "END")]

@@ -66,7 +66,13 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$showprogress <- FALSE
   if(!is.null(arguments[["showprogress"]]))
   {
-    ssEnv$showprogress <- if(is.null(arguments[["showprogress"]])) keys_figures_default[,1] else arguments$showprogress
+    ssEnv$showprogress <- if(is.null(arguments[["showprogress"]])) FALSE else arguments$showprogress
+  }
+
+  ssEnv$beta_intrasample <- FALSE
+  if(!is.null(arguments[["beta_intrasample"]]))
+  {
+    ssEnv$beta_intrasample <- if(is.null(arguments[["beta_intrasample"]])) FALSE else arguments$beta_intrasample
   }
 
   # TODO: improve planning parallel management using also cluster

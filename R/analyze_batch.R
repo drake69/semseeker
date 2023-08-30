@@ -62,7 +62,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   }
 
   populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
-
+  gc()
   # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
   fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
 
@@ -75,8 +75,8 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   i <- 0
   variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analyze_population", "sliding_window_size",
     "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed","probe_features")
-  resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  # for (i in 1:length(ssEnv$keys_sample_groups[,1]))
+  # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  for (i in 1:length(ssEnv$keys_sample_groups[,1]))
   {
 
     #
@@ -107,14 +107,14 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
       # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
       # #   browser()
 
-      # if(!exists("resultSampleSheet"))
-      #   resultSampleSheet <- resultPopulation
-      # else
-      #   resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
+      if(!exists("resultSampleSheet"))
+        resultSampleSheet <- resultPopulation
+      else
+        resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
 
       # rm(populationSampleSheet)
       gc()
-      resultPopulation
+      # resultPopulation
     }
   }
 

@@ -15,4 +15,5 @@ test_that("beta",{
   beta_file <- read.table(beta_file, sep="\t")
   testthat::expect_true(nrow(beta_file)==nrow(methylation_data))
 
+
 })

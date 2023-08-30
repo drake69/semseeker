@@ -234,7 +234,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               if(sum(grepl(pattern = "MUTATIONS",x  =  ssEnv$keys_markers))>0)
               {
                 filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
                 graphics::par(mfrow = c(1,3))
                 graphics::boxplot(MUTATIONS_HYPO~ study_summaryToPlot[,independent_variable],main = "Hypo Mutations", data  =  study_summaryToPlot, cex = 2)
                 graphics::boxplot(MUTATIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Mutations", data  =  study_summaryToPlot, cex = 2)
@@ -245,7 +245,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               if(sum(grepl(pattern = "LESIONS",x  =  ssEnv$keys_markers))>0)
               {
                 filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
                 graphics::par(mfrow = c(1,3))
                 graphics::boxplot(LESIONS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo Lesions", data  =  study_summaryToPlot, cex = 2)
                 graphics::boxplot(LESIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Lesions", data  =  study_summaryToPlot, cex = 2)
@@ -259,7 +259,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 study_summaryToPlot$DELTAS_BOTH <- as.numeric(study_summaryToPlot$DELTAS_BOTH)
                 study_summaryToPlot$DELTAS_HYPER <- as.numeric(study_summaryToPlot$DELTAS_HYPER)
                 filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAS"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
                 graphics::par(mfrow = c(1,3))
                 graphics::boxplot(DELTAS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAS Mean", data  =  study_summaryToPlot, cex = 2)
                 graphics::boxplot(DELTAS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAS", data  =  study_summaryToPlot, cex = 2)
@@ -270,7 +270,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               if(sum(grepl(pattern = "DELTAQ",x  =  ssEnv$keys_markers))>0)
               {
                 filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res  =  144)
+                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
                 graphics::par(mfrow = c(1,3))
                 graphics::boxplot(DELTAQ_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAQ Mean", data  =  study_summaryToPlot, cex = 2)
                 graphics::boxplot(DELTAQ_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAQ", data  =  study_summaryToPlot, cex = 2)
