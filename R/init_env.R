@@ -6,8 +6,20 @@
 #' @param ... other options to filter elaborations
 #'
 #' @return the working ssEnvonment
-init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multicore", ...)
+init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multicore", start_fresh= FALSE, ...)
 {
+
+  ssEnv$start_fresh <- TRUE
+  if(!is.null(arguments[["start_fresh"]]))
+  {
+    ssEnv$start_fresh <- if(is.null(arguments[["start_fresh"]])) TRUE else arguments$start_fresh
+  }
+
+  if(ssEnv$start_fresh)
+  {
+    # unlink(result_folder, recursive = TRUE)
+    ssEnv <- get_session_info(result_folder)
+  }
 
   # utils::data("PROBES")
   # utils::data("PROBES_CHR_CHR")
@@ -20,6 +32,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   ssEnv$parallel_strategy <- parallel_strategy
 
   tmp <- tempdir()
+  message("INFO: data will saved in this folder:", result_folder)
   ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
@@ -99,12 +112,12 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     message("INFO: ", Sys.time(), " I will work in sequential mode")
   }
 
-  ssEnvTemp <- get_session_info(result_folder)
+  # ssEnvTemp <- get_session_info(result_folder)
   # if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
   # {
-  #   # we had to return aold session info this init could be calles by other than semseeker function, it means
-  #   # we don't know which marker or figure were calculated
-  #   message("Reusing old session info !")
+  #   # we had to return old session info this init could be called by other than semseeker function, it means
+  #   # we don't know which marker or figure were identified
+  #   message("INFO: ", Sys.time(), " Reusing old session info !")
   #   message("INFO: ", Sys.time(), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
   #     paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
   #     " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
@@ -118,11 +131,21 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   # set default values
   keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
+
+  ssEnv$keys_figures_default <- keys_figures_default
+
   keys_markers_default <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ","BETA"))
   keys_markers_default$EXT <-  c("bed","bed","bedgraph","bed","bedgraph","bed","bedgraph")
+  ssEnv$keys_markers_default <- keys_markers_default
+
+
+  keys_markers_figure_default <-  reshape::expand.grid.df(keys_markers_default, keys_figures_default)
+  ssEnv$keys_markers_figure_default <- keys_markers_figure_default
+
   keys_areas_default <- data.frame("areas"=c("GENE","ISLAND","DMR","CHR","PROBE"))
   keys_gene_subareas_default <- data.frame("subarea"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
   keys_island_subareas_default <- data.frame("subarea"=c("N_SHORE","S_SHORE","N_SHELF","S_SHELF", "WHOLE"))
+
   ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Reference","Control","Case"))
 
   # filter selected figures, anoamlies and areas passed by user

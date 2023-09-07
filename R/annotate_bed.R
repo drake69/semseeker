@@ -24,33 +24,30 @@ annotate_bed <- function ()
                             "file_path_build")
 
   # for(i in 1:nrow(localKeys))
-  foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export) %dorng%
+  result <- foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export, .combine = rbind) %dorng%
     {
       # i <- 1
-      for (g in 1:length(ssEnv$keys_sample_groups))
-      {
-        # tryCatch(
+      for (g in 1:nrow(ssEnv$keys_sample_groups))
+      # foreach::foreach(i=1:nrow(ssEnv$keys_sample_groups), .export = variables_to_export, .combine = rbind) %dorng%
           {
-            # g <- 1
-            marker <- as.character(localKeys[i,"MARKER"])
-            sample_group <- as.character(ssEnv$keys_sample_groups[g])
-            figure <- as.character(localKeys[i,"FIGURE"])
-            subarea <- as.character(localKeys[i,"SUBAREA"])
-            area <- as.character(localKeys[i,"AREA"])
-            area_subarea <- paste(area,"_", subarea, sep="")
+        # g <- 1
+        marker <- as.character(localKeys[i,"MARKER"])
+        sample_group <- as.character(ssEnv$keys_sample_groups[g,"SAMPLE_GROUP"])
+        figure <- as.character(localKeys[i,"FIGURE"])
+        subarea <- as.character(localKeys[i,"SUBAREA"])
+        area <- as.character(localKeys[i,"AREA"])
+        area_subarea <- paste(area,"_", subarea, sep="")
 
-            bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
-            if (file.exists(bedFileName))
-              next
+        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
+        if (!file.exists(bedFileName))
+        {
+          probe_features <- probe_features_get(area_subarea)
+          probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
-            probe_features <- probe_features_get(area_subarea)
-            probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
-
-            # annotate file
-            dataToAnnotate <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
-            if(is.null(dataToAnnotate))
-              next
-
+          # annotate file
+          dataToAnnotate <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
+          if(!is.null(dataToAnnotate))
+          {
             if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
               dataToAnnotate <- merge(dataToAnnotate, probe_features, by = c("CHR", "START","END"))
             else
@@ -58,36 +55,34 @@ annotate_bed <- function ()
 
             dataToAnnotate <-subset(dataToAnnotate, !is.na(eval(parse(text=area_subarea))))
 
-            if(nrow(dataToAnnotate)==0)
-              next
-            sourceDataColNames <- colnames(dataToAnnotate)
-            sourceDataColNames[which(sourceDataColNames==area_subarea)] <- "AREA"
-            colnames(dataToAnnotate) <- sourceDataColNames
+            if(nrow(dataToAnnotate)!=0)
+              {
+                sourceDataColNames <- colnames(dataToAnnotate)
+                sourceDataColNames[which(sourceDataColNames==area_subarea)] <- "AREA"
+                colnames(dataToAnnotate) <- sourceDataColNames
 
-            dataToAnnotate$CHR <- as.factor(dataToAnnotate$CHR)
+                dataToAnnotate$CHR <- as.factor(dataToAnnotate$CHR)
 
-            probe_features <- probe_features[(probe_features$CHR %in% unique((dataToAnnotate$CHR))), ]
-            droplevels(probe_features$CHR)
-            droplevels(dataToAnnotate$CHR)
+                probe_features <- probe_features[(probe_features$CHR %in% unique((dataToAnnotate$CHR))), ]
+                droplevels(probe_features$CHR)
+                droplevels(dataToAnnotate$CHR)
 
-            colname_to_preserve <- !(colnames(dataToAnnotate) %in%  c("START","END","K27","K450","K850"))
-            dataToAnnotate <- unique(dataToAnnotate[, colname_to_preserve])
+                colname_to_preserve <- !(colnames(dataToAnnotate) %in%  c("START","END","K27","K450","K850"))
+                dataToAnnotate <- unique(dataToAnnotate[, colname_to_preserve])
 
-            # dataToAnnotate
+                # dataToAnnotate
 
-            if(exists("final_bed"))
-              final_bed <- rbind(final_bed, dataToAnnotate)
-            else
-              final_bed <- dataToAnnotate
-
-            if(ssEnv$showprogress)
-              progress_bar(sprintf("Annotating multiple files."))
+                if(exists("final_bed"))
+                final_bed <- rbind(final_bed, dataToAnnotate)
+                else
+                final_bed <- dataToAnnotate
+                gc()
+              }
+            }
           }
-        # ,
-        #   finally =  {
-        #     message("ERROR: these ", marker," ", sample_group," ", figure," ", subarea ," ",area ," ", area_subarea , " has error in annotate bed !")
-        #   }
-        # )
+        if(ssEnv$showprogress)
+          progress_bar(sprintf("Annotating multiple files."))
+
       }
 
       if(exists("final_bed"))
@@ -98,10 +93,11 @@ annotate_bed <- function ()
         if(!plyr::empty(final_bed))
         {
           fst::write_fst( x = final_bed,path =  bedFileName, compress = T )
-          message("INFO: annotated file to ", bedFileName)
+          message("INFO: ", Sys.time(),  " annotated file to ", bedFileName)
         }
       }
-
+      gc()
+      i
     }
 
 }

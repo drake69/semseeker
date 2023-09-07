@@ -6,7 +6,7 @@ test_that("range_beta_values", {
 
   ####################################################################################
   beta_thresholds_local <- semseeker:::range_beta_values(methylation_data, iqrTimes = iqrTimes)
-  testthat::expect_true(sum(colnames(beta_thresholds_local)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values"))==3)
+  testthat::expect_true(sum(colnames(beta_thresholds_local)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values","iqr","q1","q3"))==6)
 
   ####################################################################################
   testthat::expect_true(nrow(beta_thresholds_local)==nrow(methylation_data))

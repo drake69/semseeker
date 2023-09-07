@@ -7,6 +7,8 @@
 #'
 dir_check_and_create <- function  (baseFolder, subFolders)
 {
+
+
   folderSep <- as.character(.Platform$file.sep)
   parts <- unlist(strsplit(as.character(baseFolder), folderSep))
   # do.call(file.path, as.list(c(parts[1:length(parts) - 1], subFolders)))
@@ -15,7 +17,12 @@ dir_check_and_create <- function  (baseFolder, subFolders)
 
   for( y in 1:length(subFolders))
   {
+
     subFolder <- subFolders[y]
+
+    # if(subFolder=="c(\"Reference\", \"Control\", \"Case\")")
+    #   browser()
+
     browser
     if(!exists("subF"))
       subF <- file.path(subFolder)

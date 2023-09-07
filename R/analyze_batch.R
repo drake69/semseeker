@@ -61,10 +61,17 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
     stop("INFO: ", Sys.time(), " Empty methylation_data ")
   }
 
-  populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
-  gc()
-  # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
-  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
+  if(!ssEnv$beta_intrasample)
+  {
+    populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
+    gc()
+    # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
+    fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
+  }
+  else
+  {
+    populationControlRangeBetaValues <- NULL
+  }
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]
@@ -78,7 +85,6 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
   for (i in 1:length(ssEnv$keys_sample_groups[,1]))
   {
-
     #
     sample_group <- ssEnv$keys_sample_groups[i,1]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == sample_group, ]

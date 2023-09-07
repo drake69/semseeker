@@ -11,7 +11,9 @@ deltarq_get <- function(resultPopulation){
 
   Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
-  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
+
+  # must use keys_markers_figure_default because the selected marker could exclude deltar which is basilar for deltarq
+  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figure_default,Sample_Group)
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAR")
   localKeys$EXT <- "fst"
 
@@ -39,7 +41,7 @@ deltarq_get <- function(resultPopulation){
   }
 
   deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=4))
-  localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figures, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
+  localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figure_default, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTARQ")
 

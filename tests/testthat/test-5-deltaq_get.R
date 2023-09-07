@@ -32,6 +32,7 @@ test_that("deltaq_get", {
   localFileRes_both <- fst::read_fst(fileToRead)
   testthat::expect_true(sum(is.na(localFileRes_both$VALUE))==0)
   testthat::expect_true(nrow(localFileRes_both)>0)
+  ####################################################################################
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAQ_HYPER")
   fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "DELTAQ" ,"HYPER" ), "fst")
@@ -40,8 +41,8 @@ test_that("deltaq_get", {
   testthat::expect_true(nrow(deltaq_localFileRes_hyper)>0)
   ####################################################################################
 
-  tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_HYPER")
-  fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"HYPER" ), "fst")
+  tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAS_HYPER")
+  fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "DELTAS" ,"HYPER" ), "fst")
   mut_localFileRes_hyper <- fst::read_fst(fileToRead)
   testthat::expect_true(nrow(mut_localFileRes_hyper)==nrow(deltaq_localFileRes_hyper))
 

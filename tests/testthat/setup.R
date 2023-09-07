@@ -26,7 +26,12 @@ plot(density(as.numeric(methylation_data)))
 q1 <-stats::quantile(methylation_data, probs = 0.25, na.rm = TRUE)
 q3 <-stats::quantile(methylation_data, probs = 0.75, na.rm = TRUE)
 
-noise_position <- runif(nsamples*nprobes*perc_epimutation, min = 1, max = nsamples*nprobes)
+noise_position <- unique(floor(runif(nsamples*nprobes*perc_epimutation*2, min = 1, max = nsamples*nprobes)))
+noise_position <- noise_position[1:(nsamples*nprobes*perc_epimutation)]
+min(noise_position)
+max(noise_position)
+median(noise_position)
+
 noise <- c(runif(nsamples*nprobes*perc_epimutation/2,min = q3,  max= q3 + 2*(abs(q3)) ),runif(nsamples*nprobes*perc_epimutation/2,min = q1-2*(abs(q1)),max=q1))
 
 methylation_data[noise_position] <- noise
@@ -35,7 +40,7 @@ methylation_data[noise_position] <- noise
 methylation_data <- methylation_data + abs(min(noise))
 # min(methylation_data)
 
-methylation_data <- as.data.frame(matrix(methylation_data,nprobes,nsamples))
+methylation_data <- as.data.frame(matrix(data = methylation_data,nrow = nprobes,ncol = nsamples, byrow = TRUE))
 plot(density(as.numeric(methylation_data[1,])))
 
 
@@ -54,8 +59,8 @@ mySampleSheet$Covariates2 <- stats::rnorm(nsamples, mean= 67, sd= 100)
 mySampleSheet_batch <<- list(mySampleSheet, mySampleSheet, mySampleSheet)
 methylation_data_batch <<- list(methylation_data, methylation_data, methylation_data)
 
-q1 <- apply(methylation_data, 1, stats::quantile, probs = 0.25, na.rm = TRUE)
-q3 <- apply(methylation_data, 1, stats::quantile, probs = 0.75, na.rm = TRUE)
+q1 <- apply(methylation_data, 1, function (x) { stats::quantile(x, probs = 0.25, na.rm = TRUE) })
+q3 <- apply(methylation_data, 1, function (x) { stats::quantile(x, probs = 0.75, na.rm = TRUE) })
 iqr <- data.frame(q3 - q1)
 
 beta_superior_thresholds <- data.frame("HIGH" = q3 + 3 * iqr)
@@ -73,9 +78,11 @@ beta_medians <- apply(methylation_data, 1, median)
 beta_thresholds <- data.frame("beta_median_values"=beta_medians,
   "beta_inferior_thresholds"=beta_inferior_thresholds,
   "beta_superior_thresholds"=beta_superior_thresholds,
-  "iqr" = iqr)
+  "iqr" = iqr,
+  "q1"=q1,
+  "q3"=q3)
 
-colnames(beta_thresholds) <- c("beta_median_values","beta_inferior_thresholds","beta_superior_thresholds","iqr")
+colnames(beta_thresholds) <- c("beta_median_values","beta_inferior_thresholds","beta_superior_thresholds","iqr","q1","q3")
 
 #####
 ### copy as global

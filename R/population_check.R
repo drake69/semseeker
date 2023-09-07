@@ -9,12 +9,18 @@ sample_group_check <- function(sample_sheet, methylation_data)
   # if ( nrow(unique(sample_sheet))!=n_sample)
   #   stop("")
 
+
   sample_sheet <- as.data.frame(sample_sheet)
   sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", ssEnv$keys$pasted))]
 
   result <- NULL
 
-  needColumns <- c("Sample_ID", "Sample_Group")
+  if((length(sample_sheet$Sample_Group=="Case")<=3)
+    || (length(sample_sheet$Sample_Group=="Control")<=3)
+    || (length(sample_sheet$Sample_Group=="Reference")<=3))
+    return("ERROR: ", Sys.time(), " Sample groups Case, Control and Reference must be present in the sample sheet, not enough samples each group. ")
+
+    needColumns <- c("Sample_ID", "Sample_Group")
   missedColumns <- needColumns[!(needColumns %in% colnames(sample_sheet))]
 
   if (length(missedColumns) > 0) {

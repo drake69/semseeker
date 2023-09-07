@@ -36,13 +36,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     areas_selection <-arguments$areas_selection
   }
 
-  figures <- ssEnv$keys_figures[,1]
-  markers <- ssEnv$keys_markers[,1]
+  localKeys <- ssEnv$keys_markers_figures
   sample_groups <- c("Reference","Control","Case")
 
   create_excel_pivot()
 
-  # if(exists("figures")) figures,  if(exists("markers"))  markers,if(exists("areas"))  areas
 
   inference_details <- unique(inference_details)
   # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
@@ -181,17 +179,19 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
           # binomiale che si vuole usare per la regressione logistica
 
-
-          for (a in length(markers))
+          markers <- unique(localKeys$MARKER)
+          for (a in 1:length(markers) )
           {
-            keys <- expand.grid("MARKER" =  markers[a], "FIGURE" =  figures)
-            # # aggiungiamo temporaneamente BETA MEAN
-            # levels(keys$FIGURE) <- c(levels(keys$FIGURE), "MEAN")
-            # keys$FIGURE[keys$MARKER=="BETA"] <- "MEAN"
+            keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
-            cols <- paste0(keys$MARKER,"_",keys$FIGURE, sep = "")
+            cols <- keys$COMBINED
             # temporaneamente filtriamo per le colonne esistenti
             cols <- cols[cols %in% colnames(study_summary)]
+            # if(length(cols)==0)
+            # {
+            #   message("INFO: this marker with figure", keys$COMBINED , "is not identified,have you run with this combination semseeker function ?")
+            #   next
+            # }
             keys$AREA  =  "SAMPLE_GROUP"
             keys$SUBAREA  =  "SAMPLE"
             iters <- length(cols)
@@ -283,7 +283,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             if(depth_analysis >1)
             {
 
-              keys <- ssEnv$keys_markers_figures_areas
+              keys <- ssEnv$keys_areas_subareas_markers_figures
               # clean keys from already done association
               if(file.exists(fileNameResults))
               {
@@ -345,7 +345,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       cols <- (gsub("'", "_", cols))
                       tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
                       if(length(colnames(tempDataFrameBatch)) !=  length(cols))
-                        stop("ERROR: I'm stopping here data t associate are not correct, file a bug!")
+                        stop("ERROR: I'm stopping here data to associate are not correct, file a bug!")
                       colnames(tempDataFrameBatch) <- cols
                       g_start <- 2 + length(covariates)
                       result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
