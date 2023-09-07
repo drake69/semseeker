@@ -50,31 +50,32 @@ analyze_population <- function(methylation_data, sliding_window_size, sample_she
                            "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_single_sample")
   i <- 1
 
-  beta_superior_thresholds <- beta_thresholds$beta_superior_thresholds
-  beta_inferior_thresholds <- beta_thresholds$beta_inferior_thresholds
-  iqr <- beta_thresholds$iqr
-  beta_median_values <- beta_thresholds$beta_median_values
+  if (!ssEnv$beta_intrasample)
+  {
+    beta_superior_thresholds <- beta_thresholds$beta_superior_thresholds
+    beta_inferior_thresholds <- beta_thresholds$beta_inferior_thresholds
+    iqr <- beta_thresholds$iqr
+    beta_median_values <- beta_thresholds$beta_median_values
+  }
 
   # for(i in 1:nrow(sample_sheet)) {
   summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
     local_sample_detail <- sample_sheet[i,]
 
     beta_values <- methylation_data[, local_sample_detail$Sample_ID]
-
-    beta_sample <- beta_single_sample( beta_values,local_sample_detail,probe_features)
     if (ssEnv$beta_intrasample )
     {
-      q <- stats::quantile(values)
+      q <- stats::quantile(beta_values)
       q1 <- as.numeric(q[2])
       q3 <- as.numeric(q[4])
       y_med <- as.numeric(q[3])
-      iqr <- stats::IQR(values)
+      iqr <- stats::IQR(beta_values)
       iqrmult <- 3
       y_sup <- q3 + iqrmult * iqr
       y_inf <- q1 - iqrmult * iqr
-      beta_superior_thresholds <- rep(y_sup,length(values))
-      beta_inferior_thresholds <- rep(y_inf,length(values))
-      beta_median_values <- rep(y_med,length(values))
+      beta_superior_thresholds <- rep(y_sup,length(beta_values))
+      beta_inferior_thresholds <- rep(y_inf,length(beta_values))
+      beta_median_values <- rep(y_med,length(beta_values))
     }
 
     hyper_result <- analyze_single_sample( values = beta_values, sliding_window_size = sliding_window_size,
@@ -96,6 +97,10 @@ analyze_population <- function(methylation_data, sliding_window_size, sample_she
     deltar_result <- deltar_single_sample ( values = beta_values, high_thresholds = beta_superior_thresholds,
       low_thresholds = beta_inferior_thresholds, sample_detail = local_sample_detail,
       probe_features = probe_features)
+
+    # summary beta
+    names(beta_values) <- row.names(methylation_data)
+    beta_sample <- beta_single_sample( beta_values,local_sample_detail,probe_features)
 
     sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result,
       "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions, deltar_result, beta_sample)

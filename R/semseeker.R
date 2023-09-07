@@ -24,8 +24,8 @@ semseeker <- function(sample_sheet,
                       ... ) {
 
 
-  unlink(result_folder, recursive = TRUE)
-  init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, ...)
+
+  init_env( result_folder= result_folder, maxResources= maxResources, parallel_strategy = parallel_strategy, start_fresh=TRUE, ...)
   ssEnv <- get_session_info()
 
   # set digits to 22
@@ -49,8 +49,8 @@ semseeker <- function(sample_sheet,
     d <- 1
     for(d in 1:length(methylation_data))
     {
-      if(exists("probes_to_preserve"))
-        probes_to_preserve <- probes_to_preserve[ probes_to_preserve %in% row.names(stats::na.omit(methylation_data[[d]]))]
+      if (ssEnv$beta_intrasample)
+        probes_to_preserve <- row.names((methylation_data[[d]]))
       else
         probes_to_preserve <- row.names(stats::na.omit(methylation_data[[d]]))
     }
@@ -86,7 +86,9 @@ semseeker <- function(sample_sheet,
   else
     sample_groups <- c("Control","Case")
 
-  ssEnv$keys_sample_groups <- sample_groups
+  # seems to change the ssEnv reducing the items TODO
+  ssEnv <- get_session_info()
+  ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
   update_session_info(ssEnv)
 
   annotate_bed()

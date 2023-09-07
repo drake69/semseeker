@@ -76,15 +76,9 @@ create_excel_pivot <-  function() {
 
           temp_list <- list(annotatedData)
           names(temp_list) <- c(pivot_file_name)
-          if(ssEnv$showprogress)
-            progress_bar(sprintf("Creating pivot table."))
-          temp_list
           # sheetList <- c(sheetList, temp_list)
+          temp_list
       }
-      else
-        if(ssEnv$showprogress)
-          progress_bar(sprintf("Creating pivot table."))
-
     }
 
     if(exists("old_sheet_list") & length(sheetList)!=0)
@@ -116,6 +110,10 @@ create_excel_pivot <-  function() {
         if(!exists("old_sheet_list"))
           message("INFO: ", Sys.time(), " No pivot tables to save.")
       }
+
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("Creating pivot table."))
+
   }
 
 }

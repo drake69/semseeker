@@ -60,13 +60,13 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
 
   result <- ""
   result <- result[-1]
-  if(mean(deltarAnnotated_hypoSorted$DELTA)<0 |
-      mean(deltarAnnotated_hyperSorted$DELTA) <0 |
-      mean(deltarAnnotated_bothSorted$DELTA) <0 )
+  if( (min(deltarAnnotated_hypoSorted$DELTA)<0) |
+      (min(deltarAnnotated_hyperSorted$DELTA)<0) |
+      (min(deltarAnnotated_bothSorted$DELTA)<0) )
   {
-    message(mean(deltarAnnotated_hypoSorted$DELTA))
-    message(mean(deltarAnnotated_hyperSorted$DELTA))
-    message(mean(deltarAnnotated_bothSorted$DELTA))
+    message(min(deltarAnnotated_hypoSorted$DELTA))
+    message(min(deltarAnnotated_hyperSorted$DELTA))
+    message(min(deltarAnnotated_bothSorted$DELTA))
     stop("ERROR: I'm stopping here the deltar have negative values!")
   }
   result["DELTAR_HYPO"] <- mean(deltarAnnotated_hypoSorted$DELTA)

@@ -30,7 +30,7 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
       {
         beta_row <- beta_values[r,]
         b_values <- as.vector(t(beta_row))
-        temp <- stats::quantile(b_values, c(0.25,0.5,0.75))
+        temp <- stats::quantile(b_values, c(0.25,0.5,0.75), na.rm=TRUE)
         betaQ1Values <-  temp[1]
         betaQ3Values <- temp[2]
         beta_median_values <- temp[3]
@@ -59,7 +59,7 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
     th <- future.apply::future_apply(beta_values, 1 ,  get_th <- function(beta_row)
     {
       b_values <- as.vector(t(beta_row))
-      temp <- stats::quantile(b_values, c(0.25,0.5,0.75))
+      temp <- stats::quantile(b_values, c(0.25,0.5,0.75), na.rm = TRUE)
       betaQ1Values <-  temp[1]
       betaQ3Values <- temp[2]
       beta_median_values <- temp[3]

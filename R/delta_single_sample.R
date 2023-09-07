@@ -55,13 +55,13 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
 
   result <- ""
   result <- result[-1]
-  if(mean(deltasAnnotated_hypoSorted$DELTA)<0 |
-      mean(deltasAnnotated_hyperSorted$DELTA) <0 |
-      mean(deltasAnnotated_bothSorted$DELTA) <0 )
+  if( (min(deltasAnnotated_hypoSorted$DELTA)<0) |
+      (min(deltasAnnotated_hyperSorted$DELTA)<0) |
+      (min(deltasAnnotated_bothSorted$DELTA)<0) )
   {
-    message(mean(deltasAnnotated_hypoSorted$DELTA))
-    message(mean(deltasAnnotated_hyperSorted$DELTA))
-    message(mean(deltasAnnotated_bothSorted$DELTA))
+    message(min(deltasAnnotated_hypoSorted$DELTA))
+    message(min(deltasAnnotated_hyperSorted$DELTA))
+    message(min(deltasAnnotated_bothSorted$DELTA))
     stop("ERROR: I'm stopping here the deltas have negative values!")
   }
   result["DELTAS_HYPO"] <- mean(deltasAnnotated_hypoSorted$DELTA)

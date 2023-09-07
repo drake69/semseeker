@@ -7,7 +7,8 @@ create_multiple_bed <- function(sample_sheet){
   i <- 0
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
-  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
+  # multiple bed i created only for probes must be taken into account all markers
+  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figure_default,Sample_Group)
   # localKeys <- subset(localKeys, MARKER!="BETA")
 
   if(ssEnv$showprogress)
@@ -29,6 +30,7 @@ create_multiple_bed <- function(sample_sheet){
     temp_file <- tempdir()
     temp_file <- paste(temp_file, stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),sep="")
     fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), as.character(figure)), "fst")
+    fileToWriteBed <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), as.character(figure)), key$EXT)
     if(!file.exists(fileToWrite))
     {
       j <- 0
@@ -52,8 +54,9 @@ create_multiple_bed <- function(sample_sheet){
       if(file.exists(temp_file))
       {
         fst::write.fst(x = utils::read.table(temp_file, sep = "\t"),path = fileToWrite)
+        file.copy(from = temp_file, to = fileToWriteBed)
         file.remove(temp_file)
-        message("INFO: ", Sys.time(), " Created multiple annotated file!", fileToWrite)
+        message("INFO: ", Sys.time(), " Created multiple annotated file!", fileToWriteBed)
       }
     }
     if(ssEnv$showprogress)
