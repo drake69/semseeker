@@ -6,18 +6,19 @@
 #' @param ... other options to filter elaborations
 #'
 #' @return the working ssEnvonment
-init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multicore", start_fresh= FALSE, ...)
+init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multicore", ...)
 {
 
-  ssEnv$start_fresh <- TRUE
+  arguments <- list(...)
+  start_fresh <- TRUE
   if(!is.null(arguments[["start_fresh"]]))
   {
-    ssEnv$start_fresh <- if(is.null(arguments[["start_fresh"]])) TRUE else arguments$start_fresh
+    start_fresh <- arguments$start_fresh
   }
 
-  if(ssEnv$start_fresh)
+  if(start_fresh)
   {
-    # unlink(result_folder, recursive = TRUE)
+    unlink(result_folder, recursive = TRUE)
     ssEnv <- get_session_info(result_folder)
   }
 
@@ -63,7 +64,6 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   doFuture::registerDoFuture()
 
-
   tryCatch(
     {
       test_it <- list(...)
@@ -74,18 +74,17 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
       stop()
     }
   )
-  arguments <- list(...)
 
   ssEnv$showprogress <- FALSE
   if(!is.null(arguments[["showprogress"]]))
   {
-    ssEnv$showprogress <- if(is.null(arguments[["showprogress"]])) FALSE else arguments$showprogress
+    ssEnv$showprogress <-  arguments$showprogress
   }
 
   ssEnv$beta_intrasample <- FALSE
   if(!is.null(arguments[["beta_intrasample"]]))
   {
-    ssEnv$beta_intrasample <- if(is.null(arguments[["beta_intrasample"]])) FALSE else arguments$beta_intrasample
+    ssEnv$beta_intrasample <- arguments$beta_intrasample
   }
 
   # TODO: improve planning parallel management using also cluster

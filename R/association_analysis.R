@@ -27,7 +27,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   j <- 0
   k <- 0
   z <- 0
-  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
+  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 
   arguments <- list(...)
   areas_selection <- c()
