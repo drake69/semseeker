@@ -8,7 +8,6 @@
 #' @return the working ssEnvonment
 init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multicore", ...)
 {
-
   arguments <- list(...)
   start_fresh <- TRUE
   if(!is.null(arguments[["start_fresh"]]))
