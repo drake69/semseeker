@@ -1,8 +1,8 @@
 Package: semseeker
 Type: Package
 Title: Stochastic Epigenetic Mutations SEM Seeker
-Version: 0.9.9
-Author: Luigi Corsaro, Davide Gentilini, Luciano Calzari
+Version: 0.9.10
+Author: Luigi Corsaro, Davide Gentilini, Luciano Calzari, Davide Sacco
 Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
 Description: Stochastic epimutation and enriched region upstream and downstream tool for EWAS.
 License: AGPL-3

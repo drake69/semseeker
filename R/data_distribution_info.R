@@ -1,8 +1,9 @@
 data_distribution_info <- function(family_test, tempDataFrame, burdenValue, independent_variable)
 {
   family_test_missed <- TRUE
-  if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="t.test")
+  if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="t.test" | grepl("mean-bootstrap",family_test))
   {
+    tempDataFrame[,independent_variable] <- as.factor(tempDataFrame[,independent_variable])
     bartlett_pvalue <- stats::bartlett.test( stats::as.formula(paste0(burdenValue,"~", independent_variable, sep="")),
       data= as.data.frame(tempDataFrame) )
     family_test_missed <- FALSE

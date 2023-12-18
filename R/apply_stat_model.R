@@ -63,6 +63,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       if(family_test=="wilcoxon" | family_test=="t.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
         model_result <- test_model(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 
+      if(grepl("mean-bootstrap",family_test))
+        model_result <- mean_bootstrap(family_test, sig.formula, tempDataFrame, independent_variable, boot_success, tests_count)
+
       # Determine the null device for the current platform
       null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
       # Redirect output to the null device
