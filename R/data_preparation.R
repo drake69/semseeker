@@ -15,22 +15,23 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   ssEnv <- get_session_info()
 
   transformation <- as.character(transformation)
-  originalDataFrame <- tempDataFrame
-  tempDataFrame <- as.data.frame(sapply(tempDataFrame, as.numeric))
-
   independent_variable1stLevel <- NA
   independent_variable2ndLevel <- NA
   test_factor <- as.factor(tempDataFrame[, independent_variable])
   if(length(levels(test_factor))<4)
   {
+    # sort alphabetically factors
+    # levels(test_factor) <- sort(levels(test_factor))
     tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
-    }
+  }
   if(is.factor(tempDataFrame[, independent_variable]))
   {
     independent_variable1stLevel <- levels(tempDataFrame[, independent_variable])[1]
     independent_variable2ndLevel <- levels(tempDataFrame[, independent_variable])[2]
   }
 
+  originalDataFrame <- tempDataFrame
+  tempDataFrame <- as.data.frame(sapply(tempDataFrame, as.numeric))
   df_head <- tempDataFrame[,1:(g_start-1)]
 
   burden_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)

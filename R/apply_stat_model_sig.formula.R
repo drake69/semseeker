@@ -6,6 +6,12 @@ apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_
     sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
   }
 
+  if(grepl("mean-bootstrap",family_test))
+  {
+    covariates_model <- independent_variable
+    sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+  }
+
   if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
   {
     covariates_model <- independent_variable

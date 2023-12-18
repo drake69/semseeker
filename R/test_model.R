@@ -15,7 +15,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     r_model <- "stats_wilcox.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
-    beta_value <- stats::median(SPLIT[[1]]) - stats::median(SPLIT[[2]])
+    beta_value <- stats::mean(SPLIT[[1]]) - stats::mean(SPLIT[[2]])
   }
 
   if(family_test=="t.test")
