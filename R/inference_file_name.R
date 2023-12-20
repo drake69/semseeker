@@ -9,12 +9,13 @@ inference_file_name <- function(inference_detail, marker)
   independent_variable <- gsub(" ","", inference_detail$independent_variable)
   depth_analysis <- inference_detail$depth_analysis
 
-  file_result_prefix <- paste(depth_analysis, as.character(independent_variable),sep = "_")
+  file_result_prefix <- paste("DEPTH",depth_analysis, as.character(independent_variable),sep = "_")
   if(is.null(covariates) || length(covariates)  ==  0)
     file_suffix <- ""
   else
     file_suffix <- paste(covariates, collapse = "_")
 
-  fileNameResults <- file_path_build(ssEnv$result_folderInference,c( marker,file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
+  fileNameResults <- file_path_build(ssEnv$result_folderInference,c(as.character(marker),file_result_prefix , as.character(transformation), as.character(family_test), file_suffix),"csv")
 
+  return(fileNameResults)
 }

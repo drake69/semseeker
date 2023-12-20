@@ -232,7 +232,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     }
   }
 
-  message("INFO: ", Sys.time(), " I performed:",iters - 2," tests." )
+  message("INFO: ", Sys.time(), " I performed:",iters," tests." )
 
   if(exists("result_temp"))
   {

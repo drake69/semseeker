@@ -127,44 +127,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable, covariates)])
           }
 
-          result  =  data.frame (
-            "INDIPENDENT.VARIABLE" = "",
-            "MARKER"  =  "",
-            "FIGURE"  =  "",
-            "AREA"  =  "",
-            "SUBAREA"  =  "",
-            "AREA_OF_TEST"  =  "",
-            "PVALUE"  =  "",
-            "PVALUEADJ"  =  "",
-            "TEST"  =  "",
-            "BETA"  =  "",
-            "STD.ERROR" = "",
-            "AIC"  =  "",
-            "RESIDUALS.SUM"  =  "",
-            "FAMILY" = "",
-            "R.PACK" = "",
-            "TRANSFORMATION"  =  "",
-            "COVARIATES"  =  "",
-            "SHAPIRO.PVALUE"  =  "",
-            "BREUSCH-PAGAN.PVALUE" = "",
-            "BARTLETT.PVALUE"  =  "",
-            "CASE.LABEL" = "",
-            "COUNT.CASE","",
-            "MEAN.CASE"  = "",
-            "SD.CASE" = "",
-            "CONTROL.LABEL" = "",
-            "COUNT.CONTROL" = "",
-            "MEAN.CONTROL" = "",
-            "SD.CONTROL" = "",
-            "RHO" = "",
-            "CI.LOWER" =  "",
-            "CI.UPPER" =  "",
-            "CI.LOWER.ADJUSTED" =   NA,
-            "CI.UPPER.ADJUSTED" =   NA,
-            "N.PERMUTATIONS"  =  ""
-          )
-          result <- result[-1,]
-
           if(!is.null(covariates) && !length(covariates)  ==  0)
           {
             sample_names <-   sample_names[, c("Sample_ID", independent_variable, covariates)]
@@ -205,6 +167,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             if(file.exists(fileNameResults))
             {
               old_results <- utils::read.csv2(fileNameResults, header  =  T)
+              old_results <- old_results[old_results$AREA  ==  "SAMPLE_GROUP",]
+              old_results <- old_results[old_results$SUBAREA  ==  "SAMPLE",]
               keys_markers_figures_areas_done <- unlist(apply(unique(old_results [, c("MARKER","FIGURE","AREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
               keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
               keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
@@ -216,10 +180,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 g_start <- 2 + length(covariates)
                 result_temp <- apply_stat_model(tempDataFrame  =  study_summary[, c(independent_variable, covariates, cols[j])], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
                   key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
-                result <- rbind(result, result_temp)
+                if (exists("result"))
+                  result <- plyr::rbind.fill(result, result_temp)
+                else
+                  result <- result_temp
               }
 
-            result <- result[order(result$PVALUEADJ),]
+            if (exists("result"))
+              result <- result[order(result$PVALUEADJ),]
 
             study_summaryToPlot <- study_summary
 
@@ -279,15 +247,27 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               }
             }
 
+            if (exists("old_results"))
+            {
+              if (exists("result"))
+                result <- plyr::rbind.fill(result, old_results)
+              else
+                result <- old_results
+              rm(old_results)
+            }
+
+            utils::write.csv2(result, fileNameResults , row.names  =  FALSE)
 
             if(depth_analysis >1)
             {
-
-              keys <- ssEnv$keys_areas_subareas_markers_figures
+              localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
+              keys <- localKeys_1[localKeys_1$MARKER==markers[a],]
               # clean keys from already done association
               if(file.exists(fileNameResults))
               {
                 old_results <- utils::read.csv2(fileNameResults, header  =  T)
+                old_results <- old_results[old_results$AREA  !=  "SAMPLE_GROUP",]
+                old_results <- old_results[old_results$SUBAREA  !=  "SAMPLE",]
                 keys_markers_figures_areas_done <- unlist(apply(unique(old_results [, c("MARKER","FIGURE","AREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
@@ -300,6 +280,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 # result_temp_foreach <- foreach::foreach(k  =  1:nkeys, .combine  =  rbind, .export  =  variables_to_export_nested) %dorng%
                 for (k in 1:nkeys)
                 {
+
+
                   if(exists("tempDataFrame"))
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
@@ -355,43 +337,47 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       if(!exists("result_temp_foreach"))
                         result_temp_foreach <- result_temp_local_batch
                       else
-                        result_temp_foreach <- rbind(result_temp_local_batch, result_temp_foreach)
+                        result_temp_foreach <- plyr::rbind.fill(result_temp_local_batch, result_temp_foreach)
+
+                      utils::write.csv2(result_temp_foreach, fileNameResults , row.names  =  FALSE)
+
                       # result_temp_local_batch
                     }
                   }
                 }
+
+              if(exists("result_temp_foreach"))
+                result <- plyr::rbind.fill(result, result_temp_foreach)
+
+              if (exists("old_results"))
+              {
+                result <- plyr::rbind.fill(result, old_results)
+                rm(old_results)
+              }
+
+              result <- unique(result)
+              result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BH")
+              result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BY")
+              result[,"PVALUEADJ_ALL_FDR"] <- stats::p.adjust(result[,"PVALUE"],method  =  "fdr")
+              result <- result[order(result$PVALUEADJ),]
+
+              if(filter_p_value)
+                result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
+
+              utils::write.csv2(result,fileNameResults , row.names  =  FALSE)
+              if(exists("result_temp_foreach"))
+                rm(result_temp_foreach)
+              if(exists("result_temp_local_batch"))
+                rm(result_temp_local_batch)
+              if(exists("tempDataFrame"))
+                rm(tempDataFrame)
+              if(exists("result"))
+                rm(result)
             }
           }
         }
       }
     }
-
-    if(exists("result_temp_foreach"))
-      result <- rbind(result, result_temp_foreach)
-
-    result <- unique(result)
-    result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BH")
-    result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BY")
-    result[,"PVALUEADJ_ALL_FDR"] <- stats::p.adjust(result[,"PVALUE"],method  =  "fdr")
-    result <- result[order(result$PVALUEADJ),]
-
-    if(filter_p_value)
-      result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
-
-    if(nrow(result)>0)
-    {
-      if(file.exists(fileNameResults))
-      {
-        old_results <- utils::read.csv2(fileNameResults, header  =  T)
-        result <- plyr::rbind.fill(result, old_results)
-      }
-      result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BH")
-      result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BY")
-      result <- result[order(result$PVALUEADJ),]
-      result <- result[,colSums(is.na(result))<nrow(result)]
-      utils::write.csv2(result,fileNameResults , row.names  =  FALSE)
-    }
-
   }
 
   close_env()

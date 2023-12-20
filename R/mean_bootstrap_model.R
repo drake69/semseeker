@@ -62,20 +62,19 @@ mean_bootstrap <- function(family_test, sig.formula, tempDataFrame, independent_
   conf.level = 1 - (1 - boot_success/tests_count) * (1 - conf.level)
 
   # Compute beta and p-value for n_permutations replications
-  estimate <-  compute_mean_delta_boot(sig.formula=sig.formula, df=tempDataFrame, shuffle = FALSE)
+  beta_value <-  compute_mean_delta_boot(sig.formula=sig.formula, df=tempDataFrame, shuffle = FALSE)
   boot_vector <- replicate(n_permutations_test, compute_mean_delta_boot(sig.formula=sig.formula, df=tempDataFrame, shuffle = TRUE))
-  p.value <- mean(abs(boot_vector) >= abs(estimate))
+  pvalue <- mean(abs(boot_vector) >= abs(beta_value))
+  if (pvalue>1)
+    pvalue <- 1
   # Compute average beta and p-value
-  if ((p.value < 0.05) && (n_permutations_test < n_permutations))
-  {
+  if ((pvalue < 0.05) && (n_permutations_test < n_permutations))
     boot_vector <- replicate(n_permutations, compute_mean_delta_boot(sig.formula=sig.formula, df=tempDataFrame, shuffle=TRUE))
-  }
   r_model <- "mean_bootstrap"
   boot.bca.adjusted <- coxed::bca(boot_vector, conf.level = conf.level)
-  p.value <- mean(abs(boot_vector) >= abs(estimate))
+  pvalue <- mean(abs(boot_vector) >= abs(beta_value))
   ci.lower.adjusted <-  boot.bca.adjusted[1]
   ci.upper.adjusted <- boot.bca.adjusted[2]
 
   return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
-
 }
