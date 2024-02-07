@@ -36,8 +36,8 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
         beta_median_values <- temp[3]
         betaValuesIQR <- stats::IQR(b_values)
 
-        beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
-        beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
+        beta_inferior_thresholds <- max((betaQ1Values - (iqrTimes * betaValuesIQR)), min(b_values))
+        beta_superior_thresholds <- min((betaQ3Values + (iqrTimes * betaValuesIQR)), max(b_values))
 
         temp_result <- data.frame("beta_inferior_thresholds"= beta_inferior_thresholds,
           "beta_superior_thresholds"= beta_superior_thresholds,
@@ -47,8 +47,8 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
           "q3"= betaQ3Values)
         row.names(temp_result) <- row.names(b_values)
         # colnames(temp_result) <- c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values")
-        # if(ssEnv$showprogress)
-        #   progress_bar(sprintf("%s",names(b_values)))
+        if(ssEnv$showprogress)
+          progress_bar(sprintf("%s",names(b_values)))
         temp_result
       }
 
@@ -65,8 +65,8 @@ range_beta_values <- function(populationMatrix, iqrTimes = 3) {
       beta_median_values <- temp[3]
       betaValuesIQR <- stats::IQR(b_values)
 
-      beta_inferior_thresholds <- (betaQ1Values - (iqrTimes * betaValuesIQR))
-      beta_superior_thresholds <- (betaQ3Values + (iqrTimes * betaValuesIQR))
+      beta_inferior_thresholds <- max((betaQ1Values - (iqrTimes * betaValuesIQR)), min(b_values))
+      beta_superior_thresholds <- min((betaQ3Values + (iqrTimes * betaValuesIQR)), max(b_values))
 
       temp_result <- c("beta_inferior_thresholds"= beta_inferior_thresholds,
         "beta_superior_thresholds"= beta_superior_thresholds,
