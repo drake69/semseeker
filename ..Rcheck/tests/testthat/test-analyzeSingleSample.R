@@ -4,9 +4,9 @@ testthat::test_that("analyze_single_sample",{
   ssEnv <- get_session_info()
 
 
-  get_meth_tech(methylation_data)
+  get_meth_tech(signal_data)
 
-  sp <- analyze_single_sample( values = methylation_data[,1],
+  sp <- analyze_single_sample( values = signal_data[,1],
                       sliding_window_size = sliding_window_size,
                       thresholds = thresholds,
                       figure = "HYPO",

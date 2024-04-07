@@ -5,7 +5,7 @@ test_that("semeeker", {
 
   ####################################################################################
 
-  semseeker( sample_sheet =  mySampleSheet_batch,methylation_data =  methylation_data_batch, result_folder = tempFolder,
+  semseeker( sample_sheet =  mySampleSheet_batch,signal_data =  signal_data_batch, result_folder = tempFolder,
              parallel_strategy = parallel_strategy, areas="GENE", figures="BOTH")
 
   tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")

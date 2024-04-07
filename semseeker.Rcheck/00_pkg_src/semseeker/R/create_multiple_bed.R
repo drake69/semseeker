@@ -8,7 +8,7 @@ create_multiple_bed <- function(sample_sheet){
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
   localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figures,Sample_Group)
-  # localKeys <- subset(localKeys, MARKER!="BETA")
+  # localKeys <- subset(localKeys, MARKER!="SIGNAL")
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(localKeys))

@@ -2,14 +2,14 @@
 create_multiple_bed <- function(sample_sheet){
 
   ssEnv <- get_session_info()
-  message("INFO: ", Sys.time(), " Started multiple file creation!")
+  log_event("INFO: ", Sys.time(), " Started multiple file creation!")
   #create multiple file bed
   i <- 0
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
   # multiple bed i created only for probes must be taken into account all markers
   localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figure_default,Sample_Group)
-  # localKeys <- subset(localKeys, MARKER!="BETA")
+  # localKeys <- subset(localKeys, MARKER!="SIGNAL")
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
@@ -56,7 +56,7 @@ create_multiple_bed <- function(sample_sheet){
         fst::write.fst(x = utils::read.table(temp_file, sep = "\t"),path = fileToWrite)
         file.copy(from = temp_file, to = fileToWriteBed)
         file.remove(temp_file)
-        message("INFO: ", Sys.time(), " Created multiple annotated file!", fileToWriteBed)
+       log_event("DEBUG: ", Sys.time(), " Created multiple annotated file!", fileToWriteBed)
       }
     }
     if(ssEnv$showprogress)

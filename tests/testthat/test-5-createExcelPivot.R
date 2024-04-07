@@ -1,32 +1,31 @@
 test_that("create_excel_pivot", {
 
-
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, showprogress = TRUE)
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  tt <- semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
 
-  sp <- semseeker:::analyze_population(methylation_data=methylation_data,
-    sliding_window_size = sliding_window_size,
-    beta_thresholds = beta_thresholds,
+  sp <- semseeker:::analyze_population(
+    signal_data=signal_data,
+    signal_thresholds = signal_thresholds,
     sample_sheet = mySampleSheet,
-    bonferroni_threshold = bonferroni_threshold,
     probe_features = probe_features
-
   )
 
-  semseeker:::create_multiple_bed(sample_sheet = mySampleSheet)
+  multiple <- semseeker:::create_multiple_bed(mySampleSheet)
+  dq <- deltaq_get(mySampleSheet)
+  drq <- deltarq_get(mySampleSheet)
   semseeker:::annotate_bed()
 
   ####################################################################################
 
   # create and read
-  semseeker:::create_excel_pivot ()
+  semseeker:::create_excel_pivot()
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/PROBE.xlsx")))
   testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/CHR.xlsx")))

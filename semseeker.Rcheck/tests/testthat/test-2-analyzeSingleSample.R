@@ -5,13 +5,13 @@ testthat::test_that("analyze_single_sample",{
   ssEnv <-  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
 
-  sp <- semseeker:::analyze_single_sample( values = methylation_data[,1],
+  sp <- semseeker:::analyze_single_sample( values = signal_data[,1],
                       sliding_window_size = sliding_window_size,
-                      thresholds = rep(1,nrow(methylation_data)),
+                      thresholds = rep(1,nrow(signal_data)),
                       figure = "HYPO",
                       sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")] ,
                       bonferroni_threshold = 0.05,

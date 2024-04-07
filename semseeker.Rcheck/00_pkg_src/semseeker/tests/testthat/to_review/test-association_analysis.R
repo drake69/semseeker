@@ -3,8 +3,8 @@ test_that("association_analysis", {
 
   ####################################################################################
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
-    markers=c("BETA"), areas=c("PROBE","CHR","GENE"))
+  semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
+    markers=c("SIGNAL"), areas=c("PROBE","CHR","GENE"))
 
   ####################################################################################
 
@@ -16,7 +16,7 @@ test_that("association_analysis", {
     "depth_analysis"=3,
     "filter_p_value" = FALSE)
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
-    markers=c("DELTAS","DELTAQ","BETA"), areas="GENE")
+    markers=c("DELTAS","DELTAQ","SIGNAL"), areas="GENE")
   fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_gaussian_Covariates1_Covariates2", extension = "csv")
   localFileRes <- read.table(fileToRead, sep=";")
   testthat::expect_true(nrow(localFileRes)>0)
@@ -274,7 +274,7 @@ test_that("association_analysis", {
     "depth_analysis"=3,
     "filter_p_value" = FALSE)
 
-  areas_selection <- rownames(methylation_data)[1:100]
+  areas_selection <- rownames(signal_data)[1:100]
   # inference_details,result_folder, maxResources, parallel_strategy
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, areas_selection=areas_selection, areas="PROBE")
 

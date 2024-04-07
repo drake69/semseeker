@@ -6,16 +6,16 @@ testthat::test_that("delta_single_sample",{
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
 
   delta_single_sample(
-    values = methylation_data[,1],
-    high_thresholds = beta_superior_thresholds,
-    low_thresholds = beta_inferior_thresholds,
+    values = signal_data[,1],
+    high_thresholds = signal_superior_thresholds,
+    low_thresholds = signal_inferior_thresholds,
     sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")],
-    beta_medians = beta_medians,
+    signal_medians = signal_medians,
     probe_features = probe_features
   )
 

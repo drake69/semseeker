@@ -1,4 +1,4 @@
-test_that("beta",{
+test_that("signal",{
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
@@ -6,14 +6,14 @@ test_that("beta",{
 
   sample_detail <- mySampleSheet[1,]
 
-  res <- semseeker:::beta_single_sample(values = methylation_data[,sample_detail$Sample_ID], sample_detail = sample_detail, probe_features = probe_features)
+  res <- semseeker:::signal_single_sample(values = signal_data[,sample_detail$Sample_ID], sample_detail = sample_detail, probe_features = probe_features)
 
-  folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(sample_detail$Sample_Group,paste0("BETA","_", "MEAN", sep = "")))
-  beta_file <- file_path_build(folder_to_save,c(sample_detail$Sample_ID,"BETA","MEAN"),"bedgraph")
-  testthat::expect_true(file.exists(beta_file))
+  folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(sample_detail$Sample_Group,paste0("SIGNAL","_", "MEAN", sep = "")))
+  signal_file <- file_path_build(folder_to_save,c(sample_detail$Sample_ID,"SIGNAL","MEAN"),"bedgraph")
+  testthat::expect_true(file.exists(signal_file))
 
-  beta_file <- read.table(beta_file, sep="\t")
-  testthat::expect_true(nrow(beta_file)==nrow(methylation_data))
+  signal_file <- read.table(signal_file, sep="\t")
+  testthat::expect_true(nrow(signal_file)==nrow(signal_data))
 
 
 })

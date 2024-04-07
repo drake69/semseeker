@@ -1,20 +1,19 @@
-testthat::test_that("analyze_single_sample",{
+test_that("analyze_single_sample",{
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
   ssEnv <-  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
 
-  sp <- semseeker:::analyze_single_sample( values = methylation_data[,1],
-                      sliding_window_size = sliding_window_size,
-                      thresholds = beta_inferior_thresholds,
+  sp <- semseeker:::analyze_single_sample(
+                      values = signal_data[,1],
+                      thresholds = signal_inferior_thresholds,
                       figure = "HYPO",
                       sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")] ,
-                      bonferroni_threshold = 0.05,
                       probe_features = probe_features)
 
 

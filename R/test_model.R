@@ -8,6 +8,67 @@
 #'
 test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 {
+
+  if(family_test=="chisq.test")
+  {
+    tempDataFrame <- as.data.frame(tempDataFrame)
+    dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
+    dependent_variable <- dep_var[[2]]
+    independent_variable <- dep_var[[3]] # sample_group
+    sample1 <- round(tempDataFrame[,dependent_variable],3)
+    sample2 <- tempDataFrame[,independent_variable]
+    # create a contingency table
+    contingency_table <- table( dependent_variable= sample1, independent_variable= sample2)
+
+    result_chisq <- suppressWarnings(stats::chisq.test(as.matrix(contingency_table)))
+    pvalue <- result_chisq$p.value
+    r_model <- "stats_chisq.test"
+    statistic_parameter <- result_chisq$statistic
+  }
+
+  if (family_test=="fisher.test")
+  {
+    tempDataFrame <- as.data.frame(tempDataFrame)
+    dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
+    dependent_variable <- dep_var[[2]]
+    independent_variable <- dep_var[[3]] # sample_group
+    sample1 <- round(tempDataFrame[,dependent_variable],3)
+    sample2 <- tempDataFrame[,independent_variable]
+    # create a contingency table
+    contingency_table <- table( dependent_variable= sample1, independent_variable= sample2)
+
+    result_fisher <- suppressWarnings(stats::fisher.test(as.matrix(contingency_table)))
+    pvalue <- result_fisher$p.value
+    r_model <- "stats_fisher.test"
+    statistic_parameter <- result_fisher$estimate
+  }
+
+  if(family_test=="jsd")
+  {
+    # Sample observations for the first and second sample
+    tempDataFrame <- as.data.frame(tempDataFrame)
+    dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
+    SPLIT <- split(round(tempDataFrame[,dep_var[[2]]],3), tempDataFrame[,dep_var[[3]]])
+    sample1 <- SPLIT[[1]]
+    sample2 <- SPLIT[[2]]
+
+    # Combine the unique elements from both samples to create a common event space
+    common_events <- unique(c(sample1, sample2))
+
+    # Create adjusted frequency tables for both samples
+    frequency_table1_adjusted <- tabulate(match(sample1, common_events), nbins = length(common_events))
+    frequency_table2_adjusted <- tabulate(match(sample2, common_events), nbins = length(common_events))
+
+    # Convert adjusted frequencies to probabilities
+    probability_distribution1_adjusted <- frequency_table1_adjusted / sum(frequency_table1_adjusted)
+    probability_distribution2_adjusted <- frequency_table2_adjusted / sum(frequency_table2_adjusted)
+
+    # Calculate the Jensen-Shannon distance
+    statistic_parameter <- suppressMessages(suppressWarnings(philentropy::JSD(rbind(probability_distribution1_adjusted, probability_distribution2_adjusted))))
+    pvalue <- NA
+    r_model <- "philentropy.JSD"
+  }
+
   if(family_test=="wilcoxon")
   {
     result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
@@ -15,7 +76,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     r_model <- "stats_wilcox.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
-    beta_value <- stats::mean(SPLIT[[1]]) - stats::mean(SPLIT[[2]])
+    statistic_parameter <- mean(SPLIT[[1]]) - mean(SPLIT[[2]])
   }
 
   if(family_test=="t.test")
@@ -25,7 +86,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     r_model <- "stats_t.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
-    beta_value <- mean(SPLIT[[1]]) - mean(SPLIT[[2]])
+    statistic_parameter <- mean(SPLIT[[1]]) - mean(SPLIT[[2]])
   }
 
   if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
@@ -33,7 +94,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_cor <- stats::cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independent_variable]), method = as.character(family_test))
     pvalue <- result_cor$p.value
     r_model <- "stats_cor.test"
-    beta_value <- result_cor$estimate
+    statistic_parameter <- result_cor$estimate
   }
 
   ci.lower <- NA
@@ -43,9 +104,9 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   shapiro_pvalue <- NA
   std.error <- NA
   n_permutations <- NA
-  ci.lower.adjusted <- NA
-  ci.upper.adjusted <- NA
 
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
+
+
+  return (data.frame(ci.lower,ci.upper, pvalue, statistic_parameter,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations))
 
 }

@@ -6,7 +6,7 @@
 
 #' @importFrom dplyr %>%
 #' @importFrom rlang .data
-lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_column, mutation_annotated_sorted)
+lesions_get <- function(grouping_column, mutation_annotated_sorted)
 {
 
   if( is.null(mutation_annotated_sorted))
@@ -41,7 +41,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   # calculate enrichment for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
     dplyr::mutate(ENRICHMENT = stats::ave( .data$MUTATIONS, eval(parse(text = grouping_column)),
-                                           FUN = function(x) enrichement_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
+                                           FUN = function(x) enrichement_calculator(x, ssEnv$sliding_window_size))) %>% dplyr::ungroup ()
 
   basepair_calculator<-function(x,lags){
     tmp_min=-zoo::rollmax( -x, lags, align = "center", fill = 0)
@@ -53,11 +53,12 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   #calculate the base pair count for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
     dplyr::mutate(BASEPAIR_COUNT = stats::ave( .data$START, eval(parse(text = grouping_column)),
-                                              FUN = function(x) basepair_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
+                                              FUN = function(x) basepair_calculator(x, ssEnv$sliding_window_size))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 
-  lesionpValue <- suppressWarnings(stats::dhyper(mutationAnnotatedSortedLocal$ENRICHMENT, mutationAnnotatedSortedLocal$MUTATIONS_COUNT, mutationAnnotatedSortedLocal$PROBES_COUNT, sliding_window_size))
+  lesionpValue <- suppressWarnings(stats::dhyper(mutationAnnotatedSortedLocal$ENRICHMENT, mutationAnnotatedSortedLocal$MUTATIONS_COUNT,
+    mutationAnnotatedSortedLocal$PROBES_COUNT, ssEnv$sliding_window_size))
 
   lesionpValue[is.nan(lesionpValue)] <- 1
   lesionpValue[is.na(lesionpValue)] <- 1

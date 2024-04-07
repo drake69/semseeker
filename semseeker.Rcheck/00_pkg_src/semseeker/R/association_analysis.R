@@ -139,7 +139,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             "PVALUE"  =  "",
             "PVALUEADJ"  =  "",
             "TEST"  =  "",
-            "BETA"  =  "",
+            "SIGNAL"  =  "",
             "STD.ERROR" = "",
             "AIC"  =  "",
             "RESIDUALS.SUM"  =  "",
@@ -185,9 +185,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           for (a in length(markers))
           {
             keys <- expand.grid("MARKER" =  markers[a], "FIGURE" =  figures)
-            # # aggiungiamo temporaneamente BETA MEAN
+            # # aggiungiamo temporaneamente SIGNAL MEAN
             # levels(keys$FIGURE) <- c(levels(keys$FIGURE), "MEAN")
-            # keys$FIGURE[keys$MARKER=="BETA"] <- "MEAN"
+            # keys$FIGURE[keys$MARKER=="SIGNAL"] <- "MEAN"
             keys <- unique(keys)
             cols <- paste0(keys$MARKER,"_",keys$FIGURE, sep = "")
             # temporaneamente filtriamo per le colonne esistenti
@@ -199,7 +199,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             if(!is.null(covariates) && !length(covariates)  ==  0)
               study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
 
-            fileNameResults <- inference_file_name(inference_detail, markers[a])
+            fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
 
             # clean keys from already done association
             if(file.exists(fileNameResults))

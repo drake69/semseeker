@@ -24,7 +24,7 @@
 #           results_inference$AREA == keys[i, ]$AREA &
 #           results_inference$MARKER == keys[i, ]$MARKER &
 #           results_inference$FIGURE == keys[i, ]$FIGURE,
-#         c("AREA_OF_TEST", "BETA", "PVALUEADJ_ALL_BH"),
+#         c("AREA_OF_TEST", "STATISTIC_PARAMETER", "PVALUEADJ_ALL_BH"),
 #       ]
 #       # table(is.na(results_inference))
 #       gene_set <- na.omit(gene_set)

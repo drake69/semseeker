@@ -112,7 +112,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
 
   # set default values
   keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  keys_markers_default <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ","BETA"))
+  keys_markers_default <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ","SIGNAL"))
   keys_markers_default$EXT <-  c("bed","bed","bedgraph","bed","bedgraph","bed","bedgraph")
   keys_areas_default <- data.frame("areas"=c("GENE","ISLAND","DMR","CHR","PROBE"))
   keys_gene_subareas_default <- data.frame("subarea"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
@@ -160,10 +160,10 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   keys_markers <-  data.frame("MARKER"=markers)
   keys_markers_figures <-  expand.grid("MARKER"=keys_markers[,1],"FIGURE"=keys_figures[,1])
 
-  # create markers figures to work on, cleaning also for BETA only MEAN
+  # create markers figures to work on, cleaning also for SIGNAL only MEAN
   ssEnv$keys_markers_figures <- keys_markers_figures
   levels(ssEnv$keys_markers_figures$FIGURE) <- c(levels(ssEnv$keys_markers_figures$FIGURE),"MEAN")
-  ssEnv$keys_markers_figures[ssEnv$keys_markers_figures$MARKER=="BETA","FIGURE"] <- "MEAN"
+  ssEnv$keys_markers_figures[ssEnv$keys_markers_figures$MARKER=="SIGNAL","FIGURE"] <- "MEAN"
   ssEnv$keys_markers_figures <- unique(ssEnv$keys_markers_figures)
   ssEnv$keys_markers_figures$COMBINED <- paste0(c(ssEnv$keys_markers_figures$MARKER,ssEnv$keys_markers_figures$FIGURE), collapse ="_")
 
@@ -211,20 +211,20 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
     paste0(x[x!=""], collapse = "_")
   }
 
-  # force the only FIGURE of BETA as MEAN
+  # force the only FIGURE of SIGNAL as MEAN
   levels(ssEnv$keys_areas_subareas_markers_figures$FIGURE) <- c( levels(ssEnv$keys_areas_subareas_markers_figures$FIGURE),"MEAN")
-  ssEnv$keys_areas_subareas_markers_figures$FIGURE[ssEnv$keys_areas_subareas_markers_figures$MARKER=="BETA"] <-"MEAN"
+  ssEnv$keys_areas_subareas_markers_figures$FIGURE[ssEnv$keys_areas_subareas_markers_figures$MARKER=="SIGNAL"] <-"MEAN"
   ssEnv$keys_areas_subareas_markers_figures <- unique(ssEnv$keys_areas_subareas_markers_figures)
   ssEnv$keys_areas_subareas_markers_figures$COMBINED <- apply(ssEnv$keys_areas_subareas_markers_figures[,c("MARKER","FIGURE","AREA","SUBAREA")], 1, combine_not_empty )
 
   ssEnv$keys_areas_subareas <- keys_areas_subareas
   ssEnv$keys_areas_subareas$COMBINED <- apply(ssEnv$keys_areas_subareas[,c("AREA","SUBAREA")], 1, combine_not_empty )
 
-  # force the only FIGURE of BETA as MEAN
+  # force the only FIGURE of SIGNAL as MEAN
   ssEnv$keys_markers_figures <- keys_markers_figures
   ssEnv$keys_markers_figures <- merge(ssEnv$keys_markers_figures,keys_markers_default, by="MARKER")
   levels(ssEnv$keys_markers_figures$FIGURE) <- c( levels(ssEnv$keys_markers_figures$FIGURE),"MEAN")
-  ssEnv$keys_markers_figures[ssEnv$keys_markers_figures$MARKER=="BETA","FIGURE"] <- "MEAN"
+  ssEnv$keys_markers_figures[ssEnv$keys_markers_figures$MARKER=="SIGNAL","FIGURE"] <- "MEAN"
   ssEnv$keys_markers_figures$COMBINED <- apply(ssEnv$keys_markers_figures[,c("MARKER","FIGURE")], 1, combine_not_empty )
 
   ssEnv$keys_areas <- unique(ssEnv$keys_areas_subareas_markers_figures[,"AREA"])

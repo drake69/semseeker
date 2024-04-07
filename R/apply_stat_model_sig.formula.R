@@ -1,12 +1,12 @@
 apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_variable, covariates)
 {
-  if(family_test=="wilcoxon" | family_test=="t.test")
+  if(family_test=="wilcoxon" | family_test=="t.test" | family_test =="jsd" | family_test=="chisq.test" | family_test=="fisher.test")
   {
     covariates_model <- independent_variable
     sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
   }
 
-  if(grepl("mean-bootstrap",family_test))
+  if(grepl("mean-permutation",family_test) | grepl("quantile-permutation",family_test) | grepl("spearman-permutation",family_test))
   {
     covariates_model <- independent_variable
     sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))

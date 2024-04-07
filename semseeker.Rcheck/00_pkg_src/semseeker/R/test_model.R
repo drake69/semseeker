@@ -15,7 +15,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     r_model <- "stats_wilcox.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
-    beta_value <- stats::median(SPLIT[[1]]) - stats::median(SPLIT[[2]])
+    signal_value <- stats::median(SPLIT[[1]]) - stats::median(SPLIT[[2]])
   }
 
   if(family_test=="t.test")
@@ -25,7 +25,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     r_model <- "stats_t.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
-    beta_value <- mean(SPLIT[[1]]) - mean(SPLIT[[2]])
+    signal_value <- mean(SPLIT[[1]]) - mean(SPLIT[[2]])
   }
 
   if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
@@ -33,7 +33,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_cor <- stats::cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independent_variable]), method = as.character(family_test))
     pvalue <- result_cor$p.value
     r_model <- "stats_cor.test"
-    beta_value <- result_cor$estimate
+    signal_value <- result_cor$estimate
   }
 
   ci.lower <- NA
@@ -46,6 +46,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   ci.lower.adjusted <- NA
   ci.upper.adjusted <- NA
 
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
+  return (data.frame(ci.lower,ci.upper, pvalue, signal_value,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
 
 }

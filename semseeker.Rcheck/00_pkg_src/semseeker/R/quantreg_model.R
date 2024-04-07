@@ -5,7 +5,7 @@
 #' @param tau tau at which apply the wuantile regression
 #' @param lqm_control specification of the lqmm package
 #'
-compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
+compute_quantreg_signal_boot_np <- function(sig.formula,df, tau, lqm_control)
 {
   # browser()
   cols <- colnames(df)
@@ -19,8 +19,8 @@ compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
     model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
   })
   summary_qr <- suppressMessages(summary(model)$tTable)
-  beta_value <- summary_qr[2,"Value"]
-  return(beta_value)
+  signal_value <- summary_qr[2,"Value"]
+  return(signal_value)
 }
 
 #' Title
@@ -29,13 +29,13 @@ compute_quantreg_beta_boot_np <- function(sig.formula,df, tau, lqm_control)
 #' @param tau tau to apply the quantile regression
 #' @param localDataFrame dataframe to apply th regression model
 #'
-compute_qr_beta_boot_p <- function(sig.formula, tau, localDataFrame) {
+compute_qr_signal_boot_p <- function(sig.formula, tau, localDataFrame) {
   suppressMessages({
     fit <- quantreg::rq(formula =  sig.formula,data = as.data.frame(localDataFrame),  tau = tau)
   })
   coef <-as.data.frame(summary(fit, se = "boot")$coefficients)[2,"Value"]
   pval <- as.data.frame(summary(fit, se = "boot")$coefficients)[2, "Pr(>|t|)"]
-  return(list(beta = coef, pval = pval))
+  return(list(signal = coef, pval = pval))
 }
 
 
@@ -59,7 +59,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   residuals <- NA
   shapiro_pvalue <- NA
   std.error <- NA
-  beta_value <- NA
+  signal_value <- NA
   pvalue <- NA
   boot.bca <- NA
 
@@ -77,7 +77,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
         summary_qr <- suppressMessages(summary(model)$tTable)
         pvalue <- summary_qr[2,"Pr(>|t|)"]
         std.error <- summary_qr[2,"Std. Error"]
-        beta_value <- summary_qr[2,"Value"]
+        signal_value <- summary_qr[2,"Value"]
         ci.lower <- summary_qr[2,"lower bound"]
         ci.upper <- summary_qr[2,"upper bound"]
       })
@@ -85,29 +85,29 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     }
     else
     {
-      # apply bootstrap to obtain beta using quantreg
+      # apply bootstrap to obtain signal using quantreg
       # quantreg + quantile + first_round_of_permutations + second_round_of_permutations
-      # Define function to compute p-value and beta regression coefficient
+      # Define function to compute p-value and signal regression coefficient
       tau = as.numeric(quantreg_params[2])
       n_permutations_test <- as.numeric(quantreg_params[3])
-      # Compute beta and p-value for n_permutations replications
-      results <- replicate(n_permutations_test, compute_qr_beta_boot_p(sig.formula, tau, localDataFrame=tempDataFrame))
-      # Compute average beta and p-value
+      # Compute signal and p-value for n_permutations replications
+      results <- replicate(n_permutations_test, compute_qr_signal_boot_p(sig.formula, tau, localDataFrame=tempDataFrame))
+      # Compute average signal and p-value
       pvalue <- max(unlist(t(results)[,"pval"]))
       n_permutations <- as.numeric(quantreg_params[4])
       if(pvalue < 0.05 && n_permutations_test < n_permutations)
       {
-        results <- replicate(n_permutations, compute_qr_beta_boot_p(sig.formula, tau, localDataFrame=tempDataFrame))
-        # Compute average beta and p-value
+        results <- replicate(n_permutations, compute_qr_signal_boot_p(sig.formula, tau, localDataFrame=tempDataFrame))
+        # Compute average signal and p-value
         pvalue <- max(unlist(t(results)[,"pval"]))
       }
-      beta_value <- mean(unlist(t(results)[,"beta"]))
+      signal_value <- mean(unlist(t(results)[,"signal"]))
       r_model <- "quantreg_rq"
     }
   }
   if(length(quantreg_params)==5)
   {
-    # use lqmm package and apply quantreg with bootstrap and confidence interval of regression beta
+    # use lqmm package and apply quantreg with bootstrap and confidence interval of regression signal
     # quantreg + quantile + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta
     n_permutations_test <- as.numeric(quantreg_params[3])
     n_permutations <- as.numeric(quantreg_params[4])
@@ -119,12 +119,12 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     if(n_permutations > n_permutations_test)
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
-      beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
+      signal_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
       std.error <- summary(model.x.boot)[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])
-      boot.bca <- quantreg_summary(boot_vector, beta_value, conf.level = conf.level)
+      boot.bca <- quantreg_summary(boot_vector, signal_value, conf.level = conf.level)
     }
     ci.lower.adjusted <- NA
     ci.upper.adjusted <- NA
@@ -136,13 +136,13 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     else
     {
       model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations))
-      beta_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
+      signal_value <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
       std.error <- summary(model.x.boot)[2,"Std. Error"]
       tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
       colnames(tt) <- colnames(model.x.boot)
       boot_vector <- stats::na.omit(tt[,independent_variable])
-      boot.bca <- quantreg_summary(boot_vector, beta_value, conf.level = conf.level)
-      boot.bca.adjusted <- quantreg_summary(boot_vector, beta_value,  boot_success = boot_success, tests_count=tests_count, conf.level = conf.level)
+      boot.bca <- quantreg_summary(boot_vector, signal_value, conf.level = conf.level)
+      boot.bca.adjusted <- quantreg_summary(boot_vector, signal_value,  boot_success = boot_success, tests_count=tests_count, conf.level = conf.level)
       ci.lower.adjusted <-  boot.bca.adjusted[1]
       ci.upper.adjusted <- boot.bca.adjusted[2]
     }
@@ -164,7 +164,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
       model <- lqmm::lqm(sig.formula, tau =tau, data = as.data.frame(tempDataFrame), na.action = stats::na.omit, control = lqm_control)
     })
     summary_qr <- suppressMessages(summary(model)$tTable)
-    beta_value <- summary_qr[2,"Value"]
+    signal_value <- summary_qr[2,"Value"]
     std.error <- summary_qr[2,"Std. Error"]
     ci.lower <- summary_qr[2,"lower bound"]
     ci.upper <- summary_qr[2,"upper bound"]
@@ -172,8 +172,8 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
 
     if(n_permutations > n_permutations_test)
     {
-      boot_beta <- suppressMessages(replicate(n_permutations_test, compute_quantreg_beta_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
-      boot.bca <- quantreg_summary(boot_beta, beta_value, conf.level = conf.level)
+      boot_beta <- suppressMessages(replicate(n_permutations_test, compute_quantreg_signal_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
+      boot.bca <- quantreg_summary(boot_beta, signal_value, conf.level = conf.level)
       ci.lower <- boot.bca[1]
       ci.upper <- boot.bca[2]
       pvalue <- boot.bca[3]
@@ -184,8 +184,8 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     }
     else
     {
-      boot_beta <- suppressMessages(replicate(n_permutations, compute_quantreg_beta_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
-      boot.bca <- quantreg_summary(boot_beta, beta_value, conf.level = conf.level)
+      boot_beta <- suppressMessages(replicate(n_permutations, compute_quantreg_signal_boot_np(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
+      boot.bca <- quantreg_summary(boot_beta, signal_value, conf.level = conf.level)
       ci.lower <- boot.bca[1]
       ci.upper <- boot.bca[2]
       pvalue <- boot.bca[3]
@@ -195,6 +195,6 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
 
 
 
-  return (data.frame(ci.lower,ci.upper, pvalue, beta_value,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
+  return (data.frame(ci.lower,ci.upper, pvalue, signal_value,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations,ci.lower.adjusted,ci.upper.adjusted))
 
 }

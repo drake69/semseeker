@@ -1,16 +1,14 @@
 #' analyze_single_sample
 #'
 #' @param values values of methylation
-#' @param sliding_window_size size of window sliding to calculate hypergeometric
 #' @param thresholds threshold to use for comparison
 #' @param sample_detail details of the sample to analyze
 #' @param figure which figure's of sasmple will be analized HYPO or HYPER
-#' @param bonferroni_threshold bonferroni threshold to validate pValue
 #' @param probe_features probe_features details to be used
 #' @return list of lesion count  and probe_features count
 #'
 #' @importFrom doRNG %dorng%
-analyze_single_sample <- function(values, sliding_window_size, thresholds, figure, sample_detail, bonferroni_threshold = 0.05, probe_features) {
+analyze_single_sample <- function(values, thresholds, figure, sample_detail, probe_features) {
 
   ssEnv <- get_session_info()
   result <- ""

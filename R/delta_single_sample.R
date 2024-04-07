@@ -4,11 +4,11 @@
 #' @param high_thresholds highest threshold to use for comparison
 #' @param low_thresholds lowest threshold to use for comparison
 #' @param sample_detail details of sample to analyze
-#' @param beta_medians median to use for calculation
+#' @param signal_medians median to use for calculation
 #' @param probe_features genomic position of probe_features
 #' @return summary detail about the analysis
 #'
-delta_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
+delta_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, signal_medians, probe_features) {
 
   ssEnv <- get_session_info()
 
@@ -50,7 +50,7 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
 
   ### get deltas from medians #########################################################
 
-  # deltas <- data.frame("DELTA"= values - beta_medians, row.names = probe_features$PROBE)
+  # deltas <- data.frame("DELTA"= values - signal_medians, row.names = probe_features$PROBE)
   # colnames(deltas) <- "DELTA"
 
   result <- ""
@@ -59,9 +59,9 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
       (min(deltasAnnotated_hyperSorted$DELTA)<0) |
       (min(deltasAnnotated_bothSorted$DELTA)<0) )
   {
-    message(min(deltasAnnotated_hypoSorted$DELTA))
-    message(min(deltasAnnotated_hyperSorted$DELTA))
-    message(min(deltasAnnotated_bothSorted$DELTA))
+    log_event(min(deltasAnnotated_hypoSorted$DELTA))
+    log_event(min(deltasAnnotated_hyperSorted$DELTA))
+    log_event(min(deltasAnnotated_bothSorted$DELTA))
     stop("ERROR: I'm stopping here the deltas have negative values!")
   }
   result["DELTAS_HYPO"] <- mean(deltasAnnotated_hypoSorted$DELTA)

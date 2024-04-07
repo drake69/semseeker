@@ -52,7 +52,7 @@
 #                       arraytype="EPIC")
 #
 # # normalize with ChAMP
-# normalizedData<-champ.norm(beta=myLoadN$beta,
+# normalizedData<-champ.norm(signal=myLoadN$signal,
 #                     rgSet=myLoadN$rgSet,
 #                     mset=myLoadN$mset,
 #                     resultsDir= result_folder,
@@ -75,6 +75,6 @@
 #
 #
 # semseeker (sample_sheet = sample_sheet,
-#            methylation_data = normalizedData,
+#            signal_data = normalizedData,
 #            result_folder = file.path(workingFolder,"/semseeker_result/"))
 #

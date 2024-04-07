@@ -7,7 +7,7 @@ test_that("association_analysis", {
   # ####################################################################################
   #
   # ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
-  # semseeker:::semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
+  # semseeker:::semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
   #   markers=c("DELTAQ"), areas=c("PROBE","CHR","GENE"))
   #
   # ####################################################################################
@@ -277,7 +277,7 @@ test_that("association_analysis", {
   #   "depth_analysis"=3,
   #   "filter_p_value" = FALSE)
   #
-  # areas_selection <- rownames(methylation_data)[1:100]
+  # areas_selection <- rownames(signal_data)[1:100]
   # # inference_details,result_folder, maxResources, parallel_strategy
   # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, areas_selection=areas_selection, areas="PROBE")
   #

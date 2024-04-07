@@ -3,19 +3,21 @@ test_that("annotate_bed", {
   # unlink(tempFolder, recursive = T)
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90,
-    showprogress= TRUE, markers = markers)
+  ssEnv <- semseeker:::init_env(
+    result_folder =  tempFolder,
+    parallel_strategy = parallel_strategy,
+    maxResources = 90,
+    showprogress= FALSE,
+    markers = markers)
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
-  sp <- semseeker:::analyze_batch(methylation_data=methylation_data,
-    sliding_window_size = sliding_window_size,
+  sp <- semseeker:::analyze_batch(
+    signal_data=signal_data,
     sample_sheet = mySampleSheet,
-    bonferroni_threshold = bonferroni_threshold,
-    iqrTimes = 3,
     batch_id = 1
   )
 

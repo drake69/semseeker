@@ -8,7 +8,7 @@ test_that("test_match_order", {
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
-  # row.names(methylation_data) <- probe_features$PROBE
+  # row.names(signal_data) <- probe_features$PROBE
 
   probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")
 

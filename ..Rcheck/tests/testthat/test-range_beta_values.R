@@ -1,4 +1,4 @@
-test_that("range_beta_values", {
+test_that("signal_range_values", {
 
   ssEnv <- init_env(tempFolder, parallel_strategy = "sequential")
 
@@ -12,13 +12,13 @@ test_that("range_beta_values", {
   nitem <- min(nitem, nrow(probe_features))
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 
-  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
+  signal_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
+  signal_data <- as.data.frame(matrix(signal_data,nitem,nsamples))
 
-  row.names(methylation_data) <- probe_features$PROBE
+  row.names(signal_data) <- probe_features$PROBE
 
   # Sample_ID <- stri_rand_strings(nsamples, 15, pattern = "[A-Za-z]")
-  # colnames(methylation_data) <- Sample_ID
+  # colnames(signal_data) <- Sample_ID
   # Sample_Group <- c(rep("Control",nsamples/3),rep("Case",nsamples/3),rep("Reference",nsamples/3))
   # sample_sheet <- data.frame(Sample_Group, Sample_ID)
   #
@@ -27,9 +27,9 @@ test_that("range_beta_values", {
   # batch_id <- 1
   iqrTimes <- 3
 
-  rr <- range_beta_values(methylation_data)
+  rr <- signal_range_values(signal_data)
   # sp <- analyze_batch(
-  #                       methylation_data =  methylation_data,
+  #                       signal_data =  signal_data,
   #                       sample_sheet =  sample_sheet,
   #                       sliding_window_size = sliding_window_size,
   #                       bonferroni_threshold =  bonferroni_threshold,
@@ -39,10 +39,10 @@ test_that("range_beta_values", {
 
   # message(nrow(sp))
   # message(nrow(sample_sheet))
-  testthat::expect_true(sum(colnames(rr)==c("beta_inferior_thresholds","beta_superior_thresholds","beta_median_values"))==3)
-  testthat::expect_true(nrow(rr)==nrow(methylation_data))
-  testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_superior_thresholds[1])
-  testthat::expect_true(rr$beta_inferior_thresholds[1]!=rr$beta_median_values[1])
+  testthat::expect_true(sum(colnames(rr)==c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values"))==3)
+  testthat::expect_true(nrow(rr)==nrow(signal_data))
+  testthat::expect_true(rr$signal_inferior_thresholds[1]!=rr$signal_superior_thresholds[1])
+  testthat::expect_true(rr$signal_inferior_thresholds[1]!=rr$signal_median_values[1])
   # future::plan( future::multisession)
 })
 

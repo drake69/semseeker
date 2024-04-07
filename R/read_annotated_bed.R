@@ -18,7 +18,7 @@ read_annotated_bed <- function(
   {
     if(file.info(bedFileName)$size < 10)
     {
-      message("WARNING: ", Sys.time(), " Given up file:", bedFileName, " is empty!")
+      log_event("WARNING: ", Sys.time(), " Given up file:", bedFileName, " is empty!")
     }
     else
     {

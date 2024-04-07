@@ -7,7 +7,7 @@ testthat::test_that("lesions_get",{
   bonferroni_threshold <- 5
 
   mutations <-  semseeker:::mutations_get(
-    values = methylation_data[,1],
+    values = signal_data[,1],
     figure = "HYPO",
     thresholds = thresholds,
     probe_features = probe_features,
@@ -24,7 +24,7 @@ testthat::test_that("lesions_get",{
   testthat::expect_true(nrow(lesions_hypo)!=0)
 
   mutations <-  semseeker:::mutations_get(
-    values = methylation_data[,1],
+    values = signal_data[,1],
     figure = "HYPER",
     thresholds = thresholds,
     probe_features = probe_features,

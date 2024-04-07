@@ -53,7 +53,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
     }
   }
 
-  if(family_test == "log")
+  if(transformation == "log")
     burden_values <- burden_values + 0.001
 
   transformation <- as.character(transformation)
@@ -93,7 +93,8 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
     transformation <- paste0("NA_", transformation, sep="")
 
 
-  if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="t.test" & family_test!="poisson")
+  if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="jsd" & family_test!="t.test" & family_test!="poisson" |
+      family_test=="chisq.test" | family_test=="fisher.test")
   {
     variable_to_transform <- independent_variable
     if(length(covariates)>0)
@@ -123,6 +124,8 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
       )
     )
 
+
+
     # if(grepl("quantile", transformation))
     # {
     #   qq <- unlist(strsplit(transformation,"_")[2])
@@ -150,8 +153,12 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
 
   #  we want to preserve the NA in the independent variables to be removed by the models
   tempDataFrame[apply(tempDataFrame,2,is.nan)] <- 0
+  if(family_test=="binomial")
+    tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
 
   result <- list(tempDataFrame, independent_variable1stLevel, independent_variable2ndLevel)
   names(result) <- c("tempDataFrame", "independent_variable1stLevel","independent_variable2ndLevel")
+
+
   return (result)
 }

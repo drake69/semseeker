@@ -1,13 +1,12 @@
-
-# sliding_window_size <- 11
-# bonferroni_threshold <- 0.01
 # grouping_column <- "GENE"
 # mutationAnnotatedSortedLocal <- utils::read.csv2("/home/lcorsaro/Documents/SEMSEEKER_TEST_BWS/mutations_annotated_sorted_gene.csv")
 
 #' @importFrom dplyr %>%
 #' @importFrom rlang .data
-lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_column, mutation_annotated_sorted)
+lesions_get <- function(grouping_column, mutation_annotated_sorted)
 {
+
+  ssEnv <- get_session_info()
 
   if( is.null(mutation_annotated_sorted))
     return (mutation_annotated_sorted)
@@ -15,7 +14,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   if(nrow(mutation_annotated_sorted) == 0)
     return (mutation_annotated_sorted)
 
-    # browser()
+    # #
   mutationAnnotatedSortedLocal <- mutation_annotated_sorted
   summed <- stats::aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = sum)
   colnames(summed) <- c(grouping_column,"MUTATIONS_COUNT")
@@ -37,11 +36,11 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
     return(tmp)
   }
 
-  # browser()
+  # #
   # calculate enrichment for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
     dplyr::mutate(ENRICHMENT = stats::ave( .data$MUTATIONS, eval(parse(text = grouping_column)),
-                                           FUN  = function(x) enrichement_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
+                                           FUN  = function(x) enrichement_calculator(x, ssEnv$sliding_window_size))) %>% dplyr::ungroup ()
 
   basepair_calculator<-function(x,lags){
     tmp_min <- -zoo::rollmax( -x, lags, align="center", fill  <-  0)
@@ -53,11 +52,12 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   #calculate the base pair count for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
     dplyr::mutate(BASEPAIR_COUNT = stats::ave( .data$START, eval(parse(text = grouping_column)),
-                                              FUN  =  function(x) basepair_calculator(x, sliding_window_size))) %>% dplyr::ungroup ()
+                                              FUN  =  function(x) basepair_calculator(x, ssEnv$sliding_window_size))) %>% dplyr::ungroup ()
 
   mutationAnnotatedSortedLocal$ENRICHMENT[ is.na(mutationAnnotatedSortedLocal$ENRICHMENT)] <- 0
 
-  lesionpValue <- suppressWarnings(stats::dhyper(mutationAnnotatedSortedLocal$ENRICHMENT, mutationAnnotatedSortedLocal$MUTATIONS_COUNT, mutationAnnotatedSortedLocal$PROBES_COUNT, sliding_window_size))
+  lesionpValue <- suppressWarnings(stats::dhyper(mutationAnnotatedSortedLocal$ENRICHMENT, mutationAnnotatedSortedLocal$MUTATIONS_COUNT,
+    mutationAnnotatedSortedLocal$PROBES_COUNT, ssEnv$sliding_window_size))
 
   lesionpValue[is.nan(lesionpValue)] <- 1
   lesionpValue[is.na(lesionpValue)] <- 1
@@ -65,7 +65,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
   tt <- data.frame(mutationAnnotatedSortedLocal,lesionpValue)
 
   ## correction by Bonferroni
-  lesionWeighted <- (tt$lesionpValue ) < ( bonferroni_threshold/( length(tt$PROBES_COUNT) * log10(tt$BASEPAIR_COUNT) ))
+  lesionWeighted <- (tt$lesionpValue ) < ( ssEnv$bonferroni_threshold/( length(tt$PROBES_COUNT) * log10(tt$BASEPAIR_COUNT) ))
   table(lesionWeighted)
   rm(tt)
 
@@ -78,7 +78,7 @@ lesions_get <- function(sliding_window_size, bonferroni_threshold, grouping_colu
 
   }
 
-  # message("INFO: ", Sys.time(), " Got lesions for sample !")
+ log_event("DEBUG: ", Sys.time(), " Got lesions for sample !")
   return(lesionWeighted)
 
 }

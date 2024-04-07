@@ -6,14 +6,14 @@ test_that("create_multiple_bed", {
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
 
-  sp <- semseeker:::analyze_population(methylation_data=methylation_data,
+  sp <- semseeker:::analyze_population(signal_data=signal_data,
 
     sliding_window_size = sliding_window_size,
-    beta_thresholds = beta_thresholds,
+    signal_thresholds = signal_thresholds,
     sample_sheet = mySampleSheet,
     bonferroni_threshold = bonferroni_threshold,
     probe_features = probe_features

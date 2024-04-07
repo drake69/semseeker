@@ -55,7 +55,7 @@ create_excel_pivot <-  function() {
       #
       if(!plyr::empty(annotatedData))
       {
-          if(marker=="BETA")
+          if(marker=="SIGNAL")
           {
             annotatedData <- reshape2::dcast(data = annotatedData, formula = SAMPLEID + SAMPLE_GROUP ~ AREA, value.var = "VALUE",
               fun.aggregate = mean, drop = TRUE)

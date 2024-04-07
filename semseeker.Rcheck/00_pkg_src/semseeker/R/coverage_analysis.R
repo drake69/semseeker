@@ -1,4 +1,4 @@
-coverage_analysis <- function(methylation_data)
+coverage_analysis <- function(signal_data)
 {
   # probe_features <- PROBES_CHR_CHR
   # area <- c("CHR")
@@ -23,7 +23,7 @@ coverage_analysis <- function(methylation_data)
     total_count <- stats::aggregate(probe_features$PROBE, list(probe_features[, area_subarea]), FUN=length)
     colnames(total_count) <- c(as.character(area_subarea),"COUNT_TOTAL")
 
-    probe_filtered <- probe_features[ probe_features$PROBE %in% rownames(methylation_data),]
+    probe_filtered <- probe_features[ probe_features$PROBE %in% rownames(signal_data),]
     # if no probe is covered
     if (nrow(probe_filtered)>0)
     {

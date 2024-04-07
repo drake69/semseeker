@@ -10,9 +10,11 @@ probe_features_get <- function(area_subarea)
   probe_features$END <- probe_features$START
 
   if( grepl("CHR", area_subarea)  || grepl("PROBE",area_subarea))
-    probe_features <- unique(probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END")])
+    # probe_features <- unique(probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END")])
+    probe_features <- probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END")] %>% dplyr::distinct()
   else
-    probe_features <- unique(probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END",area_subarea)])
+    # probe_features <- unique(probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END",area_subarea)])
+    probe_features <- probe_features[ c(ssEnv$tech,"PROBE","CHR","START","END",area_subarea)] %>% dplyr::distinct()
 
   # needed to avoid special elaboration in other function on chromosome or probe
   if( grepl("CHR", area_subarea))

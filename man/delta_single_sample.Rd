@@ -9,7 +9,7 @@ delta_single_sample(
   high_thresholds,
   low_thresholds,
   sample_detail,
-  beta_medians,
+  signal_medians,
   probe_features
 )
 }
@@ -22,7 +22,7 @@ delta_single_sample(
 
 \item{sample_detail}{details of sample to analyze}
 
-\item{beta_medians}{median to use for calculation}
+\item{signal_medians}{median to use for calculation}
 
 \item{probe_features}{genomic position of probe_features}
 }

@@ -19,7 +19,7 @@ testthat::test_that("delta_single_sample",{
   row.names(high_thresholds) <- probe_features$PROBE
   row.names(low_thresholds) <- probe_features$PROBE
 
-  beta_medians <- high_thresholds - low_thresholds
+  signal_medians <- high_thresholds - low_thresholds
 
   delta_single_sample(
 
@@ -27,7 +27,7 @@ testthat::test_that("delta_single_sample",{
     high_thresholds = high_thresholds,
     low_thresholds = low_thresholds,
     sample_detail = data.frame("Sample_ID"= Sample_ID, "Sample_Group"="Control"),
-    beta_medians = beta_medians,
+    signal_medians = signal_medians,
     probe_features = probe_features
   )
 

@@ -42,7 +42,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count",
     "data_preparation","apply_stat_model_sig.formula","quantreg_model",
     "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
-    "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","beta_values","iqrTimes","ssEnv")
+    "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","iqrTimes","ssEnv")
   # message("Starting foreach withh: ", iters, " items")
 
   message("INFO: ", Sys.time(), " I'll perform:",iters - length(covariates)," tests." )
@@ -78,7 +78,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       # sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE, append = TRUE)
 
       pvalue <- model_result$pvalue
-      beta_value <- model_result$beta_value
+      signal_value <- model_result$signal_value
       pvalueadjusted <- model_result$pvalue
       aic_value <- model_result$aic_value
       residuals <- model_result$residuals
@@ -107,7 +107,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "PVALUE" = (model_result$pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
-          "BETA" = if(exists("beta_value")) beta_value  else NA,
+          "STATISTIC_PARAMETER" = if(exists("signal_value")) signal_value  else NA,
           "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("model_result")) (sum(model_result$residuals))  else NA,
@@ -126,7 +126,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "COUNT.CONTROL"=length(stats::na.omit(independent_variableData2ndLevel)),
           "MEAN.CONTROL"=(mean(independent_variableData2ndLevel)),
           "SD.CONTROL"= (stats::sd(independent_variableData2ndLevel)),
-          "RHO"= if(r_model=="stats_cor.test") model_result$beta_value else NA,
+          "RHO"= if(r_model=="stats_cor.test") model_result$signal_value else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
           "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
@@ -154,7 +154,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "PVALUE" = (model_result$pvalue),
           "PVALUEADJ" = pvalueadjusted,
           "TEST" = "SINGLE_AREA",
-          "BETA" = if(exists("beta_value")) beta_value  else NA,
+          "STATISTIC_PARAMETER" = if(exists("signal_value")) signal_value  else NA,
           "STD.ERROR" = if(exists("std.error")) std.error  else NA,
           "AIC" = if(exists("aic_value")) aic_value  else NA,
           "RESIDUALS.SUM" = if(exists("model_result")) (sum(model_result$residuals))  else NA,
@@ -173,7 +173,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
           "COUNT.CONTROL"=length(dependentVariableData),
           "MEAN.CONTROL"=(mean(dependentVariableData)),
           "SD.CONTROL"= (stats::sd(dependentVariableData)),
-          "RHO"= if(r_model=="stats_cor.test")  (model_result$beta_value) else NA,
+          "RHO"= if(r_model=="stats_cor.test")  (model_result$signal_value) else NA,
           "CI.LOWER"= if(exists("ci.lower")) ci.lower else NA,
           "CI.UPPER"= if(exists("ci.upper")) ci.upper else NA,
           "CI.LOWER.ADJUSTED"=  if(exists("ci.lower.adjusted")) ci.lower.adjusted else NA,
@@ -200,7 +200,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       #   "PVALUE" = NA,
       #   "PVALUEADJ" = NA,
       #   "TEST" = "SINGLE_AREA",
-      #   "BETA" = NA,
+      #   "STATISTIC_PARAMETER" = NA,
       #   "STD.ERROR" = NA,
       #   "AIC" = NA,
       #   "RESIDUALS.SUM" = NA,

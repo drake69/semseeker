@@ -77,7 +77,7 @@ create_heatmap <- function() {
 
       }
   }
-    message("INFO: ", Sys.time(), " Heatmap created." )
+    log_event("INFO: ", Sys.time(), " Heatmap created." )
 
   }
 }

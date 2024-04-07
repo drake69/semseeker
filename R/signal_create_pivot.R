@@ -1,11 +1,11 @@
 #' #' @importFrom doRNG %dorng%
-#' beta_create_pivot <-  function( figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
+#' signal_create_pivot <-  function( figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 #'
 #'   ssEnv <- get_session_info()
 #'   i <- 0
 #'   k <- 0
 #'
-#'   keys <- subset(ssEnv$keys,markers=="BETA")
+#'   keys <- subset(ssEnv$keys,markers=="SIGNAL")
 #'   reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 #'
 #'   toExport <- c("ssEnv", "tempPopData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
@@ -22,7 +22,7 @@
 #'         tempAnomaly <- subset(temp, temp$MARKER == as.character(marker))
 #'         if(!plyr::empty(tempAnomaly))
 #'         {
-#'           figure <-"BETA"
+#'           figure <-"SIGNAL"
 #'           marker <- "MEAN"
 #'           tempDataFrame <- subset(tempAnomaly, tempAnomaly$FIGURE == figure)
 #'           if(!plyr::empty(tempDataFrame))

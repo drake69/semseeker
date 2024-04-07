@@ -7,7 +7,7 @@ report of pivot}
 \usage{
 semseeker(
   sample_sheet,
-  methylation_data,
+  signal_data,
   result_folder,
   bonferroni_threshold = 0.05,
   maxResources = 90,
@@ -19,7 +19,7 @@ semseeker(
 \arguments{
 \item{sample_sheet}{dataframe with at least a column Sample_ID to identify samples}
 
-\item{methylation_data}{matrix of methylation data}
+\item{signal_data}{matrix of methylation data}
 
 \item{result_folder}{where the result will be saved}
 

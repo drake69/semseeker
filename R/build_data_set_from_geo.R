@@ -9,6 +9,13 @@
 #' @export
 build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
 
+    # check if GEOQuery package is installed
+  if(!requireNamespace("GEOquery", quietly = TRUE))
+  {
+    log_event("GEOquery package is not installed. Please install pathfindR package to use this function")
+    return()
+  }
+
     if(file.exists(GEOgse))
     {
       gse <- GEOquery::getGEO(filename = GEOgse, GSEMatrix = TRUE)
@@ -36,7 +43,7 @@ build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
     for(sample in 1:nrow(samplesheet))
     {
       # sample <- 1
-      print(sample)
+      log_event(sample)
       fileName <- samplesheet [sample,"supplementary_file"]
       if(fileName=="" || fileName=="NONE")
         next

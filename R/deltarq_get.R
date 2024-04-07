@@ -17,6 +17,10 @@ deltarq_get <- function(resultPopulation){
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAR")
   localKeys$EXT <- "fst"
 
+  progress_bar <- ""
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
+
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
@@ -33,6 +37,8 @@ deltarq_get <- function(resultPopulation){
       else
         deltarq <- deltarq_temp
     }
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("Collecting bed files."))
   }
 
   if (!exists("deltarq") | plyr::empty(deltarq))
@@ -40,11 +46,14 @@ deltarq_get <- function(resultPopulation){
     stop("Something wrong with multiple bed files!")
   }
 
-  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=4))
+  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=ssEnv$epiquantile))
   localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figure_default, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTARQ")
 
+  progress_bar <- ""
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
@@ -61,7 +70,7 @@ deltarq_get <- function(resultPopulation){
         tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTARQ_",as.character(key$FIGURE),sep="")))
         fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTARQ"), as.character(key$FIGURE)),  as.character(key$EXT))
         fst::write.fst( x= localFileRes, fileToWrite)
-        message("INFO: ", Sys.time(), " Created DELTARQ multiple annotated file!", fileToWrite)
+       log_event("DEBUG: ", Sys.time(), " Created DELTARQ multiple annotated file!", fileToWrite)
 
         tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",fun.aggregate = sum, drop = TRUE)
         colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
@@ -74,6 +83,8 @@ deltarq_get <- function(resultPopulation){
           deltarq_summary <- data.frame("LABEL"=lbl, tempDataFrame)
       }
     }
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("Binding bed files."))
   }
 
   if(!plyr::empty(deltarq_summary))

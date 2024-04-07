@@ -1,0 +1,255 @@
+#' sensitivity and sensibility analysis of SEMseeker's mutations and lesions
+#'
+#' @param result_folder where semseeker's results are stored, the root folder
+#' @param maxResources percentage of max system's resource to use
+#' @param parallel_strategy which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster
+#' @param ... other options to filter elaborations
+#'
+#' @importFrom doRNG %dorng%
+#' @export
+ss_analysis <-
+  function(result_folder,
+    independent_variable = "Sample_Group",
+    maxResources = 90,
+    parallel_strategy  = "multicore",
+    ...)
+  {
+    j <- 0
+    k <- 0
+    z <- 0
+    ssEnv <-
+      init_env(
+        result_folder =  result_folder,
+        maxResources =  maxResources,
+        parallel_strategy  =  parallel_strategy,
+        start_fresh = FALSE,
+        ...
+      )
+
+    arguments <- list(...)
+    areas_selection <- c()
+    if (!is.null(arguments[["areas_selection"]]))
+    {
+      areas_selection <- arguments$areas_selection
+    }
+
+    localKeys <- ssEnv$keys_markers_figures
+    sample_groups <- c("Reference", "Control", "Case")
+
+    create_excel_pivot()
+    result_folderPivot <- dir_check_and_create(ssEnv$result_folderData, "Pivots")
+
+    study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+    if (independent_variable=="Sample_Group")
+      study_summary <- study_summary[, c("Sample_Group","Sample_ID")]
+    else
+      study_summary <- study_summary[, c("Sample_Group","Sample_ID",independent_variable)]
+
+    markers <- unique(ssEnv$keys_markers_figures$MARKER)
+    # as vector of character
+    result_colnames <- c("MARKER", "FIGURE", "AREA", "SUBAREA", "AREA_OF_TEST", "SENSITIVITY", "SPECIFICITY",
+      "P_to_be_Case_cond_to_be_Epimutated","P_to_be_Control_cond_to_be_Not_Epimutated","SCORE","BURDEN","JSD")
+    for (a in 1:length(markers))
+    {
+      # a <- 2
+      fileNameResults <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),"sensitivity_specificity_analisys"),extension = "csv")
+      fileNameResultsTemp <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),"sensitivity_specificity_analisys","tmp"),extension = "csv")
+
+      localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
+      keys <- localKeys_1[localKeys_1$MARKER == markers[a], ]
+
+      # clean keys from already done analysis
+      if (file.exists(fileNameResults))
+      {
+        results <- utils::read.csv2(fileNameResults, header  =  T)
+        keys_markers_figures_areas_done <- unlist(apply(unique(results [, c("MARKER", "FIGURE", "AREA", "SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+        keys_to_be_done <-
+          unlist(apply(keys[, c("MARKER", "FIGURE", "AREA", "SUBAREA")], 1, function(x)
+            paste(
+              x, collapse  =  "_", sep  =  ""
+            )))
+        keys <- keys[!(keys_to_be_done %in% keys_markers_figures_areas_done),]
+      }
+
+      nkeys <- nrow(keys)
+      variables_to_export_nested <- c("variables_to_export","keys","result_folderPivot","sample_names","ssEnv","file_path_build")
+      if (nrow(keys) > 0)
+        for (k in 1:nkeys)
+        {
+          # k <- 3
+          key <- keys [k, ]
+          pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
+          fname <- file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv")
+          if (file.exists(fname))
+          {
+            log_event("INFO: ",
+              Sys.time(),
+              " Starting to read pivot:",
+              fname,
+              ".")
+            tempDataFrame <- utils::read.csv2(fname, sep  =  ";")
+            # tempDataFrame <- tempDataFrame[1:100,]
+            row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+            if (length(areas_selection) > 0)
+              tempDataFrame <-tempDataFrame[tempDataFrame[, 1] %in% areas_selection,]
+
+            #removes area_of_test name (eg. gene...)
+            tempDataFrame <- tempDataFrame[, -1]
+            if (is.null(dim(tempDataFrame)))
+              next
+            if (plyr::empty(tempDataFrame) | nrow(tempDataFrame) == 0)
+              next
+            tempDataFrame <- t(tempDataFrame)
+            tempDataFrame <- as.data.frame(tempDataFrame)
+            log_event(
+              "INFO: ",
+              Sys.time(),
+              " Read pivot:",
+              fname,
+              " with ",
+              ncol(tempDataFrame),
+              " rows."
+            )
+            tempDataFrame$Sample_ID <- rownames(tempDataFrame)
+            tempDataFrame <- merge(study_summary,tempDataFrame, by  =  "Sample_ID", all.x=TRUE)
+            tempDataFrame <- tempDataFrame[, c(-1,-3)]
+            tempDataFrame <-subset(tempDataFrame, "Sample_Group"  !=   "Reference")
+            tempDataFrame <-subset(tempDataFrame, "Sample_Group"  !=   0)
+            tempDataFrame <- as.data.frame(tempDataFrame)
+            tempDataFrame$Sample_Group <- tempDataFrame$Sample_Group =="Case"
+            tempDataFrame[is.na(tempDataFrame)] <- 0
+            cols <- (gsub(" ", "_", colnames(tempDataFrame)))
+            cols <- (gsub("-", "_", cols))
+            cols <- (gsub(":", "_", cols))
+            cols <- (gsub("/", "_", cols))
+            cols <- (gsub("'", "_", cols))
+            tempDataFrame <- as.data.frame(tempDataFrame)
+            if (length(colnames(tempDataFrame)) !=  length(cols))
+              stop("ERROR: I'm stopping here data to analyze are not correct, file a bug!")
+            colnames(tempDataFrame) <- cols
+
+            actual_labels <- tempDataFrame[,independent_variable]
+            phenotype <- tempDataFrame[,independent_variable]
+            n_case <- sum(phenotype != 0)
+            n_control <- nrow(tempDataFrame) - n_case
+
+            if(ssEnv$showprogress)
+              progress_bar <- progressr::progressor(along = 2:ncol(tempDataFrame))
+            else
+              progress_bar <- ""
+
+            var_to_export <- c("tempDataFrame","ssEnv","progress_bar","actual_labels","keys","k","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
+            # for (c in 2:ncol(tempDataFrame))
+            results_temp <- foreach::foreach(c  =  2:ncol(tempDataFrame), .combine  =  rbind, .export  =  var_to_export) %dorng%
+            {
+              area_of_test = names(tempDataFrame)[c]
+              if(ssEnv$showprogress)
+              {
+                progress_bar(sprintf("genomic area of test: %s", stringr::str_pad( area_of_test, 20, side=c('left'), pad=' ')))
+              }
+              predicted_labels <- as.numeric(tempDataFrame[,c])!=0
+              burden <- sum(as.numeric(tempDataFrame[,c]))
+              # Create a confusion matrix
+              conf_matrix <- table(Actual = actual_labels, Predicted = predicted_labels)
+              if(sum(predicted_labels) == 0)
+                conf_matrix <- cbind(conf_matrix, "TRUE"=0)
+              if(sum(predicted_labels) == length(predicted_labels))
+                conf_matrix <- cbind(conf_matrix, "FALSE"=0)
+
+              # Calculate sensitivity and specificity
+              sensitivity <- conf_matrix["TRUE","TRUE"] / sum(conf_matrix["TRUE", ])
+              specificity <- conf_matrix["FALSE", "FALSE"] / sum(conf_matrix["FALSE", ])
+
+              epimutated <- as.numeric(tempDataFrame[,c])!=0
+              # apply bayes theorem
+              # P(A|B) = P(B|A) * P(A) / P(B)
+              # P(A) = probability to be a case
+              # P(B) = probability to have a mutation in a specific area_of_test
+              # P(B|A) = probability to have a mutation in a specific area_of_test given that the sample is a case
+              # P(A|B) = probability to be a case given that the sample has a mutation in a specific area_of_test
+              P_to_be_Epimutated <- sum(epimutated) / length(epimutated)
+
+              P_to_be_Case <- n_case / (n_case + n_control)
+              P_to_be_Epimutated_cond_to_be_Case <- sum(epimutated & phenotype) / sum(phenotype)
+              P_to_be_Case_cond_to_be_Epimutated <- (P_to_be_Epimutated_cond_to_be_Case * P_to_be_Case) / P_to_be_Epimutated
+
+              P_to_be_Control <- n_control / (n_case + n_control)
+              P_to_be_Not_Epimutated_cond_to_be_Control <- sum(!epimutated & (!phenotype)) / sum(!phenotype)
+              P_to_be_Control_cond_to_be_Not_Epimutated <- (P_to_be_Not_Epimutated_cond_to_be_Control * P_to_be_Control) / (1 -P_to_be_Epimutated)
+
+              sample1 <- as.numeric(tempDataFrame[phenotype==0,c])
+              sample2 <- as.numeric(tempDataFrame[phenotype!=0,c])
+
+              # Combine the unique elements from both samples to create a common event space
+              common_events <- unique(c(sample1, sample2))
+
+              # Create adjusted frequency tables for both samples
+              frequency_table1_adjusted <- tabulate(match(sample1, common_events), nbins = length(common_events))
+              frequency_table2_adjusted <- tabulate(match(sample2, common_events), nbins = length(common_events))
+
+              # Convert adjusted frequencies to probabilities
+              probability_distribution1_adjusted <- frequency_table1_adjusted / sum(frequency_table1_adjusted)
+              probability_distribution2_adjusted <- frequency_table2_adjusted / sum(frequency_table2_adjusted)
+
+              # Calculate the Jensen-Shannon distance
+              jsd <- suppressMessages(suppressWarnings(philentropy::JSD(rbind(probability_distribution1_adjusted, probability_distribution2_adjusted))))
+
+              data.frame("MARKER"= as.character(keys[k, "MARKER"]),"FIGURE"= as.character(keys[k, "FIGURE"]),
+                "AREA"= as.character(keys[k, "AREA"]), "SUBAREA"= as.character(keys[k, "SUBAREA"]),
+                "AREA_OF_TEST" = area_of_test,"SENSITIVITY"=sensitivity, "SPECIFICITY"=specificity,
+                "P_to_be_Case_cond_to_be_Epimutated"= P_to_be_Case_cond_to_be_Epimutated,
+                "P_to_be_Control_cond_to_be_Not_Epimutated"= P_to_be_Control_cond_to_be_Not_Epimutated,
+                "SCORE"=0,"BURDEN"=burden,"JSD"=jsd)
+
+            }
+
+            results_temp <- as.data.frame(results_temp)
+            colnames(results_temp) <- result_colnames
+            if (exists("results"))
+            {
+              if (exists("results_temp"))
+                results_temp <- plyr::rbind.fill(results, results_temp)
+              else
+                results_temp <- results
+              rm(results)
+            }
+            # append to csv file
+            if(!file.exists(fileNameResultsTemp))
+              write.table(x =  results_temp, file = fileNameResultsTemp, append = FALSE, row.names = FALSE, sep="\t")
+            else
+              write.table(x =  results_temp, file = fileNameResultsTemp, append = TRUE, row.names = FALSE, sep="\t", col.names = FALSE)
+          }
+        }
+
+      # browser()
+      if(file.exists(fileNameResultsTemp))
+        results <-  read.table(file = fileNameResultsTemp, header = TRUE , stringsAsFactors = FALSE, sep="\t")
+
+      # drop column if all is na
+      if (!exists("results"))
+        next
+      results <- subset(results, results$AREA != "CHR")
+      results <- results[, colSums(is.na(results)) != nrow(results)]
+      results <- results[,result_colnames]
+      results$SPECIFICITY <- as.numeric(results$SPECIFICITY)
+      results$SENSITIVITY <- as.numeric(results$SENSITIVITY)
+
+      results$P_to_be_Case_cond_to_be_Epimutated <- as.numeric(results$P_to_be_Case_cond_to_be_Epimutated)
+      results$P_to_be_Control_cond_to_be_Not_Epimutated <- as.numeric(results$P_to_be_Control_cond_to_be_Not_Epimutated)
+      results$JSD <- as.numeric(results$JSD)
+
+      results$SCORE <- round(results$SPECIFICITY,4) +
+        round(results$SENSITIVITY,4) +
+        round(results$P_to_be_Control_cond_to_be_Not_Epimutated,4) +
+        round(results$P_to_be_Case_cond_to_be_Epimutated,4) +
+        round(results$JSD,4)
+
+      results <- results[,result_colnames]
+      write.csv2(x = results, file = fileNameResults,row.names = FALSE)
+      rm(results)
+      if(file.exists(fileNameResultsTemp))
+        file.remove(fileNameResultsTemp)
+
+    }
+    close_env()
+  }

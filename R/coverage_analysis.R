@@ -1,4 +1,4 @@
-coverage_analysis <- function(methylation_data)
+coverage_analysis <- function(signal_data)
 {
   # probe_features <- PROBES_CHR_CHR
   # area <- c("CHR")
@@ -12,7 +12,7 @@ coverage_analysis <- function(methylation_data)
     subarea <- as.character(keys[k,"SUBAREA"])
     area <-  as.character(keys[k,"AREA"])
     area_subarea <- as.character(keys[k,"COMBINED"])
-    # message(area,"\n")
+    # log_event(area,"\n")
     if(exists("covered_count"))
       rm(covered_count)
 
@@ -23,7 +23,7 @@ coverage_analysis <- function(methylation_data)
     total_count <- stats::aggregate(probe_features$PROBE, list(probe_features[, area_subarea]), FUN=length)
     colnames(total_count) <- c(as.character(area_subarea),"COUNT_TOTAL")
 
-    probe_filtered <- probe_features[ probe_features$PROBE %in% rownames(methylation_data),]
+    probe_filtered <- probe_features[ probe_features$PROBE %in% rownames(signal_data),]
     # if no probe is covered
     if (nrow(probe_filtered)>0)
     {
@@ -182,7 +182,7 @@ coverage_analysis <- function(methylation_data)
   #   units = c("px"),
   #   dpi = 144
   # )
-  message("INFO: ", Sys.time(), " Coverage analysis executed." )
+  log_event("INFO: ", Sys.time(), " Coverage analysis executed." )
 
   # cov_result <- reshape2::dcast(data = cov_result, AREA + SUBAREA ~ COV_PERC, value.var = "COUNT", sum)
   # number_areas <- rowSums(cov_result[,3:ncol(cov_result)])

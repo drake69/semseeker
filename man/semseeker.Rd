@@ -5,33 +5,16 @@
 \title{Calculate stochastic epi mutations from a methylation dataset as outcome
 report of pivot}
 \usage{
-semseeker(
-  sample_sheet,
-  methylation_data,
-  result_folder,
-  bonferroni_threshold = 0.05,
-  maxResources = 90,
-  iqrTimes = 3,
-  parallel_strategy = "multisession",
-  ...
-)
+semseeker(sample_sheet, signal_data, result_folder, ...)
 }
 \arguments{
 \item{sample_sheet}{dataframe with at least a column Sample_ID to identify samples}
 
-\item{methylation_data}{matrix of methylation data}
+\item{signal_data}{matrix of methylation data}
 
 \item{result_folder}{where the result will be saved}
 
-\item{bonferroni_threshold}{= 0.05 #threshold to define which pValue adjusted to define an epilesion}
-
-\item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
-
-\item{iqrTimes}{how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier}
-
-\item{parallel_strategy}{which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster}
-
-\item{...}{other options to filter elaborations}
+\item{...}{other options to execute elaborations}
 }
 \value{
 files into the result folder with pivot table and bedgraph.

@@ -1,5 +1,5 @@
 
-sample_group_check <- function(sample_sheet, methylation_data)
+sample_group_check <- function(sample_sheet, signal_data)
 {
 
   ssEnv <- get_session_info()
@@ -36,10 +36,10 @@ sample_group_check <- function(sample_sheet, methylation_data)
   }
 
 
-  if (sum(colnames(methylation_data) %in% sample_sheet$Sample_ID)!=ncol(methylation_data))
+  if (sum(colnames(signal_data) %in% sample_sheet$Sample_ID)!=ncol(signal_data))
   {
-    result <- paste(result, "\n", "Have a look: the methylation data first columns:", colnames(methylation_data)[1:4], "... some Sample_ID:", sample_sheet$Sample_ID[1:4], "\n" )
-    lost_column <- colnames(methylation_data)[!(colnames(methylation_data) %in% sample_sheet$Sample_ID)]
+    result <- paste(result, "\n", "Have a look: the methylation data first columns:", colnames(signal_data)[1:4], "... some Sample_ID:", sample_sheet$Sample_ID[1:4], "\n" )
+    lost_column <- colnames(signal_data)[!(colnames(signal_data) %in% sample_sheet$Sample_ID)]
     result <- paste(result, "\n","Lost column:", lost_column, "\n" )
     result <- paste(result, "\n", (" The methylation data has not the column's names as expected from the sample sheet in column Sample_ID!"))
   }

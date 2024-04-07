@@ -11,7 +11,7 @@ test_that("inference_file_name", {
 
   fileToRead <- "3_Phenotest_logn_gaussian_Covariates1_Covariates2"
   fileNameResults <- semseeker:::file_path_build(ssEnv$result_folderInference,fileToRead, extension = "csv")
-  testthat::expect_true(inference_file_name(inference_details)==fileNameResults)
+  testthat::expect_true(inference_file_name(inference_details)==fileNameResults, ssEnv$result_folderInference)
 
 
 })

@@ -6,43 +6,43 @@ test_that("deltar_single_sample",{
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
-  # for (s in 1:ncol(methylation_data))
+  # for (s in 1:ncol(signal_data))
   {
     s <- 2
     message(s)
-    sample_id <- colnames(methylation_data)[s]
+    sample_id <- colnames(signal_data)[s]
     sample_detail <- mySampleSheet[ mySampleSheet$Sample_ID==sample_id ,c("Sample_ID","Sample_Group")]
 
     semseeker:::deltar_single_sample(
-      values = methylation_data[,sample_id],
-      high_thresholds = beta_superior_thresholds,
-      low_thresholds = beta_inferior_thresholds,
+      values = signal_data[,sample_id],
+      high_thresholds = signal_superior_thresholds,
+      low_thresholds = signal_inferior_thresholds,
       sample_detail = sample_detail,
       probe_features = probe_features
     )
 
     semseeker:::delta_single_sample(
-      values = methylation_data[,sample_id],
-      high_thresholds = beta_superior_thresholds,
-      low_thresholds = beta_inferior_thresholds,
+      values = signal_data[,sample_id],
+      high_thresholds = signal_superior_thresholds,
+      low_thresholds = signal_inferior_thresholds,
       sample_detail = sample_detail,
       probe_features = probe_features
     )
 
-    semseeker:::analyze_single_sample( values = methylation_data[,sample_id],
+    semseeker:::analyze_single_sample( values = signal_data[,sample_id],
       sliding_window_size = sliding_window_size,
-      thresholds = beta_superior_thresholds ,
+      thresholds = signal_superior_thresholds ,
       figure = "HYPER",
       sample_detail = sample_detail ,
       bonferroni_threshold = 0.05,
       probe_features = probe_features)
 
-    semseeker:::analyze_single_sample( values = methylation_data[,sample_id],
+    semseeker:::analyze_single_sample( values = signal_data[,sample_id],
       sliding_window_size = sliding_window_size,
-      thresholds = beta_inferior_thresholds ,
+      thresholds = signal_inferior_thresholds ,
       figure = "HYPO",
       sample_detail = sample_detail ,
       bonferroni_threshold = 0.05,

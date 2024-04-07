@@ -1,29 +1,29 @@
-analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
+analyze_batch <- function(signal_data, sample_sheet, batch_id)
 {
   message("INFO: ", Sys.time(), " working on batch:", batch_id)
 
   ssEnv <- get_session_info()
 
   # browser()
-  methylation_data <- as.data.frame(methylation_data)
-  get_meth_tech(methylation_data)
-  coverage_analysis(methylation_data = methylation_data)
+  signal_data <- as.data.frame(signal_data)
+  get_meth_tech(signal_data)
+  coverage_analysis(signal_data = signal_data)
 
-  methDataTemp <- data.frame( "PROBE"= rownames(methylation_data), methylation_data)
+  methDataTemp <- data.frame( "PROBE"= rownames(signal_data), signal_data)
   methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
-  methylation_data <- methDataTemp[, -c(1)]
+  signal_data <- methDataTemp[, -c(1)]
   rm(methDataTemp)
 
-  message("INFO: ", Sys.time(), " I will work on:", nrow(methylation_data), " PROBES.")
+  message("INFO: ", Sys.time(), " I will work on:", nrow(signal_data), " PROBES.")
 
   probe_features <- probe_features_get("PROBE")
   message("DEBUG: ", Sys.time(), " loaded probe_features: PROBES")
-  probe_features <- probe_features[(probe_features$PROBE %in% rownames(methylation_data)),]
-  methylation_data <- methylation_data[rownames(methylation_data) %in% probe_features$PROBE, ]
-  methylation_data <- methylation_data[ order(rownames(methylation_data)), ]
+  probe_features <- probe_features[(probe_features$PROBE %in% rownames(signal_data)),]
+  signal_data <- signal_data[rownames(signal_data) %in% probe_features$PROBE, ]
+  signal_data <- signal_data[ order(rownames(signal_data)), ]
 
   # probe_features <- sort_by_chr_and_start(probe_features)
-  if (!test_match_order(row.names(methylation_data), probe_features$PROBE)) {
+  if (!test_match_order(row.names(signal_data), probe_features$PROBE)) {
     stop("Wrong order matching Probes and Methylation data!", Sys.time())
   }
 
@@ -39,32 +39,32 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   # }
 
 
-  sample_group_checkResult <- sample_group_check(sample_sheet, methylation_data)
+  sample_group_checkResult <- sample_group_check(sample_sheet, signal_data)
   if(!is.null(sample_group_checkResult))
   {
     stop(sample_group_checkResult)
   }
 
-  beta_save(methylation_data, sample_sheet, batch_id)
+  signal_save(signal_data, sample_sheet, batch_id)
 
   # reference population
   referencePopulationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == "Reference", ]
-  referencePopulationMatrix <- data.frame(PROBE = row.names(methylation_data), methylation_data[, referencePopulationSampleSheet$Sample_ID])
+  referencePopulationMatrix <- data.frame(PROBE = row.names(signal_data), signal_data[, referencePopulationSampleSheet$Sample_ID])
 
   #
-  # methylation_data <- data.frame(PROBE = row.names(methylation_data), methylation_data[ , which(!(colnames(methylation_data)%in%referencePopulationSampleSheet$Sample_ID))]  )
+  # signal_data <- data.frame(PROBE = row.names(signal_data), signal_data[ , which(!(colnames(signal_data)%in%referencePopulationSampleSheet$Sample_ID))]  )
 
 
   if (plyr::empty(referencePopulationMatrix) ||
       ncol(referencePopulationMatrix) < 2) {
-    message("ERROR: ", Sys.time(), " Empty methylation_data ", Sys.time())
-    stop("INFO: ", Sys.time(), " Empty methylation_data ")
+    message("ERROR: ", Sys.time(), " Empty signal_data ", Sys.time())
+    stop("INFO: ", Sys.time(), " Empty signal_data ")
   }
 
-  populationControlRangeBetaValues <- as.data.frame(range_beta_values(referencePopulationMatrix, iqrTimes))
+  populationControlRangeBetaValues <- as.data.frame(signal_range_values(referencePopulationMatrix, iqrTimes))
 
-  # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds","csv")), sep=";")
-  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "beta_thresholds"),"fst"))
+  # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds","csv")), sep=";")
+  fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"fst"))
 
   # remove duplicated samples due to the reference population
   referenceSamples <- sample_sheet[sample_sheet$Sample_Group == "Reference",]
@@ -73,8 +73,8 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  variables_to_export <- c( "ssEnv", "sample_sheet", "methylation_data", "analyze_population", "sliding_window_size",
-    "populationControlRangeBetaValues", "bonferroni_threshold", "PROBES", "create_multiple_bed","probe_features")
+  variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "analyze_population",
+    "populationControlRangeBetaValues", "PROBES", "create_multiple_bed","probe_features")
   resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
   # for (i in 1:length(ssEnv$keys_sample_groups[,1]))
   {
@@ -82,7 +82,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
     #
     sample_group <- ssEnv$keys_sample_groups[i,1]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == sample_group, ]
-    populationMatrixColumns <- colnames(methylation_data[, populationSampleSheet$Sample_ID])
+    populationMatrixColumns <- colnames(signal_data[, populationSampleSheet$Sample_ID])
 
     if (length(populationMatrixColumns)==0) {
       message("WARNING: ", Sys.time(), "  Population ",sample_group, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
@@ -90,11 +90,9 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
     else
     {
       resultPopulation <- analyze_population(
-        methylation_data = methylation_data[, populationMatrixColumns],
-        sliding_window_size = sliding_window_size,
+        signal_data = signal_data[, populationMatrixColumns],
         sample_sheet = populationSampleSheet,
-        beta_thresholds = populationControlRangeBetaValues,
-        bonferroni_threshold = bonferroni_threshold,
+        signal_thresholds = populationControlRangeBetaValues,
         probe_features = probe_features
       )
 
@@ -130,7 +128,7 @@ analyze_batch <- function(methylation_data, sample_sheet, sliding_window_size, b
   sample_sheet$Batch_ID <- batch_id
 
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
-  rm(methylation_data)
+  rm(signal_data)
 
   message("INFO: ", Sys.time(), "  Batch completed:", batch_id)
   return((sample_sheet))

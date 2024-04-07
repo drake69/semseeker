@@ -7,10 +7,10 @@ test_that("annotate_bed", {
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
-  sp <- semseeker:::analyze_batch(methylation_data=methylation_data,
+  sp <- semseeker:::analyze_batch(signal_data=signal_data,
     sliding_window_size = sliding_window_size,
     sample_sheet = mySampleSheet,
     bonferroni_threshold = bonferroni_threshold,

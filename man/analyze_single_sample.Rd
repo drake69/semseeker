@@ -6,26 +6,20 @@
 \usage{
 analyze_single_sample(
   values,
-  sliding_window_size,
   thresholds,
   figure,
   sample_detail,
-  bonferroni_threshold = 0.05,
   probe_features
 )
 }
 \arguments{
 \item{values}{values of methylation}
 
-\item{sliding_window_size}{size of window sliding to calculate hypergeometric}
-
 \item{thresholds}{threshold to use for comparison}
 
 \item{figure}{which figure's of sasmple will be analized HYPO or HYPER}
 
 \item{sample_detail}{details of the sample to analyze}
-
-\item{bonferroni_threshold}{bonferroni threshold to validate pValue}
 
 \item{probe_features}{probe_features details to be used}
 }

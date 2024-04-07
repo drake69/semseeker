@@ -1,7 +1,7 @@
 #' Quantile regression result value, confidence interval and pvalue
 #'
-#' @param boot_vector vector of boot statistc beta regression
-#' @param estimate beta regression
+#' @param boot_vector vector of boot statistc signal regression
+#' @param estimate signal regression
 #' @param conf.level confidence intervals alpha level
 #' @param boot_success number of success respecting the null hypothesis
 #' @param tests_count how many tests were done

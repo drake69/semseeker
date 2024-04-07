@@ -41,7 +41,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
   create_excel_pivot()
 
-
   inference_details <- unique(inference_details)
   # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
   #                          "getRNG", "%||%", ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", ".getRNGattribute", "isNumber", "isReal", "isInteger", ".foreachGlobals", "RNGprovider", ".RNGkind_length", "tail",
@@ -59,7 +58,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     family_test <- inference_detail$family_test
     if( is.null(family_test) || length(family_test)  ==  0)
     {
-      message("WARNING: ", Sys.time(), " One test family_test is missed! Skipped.")
+      log_event("WARNING: ", Sys.time(), " One test family_test is missed! Skipped.")
     }
     else
     {
@@ -78,7 +77,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
       if( is.null(independent_variable) || length(independent_variable)  ==  0)
       {
-        message("WARNING: ", Sys.time(), " One indipendent variable is missed! Skipped.")
+        log_event("WARNING: ", Sys.time(), " One indipendent variable is missed! Skipped.")
       }
       else
       {
@@ -86,7 +85,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         if( is.null(depth_analysis) || length(depth_analysis)  ==  0)
         {
           depth_analysis <- 1
-          message("WARNING: ", Sys.time(), " Missed depth analysis inference forced to 1.")
+          log_event("WARNING: ", Sys.time(), " Missed depth analysis inference forced to 1.")
         }
 
         study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
@@ -105,7 +104,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
         if (!(independent_variable %in% colnames(study_summary)))
         {
-          message("WARNING: ", Sys.time(), " This indipendent variabile:", independent_variable, " is missed! Skipping")
+          log_event("WARNING: ", Sys.time(), " This indipendent variabile:", independent_variable, " is missed! Skipping")
         }
         else
         {
@@ -142,134 +141,102 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # binomiale che si vuole usare per la regressione logistica
 
           markers <- unique(localKeys$MARKER)
+          if (exists("results"))
+            rm(results)
           for (a in 1:length(markers) )
           {
+            # browser()
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
             cols <- keys$COMBINED
-            # temporaneamente filtriamo per le colonne esistenti
-            cols <- cols[cols %in% colnames(study_summary)]
-            # if(length(cols)==0)
-            # {
-            #   message("INFO: this marker with figure", keys$COMBINED , "is not identified,have you run with this combination semseeker function ?")
-            #   next
-            # }
-            keys$AREA  =  "SAMPLE_GROUP"
-            keys$SUBAREA  =  "SAMPLE"
-            iters <- length(cols)
-
-            if(!is.null(covariates) && !length(covariates)  ==  0)
-              study_summary <- study_summary[, c(independent_variable, covariates, cols) ]
-
-            fileNameResults <- inference_file_name(inference_detail, markers[a])
-
-            # clean keys from already done association
-            if(file.exists(fileNameResults))
+            if (sum(cols %in% colnames(study_summary))!=0)
             {
-              old_results <- utils::read.csv2(fileNameResults, header  =  T)
-              old_results <- old_results[old_results$AREA  ==  "SAMPLE_GROUP",]
-              old_results <- old_results[old_results$SUBAREA  ==  "SAMPLE",]
-              keys_markers_figures_areas_done <- unlist(apply(unique(old_results [, c("MARKER","FIGURE","AREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-              keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-              keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
-            }
+              # temporaneamente filtriamo per le colonne esistenti
+              cols <- cols[cols %in% colnames(study_summary)]
+              keys$AREA  =  "SAMPLE_GROUP"
+              keys$SUBAREA  =  "SAMPLE"
+              iters <- length(cols)
 
-            if(nrow(keys)>0)
-              for(j in seq_along(nrow(keys)))
-              {
-                g_start <- 2 + length(covariates)
-                result_temp <- apply_stat_model(tempDataFrame  =  study_summary[, c(independent_variable, covariates, cols[j])], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
-                  key  =  keys[j,], transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
-                if (exists("result"))
-                  result <- plyr::rbind.fill(result, result_temp)
-                else
-                  result <- result_temp
-              }
-
-            if (exists("result"))
-              result <- result[order(result$PVALUEADJ),]
-
-            study_summaryToPlot <- study_summary
-
-            if(independent_variable  ==  "Sample_Group")
-              study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
-
-            if(family_test  ==  "binomial" || family_test  ==  "wilcoxon")
-            {
-
-              chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"sample_group_COMPARISON")
-
-              if(sum(grepl(pattern = "MUTATIONS",x  =  ssEnv$keys_markers))>0)
-              {
-                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "MUTATIONS"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-                graphics::par(mfrow = c(1,3))
-                graphics::boxplot(MUTATIONS_HYPO~ study_summaryToPlot[,independent_variable],main = "Hypo Mutations", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(MUTATIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Mutations", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(MUTATIONS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper Mutations", data  =  study_summaryToPlot, cex = 2)
-                grDevices::dev.off()
-              }
-
-              if(sum(grepl(pattern = "LESIONS",x  =  ssEnv$keys_markers))>0)
-              {
-                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "LESIONS"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-                graphics::par(mfrow = c(1,3))
-                graphics::boxplot(LESIONS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo Lesions", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(LESIONS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of Lesions", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(LESIONS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper Lesions", data  =  study_summaryToPlot, cex = 2)
-                grDevices::dev.off()
-              }
-
-              if(sum(grepl(pattern = "DELTAS",x  =  ssEnv$keys_markers))>0)
-              {
-                study_summaryToPlot$DELTAS_HYPO <- as.numeric(study_summaryToPlot$DELTAS_HYPO)
-                study_summaryToPlot$DELTAS_BOTH <- as.numeric(study_summaryToPlot$DELTAS_BOTH)
-                study_summaryToPlot$DELTAS_HYPER <- as.numeric(study_summaryToPlot$DELTAS_HYPER)
-                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAS"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-                graphics::par(mfrow = c(1,3))
-                graphics::boxplot(DELTAS_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAS Mean", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(DELTAS_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAS", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(DELTAS_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper DELTAS Mean", data  =  study_summaryToPlot, cex = 2)
-                grDevices::dev.off()
-              }
-
-              if(sum(grepl(pattern = "DELTAQ",x  =  ssEnv$keys_markers))>0)
-              {
-                filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), "DELTAQ"),"png")
-                grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-                graphics::par(mfrow = c(1,3))
-                graphics::boxplot(DELTAQ_HYPO~study_summaryToPlot[,independent_variable],main = "Hypo DELTAQ Mean", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(DELTAQ_BOTH~study_summaryToPlot[,independent_variable], main = "Both Type of DELTAQ", data  =  study_summaryToPlot, cex = 2)
-                graphics::boxplot(DELTAQ_HYPER~study_summaryToPlot[,independent_variable],main = "Hyper DELTAQ Mean", data  =  study_summaryToPlot, cex = 2)
-                grDevices::dev.off()
-              }
-            }
-
-            if (exists("old_results"))
-            {
-              if (exists("result"))
-                result <- plyr::rbind.fill(result, old_results)
+              if(!is.null(covariates) && !length(covariates)  ==  0)
+                study_summary_local <- study_summary[, c(independent_variable, covariates, cols,"Sample_Group") ]
               else
-                result <- old_results
-              rm(old_results)
-            }
+                study_summary_local <- study_summary
 
-            utils::write.csv2(result, fileNameResults , row.names  =  FALSE)
+              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
+
+              file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
+              # clean keys from already done association
+              if(file_good)
+              {
+                old_results <- utils::read.csv2(fileNameResults, header  =  T)
+                old_results_filtered <- old_results[old_results$AREA  ==  "SAMPLE_GROUP",]
+                old_results_filtered <- old_results_filtered[old_results_filtered$SUBAREA  ==  "SAMPLE",]
+                keys_markers_figures_areas_done <- unlist(apply(unique(old_results_filtered [, c("MARKER","FIGURE","AREA","SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA","SUBAREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
+              }
+
+              if(nrow(keys)>0)
+                for(j in 1:nrow(keys))
+                {
+                  key  =  keys[j,]
+                  key$FIGURE <- as.character(key$FIGURE)
+                  key$MARKER <- as.character(key$MARKER)
+                  g_start <- 2 + length(covariates)
+                  result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, c(independent_variable, covariates, key$COMBINED)], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
+                    key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
+                  if (exists("results"))
+                    results <- plyr::rbind.fill(results, result_temp)
+                  else
+                    results <- result_temp
+
+                  study_summaryToPlot <- study_summary_local
+                  if(independent_variable  ==  "Sample_Group")
+                    study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
+                  chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"SAMPLE_GROUP_COMPARISON")
+                  filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),"png")
+                  grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
+                  # graphics::par(mfrow = c(1,3))
+                  study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")] <- as.numeric(study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")])
+                  formula <- as.formula(paste(key$MARKER,"_", key$FIGURE,"~",independent_variable, sep=""))
+                  title <- paste(key$MARKER," ", key$FIGURE, sep="")
+                  graphics::boxplot( formula , main = title, data  =  study_summaryToPlot, cex = 2)
+                  grDevices::dev.off()
+                }
+
+              if (exists("results"))
+                if (!is.null(dim(results)))
+                  if (nrow(results)>0)
+                    results <- results[order(results$PVALUEADJ),]
+
+              if (exists("old_results"))
+              {
+                if (exists("results"))
+                  results <- plyr::rbind.fill(results, old_results)
+                else
+                  results <- old_results
+                rm(old_results)
+              }
+
+              utils::write.csv2(results, fileNameResults , row.names  =  FALSE)
+            }
 
             if(depth_analysis >1)
             {
               localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
               keys <- localKeys_1[localKeys_1$MARKER==markers[a],]
+
               # clean keys from already done association
-              if(file.exists(fileNameResults))
+              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
+              file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  >10
+              # clean keys from already done association
+              if(file_good)
               {
                 old_results <- utils::read.csv2(fileNameResults, header  =  T)
-                old_results <- old_results[old_results$AREA  !=  "SAMPLE_GROUP",]
-                old_results <- old_results[old_results$SUBAREA  !=  "SAMPLE",]
-                keys_markers_figures_areas_done <- unlist(apply(unique(old_results [, c("MARKER","FIGURE","AREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-                keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                old_results_filtered <- old_results[old_results$AREA  !=  "SAMPLE_GROUP",]
+                old_results_filtered <- old_results_filtered[old_results_filtered$SUBAREA  !=  "SAMPLE",]
+                keys_markers_figures_areas_done <- unlist(apply(unique(old_results_filtered [, c("MARKER","FIGURE","AREA","SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
+                keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA","SUBAREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
               }
 
@@ -289,15 +256,21 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   fname <-file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv")
                   if (file.exists(fname))
                   {
-                    message("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
+                    log_event("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
                     tempDataFrame <- utils::read.csv2(fname, sep  =  ";")
                     #assign the area name (eg gene...) to the rows
                     # has SAMPLEID as name but is the genomic area
                     row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
                     if(length(areas_selection)>0)
-                      tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection, ]
+                    {
+                      names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
+                      areas_selection <- gsub(":","_",gsub("'","_",gsub("-","_",areas_selection)))
+                      tempDataFrame <- tempDataFrame[ names_area %in% areas_selection, ]
+                    }
                     #removes area name (eg. gene...)
                     tempDataFrame <- tempDataFrame[,-1]
+                    if(is.null(dim(tempDataFrame)))
+                      next
                     if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
                       next
                     # max_row_count <- ceiling(10^6/ncol(tempDataFrame))
@@ -309,7 +282,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrameBatch <- t(tempDataFrameBatch)
                     tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
                     tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
-                    message("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
+                    log_event("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
                     if(nrow(tempDataFrameBatch)>1)
                     {
                       tempDataFrameBatch <- subset(tempDataFrameBatch, "SAMPLE_GROUP"  !=   "Reference")
@@ -334,45 +307,58 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                         key  =  key, transformation =  transformation, dototal  =  TRUE,
                         session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
 
-                      if(!exists("result_temp_foreach"))
-                        result_temp_foreach <- result_temp_local_batch
-                      else
-                        result_temp_foreach <- plyr::rbind.fill(result_temp_local_batch, result_temp_foreach)
+                      #
 
-                      utils::write.csv2(result_temp_foreach, fileNameResults , row.names  =  FALSE)
+                      if(!exists("results"))
+                        results <- result_temp_local_batch
+                      else
+                        results <- plyr::rbind.fill(results, result_temp_local_batch)
+
+                      utils::write.csv2(results, fileNameResults , row.names  =  FALSE)
 
                       # result_temp_local_batch
                     }
                   }
                 }
 
-              if(exists("result_temp_foreach"))
-                result <- plyr::rbind.fill(result, result_temp_foreach)
-
+              #
               if (exists("old_results"))
               {
-                result <- plyr::rbind.fill(result, old_results)
+                if (exists("results"))
+                  results <- plyr::rbind.fill(results, old_results)
+                else
+                  results <- old_results
                 rm(old_results)
               }
 
-              result <- unique(result)
-              result[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BH")
-              result[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(result[,"PVALUE"],method  =  "BY")
-              result[,"PVALUEADJ_ALL_FDR"] <- stats::p.adjust(result[,"PVALUE"],method  =  "fdr")
-              result <- result[order(result$PVALUEADJ),]
+              results <- unique(results)
+              # check column PVALUE exists
+              if("PVALUE" %in% colnames(results))
+              {
+                results[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BH")
+                results[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BY")
+                results[,"PVALUEADJ_ALL_FDR"] <- stats::p.adjust(results[,"PVALUE"],method  =  "fdr")
+                if (exists("results"))
+                  if (nrow(results)>0)
+                    results <- results[order(results$PVALUEADJ),]
 
-              if(filter_p_value)
-                result <- subset(result, result$PVALUE < 0.05 | result$PVALUEADJ < 0.05)
+                if(filter_p_value)
+                  results <- subset(results, results$PVALUE < 0.05 | results$PVALUEADJ < 0.05)
+              }
 
-              utils::write.csv2(result,fileNameResults , row.names  =  FALSE)
+
+              # remove columns where all rows are NA
+              results <- results[, colSums(is.na(results)) < nrow(results)]
+
+              utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
               if(exists("result_temp_foreach"))
                 rm(result_temp_foreach)
               if(exists("result_temp_local_batch"))
                 rm(result_temp_local_batch)
               if(exists("tempDataFrame"))
                 rm(tempDataFrame)
-              if(exists("result"))
-                rm(result)
+              if(exists("results"))
+                rm(results)
             }
           }
         }

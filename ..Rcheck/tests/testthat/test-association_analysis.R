@@ -1,7 +1,7 @@
 test_that("association_analysis", {
 
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", markers="DELTAS", areas="PROBE")
+  semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", markers="DELTAS", areas="PROBE")
 
   #todo: test incremental association analysis
   # inference_details <- expand.grid("independent_variable"= "Phenotest",
@@ -71,7 +71,7 @@ test_that("association_analysis", {
   association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy="sequential", figures="BOTH", markers=c("DELTAS","DELTAQ"), areas="PROBE")
 
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", markers="DELTAS", areas="CHR")
+  semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data, result_folder = tempFolder,parallel_strategy="sequential", figures="BOTH", markers="DELTAS", areas="CHR")
   inferenceFolder <- file.path(tempFolder,"Inference")
 
 

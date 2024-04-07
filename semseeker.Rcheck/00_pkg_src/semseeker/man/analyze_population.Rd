@@ -6,7 +6,7 @@
 report of pivot}
 \usage{
 analyze_population(
-  methylation_data,
+  signal_data,
   sliding_window_size,
   sample_sheet,
   beta_thresholds,
@@ -15,7 +15,7 @@ analyze_population(
 )
 }
 \arguments{
-\item{methylation_data}{whole matrix of data to analyze.}
+\item{signal_data}{whole matrix of data to analyze.}
 
 \item{sliding_window_size}{size of the sliding widows to compute epilesions
 default 11 probe_features.}

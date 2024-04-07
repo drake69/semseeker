@@ -16,7 +16,7 @@ read_multiple_bed <- function(sample_group, marker, figure)
 
   if(as.character(marker)=="DELTAS" | as.character(marker)=="DELTAQ"
     | as.character(marker)=="DELTAR" | as.character(marker)=="DELTARQ"
-    | as.character(marker)=="BETA")
+    | as.character(marker)=="SIGNAL")
   {
     col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
   }
@@ -35,7 +35,7 @@ read_multiple_bed <- function(sample_group, marker, figure)
     if(!plyr::empty(multiple_bed))
     {
       multiple_bed[is.na(multiple_bed)] <- 0
-      if(marker!="BETA" & marker!="DELTAR" & marker!="DELTAS" & marker!="DELTAQ" & !plyr::empty(multiple_bed))
+      if(marker!="SIGNAL" & marker!="DELTAR" & marker!="DELTAS" & marker!="DELTAQ" & !plyr::empty(multiple_bed))
         multiple_bed$VALUE <- 1
 
       multiple_bed <- data.frame(multiple_bed,"FIGURE" = as.character(figure), "MARKER" = as.character(marker), "SAMPLE_GROUP" = as.character(sample_group))

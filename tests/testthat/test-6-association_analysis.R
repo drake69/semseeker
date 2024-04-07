@@ -1,13 +1,12 @@
 test_that("association_analysis", {
 
-
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
 
   ####################################################################################
 
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
-  semseeker:::semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
+  semseeker:::semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
     markers=c("DELTAQ"), areas=c("PROBE","CHR","GENE"))
 
   ####################################################################################
@@ -278,7 +277,7 @@ test_that("association_analysis", {
     "depth_analysis"=3,
     "filter_p_value" = FALSE)
 
-  areas_selection <- rownames(methylation_data)[1:100]
+  areas_selection <- rownames(signal_data)[1:100]
   # inference_details,result_folder, maxResources, parallel_strategy
   semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, areas_selection=areas_selection, areas="PROBE")
 
@@ -290,7 +289,21 @@ test_that("association_analysis", {
 
   inferenceFolder <- file.path(tempFolder,"Inference")
   inference_details <- expand.grid("independent_variable"= "Sample_Group",
-    "family_test"=c("mean-bootstrap_100_1000_0.95"),
+    "family_test"=c("mean-permutation_100_1000_0.95"),
+    "transformation"="",
+    "depth_analysis"=3,
+    "filter_p_value" = FALSE)
+  semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+    markers=c("DELTAS","DELTAQ"), areas="GENE")
+  fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_gaussian_Covariates1_Covariates2", extension = "csv")
+  localFileRes <- read.table(fileToRead, sep=";")
+  testthat::expect_true(nrow(localFileRes)>0)
+
+  ####################################################################################
+
+  inferenceFolder <- file.path(tempFolder,"Inference")
+  inference_details <- expand.grid("independent_variable"= "Phenotest",
+    "family_test"=c("spearman-permutation_100_1000_0.95"),
     "transformation"="",
     "depth_analysis"=3,
     "filter_p_value" = FALSE)

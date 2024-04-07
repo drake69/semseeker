@@ -11,13 +11,12 @@
 #'
 mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
 {
-  comparison <- switch(
-    figure,
-    "HYPO"=`<`,
-    "HYPER"=`>`
-  )
-
-  mutation <- as.numeric(comparison(values, thresholds))
+  if (figure == "HYPO") {
+    mutation <- as.numeric(values < thresholds)
+  }
+  if (figure == "HYPER") {
+    mutation <- as.numeric(values > thresholds)
+  }
   mutationAnnotated <- data.frame(as.data.frame(probe_features), "MUTATIONS" = mutation, row.names = probe_features$PROBE)
   mutation_annotated_sorted <- sort_by_chr_and_start(mutationAnnotated)
 

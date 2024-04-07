@@ -78,7 +78,7 @@ Here’s how you can obtain the analyzed data:
     sample_sheet <- read.csv2("~/sample_sheet.csv")
 
     semseeker (sample_sheet = sample_sheet, 
-            methylation_data = normalizedData,
+            signal_data = normalizedData,
             result_folder = "~/semseeker_result/")
 
 # Complete Example

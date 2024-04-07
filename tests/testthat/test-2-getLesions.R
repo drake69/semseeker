@@ -7,15 +7,15 @@ testthat::test_that("lesions_get",{
   bonferroni_threshold <- 5
 
   mutations <-  semseeker:::mutations_get(
-    values = methylation_data[,1],
+    values = signal_data[,1],
     figure = "HYPO",
-    thresholds = beta_inferior_thresholds,
+    thresholds = signal_inferior_thresholds,
     probe_features = probe_features,
     sampleName = Sample_ID
   )
 
   lesions_hypo <- semseeker:::lesions_get(
-    sliding_window_size = sliding_window_size,
+    
     bonferroni_threshold = bonferroni_threshold,
     mutation_annotated_sorted = mutations,
     grouping_column = "CHR"
@@ -24,15 +24,15 @@ testthat::test_that("lesions_get",{
   testthat::expect_true(nrow(lesions_hypo)!=0)
 
   mutations <-  semseeker:::mutations_get(
-    values = methylation_data[,1],
+    values = signal_data[,1],
     figure = "HYPER",
-    thresholds = beta_superior_thresholds,
+    thresholds = signal_superior_thresholds,
     probe_features = probe_features,
     sampleName = Sample_ID
   )
 
   lesions_hyper <- semseeker:::lesions_get(
-    sliding_window_size = sliding_window_size,
+    
     bonferroni_threshold = bonferroni_threshold,
     mutation_annotated_sorted = mutations,
     grouping_column = "CHR"

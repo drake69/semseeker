@@ -9,8 +9,8 @@
 dump_sample_as_bed_file <- function(data_to_dump, fileName) {
 
   ssEnv <- get_session_info()
-  # message("dump_sample_as_bed_file ssEnv:", length(ssEnv))
-  # message("dump_sample_as_bed_file:", ssEnv$result_folderData)
+ log_event("DEBUG: ", Sys.time(),  "dump_sample_as_bed_file ssEnv:", length(ssEnv))
+ log_event("DEBUG: ", Sys.time(),  "dump_sample_as_bed_file:", ssEnv$result_folderData)
 
   if (!plyr::empty(data_to_dump) && !startsWith(x = toupper(as.character(data_to_dump[1, "CHR"])), prefix = "CHR")) {
     chr <- rep(x = "chr", dim(data_to_dump)[1])
@@ -23,7 +23,7 @@ dump_sample_as_bed_file <- function(data_to_dump, fileName) {
   data_to_dump$END <- as.numeric(data_to_dump$END)
   if (!plyr::empty(data_to_dump)) {
 
-    # message("trying to save: ", fileName)
+   log_event("DEBUG: ", Sys.time(),  "trying to save: ", fileName)
 
     # save file bed per sample
     utils::write.table(data_to_dump, file = fileName, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
@@ -36,7 +36,7 @@ dump_sample_as_bed_file <- function(data_to_dump, fileName) {
     #
     # utils::write.table(data_to_dump, file = filePath, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
   }
-  # message("dump_sample_as_bed_file: ", fileName)
+ log_event("DEBUG: ", Sys.time(),  "dump_sample_as_bed_file: ", fileName)
 }
 
 

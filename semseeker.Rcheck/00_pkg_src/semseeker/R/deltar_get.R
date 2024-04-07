@@ -4,11 +4,11 @@
 #' @param high_thresholds highest threshold to use for comparison
 #' @param low_thresholds lowest threshold to use for comparison
 #' @param sample_detail details of sample to analyze
-#' @param beta_medians median to use for calculation
+#' @param signal_medians median to use for calculation
 #' @param probe_features genomic position of probe_features
 #' @return summary detail about the analysis
 #'
-deltar_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, beta_medians, probe_features) {
+deltar_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, signal_medians, probe_features) {
 
   ssEnv <- get_session_info()
 
@@ -55,7 +55,7 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
 
   ### get deltar from medians #########################################################
 
-  # deltar <- data.frame("DELTA"= values - beta_medians, row.names = probe_features$PROBE)
+  # deltar <- data.frame("DELTA"= values - signal_medians, row.names = probe_features$PROBE)
   # colnames(deltar) <- "DELTA"
 
   result <- ""

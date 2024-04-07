@@ -4,14 +4,7 @@
 \alias{quantreg_model}
 \title{Title}
 \usage{
-quantreg_model(
-  family_test,
-  sig.formula,
-  tempDataFrame,
-  independent_variable,
-  boot_success,
-  tests_count
-)
+quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable)
 }
 \arguments{
 \item{family_test}{family lqmm, quantreg}
@@ -22,7 +15,7 @@ quantreg_model(
 
 \item{independent_variable}{name of regressor}
 
-\item{boot_success}{number of success tests to calculate corrected confidence interval}
+\item{permutation_success}{number of success tests to calculate corrected confidence interval}
 
 \item{tests_count}{count of total executed tests}
 }

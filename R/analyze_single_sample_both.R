@@ -2,7 +2,7 @@ analyze_single_sample_both <- function( sample_detail, marker) {
 
   ssEnv <- get_session_info()
   start_time_single_sample <- Sys.time()
-  # message(sample_detail$Sample_ID, " ", "SingleSampleBoth Sample analysis warmingUP ", Sys.time())
+  # log_event(sample_detail$Sample_ID, " ", "SingleSampleBoth Sample analysis warmingUP ", Sys.time())
   result <- ""
   result <- result[-1]
 
@@ -36,7 +36,7 @@ analyze_single_sample_both <- function( sample_detail, marker) {
 
   end_time_single_sample <- Sys.time()
   time_taken <- end_time_single_sample - start_time_single_sample
-  # message(sample_detail$Sample_ID, " ", "Completed sample ", time_taken)
+  # log_event(sample_detail$Sample_ID, " ", "Completed sample ", time_taken)
 
   return(result)
 }

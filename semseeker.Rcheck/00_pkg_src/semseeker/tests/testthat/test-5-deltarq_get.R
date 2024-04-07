@@ -6,7 +6,7 @@ test_that("deltarq_get", {
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
   sliding_window_size <- 11
@@ -14,9 +14,9 @@ test_that("deltarq_get", {
 
   # browser()
   sp <- semseeker:::analyze_population(
-    methylation_data=methylation_data,
+    signal_data=signal_data,
     sliding_window_size = sliding_window_size,
-    beta_thresholds = beta_thresholds,
+    signal_thresholds = signal_thresholds,
     sample_sheet = mySampleSheet,
     bonferroni_threshold = bonferroni_threshold,
     probe_features = probe_features

@@ -5,23 +5,22 @@
 
 annotate_bed <- function ()
 {
+  start_time <- Sys.time()
   ssEnv <- get_session_info()
   # area and subarea are defined using the filename
   i <- 0
   dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
-  message("INFO: ", Sys.time(), " Annotating genomic area.")
+  log_event("INFO: ", Sys.time(), " Annotating genomic area.")
 
-  total_cycles <- nrow(localKeys)* length(ssEnv$keys_sample_groups)
+  progress_bar <- ""
   if(ssEnv$showprogress)
-    progress_bar <- progressr::progressor(along = 1:total_cycles)
-  else
-    progress_bar <- ""
+    progress_bar <- progressr::progressor(along = 1:(nrow(localKeys)*nrow(ssEnv$keys_sample_groups)))
 
   variables_to_export <- c("ssEnv", "dir_check_and_create", "read_multiple_bed", "subarea",
                             "progress_bar","progression_index", "progression", "progressor_uuid",
                             "owner_session_uuid", "trace","probe_features_get","dest_folder", "localKeys",
-                            "file_path_build")
+                            "file_path_build","%>%")
 
   # for(i in 1:nrow(localKeys))
   result <- foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export, .combine = rbind) %dorng%
@@ -29,7 +28,7 @@ annotate_bed <- function ()
       # i <- 1
       for (g in 1:nrow(ssEnv$keys_sample_groups))
       # foreach::foreach(i=1:nrow(ssEnv$keys_sample_groups), .export = variables_to_export, .combine = rbind) %dorng%
-          {
+      {
         # g <- 1
         marker <- as.character(localKeys[i,"MARKER"])
         sample_group <- as.character(ssEnv$keys_sample_groups[g,"SAMPLE_GROUP"])
@@ -39,6 +38,11 @@ annotate_bed <- function ()
         area_subarea <- paste(area,"_", subarea, sep="")
 
         bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
+
+        # "DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst"
+        # if (grepl("DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst",bedFileName))
+        #   browser()
+        # log_event(bedFileName)
         if (!file.exists(bedFileName))
         {
           probe_features <- probe_features_get(area_subarea)
@@ -68,7 +72,8 @@ annotate_bed <- function ()
                 droplevels(dataToAnnotate$CHR)
 
                 colname_to_preserve <- !(colnames(dataToAnnotate) %in%  c("START","END","K27","K450","K850"))
-                dataToAnnotate <- unique(dataToAnnotate[, colname_to_preserve])
+                # dataToAnnotate <- unique(dataToAnnotate[, colname_to_preserve])
+                dataToAnnotate <- dataToAnnotate[, colname_to_preserve] %>% dplyr::distinct()
 
                 # dataToAnnotate
 
@@ -76,10 +81,10 @@ annotate_bed <- function ()
                 final_bed <- rbind(final_bed, dataToAnnotate)
                 else
                 final_bed <- dataToAnnotate
-                gc()
+                # gc()
               }
             }
-          }
+        }
         if(ssEnv$showprogress)
           progress_bar(sprintf("Annotating multiple files."))
 
@@ -88,17 +93,22 @@ annotate_bed <- function ()
       if(exists("final_bed"))
       {
         colname_to_preserve <- !(colnames(final_bed) %in%  c("START","END","K27","K450","K850"))
-        final_bed <- unique(final_bed[, colname_to_preserve])
+        # Removing duplicate rows
+        final_bed <- final_bed[, colname_to_preserve] %>% dplyr::distinct()
+
         final_bed <- as.data.frame(final_bed)
         if(!plyr::empty(final_bed))
         {
           fst::write_fst( x = final_bed,path =  bedFileName, compress = T )
-          message("INFO: ", Sys.time(),  " annotated file to ", bedFileName)
+         log_event("DEBUG: ", Sys.time(),  " annotated file to ", bedFileName)
         }
       }
-      gc()
+
+      # gc()
       i
     }
-
+    end_time <- Sys.time()
+    log_event("INFO: ", end_time, " Annotating genomic area finished in ", end_time - start_time)
+    gc()
 }
 

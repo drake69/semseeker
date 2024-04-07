@@ -17,6 +17,10 @@ deltaq_get <- function(resultPopulation){
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAS")
   localKeys$EXT <- "fst"
 
+  progress_bar <- ""
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
+
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
@@ -33,6 +37,8 @@ deltaq_get <- function(resultPopulation){
       else
         deltaq <- deltaq_temp
     }
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("Collecting bed files."))
   }
 
   if (!exists("deltaq") | plyr::empty(deltaq))
@@ -40,10 +46,14 @@ deltaq_get <- function(resultPopulation){
      stop("Something wrong with multiple bed files!")
   }
 
-  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=4))
+  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=ssEnv$epiquantile))
   localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figure_default, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAQ")
+
+  progress_bar <- ""
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
 
   for(i in 1:nrow(localKeys))
   {
@@ -61,7 +71,7 @@ deltaq_get <- function(resultPopulation){
         tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTAQ_",as.character(key$FIGURE),sep="")))
         fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"), as.character(key$FIGURE)),  as.character(key$EXT))
         fst::write.fst( x= localFileRes, fileToWrite)
-        message("INFO: ", Sys.time(), " Created DELTAQ multiple annotated file!", fileToWrite)
+       log_event("DEBUG: ", Sys.time(), " Created DELTAQ multiple annotated file!", fileToWrite)
 
         tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",fun.aggregate = sum, drop = TRUE)
         colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
@@ -74,6 +84,9 @@ deltaq_get <- function(resultPopulation){
           deltaq_summary <- data.frame("LABEL"=lbl, tempDataFrame)
       }
     }
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("Binding bed files."))
+
   }
 
   if(!plyr::empty(deltaq_summary))

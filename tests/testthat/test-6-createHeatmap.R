@@ -6,15 +6,15 @@ test_that("create_heatmap", {
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(methylation_data)
+  semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
 
 
   batch_id <- 1
-  sp <- semseeker:::analyze_batch(methylation_data =  methylation_data,
+  sp <- semseeker:::analyze_batch(signal_data =  signal_data,
     sample_sheet =  mySampleSheet,
-    sliding_window_size = sliding_window_size,
+    
     bonferroni_threshold =  bonferroni_threshold,
     iqrTimes =  iqrTimes,
     batch_id = batch_id

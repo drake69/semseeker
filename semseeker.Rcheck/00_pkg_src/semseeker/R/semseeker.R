@@ -2,7 +2,7 @@
 #' report of pivot
 #'
 #' @param sample_sheet dataframe with at least a column Sample_ID to identify samples
-#' @param methylation_data matrix of methylation data
+#' @param signal_data matrix of methylation data
 #' @param bonferroni_threshold = 0.05 #threshold to define which pValue adjusted to define an epilesion
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
 #' @param iqrTimes how many times below the first quartile and over the third quartile the interqauartile is "added" to define the outlier
@@ -15,7 +15,7 @@
 #' @importFrom doRNG %dorng%
 #'
 semseeker <- function(sample_sheet,
-                      methylation_data,
+                      signal_data,
                       result_folder,
                       bonferroni_threshold = 0.05,
                       maxResources = 90,
@@ -30,42 +30,41 @@ semseeker <- function(sample_sheet,
 
   # set digits to 22
   withr::local_options(list(digits = 22))
-  sliding_window_size <- 11
 
-  if(is.data.frame(sample_sheet) & is.data.frame(methylation_data))
+  if(is.data.frame(sample_sheet) & is.data.frame(signal_data))
   {
     sample_sheet <-list(sample_sheet)
-    methylation_data <- list(methylation_data)
+    signal_data <- list(signal_data)
   } else
   {
-    if(is.data.frame(sample_sheet) | is.data.frame(methylation_data))
-      stop("both sample_sheet and methylation_data should be data frame!")
-    if(length(sample_sheet)!=length(methylation_data))
-      stop("both sample_sheet and methylation_data should have been list with the same length!")
+    if(is.data.frame(sample_sheet) | is.data.frame(signal_data))
+      stop("both sample_sheet and signal_data should be data frame!")
+    if(length(sample_sheet)!=length(signal_data))
+      stop("both sample_sheet and signal_data should have been list with the same length!")
   }
 
-  if(length(methylation_data)>1)
+  if(length(signal_data)>1)
   {
     d <- 1
-    for(d in 1:length(methylation_data))
+    for(d in 1:length(signal_data))
     {
       if(exists("probes_to_preserve"))
-        probes_to_preserve <- probes_to_preserve[ probes_to_preserve %in% row.names(stats::na.omit(methylation_data[[d]]))]
+        probes_to_preserve <- probes_to_preserve[ probes_to_preserve %in% row.names(stats::na.omit(signal_data[[d]]))]
       else
-        probes_to_preserve <- row.names(stats::na.omit(methylation_data[[d]]))
+        probes_to_preserve <- row.names(stats::na.omit(signal_data[[d]]))
     }
   }
   else
-    probes_to_preserve <- row.names(methylation_data[[1]])
+    probes_to_preserve <- row.names(signal_data[[1]])
 
   batch_id <- 1
   for(batch_id in 1:length(sample_sheet))
   {
     message("INFO: ", Sys.time(), " Working on batch:",batch_id)
     sample_sheet_local <- sample_sheet[[batch_id]]
-    methylation_data_local <- stats::na.omit(methylation_data[[batch_id]])
-    methylation_data_local <- methylation_data_local[rownames(methylation_data_local)%in%probes_to_preserve,]
-    sample_sheet_local <- analyze_batch(methylation_data_local, sample_sheet_local, sliding_window_size, bonferroni_threshold,iqrTimes, batch_id)
+    signal_data_local <- stats::na.omit(signal_data[[batch_id]])
+    signal_data_local <- signal_data_local[rownames(signal_data_local)%in%probes_to_preserve,]
+    sample_sheet_local <- analyze_batch(signal_data_local, sample_sheet_local, batch_id)
     if(exists("sample_sheet_result"))
       sample_sheet_result <- plyr::rbind.fill(sample_sheet_result, sample_sheet_local)
     else
@@ -96,7 +95,7 @@ semseeker <- function(sample_sheet,
   # geneontology_analysis_webgestalt(ssEnv$result_folderData = ssEnv$result_folderData, fileName = fileName)
   # euristic_analysis_webgestalt(ssEnv$result_folderData = ssEnv$result_folderData)
 
-  # if(length(methylation_data)>1)
+  # if(length(signal_data)>1)
   #   batch_correlation_check(ssEnv)
 
   close_env()

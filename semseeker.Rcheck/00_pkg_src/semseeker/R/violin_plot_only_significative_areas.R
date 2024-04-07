@@ -11,7 +11,7 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
   # violin plot only significative areas
 
   areas <- utils::read.csv2(file.path(ssEnv$result_folderData, "/Pivots/", figure,"/", paste(figure,"_",marker,"_",metaarea,"_",subgroup, ".csv", sep="")))
-  results_inference <- utils::read.csv2(file.path(ssEnv$result_folderInference,inference_file_name))
+  results_inference <- utils::read.csv2(file.path(ssEnv$result_folderInference,inference_file_name), ssEnv$result_folderInference)
   results_inference <- subset(results_inference, "MARKER"==marker & "FIGURE"==figure & "AREA" == group & "SUBAREA" == subgroup
     & "INDIPENDENT.VARIABLE"==independent_variable)
 
