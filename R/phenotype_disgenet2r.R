@@ -24,7 +24,6 @@ phenotype_disgenetplus2r <- function(study,
   if (is.null(disgenet_api_key))
     return()
 
-  browser()
   Sys.setenv(DISGENETPLUS_API_KEY= disgenet_api_key)
 
 
@@ -91,7 +90,6 @@ phenotype_disgenetplus2r <- function(study,
         if (length(entrez)==0)
           next
 
-        browser()
         # res_enrich <- disgenetplus2r::gene2disease( gene =gene_set$AREA_OF_TEST, vocabulary = "ENTREZ", database = "ALL")
         # gene_set <- as.vector(gene_set$AREA_OF_TEST)
 

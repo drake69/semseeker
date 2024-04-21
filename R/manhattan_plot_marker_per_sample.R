@@ -3,7 +3,6 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
 
-
   limit_line_color <- "red"
   limit_line_color_q <- "cyan"
   limit_line_color_median <- "black"
@@ -25,7 +24,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     fname_both <-file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
     fname_hypo <-file_path_build( pivot_subfolder ,c(marker, "HYPO", "PROBE","WHOLE"),"csv")
     fname_hyper <-file_path_build( pivot_subfolder ,c(marker, "HYPER", "PROBE","WHOLE"),"csv")
-    # browser()
+    
     if (!file.exists(fname_both) | !file.exists(fname_hypo) | !file.exists(fname_hyper))
       tempKeys <- tempKeys[-k]
   }
@@ -35,7 +34,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
 
   for(j in 1:length(tempKeys))
   {
-    # browser()
+    
     marker <- as.character(tempKeys[j])
     pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
     fname_both <-file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")

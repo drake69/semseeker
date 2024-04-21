@@ -41,7 +41,6 @@ annotate_bed <- function ()
 
         # "DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst"
         # if (grepl("DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst",bedFileName))
-        #   browser()
         # log_event(bedFileName)
         if (!file.exists(bedFileName))
         {

@@ -51,6 +51,7 @@ pathway_pathfindR <- function(study,
         if (nrow(results_inference)==0)
           next
 
+        
         key <- paste(keys[i,]$AREA,keys[i,]$SUBAREA,keys[i,]$MARKER,keys[i,]$FIGURE, sep="_")
         if (nrow(results_inference)==0)
           next
@@ -114,6 +115,7 @@ pathway_pathfindR <- function(study,
       {
         if(nrow(result_pathway)!=0)
         {
+          result_pathway$PHENOTYPE <- grepl(study,result_pathway$Term_Description, ignore.case = T)
           write.csv(result_pathway, pathway_report_path)
           rm(result_pathway)
         }

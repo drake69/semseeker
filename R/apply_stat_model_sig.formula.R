@@ -1,12 +1,12 @@
 apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_variable, covariates)
 {
-  if(family_test=="wilcoxon" | family_test=="t.test" | family_test =="jsd" | family_test=="chisq.test" | family_test=="fisher.test")
+  if(family_test=="wilcoxon" | family_test=="t.test" | family_test =="jsd" | family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test")
   {
     covariates_model <- independent_variable
     sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
   }
 
-  if(grepl("mean-permutation",family_test) | grepl("quantile-permutation",family_test) | grepl("spearman-permutation",family_test))
+  if(grepl("mean-permutation",family_test) | grepl("quantile-permutation",family_test) | grepl("spearman-permutation",family_test) )
   {
     covariates_model <- independent_variable
     sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
@@ -31,7 +31,7 @@ apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_
     sig.formula <- stats::as.formula(paste0(independent_variable,"~", covariates_model, sep=""))
   }
 
-  if(family_test=="gaussian" | family_test=="poisson" | grepl("quantreg", family_test))
+  if(family_test=="gaussian" | family_test=="poisson" | grepl("quantreg", family_test) | grepl("polynomial",family_test))
   {
     if(is.null(covariates) || length(covariates)==0)
       covariates_model <- independent_variable

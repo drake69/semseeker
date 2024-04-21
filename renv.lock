@@ -507,7 +507,7 @@
     },
     "RcppArmadillo": {
       "Package": "RcppArmadillo",
-      "Version": "0.12.8.2.0",
+      "Version": "0.12.8.2.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -517,7 +517,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "85c0c4491c06db4814ed7e39b960973c"
+      "Hash": "d5448fb24fb114c4da1275a37a571f37"
     },
     "RcppEigen": {
       "Package": "RcppEigen",
@@ -1214,14 +1214,14 @@
     },
     "diptest": {
       "Package": "diptest",
-      "Version": "0.77-0",
+      "Version": "0.77-1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "graphics",
         "stats"
       ],
-      "Hash": "fd6209a5ad74d6791b54c6bbb3c324f6"
+      "Hash": "882c35d95d13cdf1cd331008b8402420"
     },
     "disgenetplus2r": {
       "Package": "disgenetplus2r",
@@ -1229,8 +1229,9 @@
       "Source": "GitLab",
       "RemoteType": "gitlab",
       "RemoteHost": "gitlab.com",
-      "RemoteRepo": "disgenetplus2r",
       "RemoteUsername": "medbio",
+      "RemoteRepo": "disgenetplus2r",
+      "RemoteSubdir": "",
       "RemoteRef": "HEAD",
       "RemoteSha": "5b13815a533f12e05c9457ed43ea03b641005ffa",
       "Requirements": [
@@ -1247,7 +1248,7 @@
         "tidyr",
         "visNetwork"
       ],
-      "Hash": "ee016ee50449b9d8c6ed490287c51e4b"
+      "Hash": "30b2f556739fd68829ffdd7a180a7fb0"
     },
     "dlstats": {
       "Package": "dlstats",
@@ -1335,10 +1336,10 @@
     },
     "dunn.test": {
       "Package": "dunn.test",
-      "Version": "1.3.5",
+      "Version": "1.3.6",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "ef1ac227f694959eb6acfe27112283e3"
+      "Hash": "64fd50c564833bbb94d6dd63d632f0c1"
     },
     "egg": {
       "Package": "egg",
@@ -2335,7 +2336,7 @@
     },
     "lme4": {
       "Package": "lme4",
-      "Version": "1.1-35.2",
+      "Version": "1.1-35.3",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -2357,7 +2358,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "c255dd80a1771f41321db15041feed11"
+      "Hash": "862f9d995f528f3051f524791955b20c"
     },
     "lmtest": {
       "Package": "lmtest",
@@ -3142,6 +3143,16 @@
       ],
       "Hash": "76c9e04c712a05848ae7a23d2f170a40"
     },
+    "renv": {
+      "Package": "renv",
+      "Version": "1.0.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "utils"
+      ],
+      "Hash": "397b7b2a265bc5a7a06852524dabae20"
+    },
     "reshape": {
       "Package": "reshape",
       "Version": "0.8.9",
@@ -3386,7 +3397,7 @@
     },
     "seriation": {
       "Package": "seriation",
-      "Version": "1.5.4",
+      "Version": "1.5.5",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -3405,7 +3416,7 @@
         "stats",
         "vegan"
       ],
-      "Hash": "786c381ec4c40d1425e50ace3fee54bc"
+      "Hash": "fa74cd2b488a535ce9864c99ebd5d92a"
     },
     "stringi": {
       "Package": "stringi",
@@ -3485,7 +3496,7 @@
     },
     "testthat": {
       "Package": "testthat",
-      "Version": "3.2.1",
+      "Version": "3.2.1.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -3510,7 +3521,7 @@
         "waldo",
         "withr"
       ],
-      "Hash": "4767a686ebe986e6cb01d075b3f09729"
+      "Hash": "3f6e7e5e2220856ff865e4834766bf2b"
     },
     "tibble": {
       "Package": "tibble",

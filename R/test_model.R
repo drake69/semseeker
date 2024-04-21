@@ -9,6 +9,8 @@
 test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 {
 
+  res <- NA
+
   if(family_test=="chisq.test")
   {
     tempDataFrame <- as.data.frame(tempDataFrame)
@@ -41,6 +43,46 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     pvalue <- result_fisher$p.value
     r_model <- "stats_fisher.test"
     statistic_parameter <- result_fisher$estimate
+  }
+
+  if (family_test=="kruskal.test")
+  {
+    
+    tempDataFrame <- as.data.frame(tempDataFrame)
+    dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
+    dependent_variable <- dep_var[[2]]
+    independent_variable <- dep_var[[3]] # sample_group
+    dependent_variable <- round(as.numeric(tempDataFrame[,dependent_variable]),3)
+    group <- as.factor(tempDataFrame[,independent_variable])
+    result_fisher <- suppressWarnings(stats::kruskal.test(x = dependent_variable, g = group))
+    pvalue <- result_fisher$p.value
+    r_model <- "stats_kruskal.test"
+    statistic_parameter <- result_fisher$statistic
+    kw_result <- stats::pairwise.wilcox.test(dependent_variable, group)
+    PVALUE_KW <- kw_result$p.value
+
+    # for each group combination extract the p-value
+    for (i in 1:nrow(PVALUE_KW)) {
+      # i <-1
+      for (j in 1:ncol(PVALUE_KW)) {
+        # j <- 1
+        p_value <- PVALUE_KW[i,j]
+        row <- as.character(rownames(PVALUE_KW)[i])
+        col <- as.character(colnames(PVALUE_KW)[j])
+        pval_name <- paste0("PVALUE_KW_",as.character(row),"_",as.character(col),sep="")
+        p_value <- data.frame(p_value)
+        colnames(p_value) <- pval_name
+        if (exists("res"))
+          res <- cbind(res, p_value)
+        else
+          res <- data.frame(p_value)
+      }
+    }
+
+    # remove rowname from res
+    rownames(res) <- NULL
+
+
   }
 
   if(family_test=="jsd")
@@ -107,6 +149,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
 
 
 
-  return (data.frame(ci.lower,ci.upper, pvalue, statistic_parameter,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations))
+  return (data.frame(ci.lower,ci.upper, pvalue, statistic_parameter,aic_value,residuals,shapiro_pvalue, r_model,std.error,n_permutations,res))
 
 }

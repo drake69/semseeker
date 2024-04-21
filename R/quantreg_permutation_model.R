@@ -35,8 +35,6 @@ compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
 quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable)
 {
   n_permutations <- NA
-
-
   ci.lower <- NA
   ci.upper <- NA
   aic_value <- NA

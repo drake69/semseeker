@@ -4,6 +4,13 @@ phenotype_phenolyzer <- function(study,
   inference_details,result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
 
+  # check existence of phenolyzer
+  if (!file.exists(phenolyzer_folder_bin))
+  {
+    log_event("ERROR: ", Sys.time(), " Phenolyzer not found in ",phenolyzer_folder_bin)
+    return()
+  }
+
   tmp <- tempdir()
 
   start_fresh <- FALSE
@@ -65,6 +72,7 @@ phenotype_phenolyzer <- function(study,
     if(nrow(gene_set)<2)
       next
 
+    
     file_term <- file.path(tempFolder, paste0("term_",random_string,".txt"))
     file_genes <- file.path(tempFolder, paste0("genes_",random_string,".txt"))
     write.table(unique(gene_set[,"AREA_OF_TEST"]), file_genes, quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -88,6 +96,7 @@ phenotype_phenolyzer <- function(study,
             " && perl ", phenolyzer_folder_bin ,"disease_annotation.pl " ,
             " -p " ,file_term,
             " -f --gene " ,file_genes,
+            " -wordcloud ",
             " -prediction -phenotype -logistic ",
             " -addon DB_DISGENET_GENE_DISEASE_SCORE,DB_GAD_GENE_DISEASE_SCORE -addon_weight 0.25 ",
             " -nproc ", ssEnv$parallel$nCore ,
@@ -95,11 +104,17 @@ phenotype_phenolyzer <- function(study,
           )
 
         null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
+        message(pcommand)
         sink(null_device)
         system(pcommand)
         sink()
 
         annotated_gene_file <- file.path(tempFolder,"out.annotated_gene_list")
+        if(!file.exists(annotated_gene_file))
+        {
+          message("No annotated gene file found")
+          next
+          }
         annotated_genes <-  utils::read.csv(annotated_gene_file, sep = "\t")
 
 
@@ -126,6 +141,11 @@ phenotype_phenolyzer <- function(study,
         phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
 
         file.copy(annotated_gene_file, phenotype_report_path, overwrite = TRUE)
+
+        
+        # phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease,"_gene_cloud",sep=""), pvalue_column=pvalue_column, pvalue)
+        # cloud_gene_file <- file.path(tempFolder,"out.annotated_gene_scores")
+        # file.copy(cloud_gene_file, phenotype_report_path, overwrite = TRUE)
 
         unlink(tempFolder, recursive = TRUE)
       }

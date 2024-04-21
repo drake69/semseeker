@@ -38,36 +38,25 @@ compute_spearman_permutation <- function(sig.formula,df, shuffle = FALSE)
 #'
 spearman_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable)
 {
-  n_permutations <- NA
-  n_permutations_test <- NA
-
-
-  ci.lower <- NA
-  ci.upper <- NA
-  aic_value <- NA
-  residuals <- NA
-  shapiro_pvalue <- NA
-  std.error <- NA
-  statistic_parameter <- NA
-  pvalue <- NA
-
   spearman_params <- unlist(strsplit(as.character(family_test),"_"))
-
+  res <- data.frame()
   # spearman_params template spearman + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta
   # apply permutation to obtain signal using spearman
   # Define function to compute delta spearman regression coefficient
   n_permutations_test <- as.numeric(spearman_params[2])
   n_permutations <- as.numeric(spearman_params[3])
   conf.level <- as.numeric(spearman_params[4])
+  res$conf.level <- conf.level
+
   pvalue_limit <- 1 - conf.level
   pvalue_limit_inf <- (pvalue_limit/2)
   pvalue_limit_sup <- 1 - (pvalue_limit/2)
 
   # Compute signal and p-value for n_permutations replications
   statistic_parameter <-  compute_spearman_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle = FALSE)
-  #
+  res$statistic_parameter <- statistic_parameter
+
   permutation_vector <- replicate(n_permutations_test, compute_spearman_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle = TRUE))
-  #
 
   pvalue <- mean(abs(permutation_vector) >= abs(statistic_parameter))
   if (pvalue>1)
@@ -75,15 +64,19 @@ spearman_permutation <- function(family_test, sig.formula, tempDataFrame, indepe
   # Compute average signal and p-value
   if ((pvalue < 0.05) && (n_permutations_test < n_permutations))
     permutation_vector <- replicate(n_permutations, compute_spearman_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle=TRUE))
-  r_model <- "spearman_permutation"
+  res$r_model <- "spearman_permutation"
 
   if(length(permutation_vector) == n_permutations_test)
     n_permutations <- n_permutations_test
 
+  res$n_permutations <- n_permutations
   pvalue <- mean(abs(permutation_vector) >= abs(statistic_parameter))
+  res$pvalue <- pvalue
   ci <- stats::quantile(permutation_vector, probs = c(pvalue_limit_inf, pvalue_limit_sup))
   ci.lower <- ci[1]
+  res$ci.lower <- ci.lower
   ci.upper <- ci[2]
+  res$ci.upper <- ci.upper
 
-  return (data.frame(ci.lower,ci.upper, pvalue, statistic_parameter,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations))
+  return (res)
 }

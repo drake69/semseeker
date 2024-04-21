@@ -145,7 +145,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             rm(results)
           for (a in 1:length(markers) )
           {
-            # browser()
+            
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
             cols <- keys$COMBINED
@@ -207,7 +207,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               if (exists("results"))
                 if (!is.null(dim(results)))
                   if (nrow(results)>0)
-                    results <- results[order(results$PVALUEADJ),]
+                    if("PVALUEADJ" %in% colnames(results))
+                      results <- results[order(results$PVALUEADJ),]
 
               if (exists("old_results"))
               {
@@ -221,7 +222,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               utils::write.csv2(results, fileNameResults , row.names  =  FALSE)
             }
 
-            if(depth_analysis >1)
+            if(depth_analysis>1)
             {
               localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
               keys <- localKeys_1[localKeys_1$MARKER==markers[a],]
@@ -247,8 +248,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 # result_temp_foreach <- foreach::foreach(k  =  1:nkeys, .combine  =  rbind, .export  =  variables_to_export_nested) %dorng%
                 for (k in 1:nkeys)
                 {
-
-
                   if(exists("tempDataFrame"))
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
@@ -321,7 +320,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   }
                 }
 
-              #
+              
               if (exists("old_results"))
               {
                 if (exists("results"))
@@ -330,6 +329,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   results <- old_results
                 rm(old_results)
               }
+
+              if(!exists("results"))
+                next
 
               results <- unique(results)
               # check column PVALUE exists
@@ -346,10 +348,31 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   results <- subset(results, results$PVALUE < 0.05 | results$PVALUEADJ < 0.05)
               }
 
+              
+              if(family_test=="kruskal.test")
+              {
+                # get columns where colnames start with PVALUE_KW_
+                kw_columns <- colnames(results)[grepl("^PVALUE_KW_", colnames(results))]
+                for (colname in kw_columns)
+                {
+                  
+                  # colname <- kw_columns[c]
+                  if (grepl(colname,"_ADJ_BH"))
+                    next
+                  adj_colname <- paste0(colname,"_ADJ_BH")
+                  results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BH")
+                  adj_colname <- paste0(colname,"_ADJ_BY")
+                  results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BY")
+                  adj_colname <- paste0(colname,"_ADJ_fdr")
+                  results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "fdr")
+                }
+              }
+
+              if (is.null(results))
+                next
 
               # remove columns where all rows are NA
               results <- results[, colSums(is.na(results)) < nrow(results)]
-
               utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
               if(exists("result_temp_foreach"))
                 rm(result_temp_foreach)
@@ -357,10 +380,18 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 rm(result_temp_local_batch)
               if(exists("tempDataFrame"))
                 rm(tempDataFrame)
-              if(exists("results"))
-                rm(results)
+
             }
           }
+          # remove columns where all rows are NA
+          results <- results[, colSums(is.na(results)) < nrow(results)]
+          utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
+          if(exists("result_temp_foreach"))
+            rm(result_temp_foreach)
+          if(exists("result_temp_local_batch"))
+            rm(result_temp_local_batch)
+          if(exists("tempDataFrame"))
+            rm(tempDataFrame)
         }
       }
     }

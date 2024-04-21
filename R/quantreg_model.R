@@ -9,33 +9,23 @@
 #'
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable)
 {
-  n_permutations <- NA
-  
-  
-  ci.lower <- NA
-  ci.upper <- NA
-  aic_value <- NA
-  residuals <- NA
-  shapiro_pvalue <- NA
-  std.error <- NA
-  statistic_parameter <- NA
-  pvalue <- NA
-  
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
+  res <- data.frame()
   tau = as.numeric(quantreg_params[2])
+  res$tau <- tau
   try({
     model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
     summary_qr <- suppressMessages(summary(model)$tTable)
-    pvalue <- summary_qr[2,"Pr(>|t|)"]
-    std.error <- summary_qr[2,"Std. Error"]
-    statistic_parameter <- summary_qr[2,"Value"]
-    ci.lower <- summary_qr[2,"lower bound"]
-    ci.upper <- summary_qr[2,"upper bound"]
+    res$pvalue <- summary_qr[2,"Pr(>|t|)"]
+    res$std.error <- summary_qr[2,"Std. Error"]
+    res$statistic_parameter <- summary_qr[2,"Value"]
+    res$ci.lower <- summary_qr[2,"lower bound"]
+    res$ci.upper <- summary_qr[2,"upper bound"]
   })
-  r_model <- "lqmm_lqm"
+  res$r_model <- "lqmm_lqm"
 
-  return (data.frame(ci.lower,ci.upper, pvalue, statistic_parameter,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations))
+  return (res)
 
 }

@@ -11,7 +11,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   create_excel_pivot()
   result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
-  # browser()
+  
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
   for(k in 1:length(localKeys)){
@@ -48,7 +48,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   probe_signal <- as.numeric(probe_signal)
   outlier <-  as.vector(ifelse(probe_signal > y_sup, "Hyper", ifelse(probe_signal < y_inf, "Hypo" ,"Non-outlier")))
   marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
-  # browser()
+  
 
   ########################################################################################################################################################################
   ############################ PLOT MARKERS FOR A GIVEN PROBE ################################################################################################
@@ -87,7 +87,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   ############################ PLOT OUTLIERS FOR A GIVEN PROBE ################################################################################################
   ########################################################################################################################################################################
 
-  # browser()
+  
   data_to_plot <- data.frame(samples = samples, signal_to_plot = as.numeric(probe_signal), outlier)
   delta_label_value <-  ifelse(probe_signal > y_sup, paste("\u03B4 ", round(probe_signal - y_sup,3),sep=""), ifelse(probe_signal < y_inf,  paste("\u03B4:", round(y_inf - probe_signal,3),sep=""),""))
   y_shift <- 0

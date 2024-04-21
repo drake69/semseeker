@@ -94,7 +94,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
 
 
   if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="jsd" & family_test!="t.test" & family_test!="poisson" |
-      family_test=="chisq.test" | family_test=="fisher.test")
+      family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test")
   {
     variable_to_transform <- independent_variable
     if(length(covariates)>0)

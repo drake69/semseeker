@@ -1,15 +1,17 @@
 #' build_data_set_from_geo
 #'
 #' @param GEOgse geo accession dataset identification
-#' @param workingFolder where sample sheet and files will be saved
+#' @param result_folder where sample sheet and files will be saved
 #' @param downloadFiles 0 means download all files from Gene Expression Ombibus (GEO),
 #'  different than zero means how many download
 #'
 #' @return samplesheet, and sample's file saved and samplesheet csv
 #' @export
-build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
+build_data_set_from_geo <-  function(GEOgse, result_folder,maxResources, parallel_strategy ,start_fresh, downloadFiles = 0, ...) {
 
-    # check if GEOQuery package is installed
+  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
+
+  # check if GEOQuery package is installed
   if(!requireNamespace("GEOquery", quietly = TRUE))
   {
     log_event("GEOquery package is not installed. Please install pathfindR package to use this function")
@@ -29,20 +31,19 @@ build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
       samplesheet <- gse[[phenoDataName]]@phenoData@data
     }
 
-
     samplesheet$Sample_ID <- samplesheet$geo_accession
     samplesheet$Sample_Group <- ""
     samplesheet$Sentrix_ID <- ""
     samplesheet$Sentrix_Position <- ""
 
-    dir_check_and_create(workingFolder,"/")
+    dir_check_and_create(result_folder,"/")
     if(downloadFiles==0)
       downloadFiles <- nrow(samplesheet)
 
     downloadedFiles <- 0
     for(sample in 1:nrow(samplesheet))
     {
-      # sample <- 1
+      sample <- 1
       log_event(sample)
       fileName <- samplesheet [sample,"supplementary_file"]
       if(fileName=="" || fileName=="NONE")
@@ -71,7 +72,7 @@ build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
           color <- c("_Grn.idat.gz","_Red.idat.gz")[i]
           # color <- "_Grn.idat.gz"
           localFileName <- paste(Sentrix_ID,"_", Sentrix_Position, color, sep="")
-          localFileName <- paste(workingFolder, "/", localFileName, sep = "")
+          localFileName <- paste(result_folder, "/", localFileName, sep = "")
           localFileNameUnzipped <- gsub(".gz","",localFileName)
           if(!file.exists(localFileName) &&  !file.exists(localFileNameUnzipped))
           {
@@ -98,7 +99,7 @@ build_data_set_from_geo <-  function(GEOgse, workingFolder, downloadFiles = 0) {
 
     utils::write.table(
       samplesheet,
-      paste(workingFolder, "/", "final_samplesheet.csv", sep = ""),
+      paste(result_folder, "/", "final_samplesheet.csv", sep = ""),
       row.names = FALSE,
       sep=",",
       quote = FALSE

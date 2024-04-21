@@ -7,6 +7,7 @@
 ss_analysis(
   result_folder,
   independent_variable = "Sample_Group",
+  control_label = "Control",
   maxResources = 90,
   parallel_strategy = "multicore",
   ...

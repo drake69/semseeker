@@ -17,7 +17,7 @@ semseeker <- function(sample_sheet,
 
   init_env( result_folder= result_folder, ...)
   ssEnv <- get_session_info()
-
+  write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet_original.csv"), row.names = FALSE)
 
   # set digits to 22
   withr::local_options(list(digits = 22))
