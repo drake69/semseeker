@@ -11,7 +11,7 @@ annotate_bed <- function ()
   i <- 0
   dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
-  log_event("INFO: ", Sys.time(), " Annotating genomic area.")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotating genomic area.")
 
   progress_bar <- ""
   if(ssEnv$showprogress)
@@ -37,7 +37,7 @@ annotate_bed <- function ()
         area <- as.character(localKeys[i,"AREA"])
         area_subarea <- paste(area,"_", subarea, sep="")
 
-        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
+        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"csv", add_gz = TRUE)
 
         # "DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst"
         # if (grepl("DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst",bedFileName))
@@ -98,8 +98,9 @@ annotate_bed <- function ()
         final_bed <- as.data.frame(final_bed)
         if(!plyr::empty(final_bed))
         {
-          fst::write_fst( x = final_bed,path =  bedFileName, compress = T )
-         log_event("DEBUG: ", Sys.time(),  " annotated file to ", bedFileName)
+          fst::write.fst( x = final_bed,path =  bedFileName, compress = 100 )
+          # write.table(final_bed, bedFileName, sep = "\t", row.names = F, col.names = T)
+          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " annotated file to ", bedFileName)
         }
       }
 

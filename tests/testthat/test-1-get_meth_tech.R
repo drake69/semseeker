@@ -25,7 +25,7 @@ test_that("get-meth_tech", {
   testthat::expect_true(ssEnv$tech=="K850")
 
   ####################################################################################
-  unlink(tempFolder, recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder, recursive = TRUE)
 
 })

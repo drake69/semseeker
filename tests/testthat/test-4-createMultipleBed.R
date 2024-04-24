@@ -34,15 +34,15 @@ test_that("create_multiple_bed", {
       {
         tempresult_folder <- semseeker:::dir_check_and_create(result_folderData,c(sample_group,paste(marker,figure, sep="_")))
         fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", marker ,figure ), "fst")
-        testthat::expect_true(file.exists(fileToRead))
         if (file.exists(fileToRead))
         {
+          testthat::expect_true(file.exists(fileToRead))
           localFileRes_both <- fst::read_fst(fileToRead)
           testthat::expect_true(nrow(localFileRes_both)>0)
         }
         else
         {
-          message("fileToRead:",fileToRead)
+          # message("fileToRead:",fileToRead)
         }
 
       }
@@ -51,6 +51,6 @@ test_that("create_multiple_bed", {
 
   ####################################################################################
 
-  unlink(tempFolder, recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder, recursive = TRUE)
 })

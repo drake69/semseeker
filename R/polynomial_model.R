@@ -2,34 +2,30 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula)
 {
 
   # plynomial_degree_partition-partition_percentage
-  plynomial_params <- unlist(strsplit(as.character(family_test),"_"))
+  polynomial_params <- unlist(strsplit(as.character(family_test),"_"))
 
-  degree <- as.numeric(plynomial_params[2])
+  degree <- as.numeric(polynomial_params[2])
   res <- data.frame("PL_DEGREE"= degree)
-  partition_percentage <- as.numeric(plynomial_params[3])
+  partition_percentage <- as.numeric(polynomial_params[3])
   res$PL_PERC <- partition_percentage
+  # res$sig.fromula <- as.character(sig.formula)
 
-  if(lengh(plynomial_params)==4)
-    res$r_model <- paste0("polynomial",plynomial_params[4], sep="")
+  if(length(polynomial_params)==4)
+    res$r_model <- paste0("polynomial",polynomial_params[4], sep="")
   else
     res$r_model <- "polynomial"
 
 
   tempDataFrame <- as.data.frame(tempDataFrame)
   dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
-  if(lengh(plynomial_params)==4)
-  {
-    if(param[4]=="predictor")
+  dependent_variable <- dep_var[[2]]
+  independent_variable <- dep_var[[3]]
+  if(length(polynomial_params)==4)
+    if(polynomial_params[4]=="predictor")
     {
       dependent_variable <- dep_var[[3]]
       independent_variable <- dep_var[[2]]
     }
-    else
-    {
-      dependent_variable <- dep_var[[2]]
-      independent_variable <- dep_var[[3]]
-    }
-  }
 
   # Split the data into training and test set
   training.samples <- tempDataFrame[, dependent_variable] %>% caret::createDataPartition(p = partition_percentage, list = FALSE)
@@ -63,7 +59,7 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula)
   coefficients <- coef(summary(model))
   # conf_int <- confint(model)
 
-  # for each group combination extract the p-value
+  # for each degree extract the p-value
   for (i in 1:nrow(coefficients)) {
     # i <- 1
     p_value <- coefficients[i,4]
@@ -79,9 +75,23 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula)
 
   # remove rowname from res
   rownames(res) <- NULL
-  # res$sig.fromula <- as.character(sig.formula)
-
+  # # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
+  # ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
+  #   ggplot2::geom_point() +
+  #   ggplot2::stat_smooth(method = lm, formula = y ~ stats::poly(x, degree, raw = TRUE))
+  #
+  # # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
+  # ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
+  #   ggplot2::geom_point() + ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE)) +
+  #   ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions), color = "red")
+  #
+  # # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
+  # ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
+  #   ggplot2::geom_point() + ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE)) +
+  #   ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions), color = "red") +
+  #   ggplot2::geom_point(data = data.frame(train.data,model$residuals) , ggplot2::aes(y = model$residuals), color = "cyan")
+  #
   return (res)
 }
 
-# polynomial_model("polynomial_4_0.8", sample_sheet, "Age ~ DELTARQ_HYPO")
+# polynomial_model("polynomial_4_0.8", sample_sheet, "DELTARQ_HYPO ~ Age")

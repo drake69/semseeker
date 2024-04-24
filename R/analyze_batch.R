@@ -1,6 +1,6 @@
 analyze_batch <- function(signal_data, sample_sheet, batch_id)
 {
-  log_event("INFO: ", Sys.time(), " working on batch:", batch_id)
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id)
 
   ssEnv <- get_session_info()
 
@@ -14,17 +14,18 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   signal_data <- methDataTemp[, -c(1)]
   rm(methDataTemp)
 
-  log_event("INFO: ", Sys.time(), " I will work on:", nrow(signal_data), " PROBES.")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work on:", nrow(signal_data), " PROBES.")
 
   probe_features <- probe_features_get("PROBE")
-  log_event("DEBUG: ", Sys.time(), " loaded probe_features: PROBES")
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " loaded probe_features: PROBES")
   probe_features <- probe_features[(probe_features$PROBE %in% rownames(signal_data)),]
   signal_data <- signal_data[rownames(signal_data) %in% probe_features$PROBE, ]
   signal_data <- signal_data[ order(rownames(signal_data)), ]
 
   # probe_features <- sort_by_chr_and_start(probe_features)
   if (!test_match_order(row.names(signal_data), probe_features$PROBE)) {
-    stop("Wrong order matching Probes and Methylation data!", Sys.time())
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Wrong order matching Probes and Methylation data!")
+    stop()
   }
 
   # if(!is.null(inferenceDetails))
@@ -57,16 +58,16 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
 
   if (plyr::empty(referencePopulationMatrix) ||
       ncol(referencePopulationMatrix) < 2) {
-    log_event("ERROR: ", Sys.time(), " Empty signal_data ", Sys.time())
-    stop("INFO: ", Sys.time(), " Empty signal_data ")
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Empty signal_data ", format(Sys.time(), "%a %b %d %X %Y"))
+    stop()
   }
 
   if(!ssEnv$signal_intrasample)
   {
     populationControlRangeBetaValues <- as.data.frame(signal_range_values(referencePopulationMatrix))
     gc()
-    # utils::write.table(x = populationControlRangeBetaValues, file = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds","csv")), sep=";")
-    fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"fst"))
+    # utils::write.table(x = gzfile(populationControlRangeBetaValues), file = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds","csv"), add_gz = TRUE), sep=";")
+    fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"fst"), compress = 100)
   }
   else
   {
@@ -91,7 +92,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
     populationMatrixColumns <- colnames(signal_data[, populationSampleSheet$Sample_ID])
 
     if (length(populationMatrixColumns)==0) {
-      log_event("WARNING: ", Sys.time(), "  Population ",sample_group, " is empty, probably the samples of this group are present in another group ? ", Sys.time())
+      log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), "  Population ",sample_group, " is empty, probably the samples of this group are present in another group ? ")
     }
     else
     {
@@ -136,7 +137,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
   rm(signal_data)
 
-  log_event("INFO: ", Sys.time(), "  Batch completed:", batch_id)
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "  Batch completed:", batch_id)
   return((sample_sheet))
 
 }

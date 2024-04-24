@@ -13,7 +13,7 @@ get_results_inference <- function (inference_details, marker , pvalue = 0.05, ad
 
   if(!file.exists(inferenceFile))
   {
-    # log_event("DEBUG: ", Sys.time(),  " Inference file does not exist: ", inferenceFile)
+    # log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Inference file does not exist: ", inferenceFile)
     return(data.frame())
   }
 
@@ -22,9 +22,9 @@ get_results_inference <- function (inference_details, marker , pvalue = 0.05, ad
   if((!pvalue_column %in% colnames(results_inference)))
   {
     log_event("DEBUG:", pvalue_column, " column does not exist in inference file: ", inferenceFile)
-    return(data.frame())
+    return(results_inference)
   }
-  
+
 
   results_inference <- results_inference[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE")]
   results_inference <- subset(results_inference,AREA==area & AREA_OF_TEST!="TOTAL")

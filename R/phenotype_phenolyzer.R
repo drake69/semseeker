@@ -7,7 +7,7 @@ phenotype_phenolyzer <- function(study,
   # check existence of phenolyzer
   if (!file.exists(phenolyzer_folder_bin))
   {
-    log_event("ERROR: ", Sys.time(), " Phenolyzer not found in ",phenolyzer_folder_bin)
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Phenolyzer not found in ",phenolyzer_folder_bin)
     return()
   }
 
@@ -20,7 +20,7 @@ phenotype_phenolyzer <- function(study,
 
   if (is.null(nrow(diseases)))
   {
-    log_event("ERROR: ", Sys.time(), " No disease found for ",disease)
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " No disease found for ",disease)
     return()
   }
 
@@ -115,7 +115,7 @@ phenotype_phenolyzer <- function(study,
           message("No annotated gene file found")
           next
           }
-        annotated_genes <-  utils::read.csv(annotated_gene_file, sep = "\t")
+        annotated_genes <-  utils::read.csv2(annotated_gene_file, sep = "\t")
 
 
         annotated_genes_temp <- annotated_genes[annotated_genes$Status=="SeedGene",]
@@ -134,7 +134,7 @@ phenotype_phenolyzer <- function(study,
         annotated_genes$gene_count <- nrow(gene_set)
         annotated_genes$order <- 1:nrow(annotated_genes)
         annotated_genes$diseases <- paste(diseases$DISEASE, collapse = ";")
-        write.csv(annotated_genes, phenotype_report_path)
+        write.csv2(annotated_genes, phenotype_report_path)
 
         annotated_gene_file <- file.path(tempFolder,"out.annotated_gene_scores")
         phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease,"_gene_scores",sep=""), pvalue_column=pvalue_column, pvalue)

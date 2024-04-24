@@ -12,7 +12,7 @@ data_distribution_info <- function(family_test, tempDataFrame, burdenValue, inde
 
   if(family_test=="gaussian" | family_test=="spearman" | family_test=="kendall" | family_test=="pearson"
     | grepl("quantreg",family_test) | grepl("poisson",family_test) | grepl("spearman-permutation",family_test)
-    | grepl("quantile-permutation",family_test) | grepl("polynomial",family_test))
+    | grepl("quantile-permutation",family_test) | grepl("polynomial",family_test) | grepl("exp",family_test) | grepl("log",family_test))
   {
     localDataFrame <- data.frame("depVar"=tempDataFrame[, burdenValue],"indepVar"=1 )
     localDataFrame <- rbind( localDataFrame,  data.frame("depVar"=tempDataFrame[, independent_variable],"indepVar"=2 ))

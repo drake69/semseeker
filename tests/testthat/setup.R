@@ -1,7 +1,7 @@
 loadNamespace("future")
 loadNamespace("stats")
 nprobes <- 6e3
-nsamples <- 240
+nsamples <- 300
 
 # intersample_mean <- 5
 # intersample_sd <- 1
@@ -36,8 +36,8 @@ signal_data <- rbind(Meth, Unmeth)
 
 # plot(density(as.numeric(signal_data)))
 
-q1 <-stats::quantile(signal_data, probs = 0.25, na.rm = TRUE)
-q3 <-stats::quantile(signal_data, probs = 0.75, na.rm = TRUE)
+q1 <-stats::quantile(signal_data, probs = 0.05, na.rm = TRUE)
+q3 <-stats::quantile(signal_data, probs = 0.05, na.rm = TRUE)
 
 # noise_position <- unique(floor(runif(nsamples*nprobes*perc_epimutation*2, min = 1, max = nsamples*nprobes)))
 # noise_position <- noise_position[1:(nsamples*nprobes*perc_epimutation)]

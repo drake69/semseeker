@@ -18,7 +18,7 @@ phenotype_disgenetplus2r <- function(study,
   tryCatch({
     disgenet_api_key <- disgenetplus2r::get_disgenetplus_api_key(user = disgenetplus2r_user, password = disgenetplus2r_password,verbose = TRUE, warnings = TRUE)
   }, error = function(e) {
-    log_event("ERROR: ", Sys.time(), " disgenetplus2r not working, internet problem or wrong credentials.")
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " disgenetplus2r not working, internet problem or wrong credentials.")
   })
 
   if (is.null(disgenet_api_key))
@@ -31,7 +31,7 @@ phenotype_disgenetplus2r <- function(study,
 
   if (is.null(nrow(diseases)))
   {
-    log_event("ERROR: ", Sys.time(), " No disease found for ",disease)
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " No disease found for ",disease)
     return()
   }
 
@@ -108,7 +108,7 @@ phenotype_disgenetplus2r <- function(study,
         output_temp$gene_count <- nrow(gene_set)
         output_temp$order <- 1:nrow(output_temp)
         output_temp$diseases <- paste(diseases$DISEASE, collapse = ";")
-        write.csv(output_temp, phenotype_report_path)
+        write.csv2(output_temp, phenotype_report_path)
 
       }
     )

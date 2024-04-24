@@ -21,6 +21,6 @@ test_that(" semseeker:::mutations_get",{
   # expect_true(sum(mutations$MUTATIONS==1)> 0 )
 
   ####################################################################################
-  unlink(tempFolder, recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder, recursive = TRUE)
 })

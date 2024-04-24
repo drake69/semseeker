@@ -28,4 +28,8 @@ test_that("apply_stat_model_sig_formula", {
   ff1 <- semseeker:::apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
   testthat::expect_true(ff1==as.formula("dependent_variable~independent_variable"))
 
+
+  semseeker:::close_env()
+  unlink(tempFolder, recursive = T)
+
 })

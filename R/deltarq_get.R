@@ -67,14 +67,14 @@ deltarq_get <- function(resultPopulation){
       {
         colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
 
-        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTARQ_",as.character(key$FIGURE),sep="")))
-        fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTARQ"), as.character(key$FIGURE)),  as.character(key$EXT))
-        fst::write.fst( x= localFileRes, fileToWrite)
-       log_event("DEBUG: ", Sys.time(), " Created DELTARQ multiple annotated file!", fileToWrite)
+        tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTARQ",key$SUFFIX,"_",as.character(key$FIGURE),sep="")))
+        fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTARQ"),key$SUFFIX, as.character(key$FIGURE)),  as.character(key$EXT))
+        fst::write.fst( x= localFileRes, fileToWrite, compress = 100)
+        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Created DELTARQ multiple annotated file!", fileToWrite)
 
         tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",fun.aggregate = sum, drop = TRUE)
         colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
-        lbl <- rep(paste("DELTARQ_",as.character(key$FIGURE),sep=""), nrow(tempDataFrame))
+        lbl <- rep(paste("DELTARQ",key$SUFFIX,"_",as.character(key$FIGURE),sep=""), nrow(tempDataFrame))
         data.frame("LABEL"=lbl, tempDataFrame)
 
         if(exists("deltarq_summary"))
@@ -90,6 +90,8 @@ deltarq_get <- function(resultPopulation){
   if(!plyr::empty(deltarq_summary))
   {
     tempDataFrame <- reshape2::dcast(data = deltarq_summary, formula = SAMPLEID  ~ LABEL, value.var = "VALUE", fun.aggregate = sum, drop = TRUE)
+    # remove from result columns existing in tempDataFrame
+    resultPopulation <- resultPopulation[,!(colnames(resultPopulation) %in% colnames(tempDataFrame))]
     resultPopulation <- merge(resultPopulation, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID")
   }
   return(resultPopulation)

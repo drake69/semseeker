@@ -8,15 +8,26 @@
 #' @return the working ssEnvonment
 init_env <- function(result_folder, maxResources = 90, ...)
 {
+  tryCatch(
+    {
+      test_it <- list(...)
+    },
+    error = function(cond)  {
+      log_event ("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Function's arguments must be passed explicitily !")
+      log_event(cond)
+      stop()
+    }
+  )
+
   arguments <- list(...)
 
   start_fresh <- TRUE
   if(!is.null(arguments[["start_fresh"]]))
     start_fresh <- arguments$start_fresh
+  arguments[["start_fresh"]] <- NULL
 
   if(start_fresh)
-    unlink(result_folder, recursive = TRUE)
-
+    unlink(result_folder, recursive = TRUE, force = TRUE)
 
   #allow export of object of 32gb with future
   options(future.globals.maxSize= 32 * 1024^3)
@@ -30,47 +41,36 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
 
   log_event("DEBUG: ##############################################################################")
-  log_event("DEBUG: ", Sys.time(), " Job Started !")
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
 
-  ssEnv$opencl  <- FALSE
-  if(!is.null(arguments[["opencl"]]))
-    ssEnv$opencl  <- arguments$opencl
-  log_event("INFO: ",Sys.time(), " opencl: ", ssEnv$opencl)
+  arguments <- set_env_variable(ssEnv, arguments,"verbosity",1)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"sex_chromosome_remove",FALSE)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"opencl",FALSE)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"bonferroni_threshold",0.05)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"iqrTimes",3)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"sliding_window_size",11)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"epiquantile",4)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"maxResources",90)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"parallel_strategy","sequential")
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"tech","")
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"showprogress",FALSE)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"signal_intrasample",FALSE)
+  ssEnv <- get_session_info(result_folder)
 
-  ssEnv$bonferroni_threshold  <- 0.05
-  if(!is.null(arguments[["bonferroni_threshold"]]))
-    ssEnv$bonferroni_threshold  <- arguments$bonferroni_threshold
-  log_event("DEBUG: ",Sys.time(), "bonferroni_threshold: ", ssEnv$bonferroni_threshold)
-
-  ssEnv$iqrTimes = 3
-  if(!is.null(arguments[["iqrTimes"]]))
-    ssEnv$iqrTimes <- arguments$iqrTimes
-  log_event("DEBUG: ",Sys.time(), "iqrTimes: ", ssEnv$iqrTimes)
-
-  ssEnv$sliding_window_size <- 11
-  if(!is.null(arguments[["sliding_window_size"]]))
-    ssEnv$sliding_window_size <-  arguments$sliding_window_size
-  log_event("DEBUG: ",Sys.time(), "sliding_window_size: ", ssEnv$sliding_window_size)
-
-  ssEnv$epiquantile <- 4
-  if(!is.null(arguments[["epiquantile"]]))
-    ssEnv$epiquantile <-  arguments$epiquantile
-  log_event("DEBUG: ",Sys.time(), "epiquantile: ", ssEnv$epiquantile)
-
-  maxResources = 90
-  if(!is.null(arguments[["maxResources"]]))
-    maxResources <- arguments$maxResources
-  log_event("DEBUG: ",Sys.time(), "maxResources: ", maxResources)
-
-  parallel_strategy ="multicore"
-  if(!is.null(arguments[["parallel_strategy"]]))
-    parallel_strategy <- arguments$parallel_strategy
-
-  ssEnv$parallel_strategy <- parallel_strategy
-  log_event("DEBUG: ",Sys.time(), "parallel_strategy: ", parallel_strategy)
 
   tmp <- tempdir()
-  log_event("INFO: data will saved in this folder:", result_folder)
+  log_event("INFO:",format(Sys.time(), "%a %b %d %X %Y")," data will saved in this folder:", result_folder)
   ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
@@ -83,7 +83,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
 
   if (sink.number() != 0)
     sink(NULL)
-  sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE)
+  sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE, append = TRUE)
 
   foreachIndex <- 0
 
@@ -103,45 +103,22 @@ init_env <- function(result_folder, maxResources = 90, ...)
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   doFuture::registerDoFuture()
 
-  tryCatch(
-    {
-      test_it <- list(...)
-    },
-    error = function(cond)  {
-      log_event ("ERROR: ", Sys.time(), " Function's arguments must be passed explicitily !")
-      log_event(cond)
-      stop()
-    }
-  )
 
-  ssEnv$tech <- ""
-  if(!is.null(arguments[["tech"]]))
-    ssEnv$tech <-  arguments$tech
-
-  ssEnv$showprogress <- FALSE
-  if(!is.null(arguments[["showprogress"]]))
-    ssEnv$showprogress <-  arguments$showprogress
-  log_event("DEBUG: ",Sys.time(), "showprogress: ", ssEnv$showprogress)
-
-  ssEnv$signal_intrasample <- FALSE
-  if(!is.null(arguments[["signal_intrasample"]]))
-    ssEnv$signal_intrasample <- arguments$signal_intrasample
-  log_event("DEBUG: ",Sys.time(), "signal_intrasample: ", ssEnv$signal_intrasample)
-
+  parallel_strategy <- ssEnv$parallel_strategy
   # TODO: improve planning parallel management using also cluster
   if(parallel_strategy=="multisession")
   {
     future::plan( future::multisession, workers = nCore)
-    log_event("INFO: ", Sys.time(), " I will work in multisession with:", nCore, " Cores")
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in multisession with:", nCore, " Cores")
   }
   if(parallel_strategy=="multicore")
   {
     future::plan( future::multicore, workers = nCore)
-    log_event("INFO: ", Sys.time(), " I will work in muticore with:", nCore," Cores")
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in muticore with:", nCore," Cores")
   }
   if(parallel_strategy=="cluster")
   {
-    log_event ("ERROR: ", Sys.time(), " Cluster feature not implemented!")
+    log_event ("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Cluster feature not implemented!")
     stop("I'm STOPPING HERE!")
     future::plan( future::cluster, workers = nCore)
   }
@@ -149,17 +126,17 @@ init_env <- function(result_folder, maxResources = 90, ...)
      & parallel_strategy!="cluster")
   {
     future::plan( future::sequential)
-    log_event("INFO: ", Sys.time(), " I will work in sequential mode")
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in sequential mode")
   }
-  log_event("INFO: ", Sys.time(), " I will work in parallel with:", nCore, " Cores")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in parallel with:", nCore, " Cores")
 
   # ssEnvTemp <- get_session_info(result_folder)
   # if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
   # {
   #   # we had to return old session info this init could be called by other than semseeker function, it means
   #   # we don't know which marker or figure were identified
-  #   log_event("INFO: ", Sys.time(), " Reusing old session info !")
-  #   log_event("INFO: ", Sys.time(), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
+  #   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Reusing old session info !")
+  #   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
   #     paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
   #     " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
   #     " for ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"SUBAREA"]), collapse = " ", sep =" "))
@@ -176,6 +153,8 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv$keys_figures_default <- keys_figures_default
 
   keys_markers_default <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ","SIGNAL"))
+  keys_markers_default$SUFFIX <-  c("","","","","","","")
+  # keys_markers_default$SUFFIX <-  c("","","","", ssEnv$epiquantile ,"",ssEnv$epiquantile)
   keys_markers_default$EXT <-  c("bed","bed","bedgraph","bed","bedgraph","bed","bedgraph")
   ssEnv$keys_markers_default <- keys_markers_default
 
@@ -194,24 +173,28 @@ init_env <- function(result_folder, maxResources = 90, ...)
 
   # filter selected figures, anoamlies and areas passed by user
   figures <- if(is.null(arguments[["figures"]])) keys_figures_default[,1] else arguments$figures
+  arguments[["figures"]] <- NULL
+
   markers <- if(is.null(arguments[["markers"]]))  keys_markers_default[,1] else arguments$markers
+  arguments[["markers"]] <- NULL
 
   areas <- if(is.null(arguments[["areas"]]))  keys_areas_default[,1] else arguments$areas
+  arguments[["areas"]] <- NULL
 
   # check parameters passed by user left areas, figures and anomnalies to work on
   if(sum(figures %in% keys_figures_default[,1])==0)
   {
-    log_event("INFO: ", Sys.time(), " The only allowed figures values are:", keys_figures_default)
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " The only allowed figures values are:", keys_figures_default)
     stop("I'm STOPPING HERE!")
   }
   if(sum(markers %in% keys_markers_default[,1])==0)
   {
-    log_event("INFO: ", Sys.time(), " The only allowed markers values are:", keys_markers_default)
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " The only allowed markers values are:", keys_markers_default)
     stop("I'm STOPPING HERE!")
   }
   if(sum(areas %in% keys_areas_default[,1])==0)
   {
-    log_event("INFO: ", Sys.time(), " The only allowed areas values are:", keys_areas_default)
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " The only allowed areas values are:", keys_areas_default)
     stop("I'm STOPPING HERE!")
   }
 
@@ -222,9 +205,10 @@ init_env <- function(result_folder, maxResources = 90, ...)
     keys_island_subareas_default <- as.data.frame(keys_island_subareas_default[keys_island_subareas_default[,"subarea"] %in% arguments$subareas,])
     if(sum(arguments$subareas %in% c(keys_gene_subareas_default[,1],keys_island_subareas_default))==0)
     {
-      log_event("INFO: ", Sys.time(), " The only allowed areas values are:", keys_areas_default)
+      log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " The only allowed areas values are:", keys_areas_default)
       stop("I'm STOPPING HERE!")
     }
+    arguments[["subareas"]] <- NULL
   }
 
   # set working on figures, marker, areas and subareas
@@ -250,14 +234,14 @@ init_env <- function(result_folder, maxResources = 90, ...)
   {
     keys_areas_subareas <-  rbind(keys_areas_subareas,expand.grid("AREA"="ISLAND","SUBAREA"=keys_island_subareas_default[,1], "COMBINED"=""))
     ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="ISLAND","SUBAREA"= keys_island_subareas_default[,1],"MARKER"=markers,"FIGURE"=figures))
-    log_event("INFO: ", Sys.time(), " These island's areas will be investigated:", paste(keys_island_subareas_default[,1], collapse = " ", sep=" "))
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " These island's areas will be investigated:", paste(keys_island_subareas_default[,1], collapse = " ", sep=" "))
   }
 
   if("GENE" %in% areas)
   {
     keys_areas_subareas <- rbind(keys_areas_subareas,expand.grid("AREA"="GENE","SUBAREA"=keys_gene_subareas_default[,1], "COMBINED"=""))
     ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="GENE","SUBAREA"= keys_gene_subareas_default[,1],"MARKER"=markers,"FIGURE"=figures))
-    log_event("INFO: ", Sys.time(), " These gene's areas will be investigated:", paste(keys_gene_subareas_default[,1], collapse = " ", sep=" "))
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " These gene's areas will be investigated:", paste(keys_gene_subareas_default[,1], collapse = " ", sep=" "))
   }
 
   if ("DMR" %in% areas)
@@ -332,13 +316,25 @@ init_env <- function(result_folder, maxResources = 90, ...)
     # }
     if (!(exists("cli", mode = "function", inherits = TRUE)))
     {
-      progressr::handlers(global = TRUE)
-      progressr::handlers("cli")
+      # check if handler is already registered
+      if(!("cli" %in% handler_settings$handler))
+      {
+        # check if handlers is on the stack
+        if(!("cli" %in% handler_settings$stack))
+        {
+          progressr::handlers(global = TRUE)
+          progressr::handlers("cli")
+        }
+      }
     }
   }
 
   update_session_info(ssEnv)
-  log_event("INFO: ", Sys.time(), " I will focus on:", paste(unique(keys_markers_figures$MARKER), collapse = " ", sep =" "), " due to ",  paste(unique(keys_markers_figures$FIGURE), collapse = " ", sep =" "), " of ",  paste(areas, collapse = " ", sep =" "))
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will focus on:", paste(unique(keys_markers_figures$MARKER), collapse = " ", sep =" "), " due to ",  paste(unique(keys_markers_figures$FIGURE), collapse = " ", sep =" "), " of ",  paste(areas, collapse = " ", sep =" "))
+
+  # check length of arguments
+  if(length(arguments)!=0)
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
 
   return(ssEnv)
 }

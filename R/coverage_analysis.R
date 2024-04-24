@@ -44,6 +44,7 @@ coverage_analysis <- function(signal_data)
 
     coverage <- coverage[ !is.na(coverage[,area_subarea]),]
     coverage <- coverage[ coverage[,area_subarea]!="",]
+
     coverage$PERC <- plyr::round_any(100 * coverage$COUNT_COVERED / coverage$COUNT_TOTAL, 5)
     cov_stat <- stats::aggregate(coverage$PERC, list(coverage$PERC), FUN=length)
     colnames(cov_stat) <- c("COV_PERC","COUNT")
@@ -182,7 +183,7 @@ coverage_analysis <- function(signal_data)
   #   units = c("px"),
   #   dpi = 144
   # )
-  log_event("INFO: ", Sys.time(), " Coverage analysis executed." )
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Coverage analysis executed." )
 
   # cov_result <- reshape2::dcast(data = cov_result, AREA + SUBAREA ~ COV_PERC, value.var = "COUNT", sum)
   # number_areas <- rowSums(cov_result[,3:ncol(cov_result)])

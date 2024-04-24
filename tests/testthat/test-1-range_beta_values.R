@@ -6,7 +6,7 @@ test_that("signal_range_values", {
 
   ####################################################################################
   signal_thresholds_local <- semseeker:::signal_range_values(signal_data)
-  testthat::expect_true(sum(colnames(signal_thresholds_local)==c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values","iqr","q1","q3"))==6)
+  testthat::expect_true(sum(colnames(signal_thresholds_local) %in% c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values","iqr","q1","q3"))==6)
 
   ####################################################################################
   testthat::expect_true(nrow(signal_thresholds_local)==nrow(signal_data))
@@ -27,7 +27,7 @@ test_that("signal_range_values", {
   testthat::expect_true( nrow(signal_thresholds_local)==nprobes)
 
 
-  unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder,recursive = TRUE)
 })
 

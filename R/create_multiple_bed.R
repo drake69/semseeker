@@ -2,7 +2,7 @@
 create_multiple_bed <- function(sample_sheet){
 
   ssEnv <- get_session_info()
-  log_event("INFO: ", Sys.time(), " Started multiple file creation!")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Started multiple file creation!")
   #create multiple file bed
   i <- 0
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
@@ -18,10 +18,11 @@ create_multiple_bed <- function(sample_sheet){
 
   to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet","progress_bar",
     "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
-  # future::plan( future::sequential)
+
   foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
   # for(i in 1:nrow(localKeys))
   {
+    # browser()
     # i <- 1
     key <- localKeys[i,]
     marker <- as.character(key$MARKER)
@@ -30,7 +31,7 @@ create_multiple_bed <- function(sample_sheet){
     temp_file <- tempdir()
     temp_file <- paste(temp_file, stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),sep="")
     fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), as.character(figure)), "fst")
-    fileToWriteBed <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), as.character(figure)), key$EXT)
+    fileToWriteBed <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), key$SUFFIX, as.character(figure)), key$EXT, add_gz=TRUE)
     if(!file.exists(fileToWrite))
     {
       j <- 0
@@ -38,10 +39,11 @@ create_multiple_bed <- function(sample_sheet){
       {
         # j <- 1
         sample <- sample_sheet[j,]
-        fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(marker), as.character(figure)), key$EXT)
+        fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(marker),key$SUFFIX, as.character(figure)), key$EXT, add_gz = TRUE)
         if(file.exists(fileToRead))
         {
-          localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
+          localtemp <- utils::read.table(gzfile(fileToRead), sep="\t", header = FALSE)
+          # localtemp <- utils::read.csv2(fileToRead, sep="\t", header = FALSE)
           localtemp$Sample_ID <- sample$Sample_ID
           if(!plyr::empty(localtemp))
           {
@@ -51,12 +53,16 @@ create_multiple_bed <- function(sample_sheet){
         }
       }
 
+      # browser()
       if(file.exists(temp_file))
       {
-        fst::write.fst(x = utils::read.table(temp_file, sep = "\t"),path = fileToWrite)
-        file.copy(from = temp_file, to = fileToWriteBed)
+        fst::write.fst(x = utils::read.table(temp_file, sep = "\t"),path = fileToWrite, compress = 100)
+        # read temp file
+        localtemp <- utils::read.table(temp_file, sep="\t", header = FALSE)
+        # write gz file
+        utils::write.table(localtemp,gzfile(fileToWriteBed), sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
         file.remove(temp_file)
-       log_event("DEBUG: ", Sys.time(), " Created multiple annotated file!", fileToWriteBed)
+        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Created multiple annotated file!", fileToWriteBed)
       }
     }
     if(ssEnv$showprogress)

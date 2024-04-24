@@ -52,7 +52,7 @@ semseeker <- function(sample_sheet,
   batch_id <- 1
   for(batch_id in 1:length(sample_sheet))
   {
-    log_event("INFO: ", Sys.time(), " Working on batch:",batch_id)
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Working on batch:",batch_id)
     sample_sheet_local <- sample_sheet[[batch_id]]
     signal_intrasample <- TRUE
     if (ssEnv$signal_intrasample)
@@ -70,7 +70,7 @@ semseeker <- function(sample_sheet,
 
   sample_sheet <- sample_sheet_result
   utils::write.csv2(sample_sheet, file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), row.names = F)
-  log_event("INFO: ", Sys.time(), " Saving Sample Sheet with Results! ", Sys.time())
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Saving Sample Sheet with Results! ")
 
   if(length(sample_sheet$Sample_Group=="Reference")>0)
     sample_groups <- c("Reference","Control","Case")
@@ -85,7 +85,7 @@ semseeker <- function(sample_sheet,
   annotate_bed()
   create_excel_pivot()
 
- log_event("DEBUG: ", Sys.time(),  "Starting inference Analysis.")
+ log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "Starting inference Analysis.")
   # inferenceAnalysis(ssEnv$result_folderData = ssEnv$result_folderData, ssEnv$session_folder= ssEnv$session_folder, inferenceDetails)
   # future::autoStopCluster(computationCluster)
   # doFuture::stopImplicitCluster()

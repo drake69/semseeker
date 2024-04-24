@@ -30,7 +30,7 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   deltarAnnotated_hyperSorted <- subset(deltarAnnotated_hyperSorted, deltarAnnotated_hyperSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_HYPER"))
-  dump_sample_as_bed_file(data_to_dump = deltarAnnotated_hyperSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","HYPER"),"bedgraph"))
+  dump_sample_as_bed_file(data_to_dump = deltarAnnotated_hyperSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","HYPER"),"bedgraph", add_gz=TRUE))
 
   ### get deltar_hypo HYPER #########################################################
   deltar_hypo <- data.frame("DELTA"=  (low_thresholds - values)/dividend, row.names = probe_features$PROBE)
@@ -41,7 +41,7 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   deltarAnnotated_hypoSorted <- subset(deltarAnnotated_hypoSorted, deltarAnnotated_hypoSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_HYPO"))
-  dump_sample_as_bed_file(data_to_dump = deltarAnnotated_hypoSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","HYPO"),"bedgraph"))
+  dump_sample_as_bed_file(data_to_dump = deltarAnnotated_hypoSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","HYPO"),"bedgraph", add_gz=TRUE))
 
 
   ### get deltar BOTH #########################################################
@@ -50,7 +50,7 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   deltarAnnotated_bothSorted <- subset(deltarAnnotated_bothSorted, deltarAnnotated_bothSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_BOTH"))
-  dump_sample_as_bed_file(data_to_dump = deltarAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTH"),"bedgraph"))
+  dump_sample_as_bed_file(data_to_dump = deltarAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTH"),"bedgraph", add_gz=TRUE))
 
 
   ### get deltar from medians #########################################################
@@ -60,18 +60,18 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
 
   result <- ""
   result <- result[-1]
-  if( (min(deltarAnnotated_hypoSorted$DELTA)<0) |
-      (min(deltarAnnotated_hyperSorted$DELTA)<0) |
-      (min(deltarAnnotated_bothSorted$DELTA)<0) )
-  {
-    log_event(min(deltarAnnotated_hypoSorted$DELTA))
-    log_event(min(deltarAnnotated_hyperSorted$DELTA))
-    log_event(min(deltarAnnotated_bothSorted$DELTA))
-    stop("ERROR: I'm stopping here the deltar have negative values!")
-  }
-  result["DELTAR_HYPO"] <- mean(deltarAnnotated_hypoSorted$DELTA)
-  result["DELTAR_HYPER"] <- mean(deltarAnnotated_hyperSorted$DELTA)
-  result["DELTAR_BOTH"] <- mean(deltarAnnotated_bothSorted$DELTA)
+  deltar_to_check <- c(deltarAnnotated_hypoSorted$DELTA, deltarAnnotated_hyperSorted$DELTA, deltarAnnotated_bothSorted$DELTA)
+  if (length(deltar_to_check)>0)
+    if( (min(deltar_to_check)<0))
+    {
+      log_event(min(deltarAnnotated_hypoSorted$DELTA))
+      log_event(min(deltarAnnotated_hyperSorted$DELTA))
+      log_event(min(deltarAnnotated_bothSorted$DELTA))
+      stop("ERROR: I'm stopping here the deltar have negative values!")
+    }
+  result["DELTAR_HYPO"] <- mean(deltarAnnotated_hypoSorted$DELTA, na.rm = TRUE)
+  result["DELTAR_HYPER"] <- mean(deltarAnnotated_hyperSorted$DELTA, na.rm = TRUE)
+  result["DELTAR_BOTH"] <- mean(deltarAnnotated_bothSorted$DELTA, na.rm = TRUE)
 
 
   return(result)

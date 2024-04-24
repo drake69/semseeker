@@ -14,7 +14,7 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   ssEnv <- get_session_info()
   # #
   start_time <- Sys.time()
-  log_event("INFO: ", Sys.time(), " AnalyzePopulation warmingUP ")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " AnalyzePopulation warmingUP ")
 
   signal_data <- stats::na.omit(signal_data)
 
@@ -25,11 +25,11 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   missed_samples <- setdiff(setdiff(sample_names, existent_samples), "PROBE")
 
   if (length(missed_samples) != 0) {
-    log_event("INFO: ", Sys.time(), " These samples data are missed: ", paste0(missed_samples, sep = " "))
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " These samples data are missed: ", paste0(missed_samples, sep = " "))
   }
 
-  log_event("INFO: ", Sys.time(), " WarmedUP AnalyzePopulation")
-  log_event("INFO: ", Sys.time(), " Start population analysis")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " WarmedUP AnalyzePopulation")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Start population analysis")
 
   # progress_bar <- progress::progress_bar$new(
   #   format = paste("INFO: Performing population analysis [:bar] :percent eta: :eta"),
@@ -112,13 +112,13 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   colnames(summary_population) <- c("Sample_ID","DELTAS_HYPO","DELTAS_HYPER","DELTAS_BOTH","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO",
                                     "LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH","DELTAR_HYPO","DELTAR_HYPER","DELTAR_BOTH","BETA_MEAN")
   rownames(summary_population) <- summary_population$Sample_ID
-  log_event("INFO: ", Sys.time(), " Row count result:", nrow(summary_population))
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Row count result:", nrow(summary_population))
   rm(signal_data)
 
-  log_event("INFO: ", Sys.time(), " Completed population analysis ")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population analysis ")
   end_time <- Sys.time()
   time_taken <- (end_time - start_time)
-  log_event("INFO: ", Sys.time(), " Completed population with summary - Time taken: ", time_taken)
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population with summary - Time taken: ", time_taken)
 
   return(summary_population)
 }

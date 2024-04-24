@@ -58,7 +58,7 @@
 #                            cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
 # )
 #
-# sample_sheet <- read.csv("~/Downloads/GSE139307/final_samplesheet.csv")
+# sample_sheet <- read.csv2("~/Downloads/GSE139307/final_samplesheet.csv")
 # normalizedData <- readRDS("~/Downloads/GSE139307/normalizeddata.rds")
 #
 #

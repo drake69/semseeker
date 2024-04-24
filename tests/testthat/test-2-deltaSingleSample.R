@@ -1,4 +1,4 @@
-testthat::test_that("delta_single_sample",{
+test_that("delta_single_sample",{
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
@@ -21,11 +21,17 @@ testthat::test_that("delta_single_sample",{
 
   result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
   outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
-  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTH"), "bedgraph")
+  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTH"), "bedgraph", add_gz = TRUE)
   testthat::expect_true(file.exists(fileName))
 
+  # message("fileName: ", fileName)
+  # test I can open it
+  res <- read.table(gzfile(fileName), header = FALSE)
+  # message("res: ", res)
+  testthat::expect_true(nrow(res)> 0)
+
   ####################################################################################
-  unlink(tempFolder, recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder, recursive = TRUE)
 
 })

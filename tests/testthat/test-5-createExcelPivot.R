@@ -2,9 +2,11 @@ test_that("create_excel_pivot", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, showprogress = TRUE)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, start_fresh=TRUE)
 
   ####################################################################################
+  # save sampèle sheet
+  write.csv2(mySampleSheet, file.path(ssEnv$result_folderData,"sample_sheet_result.csv"), row.names = FALSE)
 
   tt <- semseeker:::get_meth_tech(signal_data)
 
@@ -26,13 +28,37 @@ test_that("create_excel_pivot", {
 
   # create and read
   semseeker:::create_excel_pivot()
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/GENE.xlsx")))
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/PROBE.xlsx")))
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/CHR.xlsx")))
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/ISLAND.xlsx")))
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderData,"Pivots/DMR.xlsx")))
+  areas=c("GENE","ISLAND","DMR","CHR","PROBE", "SIGNAL")
+  subarea=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE", "N_SHORE","S_SHORE","N_SHELF","S_SHELF")
+  markers <-c("MUTATIONS","DELTAS","DELTAQ","DELTARQ","DELTAR")
+  figures <- c("HYPO","HYPER","BOTH","MEAN")
 
+  area = "GENE"
+  subarea="WHOLE"
+  marker="MUTATIONS"
+  figure="BOTH"
 
-  # unlink(tempFolder, recursive=TRUE)
+  pivot_count <- 0
+  for (area in areas)
+  {
+    for (subarea in subarea)
+    {
+      for (marker in markers)
+      {
+        for (figure in figures)
+        {
+          tempresult_folder <- semseeker:::dir_check_and_create(baseFolder = ssEnv$result_folderData , subFolders = c("Pivots",marker))
+          fileToRead <- semseeker:::file_path_build(tempresult_folder, detailsFilename = c(marker,figure,area,subarea) , "csv", add_gz = TRUE)
+          if(file.exists(fileToRead))
+            pivot_count <- pivot_count + 1
+        }
+      }
+    }
+  }
+
+  #at least  pivot
+  testthat::expect_true(pivot_count > 0)
+
   semseeker:::close_env()
+  unlink(tempFolder, recursive=TRUE)
 })

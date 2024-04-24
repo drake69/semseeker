@@ -104,8 +104,8 @@ batch_correlation_check <- function() {
       pca_contrib$Batch_ID <- as.factor(pca_contrib$Batch_ID)
     }
     pca_contrib <- as.data.frame(pca_contrib)
-    result_file <- file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$MARKER), as.character(key$FIGURE)), "csv")
-    utils::write.csv2(pca_contrib,result_file,row.names = F)
+    result_file <- file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$MARKER), as.character(key$FIGURE)), "csv", add_gz=TRUE)
+    utils::write.csv2(gzfile(pca_contrib),result_file,row.names = F)
 
     if(length(unique(t(unique(stats::na.omit(pca_contrib[,!(colnames(pca_contrib) %in% c("Batch_ID"))])))))==1
       | plyr::empty(stats::na.omit(pca_contrib)))
@@ -167,8 +167,8 @@ batch_correlation_check <- function() {
     result_cor <- merge(result_cor, dunn.results, by="dim")
     rm(dunn.results)
 
-    result_file <- file_path_build(batch_analysis_folder, c("batch_cor", as.character(key$MARKER), as.character(key$FIGURE)), "csv")
-    utils::write.csv2(result_cor,result_file,row.names = F)
+    result_file <- file_path_build(batch_analysis_folder, c("batch_cor", as.character(key$MARKER), as.character(key$FIGURE)), "csv", add_gz=TRUE)
+    utils::write.csv2(gzfile(result_cor),result_file,row.names = F)
 
     result_cor <- subset(result_cor, result_cor$p.value < 0.05)
     result_cor <- subset(result_cor, result_cor$proportion < 0.7)
@@ -184,7 +184,7 @@ batch_correlation_check <- function() {
       summary_cor <- result_cor
     # result_cor
   }
-  result_file <- file_path_build(batch_analysis_folder, c("result","cor"), "csv")
-  utils::write.csv2(summary_cor,result_file,row.names = F)
+  result_file <- file_path_build(batch_analysis_folder, c("result","cor"), "csv", add_gz=TRUE)
+  utils::write.csv2(gzfile(summary_cor),result_file,row.names = F)
 
 }

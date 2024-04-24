@@ -58,7 +58,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     family_test <- inference_detail$family_test
     if( is.null(family_test) || length(family_test)  ==  0)
     {
-      log_event("WARNING: ", Sys.time(), " One test family_test is missed! Skipped.")
+      log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " One test family_test is missed! Skipped.")
     }
     else
     {
@@ -72,12 +72,13 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
       if(independent_variable %in% covariates)
       {
-        stop("ERROR: ", Sys.time(), " The independent variable is also present as covariate!")
+        log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " The independent variable is also present as covariate!")
+        stop()
       }
 
       if( is.null(independent_variable) || length(independent_variable)  ==  0)
       {
-        log_event("WARNING: ", Sys.time(), " One indipendent variable is missed! Skipped.")
+        log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " One indipendent variable is missed! Skipped.")
       }
       else
       {
@@ -85,7 +86,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         if( is.null(depth_analysis) || length(depth_analysis)  ==  0)
         {
           depth_analysis <- 1
-          log_event("WARNING: ", Sys.time(), " Missed depth analysis inference forced to 1.")
+          log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missed depth analysis inference forced to 1.")
         }
 
         study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
@@ -104,7 +105,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
         if (!(independent_variable %in% colnames(study_summary)))
         {
-          log_event("WARNING: ", Sys.time(), " This indipendent variabile:", independent_variable, " is missed! Skipping")
+          log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " This indipendent variabile:", independent_variable, " is missed! Skipping")
         }
         else
         {
@@ -145,7 +146,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             rm(results)
           for (a in 1:length(markers) )
           {
-            
+            if (exists("results"))
+              rm(results)
+
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
             cols <- keys$COMBINED
@@ -252,11 +255,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
                   pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
-                  fname <-file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv")
+                  fname <-file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv", add_gz=TRUE)
                   if (file.exists(fname))
                   {
-                    log_event("INFO: ", Sys.time(), " Starting to read pivot:", fname,".")
-                    tempDataFrame <- utils::read.csv2(fname, sep  =  ";")
+                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", fname,".")
+                    tempDataFrame <- utils::read.table(gzfile(fname), sep  =  ";")
                     #assign the area name (eg gene...) to the rows
                     # has SAMPLEID as name but is the genomic area
                     row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
@@ -281,7 +284,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrameBatch <- t(tempDataFrameBatch)
                     tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
                     tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
-                    log_event("INFO: ", Sys.time(), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
+                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
                     if(nrow(tempDataFrameBatch)>1)
                     {
                       tempDataFrameBatch <- subset(tempDataFrameBatch, "SAMPLE_GROUP"  !=   "Reference")
@@ -320,7 +323,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   }
                 }
 
-              
+
               if (exists("old_results"))
               {
                 if (exists("results"))
@@ -348,14 +351,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   results <- subset(results, results$PVALUE < 0.05 | results$PVALUEADJ < 0.05)
               }
 
-              
+
               if(family_test=="kruskal.test")
               {
                 # get columns where colnames start with PVALUE_KW_
                 kw_columns <- colnames(results)[grepl("^PVALUE_KW_", colnames(results))]
                 for (colname in kw_columns)
                 {
-                  
+
                   # colname <- kw_columns[c]
                   if (grepl(colname,"_ADJ_BH"))
                     next

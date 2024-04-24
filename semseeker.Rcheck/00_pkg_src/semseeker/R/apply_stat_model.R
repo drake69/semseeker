@@ -46,8 +46,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # message("Starting foreach withh: ", iters, " items")
 
   message("INFO: ", Sys.time(), " I'll perform:",iters - length(covariates)," tests." )
-  result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
-  # for(g in g_start:iters)
+  # result_temp <- foreach::foreach(g = g_start:iters, .combine = rbind, .export = to_export) %dorng%
+  for(g in g_start:iters)
   {
     burdenValue <- cols[g]
     if(ssEnv$showprogress)
@@ -92,7 +92,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       n_permutations <- model_result$n_permutations
 
       if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" &
-         family_test!="kendall" & !grepl("quantreg", family_test)
+         family_test!="kendall" & !grepl("quantreg", family_test) & !grepl("plynomial", family_test)
          & family_test!="poisson")
       {
         independent_variableData1stLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable1stLevel ,burdenValue])

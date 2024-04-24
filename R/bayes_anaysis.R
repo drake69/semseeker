@@ -82,7 +82,7 @@ bayes_analysis <-
           if (file.exists(fname))
           {
             log_event("INFO: ",
-              Sys.time(),
+              format(Sys.time(), "%a %b %d %X %Y"),
               " Starting to read pivot:",
               fname,
               ".")
@@ -103,7 +103,7 @@ bayes_analysis <-
             tempDataFrame <- as.data.frame(tempDataFrame)
             log_event(
               "INFO: ",
-              Sys.time(),
+              format(Sys.time(), "%a %b %d %X %Y"),
               " Read pivot:",
               fname,
               " with ",

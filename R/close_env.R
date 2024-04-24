@@ -8,7 +8,7 @@ close_env <- function()
 
   future::plan( future::sequential)
   unlink(ssEnv$temp_folder,recursive=TRUE)
-  log_event("INFO: ", Sys.time(), " Job Completed !")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Completed !")
   log_event("DEBUG: --------------------------------------------------------------")
 
 }

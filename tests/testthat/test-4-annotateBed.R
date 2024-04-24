@@ -40,11 +40,12 @@ test_that("annotate_bed", {
   testthat::expect_true(nrow(final_bed)>0)
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
+  semseeker:::close_env()
   area =  "GENE"
   subarea <- "BODY"
-  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90)
+  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, start_fresh = FALSE)
 
-  bedFileName <- semseeker:::file_path_build(dir_bed , c(area, "Annotated"),"fst")
+  final_bed <- semseeker:::read_annotated_bed(figure,marker,area,subarea)
   testthat::expect_true(nrow(final_bed)==nrow(unique(final_bed)))
 
   area =  "GENE"
@@ -70,6 +71,6 @@ test_that("annotate_bed", {
   final_bed <- semseeker:::read_annotated_bed(figure,marker,area,subarea)
   testthat::expect_true(nrow(final_bed)>0)
 
-  unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder,recursive = TRUE)
 })

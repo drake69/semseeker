@@ -78,7 +78,7 @@ lesions_get <- function(grouping_column, mutation_annotated_sorted)
 
   }
 
- log_event("DEBUG: ", Sys.time(), " Got lesions for sample !")
+ log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Got lesions for sample !")
   return(lesionWeighted)
 
 }

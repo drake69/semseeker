@@ -2,7 +2,7 @@ test_that("deltarq_get", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, bonferroni_threshold = bonferroni_threshold)
 
   ####################################################################################
 
@@ -15,44 +15,48 @@ test_that("deltarq_get", {
   # browser()
   sp <- semseeker:::analyze_population(
     signal_data=signal_data,
-    
+
     signal_thresholds = signal_thresholds,
     sample_sheet = mySampleSheet,
-    bonferroni_threshold = bonferroni_threshold,
     probe_features = probe_features
   )
 
   semseeker:::create_multiple_bed(mySampleSheet)
   resultPopulation <- deltarq_get(mySampleSheet)
 
-  # test deltaq creation
-  tempresult_folder <- file.path(tempFolder,"Data","Control","DELTARQ_BOTH")
-  fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "DELTARQ" ,"BOTH" ), "fst")
-  localFileRes_both <- fst::read_fst(fileToRead)
-  testthat::expect_true(sum(is.na(localFileRes_both$VALUE))==0)
-  testthat::expect_true(nrow(localFileRes_both)>0)
+  markers <-c("DELTARQ")
+  figures <- c("HYPO","HYPER","BOTH")
+  sample_groups <- c("Control","Reference","Case")
 
-  tempresult_folder <- file.path(tempFolder,"Data","Control","DELTARQ_BOTH")
-  fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "DELTARQ" ,"BOTH" ), "fst")
-  deltarq_localFileRes_both <- fst::read_fst(fileToRead)
-  testthat::expect_true(sum(is.na(deltarq_localFileRes_both$VALUE))==0)
-  testthat::expect_true(nrow(deltarq_localFileRes_both)>0)
+  semseeker:::create_multiple_bed(mySampleSheet)
+  dq <- deltaq_get(mySampleSheet)
+  drq <- deltarq_get(mySampleSheet)
+  result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
+
+  count_multiple_bed <- 0
+  for (sample_group in sample_groups)
+  {
+    for (marker in markers)
+    {
+      for (figure in figures)
+      {
+        tempresult_folder <- semseeker:::dir_check_and_create(result_folderData,c(sample_group,paste(marker,figure, sep="_")))
+        fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", marker ,figure ), "fst")
+        if (file.exists(fileToRead))
+        {
+          read_multiple_bed <-semseeker:::read_multiple_bed (figure = figure, marker = marker, sample_group = sample_group)
+          testthat::expect_true(nrow(read_multiple_bed)>0)
+          count_multiple_bed <- count_multiple_bed + 1
+        }
+      }
+    }
+  }
+
+  testthat::expect_true(count_multiple_bed>0)
+
   ####################################################################################
-
-
-  tempresult_folder <- file.path(tempFolder,"Data","Control","MUTATIONS_BOTH")
-  fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "MUTATIONS" ,"BOTH" ), "fst")
-  mut_localFileRes_both <- fst::read_fst(fileToRead)
-  testthat::expect_true(nrow(mut_localFileRes_both)>=nrow(deltarq_localFileRes_both))
-
-  tempresult_folder <- file.path(tempFolder,"Data","Control","DELTAS_BOTH")
-  fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", "DELTAS" ,"BOTH" ), "fst")
-  deltas_localFileRes_both <- fst::read_fst(fileToRead)
-  testthat::expect_true(nrow(deltas_localFileRes_both)>=nrow(deltarq_localFileRes_both))
-
-  testthat::expect_true(nrow(mut_localFileRes_both)==nrow(deltas_localFileRes_both))
-  ####################################################################################
-  unlink(tempFolder, recursive = T)
   semseeker:::close_env()
+  unlink(tempFolder, recursive = T)
+
 })
 

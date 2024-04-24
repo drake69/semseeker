@@ -18,10 +18,11 @@ test_that("analyze_single_sample",{
 
 
   outputFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c("Control","MUTATIONS_HYPO"))
-  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"MUTATIONS","HYPO"), "bed")
+  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"MUTATIONS","HYPO"), "bed", add_gz = TRUE)
   testthat::expect_true(file.exists(fileName))
 
   ####################################################################################
-  unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder,recursive = TRUE)
+
 })

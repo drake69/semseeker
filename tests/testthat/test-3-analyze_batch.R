@@ -2,7 +2,11 @@ test_that("analize_batch", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <- semseeker:::init_env(tempFolder,
+    parallel_strategy = parallel_strategy,
+    bonferroni_threshold =  bonferroni_threshold,
+    iqrTimes =  iqrTimes
+  )
 
   ####################################################################################
 
@@ -13,9 +17,6 @@ test_that("analize_batch", {
   batch_id <- 2
   sp <- semseeker:::analyze_batch(signal_data =  signal_data,
     sample_sheet =  mySampleSheet,
-    
-    bonferroni_threshold =  bonferroni_threshold,
-    iqrTimes =  iqrTimes,
     batch_id = batch_id
   )
 
@@ -25,7 +26,7 @@ test_that("analize_batch", {
   testthat::expect_true(sum(na.omit(sp[,"MUTATIONS_BOTH"])>0)>0)
 
   ####################################################################################
-  unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder,recursive = TRUE)
 })
 

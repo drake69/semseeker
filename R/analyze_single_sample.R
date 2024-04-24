@@ -13,16 +13,16 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
   ssEnv <- get_session_info()
   result <- ""
   result <- result[-1]
- log_event("DEBUG: ", Sys.time(),  "analyze_single_sample:", ssEnv$result_folderData)
+ log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:", ssEnv$result_folderData)
 
   mutation_annotated_sorted <- mutations_get(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
   mutation_annotated_sorted_to_save <- subset(mutation_annotated_sorted, mutation_annotated_sorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
- log_event("DEBUG: ", Sys.time(),  "analyze_single_sample:",folder_to_save)
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:",folder_to_save)
   dump_sample_as_bed_file(
     data_to_dump = mutation_annotated_sorted_to_save,
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed")
+    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed", add_gz=TRUE)
   )
   result[paste("MUTATIONS_", figure, sep="")] <- if (!is.null(mutation_annotated_sorted_to_save)) dim(mutation_annotated_sorted_to_save)[1] else 0
 
@@ -30,7 +30,7 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
     data_to_dump = lesionWeighted,
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed")
+    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed", add_gz=TRUE)
   )
 
   result[paste("LESIONS_", figure, sep="")] <- if (!is.null(lesionWeighted)) dim(lesionWeighted)[1] else 0

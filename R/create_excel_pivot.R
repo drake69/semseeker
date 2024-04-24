@@ -8,6 +8,10 @@ create_excel_pivot <-  function() {
   # areas <- ssEnv$keys_areas
 
   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
+  # sample_sheet <- deltaq_get(sample_sheet)
+  # sample_sheet <- deltarq_get(sample_sheet)
+  # write.csv2(sample_sheet, file.path(ssEnv$result_folderData,"sample_sheet_result.csv"), row.names = FALSE)
+
   create_multiple_bed(sample_sheet)
   annotate_bed()
 
@@ -31,12 +35,13 @@ create_excel_pivot <-  function() {
     pivot_file_name <- localKeys$COMBINED[k]
 
     pivot_subfolder <- dir_check_and_create(reportFolder, marker)
-    fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
+    fileName <- file_path_build(baseFolder =  pivot_subfolder,detailsFilename =  pivot_file_name,extension =  ".csv" ,add_gz=TRUE)
     if (!file.exists(fileName))
     {
       annotatedData <-  read_annotated_bed(figure,marker,area,subarea)
       annotatedData <- subset(annotatedData, annotatedData$VALUE != 0 )
 
+      # browser()
       if(!plyr::empty(annotatedData))
       {
           if(marker=="SIGNAL")
@@ -48,7 +53,7 @@ create_excel_pivot <-  function() {
             annotatedData <- reshape2::dcast(data = annotatedData, formula =  SAMPLEID + SAMPLE_GROUP ~ AREA, value.var = "VALUE",
               fun.aggregate = sum, drop = TRUE)
 
-          utils::write.table(t(annotatedData), fileName, row.names = T, col.names = F, sep=";")
+          utils::write.table(t(annotatedData), gzfile(fileName), row.names = T, col.names = F, sep=";")
       }
     }
     if(ssEnv$showprogress)

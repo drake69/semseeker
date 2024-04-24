@@ -25,7 +25,7 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
   deltasAnnotated_hyperSorted <- subset(deltasAnnotated_hyperSorted, deltasAnnotated_hyperSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPER"))
-  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hyperSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPER"),"bedgraph"))
+  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hyperSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPER"),"bedgraph", add_gz=TRUE))
 
   ### get deltas_hypo HYPER #########################################################
   deltas_hypo <- data.frame("DELTA"=  low_thresholds - values, row.names = probe_features$PROBE)
@@ -36,7 +36,7 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
   deltasAnnotated_hypoSorted <- subset(deltasAnnotated_hypoSorted, deltasAnnotated_hypoSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPO"))
-  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hypoSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPO"),"bedgraph"))
+  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hypoSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPO"),"bedgraph", add_gz=TRUE))
 
 
   ### get deltas BOTH #########################################################
@@ -45,7 +45,7 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
   deltasAnnotated_bothSorted <- subset(deltasAnnotated_bothSorted, deltasAnnotated_bothSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTH"))
-  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTH"),"bedgraph"))
+  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTH"),"bedgraph", add_gz=TRUE))
 
 
   ### get deltas from medians #########################################################
@@ -55,15 +55,15 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
 
   result <- ""
   result <- result[-1]
-  if( (min(deltasAnnotated_hypoSorted$DELTA)<0) |
-      (min(deltasAnnotated_hyperSorted$DELTA)<0) |
-      (min(deltasAnnotated_bothSorted$DELTA)<0) )
-  {
-    log_event(min(deltasAnnotated_hypoSorted$DELTA))
-    log_event(min(deltasAnnotated_hyperSorted$DELTA))
-    log_event(min(deltasAnnotated_bothSorted$DELTA))
-    stop("ERROR: I'm stopping here the deltas have negative values!")
-  }
+  deltas_to_check <- c(deltasAnnotated_hypoSorted$DELTA, deltasAnnotated_hyperSorted$DELTA, deltasAnnotated_bothSorted$DELTA)
+  if (length(deltas_to_check) > 0)
+    if( (min(deltas_to_check)<0))
+    {
+      log_event(min(deltasAnnotated_hypoSorted$DELTA))
+      log_event(min(deltasAnnotated_hyperSorted$DELTA))
+      log_event(min(deltasAnnotated_bothSorted$DELTA))
+      stop("ERROR: I'm stopping here the deltas have negative values!")
+    }
   result["DELTAS_HYPO"] <- mean(deltasAnnotated_hypoSorted$DELTA)
   result["DELTAS_HYPER"] <- mean(deltasAnnotated_hyperSorted$DELTA)
   result["DELTAS_BOTH"] <- mean(deltasAnnotated_bothSorted$DELTA)

@@ -20,13 +20,13 @@ sample_group_check <- function(sample_sheet, signal_data)
   if((length(sample_sheet$Sample_Group=="Case")<=3)
     || (length(sample_sheet$Sample_Group=="Control")<=3)
     || (length(sample_sheet$Sample_Group=="Reference")<=3))
-    return("ERROR: ", Sys.time(), " Sample groups Case, Control and Reference must be present in the sample sheet, not enough samples each group. ")
+    return("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Sample groups Case, Control and Reference must be present in the sample sheet, not enough samples each group. ")
 
     needColumns <- c("Sample_ID", "Sample_Group")
   missedColumns <- needColumns[!(needColumns %in% colnames(sample_sheet))]
 
   if (length(missedColumns) > 0) {
-    result <- paste(result,  " Lost following columns ", missedColumns," ",Sys.time(), "Especting a column with name Sample_Group and possible values Reference,  Control and Case")
+    result <- paste(result,  " Lost following columns ", missedColumns," ",format(Sys.time(), "%a %b %d %X %Y"), "Especting a column with name Sample_Group and possible values Reference,  Control and Case")
   }
 
   if(sum(is.na(sample_sheet$Sample_ID)))

@@ -7,7 +7,7 @@
 #   } else
 #     data <- data_to_add
 #
-#   fst::write.fst(x = data,path = path_file_name)
+#   fst::write.fst(x = data,path = path_file_name, compress = 100)
 #
 # }
 # #

@@ -1,10 +1,10 @@
-testthat::test_that("lesions_get",{
-
+test_that("lesions_get",{
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
   Sample_ID <- mySampleSheet[1,"Sample_ID"]
-  bonferroni_threshold <- 5
+
+  semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures = "BOTH", markers = "DELTAS", areas = "GENE", bonferroni_threshold=5)
 
   mutations <-  semseeker:::mutations_get(
     values = signal_data[,1],
@@ -14,9 +14,10 @@ testthat::test_that("lesions_get",{
     sampleName = Sample_ID
   )
 
+  # set to 1 10 values of mutations
+  mutations[1:100,"MUTATIONS"] <- 1
+
   lesions_hypo <- semseeker:::lesions_get(
-    
-    bonferroni_threshold = bonferroni_threshold,
     mutation_annotated_sorted = mutations,
     grouping_column = "CHR"
   )
@@ -31,9 +32,8 @@ testthat::test_that("lesions_get",{
     sampleName = Sample_ID
   )
 
+  mutations[1:100,"MUTATIONS"] <- 1
   lesions_hyper <- semseeker:::lesions_get(
-    
-    bonferroni_threshold = bonferroni_threshold,
     mutation_annotated_sorted = mutations,
     grouping_column = "CHR"
   )
@@ -41,5 +41,4 @@ testthat::test_that("lesions_get",{
   testthat::expect_true(nrow(lesions_hyper)!=0)
 
   ####################################################################################
-
 })

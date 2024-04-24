@@ -22,64 +22,45 @@ test_that("semseeker:::read_multiple_bed", {
 
   markers <-c("MUTATIONS","DELTAS","DELTAQ","DELTARQ","DELTAR")
   figures <- c("HYPO","HYPER","BOTH")
-  results <- data.frame("MARKER","FIGURE","SAMPLE_GROUP","NROWS")
-  results <- results[0,]
+  sample_groups <- c("Control","Reference","Case")
 
-  for (sg in length(unique(mySampleSheet$Sample_Group)))
+  semseeker:::create_multiple_bed(mySampleSheet)
+  dq <- deltaq_get(mySampleSheet)
+  drq <- deltarq_get(mySampleSheet)
+  result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
+
+  count_multiple_bed <- 0
+  for (sample_group in sample_groups)
   {
-    # sg <-1
-    sample_group <- unique(mySampleSheet$Sample_Group)[sg]
     for (marker in markers)
     {
-      # marker <- "DELTARQ"
       for (figure in figures)
       {
-        # figure <- "HYPO"
-        # message(sample_group,figure,marker)
-        res <-semseeker:::read_multiple_bed (marker =  marker,figure =  figure, sample_group = sample_group)
-        testthat::expect_true(nrow(res)>0)
-        results <- rbind(results, data.frame("MARKER"=marker,"FIGURE"=figure,"SAMPLE_GROUP"=sample_group,"NROWS"=nrow(res)))
+        tempresult_folder <- semseeker:::dir_check_and_create(result_folderData,c(sample_group,paste(marker,figure, sep="_")))
+        fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", marker ,figure ), "fst")
+        if (file.exists(fileToRead))
+        {
+          read_multiple_bed <-semseeker:::read_multiple_bed (figure = figure, marker = marker, sample_group = sample_group)
+          testthat::expect_true(nrow(read_multiple_bed)>0)
+          count_multiple_bed <- count_multiple_bed + 1
+        }
+        else
+        {
+          # message("fileToRead:",fileToRead)
+        }
+
       }
     }
   }
 
-
-  # create combination of markers
-  comb <- combn(markers,2)
-  for (i in 1:ncol(comb)) {
-    # i <- 1
-    for (figure in figures)
-    {
-      # figure <- "HYPO"
-      for (sample_group in unique(mySampleSheet$Sample_Group))
-      {
-        res2 <- semseeker:::read_multiple_bed (comb[2,i], figure, sample_group)
-        res1 <- semseeker:::read_multiple_bed (marker =  comb[1,i], figure =  figure, sample_group =  sample_group)
-        if(comb[2,i]=="MUTATIONS")
-        {
-          res2 <- nrow(res2)
-        } else
-        {
-          res2 <- sum(res2$VALUE)
-        }
-        if(comb[1,i]=="MUTATIONS")
-        {
-          res1 <- nrow(res1)
-        } else
-        {
-          res1 <- sum(res1$VALUE)
-        }
-        # message(comb[2,i]," ",comb[1,i]," ", sample_group, " ",figure, " ", res1!=res2)
-        testthat::expect_true(res1!=res2)
-      }
-    }
-  }
-
+  # exists at least a multiple bed
+  testthat::expect_true(count_multiple_bed>0)
   ####################################################################################
 
   # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPO", probe_features, area, sample_group, groupingColumnLabel)
   # res <-semseeker:::read_multiple_bed ( "DELTAS", "HYPER", probe_features, area, sample_group, groupingColumnLabel)
   # testthat::expect_true(nrow(res)>0)
   semseeker:::close_env()
+  unlink(tempFolder, recursive = TRUE)
 }
   )

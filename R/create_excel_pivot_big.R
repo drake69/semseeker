@@ -48,5 +48,5 @@
 #'
 #'   pivot [is.na(pivot)] <- 0
 #'   fileName <- paste0(reportFolder,"/PIVOT.fst" , sep="")
-#'   fst::write_fst( x =  pivot ,path =  fileName  , compress = T )
+#'   fst::write.fst( x =  pivot ,path =  fileName  , compress = 100 )
 #' }

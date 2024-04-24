@@ -25,7 +25,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   independent_variable1stLevel <- prepared_data$independent_variable1stLevel
   independent_variable2ndLevel <- prepared_data$independent_variable2ndLevel
 
-  Breusch_Pagan_pvalue <- NA
   cols <- colnames(tempDataFrame)
   iters <- length(cols)
   g <- 0
@@ -43,10 +42,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv","g_start")
 
   result_columns <- c("MARKER", "FIGURE", "AREA", "SUBAREA", "AREA_OF_TEST", "CI.LOWER", "CI.UPPER", "PVALUE", "STATISTIC_PARAMETER", "AIC_VALUE", "RESIDUALS", "SHAPIRO_PVALUE", "R_MODEL", "STD.ERROR", "N_PERMUTATIONS", "N_PERMUTATIONS_TEST")
-  log_event("DEBUG: ", Sys.time(),  "Starting foreach withh: ", iters, " items")
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "Starting foreach withh: ", iters, " items")
 
-  log_event("DEBUG: ", Sys.time(), " I'll perform:",iters - length(covariates)," tests." )
-  
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll perform:",iters - length(covariates)," tests." )
+
   result_temp <- foreach::foreach(g = g_start:iters, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
   # for(g in g_start:iters)
   {
@@ -74,7 +73,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       if(family_test!="gaussian" & family_test!="spearman" & family_test!="pearson" &
          family_test!="kendall" & !grepl("quantreg-permutation", family_test)
          & family_test!="poisson"  & !grepl("mean-permutation", family_test) &
-          !grepl("polynomial", family_test))
+          !grepl("polynomial", family_test) & !grepl("exp", family_test))
       {
         independent_variableData1stLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable1stLevel,burdenValue])
         independent_variableData2ndLevel <- stats::na.omit(tempDataFrame[tempDataFrame[, independent_variable]==independent_variable2ndLevel,burdenValue])
@@ -94,20 +93,21 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
         if(sum(is.na(dependentVariableData)>0) | sum(is.na(independent_variableData)))
         {
-          log_event("ERROR: ", Sys.time(), "The submitted data are not factorial or numeric.")
+          log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "The submitted data are not factorial or numeric.")
           stop()
         }
       }
 
       colnames(model_result) <- toupper(colnames(model_result))
+      colnames(local_result) <- toupper(colnames(local_result))
       local_result <- cbind(local_result, model_result)
       gc()
       local_result
     }
   }
 
-  
-  log_event("INFO: ", Sys.time(), " I performed:",iters," tests." )
+
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I performed:",iters," tests." )
 
   gc()
   # & !is.null(result_temp)

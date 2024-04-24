@@ -26,8 +26,8 @@ test_that("analyze_population", {
 
   ####################################################################################
 
-  unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder,recursive = TRUE)
 
 })
 

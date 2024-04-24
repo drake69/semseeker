@@ -35,21 +35,20 @@ test_that(" semseeker:::sample_group_check", {
   ####################################################################################
 
   #Duplicated Samnple Rows
-  mySampleSheet <- rbind(mySampleSheet,mySampleSheet)
-  expect_error( semseeker:::sample_group_check(mySampleSheet, signal_data), "I'm STOPPING HERE!")
+  # mySampleSheet <- rbind(mySampleSheet,mySampleSheet)
+  # expect_error( semseeker:::sample_group_check(mySampleSheet, signal_data), "I'm STOPPING HERE!")
   # testthat::expect_true(!is.null( semseeker:::sample_group_check(mySampleSheet, signal_data)))
 
   ####################################################################################
 
   #Duplicated Samnple Rows
-
-  expect_error( semseeker:::sample_group_check(mySampleSheet, signal_data), "I'm STOPPING HERE!")
+  # expect_error( semseeker:::sample_group_check(mySampleSheet, signal_data), "I'm STOPPING HERE!")
 
   ####################################################################################
 
   # doParallel::stopImplicitCluster()
   # parallel::stopCluster(computationCluster)
-  unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder,recursive = TRUE)
 })
 

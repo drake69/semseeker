@@ -30,7 +30,7 @@ dir_check_and_create <- function  (baseFolder, subFolders)
     {
       subF <- file.path(subF, subFolder)
       if(!dir.exists(subF))
-        dir.create(subF)
+        dir.create(subF, recursive = FALSE)
     }
   }
   return(file.path(as.character(subF)))
