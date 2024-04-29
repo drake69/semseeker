@@ -32,7 +32,6 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
   if (grepl("quantreg-permutation", family_test))
     model_result <- quantreg_permutation_model(family_test, sig.formula, tempDataFrame, independent_variable)
   sink()
-  # sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE, append = TRUE)
 
   if (grepl("quantreg", family_test))
     model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable)

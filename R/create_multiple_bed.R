@@ -1,7 +1,7 @@
 #' @importFrom doRNG %dorng%
 create_multiple_bed <- function(sample_sheet){
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Started multiple file creation!")
   #create multiple file bed
   i <- 0
@@ -27,11 +27,11 @@ create_multiple_bed <- function(sample_sheet){
     key <- localKeys[i,]
     marker <- as.character(key$MARKER)
     figure <- as.character(key$FIGURE)
-    tempresult_folderData <-dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(marker),"_",as.character(figure),sep="")))
+    tempresult_folderData <-semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(marker),"_",as.character(figure),sep="")))
     temp_file <- tempdir()
     temp_file <- paste(temp_file, stringi::stri_rand_strings(1, 12, pattern = "[A-Za-z0-9]"),sep="")
-    fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), as.character(figure)), "fst")
-    fileToWriteBed <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), key$SUFFIX, as.character(figure)), key$EXT, add_gz=TRUE)
+    fileToWrite <- semseeker:::file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), as.character(figure)), "fst")
+    fileToWriteBed <- semseeker:::file_path_build(tempresult_folderData, c("MULTIPLE", as.character(marker), key$SUFFIX, as.character(figure)), key$EXT, add_gz=TRUE)
     if(!file.exists(fileToWrite))
     {
       j <- 0
@@ -39,7 +39,10 @@ create_multiple_bed <- function(sample_sheet){
       {
         # j <- 1
         sample <- sample_sheet[j,]
-        fileToRead <- file_path_build(tempresult_folderData, c(sample$Sample_ID, as.character(marker),key$SUFFIX, as.character(figure)), key$EXT, add_gz = TRUE)
+        fileToRead <- semseeker:::file_path_build(baseFolder =  tempresult_folderData,
+          detailsFilename =  c(sample$Sample_ID, as.character(marker),key$SUFFIX, as.character(figure)),
+          extension =  key$EXT,
+          add_gz = TRUE)
         if(file.exists(fileToRead))
         {
           localtemp <- utils::read.table(gzfile(fileToRead), sep="\t", header = FALSE)

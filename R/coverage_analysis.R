@@ -3,7 +3,7 @@ coverage_analysis <- function(signal_data)
   # probe_features <- PROBES_CHR_CHR
   # area <- c("CHR")
   # probes_prefix <- "PROBES_CHR_"
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   keys <- ssEnv$keys_areas_subareas
   for ( k in 1:nrow(keys))
@@ -16,7 +16,7 @@ coverage_analysis <- function(signal_data)
     if(exists("covered_count"))
       rm(covered_count)
 
-    probe_features <- probe_features_get(area_subarea)
+    probe_features <- semseeker:::probe_features_get(area_subarea)
     if(plyr::empty(probe_features) | nrow(probe_features)==0)
       next
 
@@ -70,7 +70,7 @@ coverage_analysis <- function(signal_data)
   if(nrow(tot_result)<1)
     return()
 
-  chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
+  chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
   filename = paste0( chartFolder,"/","EACH_AREA_COVERAGE_ANALYSIS.png",sep="")
 
   temp_cov_result <- subset(cov_result,cov_result$SUBAREA !="WHOLE")
@@ -188,7 +188,7 @@ coverage_analysis <- function(signal_data)
   # cov_result <- reshape2::dcast(data = cov_result, AREA + SUBAREA ~ COV_PERC, value.var = "COUNT", sum)
   # number_areas <- rowSums(cov_result[,3:ncol(cov_result)])
   # cov_result[,3:ncol(cov_result)] <- round(100*cov_result[,3:ncol(cov_result)]/number_areas,0)
-  # chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
+  # chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
   # tt <- as.data.frame(cov_result[,3:ncol(cov_result)])
   # rownames(tt) <- paste(cov_result$AREA,cov_result$SUBAREA, sep=" ")
   # colors <- grDevices::hsv(0.560, seq(0,1,length.out = 100) , 1)

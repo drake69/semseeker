@@ -8,9 +8,9 @@ pathway_WebGestalt <- function(study,
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = start_fresh, ...)
 
   keys <- unique(ssEnv$keys_for_pathway)
-  path <- dir_check_and_create(ssEnv$result_folderPathway,"WebGestalt")
+  path <- semseeker:::dir_check_and_create(ssEnv$result_folderPathway,"WebGestalt")
   tmp <- tempdir()
-  tempFolder <- dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
+  tempFolder <- semseeker:::dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
 
 
   #check if optional package is installed
@@ -33,7 +33,7 @@ pathway_WebGestalt <- function(study,
       for ( em in 1:length(enrich_methods))
       {
         projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, pvalue)
-        filenameResult = file_path_build(path,projectName,"csv")
+        filenameResult = semseeker:::file_path_build(path,projectName,"csv")
         if(file.exists(filenameResult))
           next
 
@@ -91,7 +91,7 @@ pathway_WebGestalt <- function(study,
 
           if(min(enrichResult$FDR) < ssEnv$alpha)
           {
-            plotFileName = file_path_build(path,projectName,"png")
+            plotFileName = semseeker:::file_path_build(path,projectName,"png")
             grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")
             enrichResult <- as.data.frame(enrichResult)
             enrichResult <- enrichResult[order(enrichResult$expect),]
@@ -121,7 +121,7 @@ pathway_WebGestalt <- function(study,
     if(exists("enrichResultFinal"))
     {
       projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, pvalue)
-      filenameResult = file_path_build(path,projectName,"csv")
+      filenameResult = semseeker:::file_path_build(path,projectName,"csv")
       write.csv2(enrichResultFinal, filenameResult)
       rm(enrichResultFinal)
     }

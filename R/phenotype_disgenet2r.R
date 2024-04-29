@@ -51,8 +51,8 @@
 #     key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
 #
 #     phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=disease, pvalue_column=pvalue_column, pvalue)
-#     path <- dir_check_and_create(ssEnv$result_folderPhenotype,"disgenet")
-#     phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
+#     path <- semseeker:::dir_check_and_create(ssEnv$result_folderPhenotype,"disgenet")
+#     phenotype_report_path <- semseeker:::file_path_build(path,phenotype_analysis_name,"csv")
 #     if(file.exists(phenotype_report_path))
 #       next
 #

@@ -3,9 +3,12 @@ update_session_info <- function(ssEnv)
   # .pkgglobalenv
 
   # get ssEnv in memory and overwrite only if lenght is ugual or greater
-  ssEnv_local <- get_session_info()
+  ssEnv_local <- semseeker:::get_session_info()
   if (length(ssEnv)>=length(ssEnv_local))
+    {
     assign("ssEnv", ssEnv, envir=.pkgglobalenv)
+    options("ssEnv"=ssEnv)
+  }
 
 
   #save principal copy

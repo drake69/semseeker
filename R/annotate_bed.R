@@ -6,10 +6,10 @@
 annotate_bed <- function ()
 {
   start_time <- Sys.time()
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   # area and subarea are defined using the filename
   i <- 0
-  dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
+  dest_folder <- semseeker:::dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotating genomic area.")
 
@@ -19,8 +19,8 @@ annotate_bed <- function ()
 
   variables_to_export <- c("ssEnv", "dir_check_and_create", "read_multiple_bed", "subarea",
                             "progress_bar","progression_index", "progression", "progressor_uuid",
-                            "owner_session_uuid", "trace","probe_features_get","dest_folder", "localKeys",
-                            "file_path_build","%>%")
+                            "owner_session_uuid", "trace","semseeker:::probe_features_get","dest_folder", "localKeys",
+                            "file_path_build","%>%","get_session_info")
 
   # for(i in 1:nrow(localKeys))
   result <- foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export, .combine = max) %dorng%
@@ -37,15 +37,15 @@ annotate_bed <- function ()
         area <- as.character(localKeys[i,"AREA"])
         area_subarea <- paste(area,"_", subarea, sep="")
 
-        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
+        bedFileName <- semseeker:::file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
 
         if (!file.exists(bedFileName))
         {
-          probe_features <- probe_features_get(area_subarea)
+          probe_features <- semseeker:::probe_features_get(area_subarea)
           probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
           # annotate file
-          dataToAnnotate <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
+          dataToAnnotate <- semseeker:::read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
           if(!is.null(dataToAnnotate))
           {
             if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join

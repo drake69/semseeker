@@ -1,4 +1,4 @@
-#' analyze_single_sample
+#' semseeker:::analyze_single_sample
 #'
 #' @param values values of methylation
 #' @param thresholds threshold to use for comparison
@@ -10,7 +10,7 @@
 #' @importFrom doRNG %dorng%
 analyze_single_sample <- function(values, thresholds, figure, sample_detail, probe_features) {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   result <- data.frame()
   result <- result[-1]
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:", ssEnv$result_folderData)
@@ -20,11 +20,11 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
   if (nrow(mutation_annotated_sorted_to_save) != 0)
     mutation_annotated_sorted_to_save$VALUE <- 1
 
-  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
+  folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:",folder_to_save)
   dump_sample_as_bed_file(
     data_to_dump = mutation_annotated_sorted_to_save,
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed", add_gz=TRUE)
+    fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed", add_gz=TRUE)
   )
   result <- data.frame_add.column(result, paste("MUTATIONS_", figure, sep=""),if (!is.null(mutation_annotated_sorted_to_save)) dim(mutation_annotated_sorted_to_save)[1] else 0)
 
@@ -32,10 +32,10 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
   if(nrow(lesionWeighted) != 0)
     lesionWeighted$VALUE <- 1
 
-  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
+  folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
     data_to_dump = lesionWeighted,
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed", add_gz=TRUE)
+    fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed", add_gz=TRUE)
   )
 
   result <- data.frame_add.column(result, paste("LESIONS_", figure, sep=""), if (!is.null(lesionWeighted)) dim(lesionWeighted)[1] else 0)

@@ -2,7 +2,7 @@
 sample_group_check <- function(sample_sheet, signal_data)
 {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   # count rows of sample sheet and column of methylation
   # n_sample <- nrow(sample_sheet)

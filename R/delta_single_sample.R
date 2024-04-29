@@ -10,7 +10,7 @@
 #'
 delta_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, signal_medians, probe_features) {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   if(any(high_thresholds<low_thresholds))
     stop("ERROR: I'm stopping here the some high have values less than low!")
@@ -26,8 +26,8 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
   # save only deltas of epimutation
   deltasAnnotated_hyperSorted <- subset(deltasAnnotated_hyperSorted, deltasAnnotated_hyperSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
-  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPER"))
-  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hyperSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPER"),"bedgraph", add_gz=TRUE))
+  folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPER"))
+  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hyperSorted, fileName = semseeker:::file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPER"),"bedgraph", add_gz=TRUE))
 
   ### get deltas_hypo HYPER #########################################################
   deltas_hypo <- data.frame("DELTA"=  low_thresholds - values, row.names = probe_features$PROBE)
@@ -37,8 +37,8 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
   # save only deltas of epimutation
   deltasAnnotated_hypoSorted <- subset(deltasAnnotated_hypoSorted, deltasAnnotated_hypoSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
-  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPO"))
-  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hypoSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPO"),"bedgraph", add_gz=TRUE))
+  folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_HYPO"))
+  dump_sample_as_bed_file(data_to_dump = deltasAnnotated_hypoSorted, fileName = semseeker:::file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPO"),"bedgraph", add_gz=TRUE))
 
   if (any(ssEnv$keys_markers_figures$COMBINED=="DELTAS_BOTH"))
   {
@@ -47,8 +47,8 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
     deltasAnnotated_bothSorted <- sort_by_chr_and_start(deltasAnnotated_both)
     deltasAnnotated_bothSorted <- subset(deltasAnnotated_bothSorted, deltasAnnotated_bothSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
-    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTH"))
-    dump_sample_as_bed_file(data_to_dump = deltasAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTH"),"bedgraph", add_gz=TRUE))
+    folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTH"))
+    dump_sample_as_bed_file(data_to_dump = deltasAnnotated_bothSorted, fileName = semseeker:::file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTH"),"bedgraph", add_gz=TRUE))
     result <- data.frame_add.column(result, "DELTAS_BOTH",mean(deltasAnnotated_bothSorted$DELTA, na.rm = TRUE))
   }
   ### get deltas BOTHSUM #########################################################
@@ -61,8 +61,8 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
     deltasAnnotated_both_sumSorted <- sort_by_chr_and_start(deltasAnnotated_both_sum)
     deltasAnnotated_both_sumSorted <- subset(deltasAnnotated_both_sumSorted, deltasAnnotated_both_sumSorted$DELTA != 0)[, c("CHR", "START", "END", "DELTA")]
 
-    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTHSUM"))
-    dump_sample_as_bed_file(data_to_dump = deltasAnnotated_both_sumSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTHSUM"),"bedgraph", add_gz=TRUE))
+    folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTHSUM"))
+    dump_sample_as_bed_file(data_to_dump = deltasAnnotated_both_sumSorted, fileName = semseeker:::file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTHSUM"),"bedgraph", add_gz=TRUE))
     result <- data.frame_add.column(result, "DELTAS_BOTHSUM",mean(deltasAnnotated_both_sumSorted$DELTA, na.rm = TRUE))
   }
 

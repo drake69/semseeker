@@ -9,7 +9,7 @@
 test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot )
 {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   res <- data.frame(pvalue=1)
   if(family_test=="chisq.test")
   {

@@ -5,7 +5,7 @@
 #' @importFrom doRNG %dorng%
 create_heatmap <- function() {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   sample_group_comb <- utils::combn(ssEnv$keys_sample_groups, 2)
   for (g in 1:sample_group_comb)
   {
@@ -29,7 +29,7 @@ create_heatmap <- function() {
       subarea <- localKeys[j,"SUBAREA"]
       marker <- localKeys[j,"MARKER"]
       figure <- localKeys[j,"FIGURE"]
-      chartFolder <- dir_check_and_create(ssEnv$result_folderChart, area)
+      chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart, area)
 
       annotatedData <-  read_annotated_bed(figure,marker,area,subarea)
       annotatedData <- subset(annotatedData, annotatedData$SAMPLE_GROUP %in% sample_group_comb)

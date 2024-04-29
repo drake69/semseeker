@@ -1,7 +1,7 @@
 polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot)
 {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   # plynomial_degree_partition-partition_percentage
   polynomial_params <- unlist(strsplit(as.character(family_test),"_"))
@@ -88,8 +88,8 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   rownames(res) <- NULL
   if(plot)
   {
-    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
+    chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
+    filename  =  semseeker:::file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
     # Plotting the fitted curve
     # ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
     #   ggplot2::geom_point( color = ssEnv$color_palette[1] ) +

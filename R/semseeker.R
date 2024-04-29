@@ -16,7 +16,7 @@ semseeker <- function(sample_sheet,
                       ... ) {
 
   init_env( result_folder= result_folder, ...)
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet_original.csv"), row.names = FALSE)
 
   # set digits to 22
@@ -78,7 +78,7 @@ semseeker <- function(sample_sheet,
     sample_groups <- c("Control","Case")
 
   # seems to change the ssEnv reducing the items TODO
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
   update_session_info(ssEnv)
 

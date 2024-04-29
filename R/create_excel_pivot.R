@@ -2,8 +2,8 @@
 create_excel_pivot <-  function() {
 
   start_time <- Sys.time()
-  ssEnv <- get_session_info()
-  reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
+  ssEnv <- semseeker:::get_session_info()
+  reportFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderData,"Pivots")
   localKeys <- ssEnv$keys_areas_subareas_markers_figures
   # areas <- ssEnv$keys_areas
 
@@ -32,8 +32,8 @@ create_excel_pivot <-  function() {
     figure <-  as.character(localKeys[k,"FIGURE"])
     pivot_file_name <-  as.character(localKeys[k,"COMBINED"])
 
-    pivot_subfolder <- dir_check_and_create(reportFolder, marker)
-    pivot_file_name <- file_path_build(baseFolder =  pivot_subfolder,detailsFilename =  pivot_file_name,extension =  ".csv" ,add_gz=TRUE)
+    pivot_subfolder <- semseeker:::dir_check_and_create(reportFolder, marker)
+    pivot_file_name <- semseeker:::file_path_build(baseFolder =  pivot_subfolder,detailsFilename =  pivot_file_name,extension =  ".csv" ,add_gz=TRUE)
     if (!file.exists(pivot_file_name))
     {
       annotatedData <-  read_annotated_bed(figure,marker,area,subarea)

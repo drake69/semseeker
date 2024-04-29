@@ -11,7 +11,7 @@
 #'
 analyze_population <- function(signal_data, sample_sheet,signal_thresholds, probe_features) {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   # #
   start_time <- Sys.time()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " AnalyzePopulation warmingUP ")
@@ -43,7 +43,8 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   variables_to_export <- c("sample_sheet", "signal_data", "analyze_single_sample", "ssEnv",
                             "signal_superior_thresholds","deltar_single_sample","signal_inferior_thresholds","iqr","signal_median_values",
                            "bt","bonferroni_threshold", "probe_features", "analyze_single_sample_both", "delta_single_sample", "progress_bar",
-                           "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_single_sample")
+                           "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_single_sample",
+                           "get_session_info")
   i <- 1
 
   if (!ssEnv$signal_intrasample)
@@ -58,6 +59,7 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= plyr::rbind.fill , .export = variables_to_export) %dorng% {
     local_sample_detail <- sample_sheet[i,]
 
+    ssEnv <- semseeker:::get_session_info()
     signal_values <- signal_data[, local_sample_detail$Sample_ID]
     if (ssEnv$signal_intrasample )
     {
@@ -74,17 +76,17 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
       signal_median_values <- rep(y_med,length(signal_values))
     }
 
-    hyper_result <- analyze_single_sample( values = signal_values,
+    hyper_result <- semseeker:::analyze_single_sample( values = signal_values,
       thresholds = signal_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,
        probe_features = probe_features)
 
-    hypo_result <- analyze_single_sample( values = signal_values,
+    hypo_result <- semseeker:::analyze_single_sample( values = signal_values,
       thresholds = signal_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail,
       probe_features = probe_features)
 
-    both_result_mutations <- analyze_single_sample_both( sample_detail =  local_sample_detail, "MUTATIONS")
+    both_result_mutations <- semseeker:::analyze_single_sample_both( sample_detail =  local_sample_detail, "MUTATIONS")
 
-    both_result_lesions <- analyze_single_sample_both( sample_detail =  local_sample_detail, "LESIONS")
+    both_result_lesions <- semseeker:::analyze_single_sample_both( sample_detail =  local_sample_detail, "LESIONS")
 
     delta_result <- delta_single_sample ( values = signal_values, high_thresholds = signal_superior_thresholds,
       low_thresholds = signal_inferior_thresholds, sample_detail = local_sample_detail,

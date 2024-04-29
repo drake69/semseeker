@@ -10,7 +10,7 @@
 covariates_removal <- function(signal_values, covariates, sample_sheet, result_folder, ...)
 {
   init_env( result_folder= result_folder, maxResources= maxResources, ...)
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet.csv"))
   sample_sheet <- subset(sample_sheet, Sample_Group != "Reference")
   signal_values <- signal_values[,sample_sheet$Sample_ID]

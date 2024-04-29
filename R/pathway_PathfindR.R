@@ -63,8 +63,8 @@ pathway_pathfindR <- function(study,
           suffix = "without_signal_"
 
         phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, pvalue)
-        path <- dir_check_and_create(ssEnv$result_folderPathway,"pathfindR")
-        pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
+        path <- semseeker:::dir_check_and_create(ssEnv$result_folderPathway,"pathfindR")
+        pathway_report_path <- semseeker:::file_path_build(path,phenotype_analysis_name,"csv")
 
         if(file.exists(pathway_report_path))
         {

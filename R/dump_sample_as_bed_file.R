@@ -8,7 +8,7 @@
 
 dump_sample_as_bed_file <- function(data_to_dump, fileName) {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "dump_sample_as_bed_file ssEnv:", length(ssEnv))
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "dump_sample_as_bed_file:", ssEnv$result_folderData)
 

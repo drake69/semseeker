@@ -3,9 +3,9 @@ box.plot <- function(dataFrameToPlot, independent_variable,dependent_variable, t
     if (!is.family_dicotomic(family_test))
       return()
 
-    ssEnv <- get_session_info()
-    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("COMPARISON"))
-    filename  =  file_path_build(chartFolder,toupper(c(as.character(transformation), independent_variable,"Vs", dependent_variable)),"png")
+    ssEnv <- semseeker:::get_session_info()
+    chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,c("COMPARISON"))
+    filename  =  semseeker:::file_path_build(chartFolder,toupper(c(as.character(transformation), independent_variable,"Vs", dependent_variable)),"png")
     if(!file.exists(filename))
     {
       grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)

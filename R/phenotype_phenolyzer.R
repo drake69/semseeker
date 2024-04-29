@@ -35,15 +35,15 @@ phenotype_phenolyzer <- function(study,
   for(i in 1:nrow(keys))
   {
     random_string <- stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")
-    tempFolder <- dir_check_and_create(tmp,c("/semseeker/",random_string))
+    tempFolder <- semseeker:::dir_check_and_create(tmp,c("/semseeker/",random_string))
 
     if(ssEnv$showprogress)
       progress_bar(sprintf("Searching for disease using phenolyzer: %s",keys[i,]$COMBINED))
     key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
 
-    path <- dir_check_and_create(ssEnv$result_folderPhenotype,"phenolyzer")
+    path <- semseeker:::dir_check_and_create(ssEnv$result_folderPhenotype,"phenolyzer")
     phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease,"_gene_scores",sep=""), pvalue_column=pvalue_column, pvalue)
-    phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
+    phenotype_report_path <- semseeker:::file_path_build(path,phenotype_analysis_name,"csv")
     if(file.exists(phenotype_report_path))
       next
 
@@ -64,7 +64,7 @@ phenotype_phenolyzer <- function(study,
       next
 
     phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=disease, pvalue_column=pvalue_column, pvalue)
-    phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
+    phenotype_report_path <- semseeker:::file_path_build(path,phenotype_analysis_name,"csv")
 
     gene_set <- results_inference[,c("AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column)]
     gene_set <- na.omit(gene_set)
@@ -138,7 +138,7 @@ phenotype_phenolyzer <- function(study,
 
         annotated_gene_file <- file.path(tempFolder,"out.annotated_gene_scores")
         phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease,"_gene_scores",sep=""), pvalue_column=pvalue_column, pvalue)
-        phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
+        phenotype_report_path <- semseeker:::file_path_build(path,phenotype_analysis_name,"csv")
 
         file.copy(annotated_gene_file, phenotype_report_path, overwrite = TRUE)
 

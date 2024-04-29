@@ -1,6 +1,6 @@
 probe_features_get <- function(area_subarea)
 {
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   if(is.null(ssEnv$tech) | ssEnv$tech=="")
     {

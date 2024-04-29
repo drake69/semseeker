@@ -17,37 +17,37 @@
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, session_folder,
                              independent_variable, depth_analysis=3, ...)
 {
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   arguments <- list(...)
 
-  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
+  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis)
   tempDataFrame <- prepared_data$tempDataFrame
   independent_variable1stLevel <- prepared_data$independent_variableLevels[1]
   independent_variable2ndLevel <- prepared_data$independent_variableLevels[2]
 
   cols <- colnames(tempDataFrame)
-  iters <- length(cols)
+  g_end <- length(cols)
   g <- 0
 
   if(ssEnv$showprogress)
-    progress_bar <- progressr::progressor(along = g_start:iters)
+    progress_bar <- progressr::progressor(along = g_start:g_end)
   else
     progress_bar <- ""
 
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
     "independent_variable1stLevel", "independent_variable2ndLevel",
-    "key", "transformation","exact_pvalue","iters",
+    "key", "transformation","exact_pvalue","g_end",
     "data_preparation","apply_stat_model_sig.formula","quantreg_permutation_model",
     "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
     "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv","g_start")
 
   result_columns <- c("MARKER", "FIGURE", "AREA", "SUBAREA", "AREA_OF_TEST", "CI.LOWER", "CI.UPPER", "PVALUE", "STATISTIC_PARAMETER", "AIC_VALUE", "RESIDUALS", "SHAPIRO_PVALUE", "R_MODEL", "STD.ERROR", "N_PERMUTATIONS", "N_PERMUTATIONS_TEST")
-  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Starting foreach with: ", iters, " items")
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Starting foreach with: ", g_end, " items")
 
-  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll perform:",iters - length(covariates)," tests." )
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll perform:",g_end - length(covariates)," tests." )
 
-  result_temp <- foreach::foreach(g = g_start:iters, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
-  # for(g in g_start:iters)
+  result_temp <- foreach::foreach(g = g_start:g_end, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
+  # for(g in g_start:g_end)
   {
     burdenValue <- cols[g]
     if(ssEnv$showprogress)
@@ -58,7 +58,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       # browser()
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (iters - g_start < 5))
+      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5))
 
 
       local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
@@ -118,7 +118,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   }
 
 
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I performed:",iters," tests." )
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I performed:",g_end," tests." )
 
   gc()
   # & !is.null(result_temp)

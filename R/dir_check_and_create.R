@@ -1,4 +1,4 @@
-#' dir_check_and_create
+#' semseeker:::dir_check_and_create
 #'
 #' @param baseFolder folder to look in
 #' @param subFolders sub folders to create, complete tree

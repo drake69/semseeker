@@ -1,6 +1,6 @@
 inference_file_name <- function(inference_detail, marker, folder,file_extension="csv", prefix = "", suffix="")
 {
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   covariates <- inference_detail$covariates
   covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
@@ -20,7 +20,7 @@ inference_file_name <- function(inference_detail, marker, folder,file_extension=
   file_result_prefix = paste(prefix, file_result_prefix, sep = "")
   file_suffix = paste(file_suffix, suffix, sep = "")
 
-  fileNameResults <- file_path_build(folder,c(as.character(marker),file_result_prefix ,file_suffix) , file_extension)
+  fileNameResults <- semseeker:::file_path_build(folder,c(as.character(marker),file_result_prefix ,file_suffix) , file_extension)
 
   return(fileNameResults)
 }

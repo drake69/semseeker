@@ -9,10 +9,10 @@
 #' @param covariates vector of covariates to be found in the sample sheet
 #' @param depth_analysis 1 only sample, 2 chr, 3 alle genomic areas
 #'
-data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, dototal, covariates, depth_analysis)
+data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis)
 {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   transformation <- as.character(transformation)
   independentVariableIsFactor <- FALSE
@@ -47,7 +47,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
 
   df_head <- tempDataFrame[,1:(g_start-1)]
 
-  burden_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)
+  burden_values <- sapply(tempDataFrame[,g_start:g_end], as.numeric)
 
 
   df_colnames <- colnames(tempDataFrame)
@@ -80,7 +80,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
     {
       burden_values = switch(
         as.character(transformation),
-        "scale" = if(ncol(burden_values)>1) as.data.frame(apply(burden_values,2,scale)) else scale(burden_values),
+        "scale" = scale(burden_values),
         "log" = log(burden_values),
         "log2" = log2(burden_values),
         "log10"= log10(burden_values),
@@ -125,7 +125,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
         {
           independent_variableValues = switch(
             as.character(transformation),
-            "scale" = if(ncol(independent_variableValues)>1) as.data.frame(apply(independent_variableValues,2,scale)) else scale(independent_variableValues),
+            "scale" = scale(independent_variableValues),
             "log" = log(independent_variableValues),
             "log2" = log2(independent_variableValues),
             "log10"= log10(independent_variableValues),

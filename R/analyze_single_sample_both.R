@@ -1,6 +1,6 @@
 analyze_single_sample_both <- function( sample_detail, marker) {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   # log_event(sample_detail$Sample_ID, " ", "SingleSampleBoth Sample analysis warmingUP ", format(Sys.time(), "%a %b %d %X %Y"))
   result <- data.frame()
 
@@ -19,8 +19,8 @@ analyze_single_sample_both <- function( sample_detail, marker) {
   for( i in 1:length(figures))
   {
     figure <- figures[i]
-    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed", add_gz=TRUE)
+    folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
+    fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed", add_gz=TRUE)
     if(file.exists(fileName))
     {
       data_to_saveTemp <- utils::read.table(fileName, sep="\t", col.names =c("CHR", "START", "END","VALUE") )
@@ -42,8 +42,8 @@ analyze_single_sample_both <- function( sample_detail, marker) {
   if (any(ssEnv$keys_markers_figures$COMBINED==paste(marker,"_","BOTH",sep="")))
   {
     figure <- "BOTH"
-    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed", add_gz=TRUE)
+    folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
+    fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed", add_gz=TRUE)
     data_to_save_both <- data_to_save
     data_to_save_both$VALUE <- 1
 
@@ -57,8 +57,8 @@ analyze_single_sample_both <- function( sample_detail, marker) {
   if (any(ssEnv$keys_markers_figures$COMBINED==paste(marker,"_","BOTHSUM",sep="")))
   {
     figure <- "BOTHSUM"
-    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
-    fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed", add_gz=TRUE)
+    folder_to_save <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0(marker,"_", figure, sep = "")))
+    fileName = semseeker:::file_path_build(folder_to_save,c(sample_detail$Sample_ID,marker,figure),"bed", add_gz=TRUE)
     dump_sample_as_bed_file(
       data_to_dump = data_to_save,
       fileName = fileName

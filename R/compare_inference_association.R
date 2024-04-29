@@ -17,7 +17,7 @@ compare_inference_association_cross_studies <- function(inference_detail, studie
     {
       # get the inference details for the study
       result_folder_study <- studies[s,"RESULT_FOLDER"]
-      ssEnv$result_folderInference <- dir_check_and_create(result_folder_study, "Inference")
+      ssEnv$result_folderInference <- semseeker:::dir_check_and_create(result_folder_study, "Inference")
       update_session_info(ssEnv)
       temp_res <- get_results_areas_inference(inference_details = inference_detail, marker = MARKER, area= AREA,
         pvalue = pvalue, adjust_per_area = adjust_per_area, adjust_globally = adjust_globally, pvalue_column= pvalue_column,adjustment_method = adjustment_method)
@@ -32,13 +32,13 @@ compare_inference_association_cross_studies <- function(inference_detail, studie
   # change STUDY column to take int account the direction of the statistic
   aggregated_study_results$STUDY <- as.character(paste0(aggregated_study_results$STUDY,"_", ifelse((aggregated_study_results$STATISTIC_PARAMETER > 0),"INCR","DECR") ))
   # browser()
-  ssEnv$result_folderInference <- dir_check_and_create(result_folder, "Inference")
+  ssEnv$result_folderInference <- semseeker:::dir_check_and_create(result_folder, "Inference")
   update_session_info(ssEnv)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   # reshape to a teble with study as columns, area as rows and values as cell without aggreagtion
   aggregated_study_results_table <- reshape2::dcast(aggregated_study_results, AREA + SUBAREA + MARKER + FIGURE + AREA_OF_TEST ~ STUDY, value.var = pvalue_column)
   # aggregated_study_results_table <- na.omit(aggregated_study_results_table)
-  write.csv2(aggregated_study_results_table, file_path_build(ssEnv$result_folderInference, "aggregated_study_results_table", "csv"), row.names = F)
+  write.csv2(aggregated_study_results_table, semseeker:::file_path_build(ssEnv$result_folderInference, "aggregated_study_results_table", "csv"), row.names = F)
   studies_to_comb <- na.omit(unique(aggregated_study_results$STUDY))
   for( j in 2:length(studies_to_comb))
   {

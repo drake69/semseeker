@@ -36,7 +36,7 @@ build_data_set_from_geo <-  function(GEOgse, result_folder,maxResources, paralle
     samplesheet$Sentrix_ID <- ""
     samplesheet$Sentrix_Position <- ""
 
-    dir_check_and_create(result_folder,"/")
+    semseeker:::dir_check_and_create(result_folder,"/")
     if(downloadFiles==0)
       downloadFiles <- nrow(samplesheet)
 

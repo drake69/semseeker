@@ -7,7 +7,7 @@
 
 signal_range_values <- function(populationMatrix) {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   # populationMatrixDim <- dim(populationMatrix)
   populatioinMatrix <- as.data.frame(populationMatrix)

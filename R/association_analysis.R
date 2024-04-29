@@ -85,13 +85,13 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missed DEPTH analysis inference forced to 1.")
         }
 
-        study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+        study_summary <-   utils::read.csv2(semseeker:::file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
 
         # transform independent variable as factor
         if(family_test  ==  "binomial" || family_test  ==  "wilcoxon" || family_test  ==  "t.test")
           study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
 
-        result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
+        result_folderPivot <- semseeker:::dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
         file_result_prefix <- paste(depth_analysis, as.character(independent_variable),sep = "_")
 
@@ -154,7 +154,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               cols <- cols[cols %in% colnames(study_summary)]
               keys$AREA  =  "SAMPLE_GROUP"
               keys$SUBAREA  =  "SAMPLE"
-              iters <- length(cols)
+              g_end <- length(cols)
 
               if(!is.null(covariates) && !length(covariates)  ==  0)
                 study_summary_local <- study_summary[, c(independent_variable, covariates, cols,"Sample_Group") ]
@@ -195,8 +195,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   # study_summaryToPlot <- study_summary_local
                   # if(independent_variable  ==  "Sample_Group")
                   #   study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
-                  # chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"SAMPLE_GROUP_COMPARISON")
-                  # filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),"png")
+                  # chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,"SAMPLE_GROUP_COMPARISON")
+                  # filename  =  semseeker:::file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),"png")
                   # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
                   # # graphics::par(mfrow = c(1,3))
                   # study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")] <- as.numeric(study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")])
@@ -261,8 +261,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   if(exists("tempDataFrame"))
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
-                  pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
-                  fname <-file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv", add_gz=TRUE)
+                  pivot_subfolder <- semseeker:::dir_check_and_create(result_folderPivot, key$MARKER)
+                  fname <- semseeker:::file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv", add_gz=TRUE)
                   if (file.exists(fname))
                   {
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", fname,".")
@@ -349,7 +349,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
               save_result(results,fileNameResults, family_test, filter_p_value )
             }
-            save_result(results,fileNameResults)
+            save_result(results,fileNameResults, family_test, filter_p_value )
 
             if(exists("result_temp_foreach"))
               rm(result_temp_foreach)

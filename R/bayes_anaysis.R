@@ -39,9 +39,9 @@ bayes_analysis <-
     sample_groups <- c("Reference", "Control", "Case")
 
     create_excel_pivot()
-    result_folderPivot <- dir_check_and_create(ssEnv$result_folderData, "Pivots")
+    result_folderPivot <- semseeker:::dir_check_and_create(ssEnv$result_folderData, "Pivots")
 
-    study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+    study_summary <-   utils::read.csv2(semseeker:::file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
     if (independent_variable=="Sample_Group")
       study_summary <- study_summary[, c("Sample_Group","Sample_ID")]
     else
@@ -51,7 +51,7 @@ bayes_analysis <-
     for (a in length(markers))
     {
       # a <- 2
-      fileNameResults <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(markers[a],"bayes_analisys"),extension = "csv")
+      fileNameResults <- semseeker:::file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(markers[a],"bayes_analisys"),extension = "csv")
 
       localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
       keys <- localKeys_1[localKeys_1$MARKER == markers[a], ]
@@ -77,8 +77,8 @@ bayes_analysis <-
         {
           # k <- 3
           key <- keys [k, ]
-          pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
-          fname <- file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv")
+          pivot_subfolder <- semseeker:::dir_check_and_create(result_folderPivot, key$MARKER)
+          fname <- semseeker:::file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv")
           if (file.exists(fname))
           {
             log_event("INFO: ",
@@ -195,7 +195,7 @@ bayes_analysis <-
       max_P_to_be_Case_cond_to_be_Epimutated <- max(results$P_to_be_Case_cond_to_be_Epimutated)
       results <- subset(results,results$P_to_be_Case_cond_to_be_Epimutated!=0 & results$P_to_be_Case_cond_to_be_Epimutated!=0)
       results <- subset(results,results$P_to_be_Case_cond_to_be_Epimutated== max_P_to_be_Case_cond_to_be_Epimutated)
-      fileNameResults <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(markers[a],"filtered_bayes_analisys"),extension = "csv")
+      fileNameResults <- semseeker:::file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(markers[a],"filtered_bayes_analisys"),extension = "csv")
       write.csv2(x = results, file = fileNameResults, row.names = FALSE)
 
       rm(results)

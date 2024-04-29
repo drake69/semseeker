@@ -1,7 +1,7 @@
 close_env <- function()
 {
 
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
 
   if (ssEnv$showprogress)
     progressr::handlers()

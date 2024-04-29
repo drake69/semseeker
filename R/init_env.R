@@ -35,52 +35,52 @@ init_env <- function(result_folder, maxResources = 90, ...)
   #allow export of object of 32gb with future
   options(future.globals.maxSize= 32 * 1024^3)
 
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
 
   # utils::data("PROBES")
   # utils::data("PROBES_CHR_CHR")
   ssEnv$seed <- 7658776
   set.seed(7658776)
-  ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
+  ssEnv$session_folder <-  semseeker:::dir_check_and_create(result_folder,c("Log"))
 
   log_event("INFO: ##############################################################################")
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
 
   arguments <- set_env_variable(ssEnv, arguments,"alpha",0.05)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"verbosity",1)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"sex_chromosome_remove",FALSE)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"opencl",FALSE)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"bonferroni_threshold",0.05)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"iqrTimes",3)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"sliding_window_size",11)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"epiquantile",4)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"maxResources",90)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"parallel_strategy","sequential")
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"tech","")
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"showprogress",FALSE)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"signal_intrasample",FALSE)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8','#b9ef92', '#ffefb6', '#cfebb6')
   arguments <- set_env_variable(ssEnv, arguments,"color_palette",original_colors)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   darker_colors <- grDevices::adjustcolor(original_colors, alpha.f = 0.5)
   darker_colors <- c("blue","red","purple","green","yellow","orange","brown")
   arguments <- set_env_variable(ssEnv, arguments,"color_palette_darker",darker_colors)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"cluster_workers",NULL)
-  ssEnv <- get_session_info(result_folder)
+  ssEnv <- semseeker:::get_session_info(result_folder)
 
   dry_run <- FALSE
   if(!is.null(arguments[["dry_run"]]))
@@ -92,18 +92,19 @@ init_env <- function(result_folder, maxResources = 90, ...)
   tmp <- tempdir()
   log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y")," data will saved in this folder:", result_folder)
   ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
-  ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
-  ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
-  ssEnv$result_folderPathway <-    dir_check_and_create(result_folder, "Pathway")
-  ssEnv$result_folderPhenotype <-    dir_check_and_create(result_folder, "Phenotype")
-  ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
-  ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
+  ssEnv$result_folderData <-  semseeker:::dir_check_and_create(result_folder, "Data")
+  ssEnv$result_folderChart <-    semseeker:::dir_check_and_create(result_folder, "Chart")
+  ssEnv$result_folderInference <-    semseeker:::dir_check_and_create(result_folder, "Inference")
+  ssEnv$result_folderPathway <-    semseeker:::dir_check_and_create(result_folder, "Pathway")
+  ssEnv$result_folderPhenotype <-    semseeker:::dir_check_and_create(result_folder, "Phenotype")
+  ssEnv$result_folderEuristic <-  semseeker:::dir_check_and_create(result_folder,"Euristic")
+  ssEnv$session_folder <-  semseeker:::dir_check_and_create(result_folder,c("Log"))
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
 
   if (sink.number() != 0)
     sink(NULL)
-  sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE, append = TRUE)
+  file_name <- paste(as.character(Sys.info()["nodename"]),"_session_output.log", sep="")
+  sink(file.path(ssEnv$session_folder,file_name), split = TRUE, append = TRUE)
 
   foreachIndex <- 0
 
@@ -121,8 +122,9 @@ init_env <- function(result_folder, maxResources = 90, ...)
   outFile <- file.path(ssEnv$session_folder, "cluster_r.out")
 
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
+  # options(future.globals.resolve = TRUE)
+  options(future.globals.maxSize = 5e8)
   doFuture::registerDoFuture()
-
 
   parallel_strategy <- ssEnv$parallel_strategy
   # TODO: improve planning parallel management using also cluster
@@ -152,6 +154,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
       log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work with a cluster with:", nCore," Cores")
     }
   }
+
   if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
      & parallel_strategy!="cluster")
   {
@@ -160,7 +163,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   }
 
 
-  # ssEnvTemp <- get_session_info(result_folder)
+  # ssEnvTemp <- semseeker:::get_session_info(result_folder)
   # if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
   # {
   #   # we had to return old session info this init could be called by other than semseeker function, it means

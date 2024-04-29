@@ -1,6 +1,6 @@
 log_event <- function(...)
 {
-  ssEnv <- get_session_info()
+  ssEnv <- semseeker:::get_session_info()
   # append log_event to log file
   log_events <- list(...)
   log_event_to_save <- ""
@@ -8,7 +8,8 @@ log_event <- function(...)
   {
     log_event_to_save <- paste0(log_event_to_save, log_events[i])
   }
-  log_file <- file.path(ssEnv$session_folder,"session_output.log")
+  file_name <- paste(as.character(Sys.info()["nodename"]),"_session_output.log", sep="")
+  log_file <- file.path(ssEnv$session_folder,file_name)
 
   if(is.null(ssEnv$verbosity))
     verbosity <- 4
