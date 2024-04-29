@@ -62,7 +62,7 @@ spearman_permutation <- function(family_test, sig.formula, tempDataFrame, indepe
   if (pvalue>1)
     pvalue <- 1
   # Compute average signal and p-value
-  if ((pvalue < 0.05) && (n_permutations_test < n_permutations))
+  if ((pvalue < ssEnv$alpha) && (n_permutations_test < n_permutations))
     permutation_vector <- replicate(n_permutations, compute_spearman_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle=TRUE))
   res$r_model <- "spearman_permutation"
 

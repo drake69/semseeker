@@ -9,12 +9,12 @@
 #' @export
 build_data_set_from_geo <-  function(GEOgse, result_folder,maxResources, parallel_strategy ,start_fresh, downloadFiles = 0, ...) {
 
-  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
+  # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 
   # check if GEOQuery package is installed
   if(!requireNamespace("GEOquery", quietly = TRUE))
   {
-    log_event("GEOquery package is not installed. Please install pathfindR package to use this function")
+    message("GEOquery package is not installed. Please install pathfindR package to use this function")
     return()
   }
 

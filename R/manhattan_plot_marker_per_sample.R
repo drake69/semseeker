@@ -1,9 +1,9 @@
 manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range = 1000:2000,
-  hyper_color = "blue",   hypo_color = "orange",   non_outlier_color = "grey", limit_label_color = "blue",
+  hyper_color = ssEnv$color_palette[1],   hypo_color = "orange",   non_outlier_color = "grey", limit_label_color = ssEnv$color_palette[1],
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
 
-  limit_line_color <- "red"
+  limit_line_color <- ssEnv$color_palette[2]
   limit_line_color_q <- "cyan"
   limit_line_color_median <- "black"
 

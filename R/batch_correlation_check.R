@@ -155,7 +155,7 @@ batch_correlation_check <- function() {
       dunn.result <- as.data.frame(t(dunn.result$res[c("Comparison","P.adj")]))
       colnames(dunn.result) <- dunn.result[1,]
       dunn.result <- dunn.result[-1,]
-      dunn.result$dunn.p.value <- any(dunn.result < 0.05)
+      dunn.result$dunn.p.value <- any(dunn.result < ssEnv$alpha)
       dunn.result$dim <- kk[y]
       dunn.result$kruskal.wallis.p.value <- k.result$p.value
       if(exists("dunn.results"))
@@ -170,7 +170,7 @@ batch_correlation_check <- function() {
     result_file <- file_path_build(batch_analysis_folder, c("batch_cor", as.character(key$MARKER), as.character(key$FIGURE)), "csv", add_gz=TRUE)
     utils::write.csv2(gzfile(result_cor),result_file,row.names = F)
 
-    result_cor <- subset(result_cor, result_cor$p.value < 0.05)
+    result_cor <- subset(result_cor, result_cor$p.value < ssEnv$alpha)
     result_cor <- subset(result_cor, result_cor$proportion < 0.7)
     if(!plyr::empty(result_cor))
     {

@@ -30,7 +30,7 @@ compute_mean_delta_permutation_gpu_single <- function(sig.formula,df, n_permutat
 {
     ssEnv <- get_session_info()
 
-    
+
     burden_var <- as.character(all.vars(sig.formula)[1])
     independent_var <- as.character(all.vars(sig.formula)[2])
     burden <- df[,burden_var]
@@ -121,7 +121,6 @@ compute_mean_delta_permutation_gpu <- function(sig.formula,df, n_permutations, s
 {
   ssEnv <- get_session_info()
 
-  
   # burden_var <- as.character(all.vars(sig.formula)[1])
   independent_var <- as.character(all.vars(sig.formula)[2])
   burden <- df[,-which(colnames(df) %in% c(independent_var))]
@@ -203,7 +202,7 @@ mean_permutation <- function(family_test, sig.formula, tempDataFrame, independen
   n_permutations <- as.numeric(mean_params[3])
   conf.level <- as.numeric(mean_params[4])
 
-  
+
 
   # Compute signal and p-value for n_permutations replications
   statistic_parameter <-  compute_mean_delta_permutation_cpu(sig.formula=sig.formula, df=tempDataFrame, shuffle = FALSE)

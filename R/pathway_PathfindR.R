@@ -1,6 +1,6 @@
 pathway_pathfindR <- function(study,
   path_db,  iterations = 10, exclude_beta= FALSE,
-  pvalue = 0.05, adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUEADJ_ALL_BH",
+  pvalue = 0.05, adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
 {
 
@@ -40,14 +40,14 @@ pathway_pathfindR <- function(study,
         db <- path_db[k]
         # i <- 13
         # db <- "KEGG"
-        # pvalue_column <- "PVALUEADJ_ALL_BH"
+        # pvalue_column <- "PVALUE_ADJ_ALL_BH"
 
         if(exists("existing_db"))
           existing_keys <- unique(pathway_report[pathway_report$source==db,"key"])
 
         if(ssEnv$showprogress)
           progress_bar(sprintf("Searching for pathway using pathfindR for %s",keys[i,]$COMBINED))
-        results_inference <- get_results_inference(inference_detail,keys[i,]$MARKER, pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method)
+        results_inference <- get_results_areas_inference(inference_detail,keys[i,]$MARKER, pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method)
         if (nrow(results_inference)==0)
           next
 

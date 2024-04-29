@@ -11,6 +11,8 @@
 deltar_single_sample <- function ( values, high_thresholds, low_thresholds, sample_detail, signal_medians, probe_features) {
 
   ssEnv <- get_session_info()
+  result <- data.frame()
+  result <- result[-1]
 
 
   dividend <- high_thresholds - low_thresholds
@@ -44,35 +46,49 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   dump_sample_as_bed_file(data_to_dump = deltarAnnotated_hypoSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","HYPO"),"bedgraph", add_gz=TRUE))
 
 
-  ### get deltar BOTH #########################################################
-  deltarAnnotated_both <- rbind(deltarAnnotated_hypoSorted, deltarAnnotated_hyperSorted)
-  deltarAnnotated_bothSorted <- sort_by_chr_and_start(deltarAnnotated_both)
-  deltarAnnotated_bothSorted <- subset(deltarAnnotated_bothSorted, deltarAnnotated_bothSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
+  if (any(ssEnv$keys_markers_figures$COMBINED=="DELTAR_BOTH"))
+  {
+    ### get deltar BOTH #########################################################
+    deltarAnnotated_both <- rbind(deltarAnnotated_hypoSorted, deltarAnnotated_hyperSorted)
+    deltarAnnotated_bothSorted <- sort_by_chr_and_start(deltarAnnotated_both)
+    deltarAnnotated_bothSorted <- subset(deltarAnnotated_bothSorted, deltarAnnotated_bothSorted$DELTA > 0)[, c("CHR", "START", "END", "DELTA")]
 
-  folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_BOTH"))
-  dump_sample_as_bed_file(data_to_dump = deltarAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTH"),"bedgraph", add_gz=TRUE))
+    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_BOTH"))
+    dump_sample_as_bed_file(data_to_dump = deltarAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTH"),"bedgraph", add_gz=TRUE))
+    result <- data.frame_add.column(result, "DELTAR_BOTH",mean(deltarAnnotated_bothSorted$DELTA, na.rm = TRUE))
+  }
 
+  if (any(ssEnv$keys_markers_figures$COMBINED=="DELTAR_BOTHSUM"))
+  {
+    ### get deltar BOTHSUM #########################################################
+    deltarAnnotated_hypoSorted_sign <- deltarAnnotated_hypoSorted
+    deltarAnnotated_hypoSorted_sign$DELTA <- (-1 * deltarAnnotated_hypoSorted_sign$DELTA)
+    deltarAnnotated_both_sum <- rbind(deltarAnnotated_hyperSorted, deltarAnnotated_hypoSorted_sign)
+    deltarAnnotated_both_sumSorted <- sort_by_chr_and_start(deltarAnnotated_both_sum)
+    deltarAnnotated_both_sumSorted <- subset(deltarAnnotated_both_sumSorted, deltarAnnotated_both_sumSorted$DELTA != 0)[, c("CHR", "START", "END", "DELTA")]
+
+    folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_BOTHSUM"))
+    dump_sample_as_bed_file(data_to_dump = deltarAnnotated_both_sumSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTHSUM"),"bedgraph", add_gz=TRUE))
+    result <- data.frame_add.column(result, "DELTAR_BOTHSUM",mean(deltarAnnotated_both_sumSorted$DELTA, na.rm = TRUE))
+  }
 
   ### get deltar from medians #########################################################
 
   # deltar <- data.frame("DELTA"= values - signal_medians, row.names = probe_features$PROBE)
   # colnames(deltar) <- "DELTA"
 
-  result <- ""
-  result <- result[-1]
-  deltar_to_check <- c(deltarAnnotated_hypoSorted$DELTA, deltarAnnotated_hyperSorted$DELTA, deltarAnnotated_bothSorted$DELTA)
+  deltar_to_check <- c(deltarAnnotated_hypoSorted$DELTA, deltarAnnotated_hyperSorted$DELTA)
   if (length(deltar_to_check)>0)
     if( (min(deltar_to_check)<0))
     {
       log_event(min(deltarAnnotated_hypoSorted$DELTA))
       log_event(min(deltarAnnotated_hyperSorted$DELTA))
-      log_event(min(deltarAnnotated_bothSorted$DELTA))
       stop("ERROR: I'm stopping here the deltar have negative values!")
     }
-  result["DELTAR_HYPO"] <- mean(deltarAnnotated_hypoSorted$DELTA, na.rm = TRUE)
-  result["DELTAR_HYPER"] <- mean(deltarAnnotated_hyperSorted$DELTA, na.rm = TRUE)
-  result["DELTAR_BOTH"] <- mean(deltarAnnotated_bothSorted$DELTA, na.rm = TRUE)
-
+  result <- data.frame_add.column(result, "DELTAR_HYPO",mean(deltarAnnotated_hypoSorted$DELTA, na.rm = TRUE))
+  result <- data.frame_add.column(result, "DELTAR_HYPER",mean(deltarAnnotated_hyperSorted$DELTA, na.rm = TRUE))
+  # fill NA with 0
+  result[is.na(result)] <- 0
 
   return(result)
 }

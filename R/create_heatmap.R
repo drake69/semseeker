@@ -57,7 +57,7 @@ create_heatmap <- function() {
             mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
           }
 
-          # col<- colorRampPalette(c("violet","white","blue"))(1024)
+          # col<- colorRampPalette(c("violet","white",ssEnv$color_palette[1]))(1024)
           # skip heatmap if no enough data are available
           tt <- as.data.frame(annotatedData[,3:ncol(annotatedData)])
           if (!plyr::empty(tt))

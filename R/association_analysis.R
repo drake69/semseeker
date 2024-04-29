@@ -9,7 +9,7 @@
 #' MUTATIONS_* ~ tcdd_mother + exam_age
 #' transformation to be applied to dependent variable
 #' (mutations and lesions): scale, log, log2, log10, exp, none, quantile_quantiles(as number) eg quantile_3
-#' depth analysis:
+#' DEPTH analysis:
 #' 1: sample level
 #' 2: type level (gene, DMR, cpgisland) (includes 1)
 #' 3: genomic area: gene, body, gene tss1550, gene whole, gene tss200,  (includes 1 and 2)
@@ -32,9 +32,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   arguments <- list(...)
   areas_selection <- c()
   if(!is.null(arguments[["areas_selection"]]))
-  {
     areas_selection <-arguments$areas_selection
-  }
+
 
   localKeys <- ssEnv$keys_markers_figures
   sample_groups <- c("Reference","Control","Case")
@@ -55,18 +54,15 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
     covariates <- inference_detail$covariates
     covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
+    # remove covariates with length zero
+    covariates <- covariates[lengths(covariates)  !=  0]
+    covariates <- covariates[covariates  !=  ""]
     family_test <- inference_detail$family_test
-    if( is.null(family_test) || length(family_test)  ==  0)
-    {
-      log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " One test family_test is missed! Skipped.")
-    }
-    else
+    if (validate_family_test(family_test))
     {
       transformation <- inference_detail$transformation
       if(is.null(transformation) || length(transformation)  ==  0)
-      {
         transformation <- NULL
-      }
 
       independent_variable <- gsub(" ","", inference_detail$independent_variable)
 
@@ -86,7 +82,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         if( is.null(depth_analysis) || length(depth_analysis)  ==  0)
         {
           depth_analysis <- 1
-          log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missed depth analysis inference forced to 1.")
+          log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missed DEPTH analysis inference forced to 1.")
         }
 
         study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
@@ -134,7 +130,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           }
           else
           {
-            sample_names <-   sample_names[, c("Sample_ID", independent_variable)]
+            sample_names <-   unique(sample_names[, c("Sample_ID", independent_variable)])
             colnames(sample_names) <- c("Sample_ID", independent_variable)
           }
           ######################################################################################################
@@ -167,13 +163,13 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
               fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
 
+              # browser()
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
               # clean keys from already done association
               if(file_good)
               {
-                old_results <- utils::read.csv2(fileNameResults, header  =  T)
-                old_results_filtered <- old_results[old_results$AREA  ==  "SAMPLE_GROUP",]
-                old_results_filtered <- old_results_filtered[old_results_filtered$SUBAREA  ==  "SAMPLE",]
+                old_results <- unique(utils::read.csv2(fileNameResults, header  =  T))
+                old_results_filtered <- old_results[old_results$DEPTH == 1,]
                 keys_markers_figures_areas_done <- unlist(apply(unique(old_results_filtered [, c("MARKER","FIGURE","AREA","SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA","SUBAREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
@@ -186,32 +182,35 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   key$FIGURE <- as.character(key$FIGURE)
                   key$MARKER <- as.character(key$MARKER)
                   g_start <- 2 + length(covariates)
-                  result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, c(independent_variable, covariates, key$COMBINED)], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
+                  column_selectors <- c(independent_variable, covariates, key$COMBINED)
+                  # remove empty items
+                  column_selectors <- column_selectors[column_selectors != ""]
+                  result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
                     key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
                   if (exists("results"))
                     results <- plyr::rbind.fill(results, result_temp)
                   else
                     results <- result_temp
 
-                  study_summaryToPlot <- study_summary_local
-                  if(independent_variable  ==  "Sample_Group")
-                    study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
-                  chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"SAMPLE_GROUP_COMPARISON")
-                  filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),"png")
-                  grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-                  # graphics::par(mfrow = c(1,3))
-                  study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")] <- as.numeric(study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")])
-                  formula <- as.formula(paste(key$MARKER,"_", key$FIGURE,"~",independent_variable, sep=""))
-                  title <- paste(key$MARKER," ", key$FIGURE, sep="")
-                  graphics::boxplot( formula , main = title, data  =  study_summaryToPlot, cex = 2)
-                  grDevices::dev.off()
+                  # study_summaryToPlot <- study_summary_local
+                  # if(independent_variable  ==  "Sample_Group")
+                  #   study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
+                  # chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"SAMPLE_GROUP_COMPARISON")
+                  # filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),"png")
+                  # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
+                  # # graphics::par(mfrow = c(1,3))
+                  # study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")] <- as.numeric(study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")])
+                  # formula <- as.formula(paste(key$MARKER,"_", key$FIGURE,"~",independent_variable, sep=""))
+                  # title <- paste(key$MARKER," ", key$FIGURE, sep="")
+                  # graphics::boxplot( formula , main = title, data  =  study_summaryToPlot, cex = 2)
+                  # grDevices::dev.off()
                 }
 
               if (exists("results"))
                 if (!is.null(dim(results)))
                   if (nrow(results)>0)
-                    if("PVALUEADJ" %in% colnames(results))
-                      results <- results[order(results$PVALUEADJ),]
+                    if("PVALUE_ADJ" %in% colnames(results))
+                      results <- results[order(results$PVALUE_ADJ),]
 
               if (exists("old_results"))
               {
@@ -222,9 +221,15 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 rm(old_results)
               }
 
-              utils::write.csv2(results, fileNameResults , row.names  =  FALSE)
+              results[results == ""] <- NA
+              # remove columns where all rows are NA
+              results <- results[, colSums(is.na(results)) < nrow(results)]
+              # utils::write.csv2(results, fileNameResults , row.names  =  FALSE)
             }
 
+
+            # browser()
+            # execute for all the areas
             if(depth_analysis>1)
             {
               localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
@@ -233,12 +238,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               # clean keys from already done association
               fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  >10
+              dototal <- TRUE
               # clean keys from already done association
               if(file_good)
               {
-                old_results <- utils::read.csv2(fileNameResults, header  =  T)
-                old_results_filtered <- old_results[old_results$AREA  !=  "SAMPLE_GROUP",]
-                old_results_filtered <- old_results_filtered[old_results_filtered$SUBAREA  !=  "SAMPLE",]
+                old_results <- unique(utils::read.csv2(fileNameResults, header  =  T))
+                old_results_filtered <- old_results[(old_results$DEPTH  !=  1),]
+                dototal <- !any(old_results_filtered$DEPTH == 2)
+                old_results_filtered <- old_results_filtered[(old_results_filtered$DEPTH !=2),]
                 keys_markers_figures_areas_done <- unlist(apply(unique(old_results_filtered [, c("MARKER","FIGURE","AREA","SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA","SUBAREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
@@ -259,18 +266,30 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   if (file.exists(fname))
                   {
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", fname,".")
-                    tempDataFrame <- utils::read.table(gzfile(fname), sep  =  ";")
-                    #assign the area name (eg gene...) to the rows
-                    # has SAMPLEID as name but is the genomic area
-                    row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+                    tempDataFrame <- utils::read.table(gzfile(fname), sep  =  ";", header  =  T)
+                    tempDataFrame <- plyr::rename(tempDataFrame, c("SAMPLEID"  =  "Sample_ID"))
+                    #removes area name (eg. sample_group name)
+                    tempDataFrame <- tempDataFrame[-1,]
                     if(length(areas_selection)>0)
                     {
-                      names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
-                      areas_selection <- gsub(":","_",gsub("'","_",gsub("-","_",areas_selection)))
-                      tempDataFrame <- tempDataFrame[ names_area %in% areas_selection, ]
+                      # # browser()
+                      # check if areas_selection is a range
+                      if(length(areas_selection)==1)
+                      {
+                        if (grepl(":",areas_selection))
+                        {
+                          areas_selection <- unlist(strsplit(areas_selection,":"))
+                          areas_selection <- seq(from  =  as.numeric(areas_selection[1]), to  =  as.numeric(areas_selection[2]))
+                          tempDataFrame <- tempDataFrame[areas_selection, ]
+                        }
+                      }
+                      else
+                      {
+                        areas_selection <- gsub(":","_",gsub("'","_",gsub("-","_",areas_selection)))
+                        names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
+                        tempDataFrame <- tempDataFrame[ names_area %in% areas_selection, ]
+                      }
                     }
-                    #removes area name (eg. gene...)
-                    tempDataFrame <- tempDataFrame[,-1]
                     if(is.null(dim(tempDataFrame)))
                       next
                     if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
@@ -283,18 +302,16 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrameBatch <- tempDataFrame
                     tempDataFrameBatch <- t(tempDataFrameBatch)
                     tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                    colnames(tempDataFrameBatch) <- tempDataFrameBatch[1,]
+                    tempDataFrameBatch <- tempDataFrameBatch[-1,]
                     tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
                     if(nrow(tempDataFrameBatch)>1)
                     {
-                      tempDataFrameBatch <- subset(tempDataFrameBatch, "SAMPLE_GROUP"  !=   "Reference")
-                      tempDataFrameBatch <- subset(tempDataFrameBatch, "SAMPLE_GROUP"  !=   0)
                       tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
                       tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                      tempDataFrameBatch$SAMPLE_GROUP <- sample_names[, independent_variable]
                       tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
-                      tempDataFrameBatch[, independent_variable] <- sample_names[, independent_variable]
-                      tempDataFrameBatch <- tempDataFrameBatch[, !(names(tempDataFrameBatch) %in% c("SAMPLE_GROUP","Sample_ID"))]
+                      tempDataFrameBatch <- tempDataFrameBatch[,-1]
                       cols <- (gsub(" ", "_", colnames(tempDataFrameBatch)))
                       cols <- (gsub("-", "_", cols))
                       cols <- (gsub(":", "_", cols))
@@ -306,23 +323,17 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       colnames(tempDataFrameBatch) <- cols
                       g_start <- 2 + length(covariates)
                       result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
-                        key  =  key, transformation =  transformation, dototal  =  TRUE,
+                        key  =  key, transformation =  transformation, dototal  =  dototal,
                         session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
-
-                      #
 
                       if(!exists("results"))
                         results <- result_temp_local_batch
                       else
                         results <- plyr::rbind.fill(results, result_temp_local_batch)
-
-                      utils::write.csv2(results, fileNameResults , row.names  =  FALSE)
-
-                      # result_temp_local_batch
                     }
                   }
+                  save_result(results,fileNameResults, family_test, filter_p_value )
                 }
-
 
               if (exists("old_results"))
               {
@@ -333,72 +344,75 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 rm(old_results)
               }
 
-              if(!exists("results"))
+              if(!exists("results") | is.null(results))
                 next
 
-              results <- unique(results)
-              # check column PVALUE exists
-              if("PVALUE" %in% colnames(results))
-              {
-                results[,"PVALUEADJ_ALL_BH"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BH")
-                results[,"PVALUEADJ_ALL_BY"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BY")
-                results[,"PVALUEADJ_ALL_FDR"] <- stats::p.adjust(results[,"PVALUE"],method  =  "fdr")
-                if (exists("results"))
-                  if (nrow(results)>0)
-                    results <- results[order(results$PVALUEADJ),]
-
-                if(filter_p_value)
-                  results <- subset(results, results$PVALUE < 0.05 | results$PVALUEADJ < 0.05)
-              }
-
-
-              if(family_test=="kruskal.test")
-              {
-                # get columns where colnames start with PVALUE_KW_
-                kw_columns <- colnames(results)[grepl("^PVALUE_KW_", colnames(results))]
-                for (colname in kw_columns)
-                {
-
-                  # colname <- kw_columns[c]
-                  if (grepl(colname,"_ADJ_BH"))
-                    next
-                  adj_colname <- paste0(colname,"_ADJ_BH")
-                  results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BH")
-                  adj_colname <- paste0(colname,"_ADJ_BY")
-                  results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BY")
-                  adj_colname <- paste0(colname,"_ADJ_fdr")
-                  results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "fdr")
-                }
-              }
-
-              if (is.null(results))
-                next
-
-              # remove columns where all rows are NA
-              results <- results[, colSums(is.na(results)) < nrow(results)]
-              utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
-              if(exists("result_temp_foreach"))
-                rm(result_temp_foreach)
-              if(exists("result_temp_local_batch"))
-                rm(result_temp_local_batch)
-              if(exists("tempDataFrame"))
-                rm(tempDataFrame)
-
+              save_result(results,fileNameResults, family_test, filter_p_value )
             }
+            save_result(results,fileNameResults)
+
+            if(exists("result_temp_foreach"))
+              rm(result_temp_foreach)
+            if(exists("result_temp_local_batch"))
+              rm(result_temp_local_batch)
+            if(exists("tempDataFrame"))
+              rm(tempDataFrame)
+
           }
-          # remove columns where all rows are NA
-          results <- results[, colSums(is.na(results)) < nrow(results)]
-          utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
-          if(exists("result_temp_foreach"))
-            rm(result_temp_foreach)
-          if(exists("result_temp_local_batch"))
-            rm(result_temp_local_batch)
-          if(exists("tempDataFrame"))
-            rm(tempDataFrame)
         }
       }
     }
   }
 
   close_env()
+}
+
+save_result <- function(results,fileNameResults, family_test, filter_p_value ){
+
+  results <- unique(results)
+
+  # check column PVALUE exists
+  if("PVALUE" %in% colnames(results))
+  {
+    results[,"PVALUE_ADJ_ALL_BH"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BH")
+    results[,"PVALUE_ADJ_ALL_BY"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BY")
+    results[,"PVALUE_ADJ_ALL_FDR"] <- stats::p.adjust(results[,"PVALUE"],method  =  "fdr")
+    if (exists("results"))
+      if (nrow(results)>0)
+        results <- results[order(results$PVALUE_ADJ),]
+
+    if(filter_p_value)
+      results <- subset(results, results$PVALUE < ssEnv$alpha | results$PVALUE_ADJ < ssEnv$alpha)
+  }
+
+
+  if(family_test=="kruskal.test")
+  {
+    # get columns where colnames start with PVALUE_KW_
+    kw_columns <- colnames(results)[grepl("^PVALUE_KW_", colnames(results))]
+    for (colname in kw_columns)
+    {
+
+      # colname <- kw_columns[c]
+      if (grepl(colname,"_ADJ_BH"))
+        next
+      adj_colname <- paste0(colname,"_ADJ_BH")
+      results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BH")
+      adj_colname <- paste0(colname,"_ADJ_BY")
+      results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BY")
+      adj_colname <- paste0(colname,"_ADJ_fdr")
+      results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "fdr")
+    }
+  }
+
+  results$DEPTH <- 3
+  results[results$SUBAREA=="SAMPLE","DEPTH"] <- 1
+  results[results$AREA_OF_TEST=="TOTAL","DEPTH"] <- 2
+  # replace empty with NA
+  results[results == ""] <- NA
+  results[results == " "] <- NA
+  # remove columns where all rows are NA
+  results <- results[, colSums(is.na(results)) < nrow(results)]
+  utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
+
 }

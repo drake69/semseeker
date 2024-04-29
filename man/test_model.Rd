@@ -9,7 +9,9 @@ test_model(
   tempDataFrame,
   sig.formula,
   burdenValue,
-  independent_variable
+  independent_variable,
+  transformation,
+  plot
 )
 }
 \arguments{

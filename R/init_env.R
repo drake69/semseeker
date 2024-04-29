@@ -21,6 +21,9 @@ init_env <- function(result_folder, maxResources = 90, ...)
 
   arguments <- list(...)
 
+  # remove all spaces from all items of arguments
+  arguments <- lapply(arguments, function(x) gsub(" ", "", x))
+
   start_fresh <- TRUE
   if(!is.null(arguments[["start_fresh"]]))
     start_fresh <- arguments$start_fresh
@@ -40,9 +43,11 @@ init_env <- function(result_folder, maxResources = 90, ...)
   set.seed(7658776)
   ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
 
-  log_event("DEBUG: ##############################################################################")
-  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
+  log_event("INFO: ##############################################################################")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
 
+  arguments <- set_env_variable(ssEnv, arguments,"alpha",0.05)
+  ssEnv <- get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"verbosity",1)
   ssEnv <- get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"sex_chromosome_remove",FALSE)
@@ -67,10 +72,25 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv <- get_session_info(result_folder)
   arguments <- set_env_variable(ssEnv, arguments,"signal_intrasample",FALSE)
   ssEnv <- get_session_info(result_folder)
+  original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8','#b9ef92', '#ffefb6', '#cfebb6')
+  arguments <- set_env_variable(ssEnv, arguments,"color_palette",original_colors)
+  ssEnv <- get_session_info(result_folder)
+  darker_colors <- grDevices::adjustcolor(original_colors, alpha.f = 0.5)
+  darker_colors <- c("blue","red","purple","green","yellow","orange","brown")
+  arguments <- set_env_variable(ssEnv, arguments,"color_palette_darker",darker_colors)
+  ssEnv <- get_session_info(result_folder)
+  arguments <- set_env_variable(ssEnv, arguments,"cluster_workers",NULL)
+  ssEnv <- get_session_info(result_folder)
 
+  dry_run <- FALSE
+  if(!is.null(arguments[["dry_run"]]))
+    dry_run <- arguments$dry_run
+  arguments[["dry_run"]] <- NULL
+  if(dry_run)
+    ssEnv$verbosity <- 4
 
   tmp <- tempdir()
-  log_event("INFO:",format(Sys.time(), "%a %b %d %X %Y")," data will saved in this folder:", result_folder)
+  log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y")," data will saved in this folder:", result_folder)
   ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
@@ -118,9 +138,19 @@ init_env <- function(result_folder, maxResources = 90, ...)
   }
   if(parallel_strategy=="cluster")
   {
-    log_event ("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Cluster feature not implemented!")
-    stop("I'm STOPPING HERE!")
-    future::plan( future::cluster, workers = nCore)
+    # log_event ("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Cluster feature not implemented!")
+    # stop("I'm STOPPING HERE!")
+    if (!is.null(ssEnv$cluster_workers))
+    {
+      future::plan( future::cluster, workers = ssEnv$cluster_workers)
+      log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work with a cluster with:",ssEnv$cluster_workers)
+      # ssEnv$showprogress <- FALSE
+    }
+    else
+    {
+      future::plan( future::cluster, workers = nCore)
+      log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work with a cluster with:", nCore," Cores")
+    }
   }
   if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
      & parallel_strategy!="cluster")
@@ -128,7 +158,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
     future::plan( future::sequential)
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in sequential mode")
   }
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in parallel with:", nCore, " Cores")
+
 
   # ssEnvTemp <- get_session_info(result_folder)
   # if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
@@ -148,7 +178,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   # }
 
   # set default values
-  keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
+  keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH","BOTHSUM"))
 
   ssEnv$keys_figures_default <- keys_figures_default
 
@@ -178,7 +208,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   markers <- if(is.null(arguments[["markers"]]))  keys_markers_default[,1] else arguments$markers
   arguments[["markers"]] <- NULL
 
-  areas <- if(is.null(arguments[["areas"]]))  keys_areas_default[,1] else arguments$areas
+  areas <- if(is.null(arguments[["areas"]]))  keys_areas_default[,1] else unique(arguments$areas)
   arguments[["areas"]] <- NULL
 
   # check parameters passed by user left areas, figures and anomnalies to work on
@@ -264,7 +294,9 @@ init_env <- function(result_folder, maxResources = 90, ...)
 
   combine_not_empty <- function(x)
   {
-    paste0(x[x!=""], collapse = "_")
+    # paste0(x[x!=""], collapse = "_")
+    # remove spaces
+    gsub(" ","",paste0(x[x!=""], collapse = "_"))
   }
 
   # force the only FIGURE of SIGNAL as MEAN
@@ -334,7 +366,20 @@ init_env <- function(result_folder, maxResources = 90, ...)
 
   # check length of arguments
   if(length(arguments)!=0)
-    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
+  {
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
+    stop()
+    }
+
+
+  if(dry_run)
+    {
+      # out at console as pretty table
+
+      knitr::kable(as.data.frame(ssEnv$keys_areas_subareas_markers_figures), format = "pipe", caption = "Selection:")
+      message(ssEnv$keys_areas_subareas_markers_figures)
+      stop("INFO: Dry run is requested. Exiting now.")
+    }
 
   return(ssEnv)
 }

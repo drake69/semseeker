@@ -2,7 +2,8 @@ test_that("log-event", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures = "BOTH", markers = "DELTAS", areas = "GENE")
+  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90,
+    figures = "BOTH", markers = "DELTAS", areas = "GENE")
 
   # log event
   semseeker:::log_event("GEOquery package is not installed. Please install pathfindR package to use this function")

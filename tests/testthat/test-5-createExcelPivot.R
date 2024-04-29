@@ -2,7 +2,8 @@ test_that("create_excel_pivot", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, start_fresh=TRUE)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, start_fresh=TRUE,
+    showprogress = FALSE, verbosity=verbosity)
 
   ####################################################################################
   # save sampèle sheet
@@ -19,10 +20,10 @@ test_that("create_excel_pivot", {
     probe_features = probe_features
   )
 
-  multiple <- semseeker:::create_multiple_bed(mySampleSheet)
+  semseeker:::create_multiple_bed(mySampleSheet)
   dq <- deltaq_get(mySampleSheet)
   drq <- deltarq_get(mySampleSheet)
-  semseeker:::annotate_bed()
+  # semseeker:::annotate_bed()
 
   ####################################################################################
 
@@ -31,7 +32,7 @@ test_that("create_excel_pivot", {
   areas=c("GENE","ISLAND","DMR","CHR","PROBE", "SIGNAL")
   subarea=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE", "N_SHORE","S_SHORE","N_SHELF","S_SHELF")
   markers <-c("MUTATIONS","DELTAS","DELTAQ","DELTARQ","DELTAR")
-  figures <- c("HYPO","HYPER","BOTH","MEAN")
+  figures <- c("HYPO","HYPER","BOTH","MEAN","BOTHS")
 
   area = "GENE"
   subarea="WHOLE"

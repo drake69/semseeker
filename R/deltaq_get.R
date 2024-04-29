@@ -16,6 +16,8 @@ deltaq_get <- function(resultPopulation){
   # must use keys_markers_figure_default because the selected marker could exclude deltas which is basic for deltaq
   localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figure_default,Sample_Group)
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAS")
+  localKeys <- subset(localKeys, localKeys$FIGURE!="BOTHSUM")
+  localKeys <- subset(localKeys, localKeys$FIGURE!="BOTH")
   localKeys$EXT <- "fst"
 
   progress_bar <- ""
@@ -47,7 +49,14 @@ deltaq_get <- function(resultPopulation){
      stop("Something wrong with multiple bed files!")
   }
 
-  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n=ssEnv$epiquantile))
+  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n= as.numeric(ssEnv$epiquantile)))
+  deltaq_both <- deltaq
+  deltaq_both$FIGURE <- "BOTH"
+  deltaq_both_sum <- deltaq
+  deltaq_both_sum$DELTAQ <- ifelse((deltaq_both_sum$FIGURE=="HYPO"), -1 * deltaq_both_sum$DELTAQ ,deltaq_both_sum$DELTAQ )
+  deltaq_both_sum$FIGURE <- "BOTHSUM"
+  deltaq <- rbind(deltaq, deltaq_both, deltaq_both_sum)
+
   localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figure_default, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAQ")

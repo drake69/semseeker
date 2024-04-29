@@ -16,7 +16,7 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
     & "INDIPENDENT.VARIABLE"==independent_variable)
 
   #pivot hase SAMPLEID over the genomic area of interest
-  areas <- areas[areas$SAMPLEID %in% results_inference[results_inference$PVALUEADJ_ALL_BH<0.05, "AREA_OF_TEST"], ]
+  areas <- areas[areas$SAMPLEID %in% results_inference[results_inference$PVALUE_ADJ_ALL_BH< ssEnv$alpha, "AREA_OF_TEST"], ]
 
   sample_name <- colnames(areas)
   colnames(areas) <- areas[1,]

@@ -1,6 +1,6 @@
 pathway_WebGestalt <- function(study,
   types=c("BP","MF"),  enrich_methods = c("ORA"),
-  pvalue = 0.05, adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUEADJ_ALL_BH",
+  pvalue = 0.05, adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details,result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
 
@@ -42,7 +42,7 @@ pathway_WebGestalt <- function(study,
         if(ssEnv$showprogress)
           progress_bar(sprintf("Searching for disease using webgestalt: %s with %s and %s",keys[i,]$COMBINED,enrich_method,type))
         key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
-        results_inference <- get_results_inference(inference_details,keys[i,"MARKER"], pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method)
+        results_inference <- get_results_areas_inference(inference_details,keys[i,"MARKER"], pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method)
         if (nrow(results_inference)==0)
           next
 
@@ -89,7 +89,7 @@ pathway_WebGestalt <- function(study,
           enrichResult$enrich_method <- enrich_method
           enrichResult$key <- key
 
-          if(min(enrichResult$FDR) < 0.05)
+          if(min(enrichResult$FDR) < ssEnv$alpha)
           {
             plotFileName = file_path_build(path,projectName,"png")
             grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")

@@ -21,7 +21,7 @@ tipi di correlazioni: pearson, kendall, spearman
 MUTATIONS_* ~ tcdd_mother + exam_age
 transformation to be applied to dependent variable
 (mutations and lesions): scale, log, log2, log10, exp, none, quantile_quantiles(as number) eg quantile_3
-depth analysis:
+DEPTH analysis:
 1: sample level
 2: type level (gene, DMR, cpgisland) (includes 1)
 3: genomic area: gene, body, gene tss1550, gene whole, gene tss200,  (includes 1 and 2)

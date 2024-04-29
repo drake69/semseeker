@@ -3,6 +3,7 @@ deltarq_get <- function(resultPopulation){
 
   ssEnv <- get_session_info()
 
+  # local_deltarq <- paste0("DELTARQ",ssEnv$epiquantile, sep="")
   #create multiple file bed
   variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "ssEnv", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
     ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
@@ -12,9 +13,11 @@ deltarq_get <- function(resultPopulation){
   Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
 
-  # must use keys_markers_figure_default because the selected marker could exclude deltar which is basilar for deltarq
+  # must use keys_markers_figure_default because the selected marker could exclude deltar which is basic for deltarq
   localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figure_default,Sample_Group)
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAR")
+  localKeys <- subset(localKeys, localKeys$FIGURE!="BOTHSUM")
+  localKeys <- subset(localKeys, localKeys$FIGURE!="BOTH")
   localKeys$EXT <- "fst"
 
   progress_bar <- ""
@@ -46,7 +49,14 @@ deltarq_get <- function(resultPopulation){
     stop("Something wrong with multiple bed files!")
   }
 
-  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=ssEnv$epiquantile))
+  deltarq$DELTARQ <- as.numeric(dplyr::ntile(x=deltarq[,"VALUE"] , n=as.numeric(ssEnv$epiquantile)))
+  deltarq_both <- deltarq
+  deltarq_both$FIGURE <- "BOTH"
+  deltarq_both_sum <- deltarq
+  deltarq_both_sum$DELTARQ <- ifelse((deltarq_both_sum$FIGURE=="HYPO"), (-1 * deltarq_both_sum$DELTARQ) , deltarq_both_sum$DELTARQ)
+  deltarq_both_sum$FIGURE <- "BOTHSUM"
+  deltarq <- rbind(deltarq, deltarq_both, deltarq_both_sum)
+
   localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figure_default, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTARQ")
@@ -54,6 +64,7 @@ deltarq_get <- function(resultPopulation){
   progress_bar <- ""
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
+
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
@@ -74,7 +85,7 @@ deltarq_get <- function(resultPopulation){
 
         tempDataFrame <- reshape2::dcast(data = localFileRes, formula = SAMPLEID  ~ ., value.var = "VALUE",fun.aggregate = sum, drop = TRUE)
         colnames(tempDataFrame) <- c("SAMPLEID","VALUE")
-        lbl <- rep(paste("DELTARQ",key$SUFFIX,"_",as.character(key$FIGURE),sep=""), nrow(tempDataFrame))
+        lbl <- rep(paste("DELTARQ", key$SUFFIX,"_",as.character(key$FIGURE),sep=""), nrow(tempDataFrame))
         data.frame("LABEL"=lbl, tempDataFrame)
 
         if(exists("deltarq_summary"))
@@ -85,6 +96,7 @@ deltarq_get <- function(resultPopulation){
     }
     if(ssEnv$showprogress)
       progress_bar(sprintf("Binding bed files."))
+
   }
 
   if(!plyr::empty(deltarq_summary))

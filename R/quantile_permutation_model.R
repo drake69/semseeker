@@ -41,9 +41,9 @@ quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   # quantile_params template quantile + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta
   # apply permutation to obtain signal using quantile
   # Define function to compute delta quantile regression coefficient
-  res <- data.frame()
+
   n_permutations_test <- as.numeric(quantile_params[2])
-  res$n_permutations <- n_permutations_test
+  res <- data.frame(n_permutations = n_permutations_test)
 
   n_permutations <- as.numeric(quantile_params[3])
   conf.level <- as.numeric(quantile_params[4])

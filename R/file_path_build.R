@@ -1,5 +1,6 @@
 file_path_build <- function(baseFolder, detailsFilename, extension, add_gz = FALSE){
 
+  # detailsFilename <- as.vector(sapply(detailsFilename, toupper))
   detailsFilename <- as.vector(sapply(detailsFilename, as.character))
   # remove empty strings
   detailsFilename <- detailsFilename[detailsFilename != ""]

@@ -1,6 +1,6 @@
 phenotype_phenolyzer <- function(study,
   disease,phenolyzer_folder_bin,minimum_score = 0.5,
-  pvalue = 0.05, adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUEADJ_ALL_BH",
+  pvalue = 0.05, adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details,result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
 
@@ -47,7 +47,7 @@ phenotype_phenolyzer <- function(study,
     if(file.exists(phenotype_report_path))
       next
 
-    results_inference <- get_results_inference(inference_details,keys[i,"MARKER"], pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method)
+    results_inference <- get_results_areas_inference(inference_details,keys[i,"MARKER"], pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method)
     if (nrow(results_inference)==0)
       next
     if(keys[i,]$SUBAREA=="WHOLE")

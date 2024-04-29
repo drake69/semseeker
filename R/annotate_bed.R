@@ -23,7 +23,7 @@ annotate_bed <- function ()
                             "file_path_build","%>%")
 
   # for(i in 1:nrow(localKeys))
-  result <- foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export, .combine = rbind) %dorng%
+  result <- foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export, .combine = max) %dorng%
     {
       # i <- 1
       for (g in 1:nrow(ssEnv$keys_sample_groups))
@@ -37,11 +37,8 @@ annotate_bed <- function ()
         area <- as.character(localKeys[i,"AREA"])
         area_subarea <- paste(area,"_", subarea, sep="")
 
-        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"csv", add_gz = TRUE)
+        bedFileName <- file_path_build(dest_folder , c(marker, figure, area,subarea, "Annotated"),"fst")
 
-        # "DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst"
-        # if (grepl("DELTARQ_BOTH_PROBE_WHOLE_Annotated.fst",bedFileName))
-        # log_event(bedFileName)
         if (!file.exists(bedFileName))
         {
           probe_features <- probe_features_get(area_subarea)
@@ -102,13 +99,13 @@ annotate_bed <- function ()
           # write.table(final_bed, bedFileName, sep = "\t", row.names = F, col.names = T)
           log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " annotated file to ", bedFileName)
         }
+        rm(final_bed)
       }
-
       # gc()
       i
     }
     end_time <- Sys.time()
-    log_event("INFO: ", end_time, " Annotating genomic area finished in ", end_time - start_time)
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotated ",result," genomic areas file finished in ", round(end_time - start_time,2)," minutes.")
     gc()
 }
 

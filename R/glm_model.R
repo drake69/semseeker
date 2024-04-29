@@ -4,7 +4,7 @@
 #' @param tempDataFrame data frame to use for the model
 #' @param sig.formula formula to apply the model
 #'
-glm_model <- function(family_test, tempDataFrame, sig.formula )
+glm_model <- function(family_test, tempDataFrame, sig.formula)
 {
   result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
   res <- data.frame("pvalue" = summary(result_glm)$coeff[-1, 4][1])
@@ -12,6 +12,7 @@ glm_model <- function(family_test, tempDataFrame, sig.formula )
   res$aic_value <- (result_glm$aic)
   res$std.error <- summary(result_glm)$coeff[-1, 2][1]
 
+  box.plot(dataFrameToPlot, independent_variable,burdenValue, transformation, family_test)
   # calculate rmse
 
   if(family_test=="gaussian")

@@ -11,12 +11,14 @@
 analyze_single_sample <- function(values, thresholds, figure, sample_detail, probe_features) {
 
   ssEnv <- get_session_info()
-  result <- ""
+  result <- data.frame()
   result <- result[-1]
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:", ssEnv$result_folderData)
 
   mutation_annotated_sorted <- mutations_get(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
   mutation_annotated_sorted_to_save <- subset(mutation_annotated_sorted, mutation_annotated_sorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
+  if (nrow(mutation_annotated_sorted_to_save) != 0)
+    mutation_annotated_sorted_to_save$VALUE <- 1
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("MUTATIONS","_", figure, sep = "")))
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:",folder_to_save)
@@ -24,20 +26,20 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
     data_to_dump = mutation_annotated_sorted_to_save,
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed", add_gz=TRUE)
   )
-  result[paste("MUTATIONS_", figure, sep="")] <- if (!is.null(mutation_annotated_sorted_to_save)) dim(mutation_annotated_sorted_to_save)[1] else 0
+  result <- data.frame_add.column(result, paste("MUTATIONS_", figure, sep=""),if (!is.null(mutation_annotated_sorted_to_save)) dim(mutation_annotated_sorted_to_save)[1] else 0)
 
   lesionWeighted <- lesions_get(grouping_column = "CHR", mutation_annotated_sorted = mutation_annotated_sorted)
+  if(nrow(lesionWeighted) != 0)
+    lesionWeighted$VALUE <- 1
+
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),paste0("LESIONS","_", figure, sep = "")))
   dump_sample_as_bed_file(
     data_to_dump = lesionWeighted,
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed", add_gz=TRUE)
   )
 
-  result[paste("LESIONS_", figure, sep="")] <- if (!is.null(lesionWeighted)) dim(lesionWeighted)[1] else 0
+  result <- data.frame_add.column(result, paste("LESIONS_", figure, sep=""), if (!is.null(lesionWeighted)) dim(lesionWeighted)[1] else 0)
 
-  # count the real values available for the sample
-  if(figure=="HYPER")
-     result["PROBES_COUNT"] <- length(stats::na.omit(values))
 
   return(result)
 }

@@ -3,9 +3,9 @@
 # study ="TCDD"
 # adjust_per_area <- F
 # adjust_globally <- F
-# pvalue_columns <- c("PVALUE","PVALUEADJ","PVALUEADJ_ALL_BH")
+# pvalue_columns <- c("PVALUE","PVALUE_ADJ","PVALUE_ADJ_ALL_BH")
 # pvalue_limit <- c(0.05,0.05,0.05)
-# # pvalue_columns <- c("PVALUEADJ_ALL_BH")
+# # pvalue_columns <- c("PVALUE_ADJ_ALL_BH")
 # # pvalue_limit <- c(0.05)
 # adjustment_method <- "BH"
 # path_db <- c("KEGG", "Reactome", "BioCarta", "GO-All", "GO-BP", "GO-CC", "GO-MF", "cell_markers", "mmu_KEGG")

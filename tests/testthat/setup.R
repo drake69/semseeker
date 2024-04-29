@@ -1,7 +1,7 @@
 loadNamespace("future")
 loadNamespace("stats")
 nprobes <- 6e3
-nsamples <- 300
+nsamples <- 30
 
 # intersample_mean <- 5
 # intersample_sd <- 1
@@ -120,3 +120,20 @@ markers <<- c("MUTATIONS","DELTAQ")
 #
 tmp <- tempdir()
 tempFolders <<- paste(tmp,"/semseeker/",stringi::stri_rand_strings(50, 7, pattern = "[A-Za-z0-9]"),sep="")
+
+
+check_execution_context <- function() {
+  calls <- sys.calls()
+  if (any(sapply(calls, function(x) "test_file" %in% names(x)))) {
+    showprogress <<- FALSE
+    verbosity <<- 1
+    # message("Called from testthat")
+  } else {
+    showprogress <<- TRUE
+    verbosity <<- 3
+    # message("Called from source or directly")
+  }
+}
+
+check_execution_context()
+

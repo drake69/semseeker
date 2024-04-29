@@ -15,23 +15,36 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   ssEnv <- get_session_info()
 
   transformation <- as.character(transformation)
-  independent_variable1stLevel <- NA
-  independent_variable2ndLevel <- NA
-  test_factor <- as.factor(tempDataFrame[, independent_variable])
-  if(length(levels(test_factor))<4)
-  {
-    # sort alphabetically factors
-    # levels(test_factor) <- sort(levels(test_factor))
-    tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
-  }
-  if(is.factor(tempDataFrame[, independent_variable]))
-  {
-    independent_variable1stLevel <- levels(tempDataFrame[, independent_variable])[1]
-    independent_variable2ndLevel <- levels(tempDataFrame[, independent_variable])[2]
+  independentVariableIsFactor <- FALSE
+  independent_variableLevels <- NULL
+  if (is.family_dicotomic(family_test))
+    {
+      test_factor <- as.factor(tempDataFrame[, independent_variable])
+      # browser()
+      independent_variableLevels <- NA
+      independentVariableIsFactor <- FALSE
+      if(length(levels(test_factor))<4)
+      {
+        # sort alphabetically factors
+        # levels(test_factor) <- sort(levels(test_factor))
+        tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
+        tempDataFrame[, independent_variable] <- droplevels(tempDataFrame[, independent_variable])
+      }
+      if(is.factor(tempDataFrame[, independent_variable]))
+      {
+        independentVariableIsFactor <- TRUE
+        independentVariableData <- tempDataFrame[, independent_variable]
+        independent_variableLevels <- levels(tempDataFrame[, independent_variable])
+        # independent_variable1stLevel <- levels(tempDataFrame[, independent_variable])[1]
+        # independent_variable2ndLevel <- levels(tempDataFrame[, independent_variable])[2]
+      }
   }
 
   originalDataFrame <- tempDataFrame
   tempDataFrame <- as.data.frame(sapply(tempDataFrame, as.numeric))
+  if (independentVariableIsFactor)
+    tempDataFrame[, independent_variable] <- independentVariableData
+
   df_head <- tempDataFrame[,1:(g_start-1)]
 
   burden_values <- sapply(tempDataFrame[,g_start:ncol(tempDataFrame)], as.numeric)
@@ -156,8 +169,8 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   if(family_test=="binomial")
     tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
 
-  result <- list(tempDataFrame, independent_variable1stLevel, independent_variable2ndLevel)
-  names(result) <- c("tempDataFrame", "independent_variable1stLevel","independent_variable2ndLevel")
+  result <- list(tempDataFrame, independent_variableLevels)
+  names(result) <- c("tempDataFrame", "independent_variableLevels")
 
 
   return (result)

@@ -55,7 +55,7 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   }
 
   # for(i in 1:nrow(sample_sheet)) {
-  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= "rbind", .export = variables_to_export) %dorng% {
+  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= plyr::rbind.fill , .export = variables_to_export) %dorng% {
     local_sample_detail <- sample_sheet[i,]
 
     signal_values <- signal_data[, local_sample_detail$Sample_ID]
@@ -98,8 +98,12 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
     names(signal_values) <- row.names(signal_data)
     signal_sample <- signal_single_sample( signal_values,local_sample_detail,probe_features)
 
-    sample_status_temp <- c( "Sample_ID"=local_sample_detail$Sample_ID, delta_result, hyper_result, hypo_result,
-      "MUTATIONS_BOTH"=both_result_mutations,"LESIONS_BOTH"=both_result_lesions, deltar_result, signal_sample)
+
+    sample_status_temp <- dplyr::bind_cols( hyper_result, hypo_result,
+      both_result_mutations,both_result_lesions, deltar_result, signal_sample)
+    sample_status_temp$Sample_ID <- local_sample_detail$Sample_ID
+    # count the real values available for the sample
+    sample_status_temp$PROBES_COUNT <- length(stats::na.omit(signal_values))
 
     if(ssEnv$showprogress)
       progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
@@ -109,8 +113,6 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   # progress_bar$terminate()
   summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)
-  colnames(summary_population) <- c("Sample_ID","DELTAS_HYPO","DELTAS_HYPER","DELTAS_BOTH","MUTATIONS_HYPER","LESIONS_HYPER","PROBES_COUNT","MUTATIONS_HYPO",
-                                    "LESIONS_HYPO","MUTATIONS_BOTH","LESIONS_BOTH","DELTAR_HYPO","DELTAR_HYPER","DELTAR_BOTH","BETA_MEAN")
   rownames(summary_population) <- summary_population$Sample_ID
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Row count result:", nrow(summary_population))
   rm(signal_data)
@@ -118,7 +120,7 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population analysis ")
   end_time <- Sys.time()
   time_taken <- (end_time - start_time)
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population with summary - Time taken: ", time_taken)
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population with summary - Time taken: ", round(time_taken), " minutes.")
 
   return(summary_population)
 }

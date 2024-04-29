@@ -2,7 +2,7 @@ test_that("deltar_single_sample",{
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, bonferroni_threshold = 0.05)
+  ssEnv <- semseeker:::init_env(tempFolder, bonferroni_threshold = 0.05, showprogess=showprogress, start_fresh=TRUE)
 
   ####################################################################################
 
@@ -56,7 +56,7 @@ test_that("deltar_single_sample",{
     result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
     outputFolder <- semseeker:::dir_check_and_create(result_folderData,c(sample_detail$Sample_Group,"DELTAR_BOTH"))
     fileName <- semseeker:::file_path_build(outputFolder,c(sample_id,"DELTAR","BOTH"), "bedgraph", add_gz = TRUE)
-    deltar <- read.table(fileName)
+    deltar <- read.table(gzfile(fileName))
     # deltar <- read.csv(fileName, sep="\t")
     testthat::expect_true(nrow(deltar)>0)
     testthat::expect_true(nrow(deltar)==nrow(mutations))
@@ -65,6 +65,14 @@ test_that("deltar_single_sample",{
 
     outputFolder <- semseeker:::dir_check_and_create(result_folderData,c(sample_detail$Sample_Group,"DELTAS_BOTH"))
     fileName <- semseeker:::file_path_build(outputFolder,c(sample_id,"DELTAS","BOTH"), "bedgraph", add_gz = TRUE)
+    deltas <- read.table(fileName)
+    testthat::expect_true(nrow(deltas)>0)
+    testthat::expect_true(nrow(deltar)==nrow(deltas))
+
+    ####################################################################################
+
+    outputFolder <- semseeker:::dir_check_and_create(result_folderData,c(sample_detail$Sample_Group,"DELTAR_BOTHS"))
+    fileName <- semseeker:::file_path_build(outputFolder,c(sample_id,"DELTAR","BOTHS"), "bedgraph", add_gz = TRUE)
     deltas <- read.table(fileName)
     testthat::expect_true(nrow(deltas)>0)
     testthat::expect_true(nrow(deltar)==nrow(deltas))

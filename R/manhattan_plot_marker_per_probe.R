@@ -1,5 +1,5 @@
 manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sample=0, min_sample=0 , min_signal_probe=0, label_font_size=3,
-  hyper_color = "blue", hypo_color = "orange",  non_outlier_color = "grey",  limit_label_color = "blue",  limit_line_color = "red", limit_line_color_median = "black",
+  hyper_color = "grey", hypo_color = "orange",  non_outlier_color = "grey",  limit_label_color = "blue",  limit_line_color = "red", limit_line_color_median = "black",
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
 
@@ -11,7 +11,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   create_excel_pivot()
   result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
-  
+
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
   for(k in 1:length(localKeys)){
@@ -48,7 +48,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   probe_signal <- as.numeric(probe_signal)
   outlier <-  as.vector(ifelse(probe_signal > y_sup, "Hyper", ifelse(probe_signal < y_inf, "Hypo" ,"Non-outlier")))
   marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
-  
+
 
   ########################################################################################################################################################################
   ############################ PLOT MARKERS FOR A GIVEN PROBE ################################################################################################
@@ -87,7 +87,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   ############################ PLOT OUTLIERS FOR A GIVEN PROBE ################################################################################################
   ########################################################################################################################################################################
 
-  
+
   data_to_plot <- data.frame(samples = samples, signal_to_plot = as.numeric(probe_signal), outlier)
   delta_label_value <-  ifelse(probe_signal > y_sup, paste("\u03B4 ", round(probe_signal - y_sup,3),sep=""), ifelse(probe_signal < y_inf,  paste("\u03B4:", round(y_inf - probe_signal,3),sep=""),""))
   y_shift <- 0

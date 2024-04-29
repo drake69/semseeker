@@ -14,7 +14,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
   res <- data.frame()
   tau = as.numeric(quantreg_params[2])
-  res$tau <- tau
+  res <- data.frame("tau" = tau)
   try({
     model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)
     summary_qr <- suppressMessages(summary(model)$tTable)

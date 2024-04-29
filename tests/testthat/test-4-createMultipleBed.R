@@ -21,11 +21,15 @@ test_that("create_multiple_bed", {
   figures <- c("HYPO","HYPER","BOTH")
   sample_groups <- c("Control","Reference","Case")
 
+
   semseeker:::create_multiple_bed(mySampleSheet)
   dq <- deltaq_get(mySampleSheet)
   drq <- deltarq_get(mySampleSheet)
   result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
 
+  # marker <- "MUTATIONS"
+  # figure <- "BOTHS"
+  # sample_group <- "Control"
   for (sample_group in sample_groups)
   {
     for (marker in markers)

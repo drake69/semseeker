@@ -14,17 +14,7 @@ read_multiple_bed <- function(sample_group, marker, figure)
   f <- paste0(marker,"_", figure, sep="")
   souceFolder <- dir_check_and_create(ssEnv$result_folderData, c(as.character(sample_group),f))
 
-  if(as.character(marker)=="DELTAS" | as.character(marker)=="DELTAQ"
-    | as.character(marker)=="DELTAR"
-    | as.character(marker)=="SIGNAL" | as.character(marker)=="DELTARQ")
-  {
-    col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
-  }
-  else
-  {
-    col_names <- c("CHR", "START", "END", "SAMPLEID")
-  }
-
+  col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
   fileName <-file_path_build(souceFolder,c("MULTIPLE",as.character(marker),as.character(figure)),"fst")
 
   if(file.exists(fileName))
@@ -35,8 +25,6 @@ read_multiple_bed <- function(sample_group, marker, figure)
     if(!plyr::empty(multiple_bed))
     {
       multiple_bed[is.na(multiple_bed)] <- 0
-      if(marker!="SIGNAL" & marker!="DELTAR" & marker!="DELTAS" & marker!="DELTAQ" & marker!="DELTARQ" & !plyr::empty(multiple_bed))
-        multiple_bed$VALUE <- 1
 
       multiple_bed <- data.frame(multiple_bed,"FIGURE" = as.character(figure), "MARKER" = as.character(marker), "SAMPLE_GROUP" = as.character(sample_group))
       multiple_bed$SAMPLE_GROUP <- as.factor(multiple_bed$SAMPLE_GROUP)
