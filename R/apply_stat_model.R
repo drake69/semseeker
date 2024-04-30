@@ -14,12 +14,13 @@
 #'
 #' @importFrom doRNG %dorng%
 #'
-apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal, session_folder,
-                             independent_variable, depth_analysis=3, ...)
+apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal,
+                              session_folder, independent_variable, depth_analysis=3, ...)
 {
   ssEnv <- semseeker:::get_session_info()
   arguments <- list(...)
 
+  g_end <- ncol(tempDataFrame)
   prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis)
   tempDataFrame <- prepared_data$tempDataFrame
   independent_variable1stLevel <- prepared_data$independent_variableLevels[1]

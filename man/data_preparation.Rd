@@ -10,6 +10,7 @@ data_preparation(
   tempDataFrame,
   independent_variable,
   g_start,
+  g_end,
   dototal,
   covariates,
   depth_analysis

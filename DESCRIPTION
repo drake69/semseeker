@@ -39,7 +39,9 @@ Imports:
     utils,
     withr,
     zoo,
-    VennDiagram
+    VennDiagram,
+    effsize,
+    pwr
 RoxygenNote: 7.3.1
 Suggests:
     caret,

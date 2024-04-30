@@ -123,7 +123,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
 
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   # options(future.globals.resolve = TRUE)
-  options(future.globals.maxSize = 5e8)
+  # options(future.globals.maxSize = 5e8)
   doFuture::registerDoFuture()
 
   parallel_strategy <- ssEnv$parallel_strategy

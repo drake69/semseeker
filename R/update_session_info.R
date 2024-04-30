@@ -7,7 +7,7 @@ update_session_info <- function(ssEnv)
   if (length(ssEnv)>=length(ssEnv_local))
     {
     assign("ssEnv", ssEnv, envir=.pkgglobalenv)
-    options("ssEnv"=ssEnv)
+    # options("ssEnv"=ssEnv)
   }
 
 
