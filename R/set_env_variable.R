@@ -1,6 +1,7 @@
-set_env_variable <- function(ssEnv, arguments, var_name, var_default_value)
+set_env_variable <- function(arguments, var_name, var_default_value)
 {
 
+  ssEnv <- semseeker:::get_session_info()
   if(is.null(ssEnv[[var_name]]))
     ssEnv[[var_name]]  <- var_default_value
 

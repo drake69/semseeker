@@ -20,6 +20,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   )
 
   arguments <- list(...)
+  arguments[["areas_selection"]] <- NULL
 
   # remove all spaces from all items of arguments
   arguments <- lapply(arguments, function(x) gsub(" ", "", x))
@@ -30,57 +31,48 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments[["start_fresh"]] <- NULL
 
   if(start_fresh)
+  {
     unlink(result_folder, recursive = TRUE, force = TRUE)
+    ssEnv <- list()
+  }
+  else
+    ssEnv <- semseeker:::get_session_info(result_folder)
 
-  #allow export of object of 32gb with future
-  options(future.globals.maxSize= 32 * 1024^3)
-
-  ssEnv <- semseeker:::get_session_info(result_folder)
+  ssEnv$session_folder <-  semseeker:::dir_check_and_create(result_folder,c("Log"))
+  semseeker:::update_session_info(ssEnv)
 
   # utils::data("PROBES")
   # utils::data("PROBES_CHR_CHR")
   ssEnv$seed <- 7658776
-  set.seed(7658776)
-  ssEnv$session_folder <-  semseeker:::dir_check_and_create(result_folder,c("Log"))
+  set.seed(ssEnv$seed)
 
   log_event("INFO: ##############################################################################")
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
 
-  arguments <- set_env_variable(ssEnv, arguments,"alpha",0.05)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"verbosity",1)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"sex_chromosome_remove",FALSE)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"opencl",FALSE)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"bonferroni_threshold",0.05)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"iqrTimes",3)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"sliding_window_size",11)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"epiquantile",4)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"maxResources",90)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"parallel_strategy","sequential")
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"tech","")
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"showprogress",FALSE)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"signal_intrasample",FALSE)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8','#b9ef92', '#ffefb6', '#cfebb6')
-  arguments <- set_env_variable(ssEnv, arguments,"color_palette",original_colors)
-  ssEnv <- semseeker:::get_session_info(result_folder)
+  arguments <- set_env_variable(arguments,"alpha",0.05)
+  arguments <- set_env_variable(arguments,"verbosity",1)
+  arguments <- set_env_variable(arguments,"sex_chromosome_remove",FALSE)
+  arguments <- set_env_variable(arguments,"opencl",FALSE)
+  arguments <- set_env_variable(arguments,"bonferroni_threshold",0.05)
+  arguments <- set_env_variable(arguments,"iqrTimes",3)
+  arguments <- set_env_variable(arguments,"sliding_window_size",11)
+  arguments <- set_env_variable(arguments,"epiquantile",4)
+  arguments <- set_env_variable(arguments,"tech","")
+  arguments <- set_env_variable(arguments,"showprogress",FALSE)
+  arguments <- set_env_variable(arguments,"signal_intrasample",FALSE)
+  original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8', '#ffefb6', '#cfebb6','#b9ef92')
+  arguments <- set_env_variable(arguments,"color_palette",original_colors)
   darker_colors <- grDevices::adjustcolor(original_colors, alpha.f = 0.5)
   darker_colors <- c("blue","red","purple","green","yellow","orange","brown")
-  arguments <- set_env_variable(ssEnv, arguments,"color_palette_darker",darker_colors)
-  ssEnv <- semseeker:::get_session_info(result_folder)
-  arguments <- set_env_variable(ssEnv, arguments,"cluster_workers",NULL)
-  ssEnv <- semseeker:::get_session_info(result_folder)
+  arguments <- set_env_variable(arguments,"color_palette_darker",darker_colors)
+  arguments <- set_env_variable(arguments,"cluster_workers",NULL)
+  model_metrics <- c("MAE", "RMSE","MSLE", "SSE","R_SQUARED_ADJ","R_SQUARED","MAPE","MPE","R_SQUARED_COMPL","R_SQUARED_ADJ_COMPL","MSE",
+    "MAE_TEST", "RMSE_TEST","MSLE_TEST", "SSE_TEST","R_SQUARED_ADJ_TEST","R_SQUARED_TEST","MAPE_TEST","MPE_TEST","R_SQUARED_COMPL_TEST","R_SQUARED_ADJ_COMPL_TEST","MSE_TEST",
+    "EFFECT_SIZE_ESTIMATE","EFFECT_SIZE_MAGNITUDE", "RBC", "POWER", "STD.ERROR","STATISTIC_PARAMETER")
+  arguments <- set_env_variable(arguments,"model_metrics",model_metrics)
+
+  # get ssEnv
+  ssEnv <- get_session_info()
 
   dry_run <- FALSE
   if(!is.null(arguments[["dry_run"]]))
@@ -108,77 +100,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
 
   foreachIndex <- 0
 
-  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-
-  if (nzchar(chk) && chk == "TRUE") {
-    # use 2 cores in CRAN/Travis/AppVeyor
-    nCore <- 2L
-  } else {
-    # use all cores in devtools::test()
-    nCore <- future::availableCores() - 1
-    nCore <- if(floor(future::availableCores() * maxResources/100 ) > nCore ) nCore else floor(future::availableCores() * maxResources/100 )
-  }
-  # permutation cluster
-  outFile <- file.path(ssEnv$session_folder, "cluster_r.out")
-
-  options(doFuture.foreach.export = ".export-and-automatic-with-warning")
-  # options(future.globals.resolve = TRUE)
-  # options(future.globals.maxSize = 5e8)
-  doFuture::registerDoFuture()
-
-  parallel_strategy <- ssEnv$parallel_strategy
-  # TODO: improve planning parallel management using also cluster
-  if(parallel_strategy=="multisession")
-  {
-    future::plan( future::multisession, workers = nCore)
-    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in multisession with:", nCore, " Cores")
-  }
-  if(parallel_strategy=="multicore")
-  {
-    future::plan( future::multicore, workers = nCore)
-    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in muticore with:", nCore," Cores")
-  }
-  if(parallel_strategy=="cluster")
-  {
-    # log_event ("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Cluster feature not implemented!")
-    # stop("I'm STOPPING HERE!")
-    if (!is.null(ssEnv$cluster_workers))
-    {
-      future::plan( future::cluster, workers = ssEnv$cluster_workers)
-      log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work with a cluster with:",ssEnv$cluster_workers)
-      # ssEnv$showprogress <- FALSE
-    }
-    else
-    {
-      future::plan( future::cluster, workers = nCore)
-      log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work with a cluster with:", nCore," Cores")
-    }
-  }
-
-  if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
-     & parallel_strategy!="cluster")
-  {
-    future::plan( future::sequential)
-    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in sequential mode")
-  }
-
-
-  # ssEnvTemp <- semseeker:::get_session_info(result_folder)
-  # if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
-  # {
-  #   # we had to return old session info this init could be called by other than semseeker function, it means
-  #   # we don't know which marker or figure were identified
-  #   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Reusing old session info !")
-  #   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
-  #     paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
-  #     " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
-  #     " for ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"SUBAREA"]), collapse = " ", sep =" "))
-  #   if(dir.exists(ssEnv$session_folder))
-  #   {
-  #     update_session_info(ssEnvTemp)
-  #     return(ssEnvTemp)
-  #   }
-  # }
+  # parellel_session()
 
   # set default values
   keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH","BOTHSUM"))
@@ -331,13 +253,12 @@ init_env <- function(result_folder, maxResources = 90, ...)
   keys <- keys[!duplicated(keys),]
   ssEnv$keys_for_pathway <- keys
 
-  ssEnv$parallel <- data.frame("strategy"=parallel_strategy, "nCore"=nCore)
 
-  ssEnv$functionToExport <- c( "analyze_single_sample","deltar_single_sample",
-                               "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
-                               "file_path_build","analyze_single_sample_both",
-                               "sort_by_chr_and_start", "test_match_order", "lesions_get",
-                               "mutations_get")
+  ssEnv$functionToExport <- c( "semseeker:::analyze_single_sample","deltar_single_sample",
+    "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
+    "file_path_build","semseeker:::analyze_single_sample_both",
+    "sort_by_chr_and_start", "test_match_order", "lesions_get",
+    "mutations_get")
 
 
   # to manage progress bar
@@ -364,7 +285,11 @@ init_env <- function(result_folder, maxResources = 90, ...)
     }
   }
 
-  update_session_info(ssEnv)
+  arguments <- set_env_variable(arguments,"maxResources",90)
+  arguments <- set_env_variable(arguments,"parallel_strategy","sequential")
+  parallel_session()
+
+  semseeker:::update_session_info(ssEnv)
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will focus on:", paste(unique(keys_markers_figures$MARKER), collapse = " ", sep =" "), " due to ",  paste(unique(keys_markers_figures$FIGURE), collapse = " ", sep =" "), " of ",  paste(areas, collapse = " ", sep =" "))
 
   # check length of arguments
@@ -372,17 +297,19 @@ init_env <- function(result_folder, maxResources = 90, ...)
   {
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
     stop()
-    }
+  }
 
 
   if(dry_run)
-    {
-      # out at console as pretty table
+  {
+    # out at console as pretty table
 
-      knitr::kable(as.data.frame(ssEnv$keys_areas_subareas_markers_figures), format = "pipe", caption = "Selection:")
-      message(ssEnv$keys_areas_subareas_markers_figures)
-      stop("INFO: Dry run is requested. Exiting now.")
-    }
+    knitr::kable(as.data.frame(ssEnv$keys_areas_subareas_markers_figures), format = "pipe", caption = "Selection:")
+    message(ssEnv$keys_areas_subareas_markers_figures)
+    stop("INFO: Dry run is requested. Exiting now.")
+  }
+
+  semseeker:::update_session_info(ssEnv)
 
   return(ssEnv)
 }

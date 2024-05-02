@@ -24,12 +24,12 @@ set.seed(474693)
 nCpG <- nprobes * 0.9
 nTypeI <- 90
 nTypeII <- 10
-Meth <- as.data.frame(matrix(rbeta(nCpG * nsamples, nTypeI, nTypeII), nrow = nCpG))
+Meth <- as.data.frame(matrix(stats::rbeta(nCpG * nsamples, nTypeI, nTypeII), nrow = nCpG))
 
 nCpG <- nprobes * 0.1
 nTypeI2 <- 4
 nTypeII2 <- 6
-Unmeth <- as.data.frame(matrix(rbeta(nCpG * nsamples, nTypeI2, nTypeII2), nrow = nCpG))
+Unmeth <- as.data.frame(matrix(stats::rbeta(nCpG * nsamples, nTypeI2, nTypeII2), nrow = nCpG))
 
 signal_data <- rbind(Meth, Unmeth)
 # signal_data <- rep(stats::rnorm(nprobes,mean = intersample_mean, sd = intersample_sd),nsamples)

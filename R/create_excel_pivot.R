@@ -10,7 +10,7 @@ create_excel_pivot <-  function() {
   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
 
   create_multiple_bed(sample_sheet)
-  annotate_bed()
+  semseeker:::annotate_bed()
 
   if(ssEnv$showprogress)
     progress_bar_ann <- progressr::progressor(along=1:nrow(localKeys))

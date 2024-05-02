@@ -16,7 +16,7 @@ validate_family_test <- function(family_test){
 
   if(grepl("mean-permutation",family_test))
   {
-    mean_params <- unlist(strsplit(as.character(family_test_test),"_"))
+    mean_params <- unlist(strsplit(as.character(family_test),"_"))
     if (length(mean_params) != 4)
       log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "mean-permutation family_test must have been with the follwing syntax mean-permutation_n.permutations.test_n.permutations_conf.level")
     else
@@ -25,7 +25,7 @@ validate_family_test <- function(family_test){
 
   if (grepl("quantile-permutation",family_test))
   {
-    quantile_params <- unlist(strsplit(as.character(family_test_test),"_"))
+    quantile_params <- unlist(strsplit(as.character(family_test),"_"))
     if (length(quantile_params) != 5)
       log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "quantile-permutation family_test must have been with the follwing syntax quantile-permutation_quantile_n.permutations.test_n.permutations_conf.level")
     else
@@ -34,7 +34,7 @@ validate_family_test <- function(family_test){
 
   if (grepl("quantreg-permutation",family_test))
   {
-    quantile_params <- unlist(strsplit(as.character(family_test_test),"_"))
+    quantile_params <- unlist(strsplit(as.character(family_test),"_"))
     if (length(quantile_params) != 5)
       log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "quantreg-permutation family_test must have been with the follwing syntax quantile-permutation_tau_n.permutations.test_n.permutations_conf.level")
     else

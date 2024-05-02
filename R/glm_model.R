@@ -22,9 +22,9 @@ glm_model <- function(family_test, tempDataFrame, sig.formula)
     #calculate shapiro of working residuals
     res$shapiro_pvalue_residuals <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
     # calculate residuals homoschedadasticity
-    res$Breusch_Pagan_pvalue_residuals <- lmtest::bptest(result_glm)$p.value
+    res$residuals_breusch_pagan_pvalue_compl <- 1- lmtest::bptest(result_glm)$p.value
     # bartlett of residuals
-    # res$bartlett_pvalue_residuals <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::bartlett.test(residuals, as.factor(tempDataFrame[, independent_variable]))$p.value) else NA
+    # res$residuals_bartlett_pvalue_compl <- ifelse((length(residuals)>3 & length(unique(residuals))>3),1-(stats::bartlett.test(residuals)$p.value),NA)
   }
 
   #  calculate r-squared

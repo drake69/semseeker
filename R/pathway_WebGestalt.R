@@ -89,7 +89,7 @@ pathway_WebGestalt <- function(study,
           enrichResult$enrich_method <- enrich_method
           enrichResult$key <- key
 
-          if(min(enrichResult$FDR) < ssEnv$alpha)
+          if(min(enrichResult$FDR) < as.numeric(ssEnv$alpha))
           {
             plotFileName = semseeker:::file_path_build(path,projectName,"png")
             grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")

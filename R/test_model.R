@@ -32,7 +32,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     degrees_of_freedom <- result_chisq$parameter
     effect_size <- sqrt(result_chisq$statistic/nrow(tempDataFrame))
     rea$effect_size <- effect_size
-    power_result <- pwr::pwr.chisq.test(w = effect_size, N = nrow(tempDataFrame) , df = degrees_of_freedom, sig.level = ssEnv$alpha, power = )
+    power_result <- pwr::pwr.chisq.test(w = effect_size, N = nrow(tempDataFrame) , df = degrees_of_freedom, sig.level = as.numeric(ssEnv$alpha), power = )
     res$power <- power_result$power
   }
 
@@ -86,7 +86,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
         row <- as.character(rownames(PVALUE_KW)[i])
         col <- as.character(colnames(PVALUE_KW)[j])
         pval_name <- paste0("PVALUE_KW_",as.character(row),"_",as.character(col),sep="")
-        significative <- significative & p_value < ssEnv$alpha
+        significative <- significative & p_value < as.numeric(ssEnv$alpha)
         pvalue <- max(pvalue, p_value)
         p_value <- data.frame(p_value)
         colnames(p_value) <- pval_name
@@ -151,7 +151,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     # Calculate rank-biserial correlation as effect size
     res$rbc <- result_w$statistic / (length(SPLIT[[1]]) * length(SPLIT[[2]]))
     # Calculate power
-    power_result = pwr::pwr.t2n.test(d = res$statistic_parameter, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = ssEnv$alpha, power = NULL)
+    power_result = pwr::pwr.t2n.test(d = res$statistic_parameter, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = as.numeric(ssEnv$alpha), power = NULL)
     res$power <- power_result$power
   }
 
@@ -166,7 +166,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
     res$statistic_parameter <- mean(SPLIT[[1]]) - mean(SPLIT[[2]])
-    power_result = pwr::pwr.t2n.test(d = statistic_parameter, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = ssEnv$alpha, power = NULL)
+    power_result = pwr::pwr.t2n.test(d = statistic_parameter, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = as.numeric(ssEnv$alpha), power = NULL)
     res$power <- power_result$power
   }
 
@@ -176,7 +176,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     pvalue <- result_cor$p.value
     r_model <- "stats_cor.test"
     statistic_parameter <- result_cor$estimate
-    power_result <- pwr::pwr.r.test(n = nrow(tempDataFrame) , r = statistic_parameter , sig.level = ssEnv$alpha , power = NULL)
+    power_result <- pwr::pwr.r.test(n = nrow(tempDataFrame) , r = statistic_parameter , sig.level = as.numeric(ssEnv$alpha) , power = NULL)
     res$power <- power_result$power
   }
 

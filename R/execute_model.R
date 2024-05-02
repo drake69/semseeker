@@ -1,5 +1,8 @@
 execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation="", plot=FALSE){
 
+  # model_result <- data.frame()
+  #
+  # tryCatch({
   if( family_test=="binomial" | family_test=="poisson" | family_test=="gaussian")
     model_result <- glm_model(family_test, tempDataFrame, sig.formula )
 
@@ -36,5 +39,11 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
   if (grepl("quantreg", family_test))
     model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable)
 
+  #   return (model_result)
+  # }, error = function(e) {
+  #   return (model_result)
+  # })
+
   return (model_result)
+
 }

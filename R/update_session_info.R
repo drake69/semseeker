@@ -1,24 +1,27 @@
 update_session_info <- function(ssEnv)
 {
-  # .pkgglobalenv
 
-  # get ssEnv in memory and overwrite only if lenght is ugual or greater
-  ssEnv_local <- semseeker:::get_session_info()
-  if (length(ssEnv)>=length(ssEnv_local))
-    {
-    assign("ssEnv", ssEnv, envir=.pkgglobalenv)
-    # options("ssEnv"=ssEnv)
-  }
+  saveCount <- 0
+  if (is.null(ssEnv) | length(ssEnv)==0)
+    stop("DEBUG: I'm STOPPING HERE! You called update session info without ssEnv!")
 
+  # save to environment
+  assign("ssEnv", ssEnv, envir=.pkgglobalenv)
+  saveCount <- saveCount + 1
 
-  #save principal copy
-  if (!dir.exists(file.path(ssEnv$session_folder)))
+  # save to file
+  saveRDS(ssEnv, file.path(ssEnv$session_folder,"session_info.rds"))
+  # format date as YYYYMMDD
+  today <- Sys.Date()
+  saveRDS(ssEnv, file.path(ssEnv$session_folder,paste0(today, "_session_info.rds", sep="")))
+  saveCount <- saveCount + 1
+
+  # save for doFuture
+  # options("ssEnv"=ssEnv)
+  # saveCount <- saveCount + 1
+
+  if (saveCount != 2)
     stop("I'm STOPPING HERE! ", ssEnv$result_folderData)
-  else
-  {
-    saveRDS(ssEnv, file.path(ssEnv$session_folder,"session_info.rds"))
-    # format date as YYYYMMDD
-    today <- Sys.Date()
-    saveRDS(ssEnv, file.path(ssEnv$session_folder,paste0(today, "_session_info.rds", sep="")))
-  }
+
+  return(ssEnv)
 }

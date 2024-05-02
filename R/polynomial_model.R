@@ -35,35 +35,26 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   train.data  <- tempDataFrame[training.samples, ]
   test.data <- tempDataFrame[-training.samples, ]
 
-  # Build the model
-  model <- stats::lm(eval(parse(text=dependent_variable)) ~ stats::poly(eval(parse(text=independent_variable)), degree, raw = TRUE), data = train.data)
+  # Build the polynomial_model_result
+  polynomial_model_result <- stats::lm(eval(parse(text=dependent_variable)) ~ stats::poly(eval(parse(text=independent_variable)), degree, raw = TRUE), data = train.data)
 
-  # Calculate Sum of Squares due to Error (SSE)
-  res$sse <- sum(model$residuals^2)
-  # Calculate Root Mean Square Error (RMSE)
-  res$rmse <- sqrt(mean(model$residuals^2))
-  # Goodness-of-Fit Statistics (R-squared)
-  res$r_squared <- summary(model)$r.squared
-  # Calculate Adjusted R-squared
-  res$adj_r_squared <- summary(model)$adj.r.squared
-  # Mean Absolute Error (MAE)
-  res$mae <- mean(abs(model$residuals))
-  # Mean Squared Log Error (MSLE)
-  res$msle <- mean((log(predict(model) + 1) - log(train.data[, dependent_variable] + 1))^2)
+  # check id polynomial_model_result is null
+  if(is.null(polynomial_model_result))
+    return(res)
 
+  predictions <- stats::predict(polynomial_model_result)
   if(nrow(test.data) != 0)
   {
     # Make predictions
-    predictions_test <- stats::predict(model, newdata = test.data)
-    # Calculate RMSE test
-    res$rmse_test = caret::RMSE(predictions_test, test.data[,dependent_variable])
-    # Calculate Root Mean Square Error (RMSE)
-    res$r_squared_test = caret::R2(predictions_test, test.data[,dependent_variable])
+    predictions_test <- stats::predict(polynomial_model_result, newdata = test.data)
+    res <- cbind(res, model_performance(predictions, train.data[,dependent_variable], predictions_test, test.data[,dependent_variable]))
   }
+  else
+    res <- cbind(res, model_performance(predictions, train.data[,dependent_variable], c(),c()))
 
   # Coefficients and Confidence Intervals
-  coefficients <- coef(summary(model))
-  # conf_int <- confint(model)
+  coefficients <- coef(summary(polynomial_model_result))
+  # conf_int <- confint(polynomial_model_result)
 
   significative <- TRUE
   # for each degree extract the p-value
@@ -76,7 +67,7 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     else
       pval_name <- paste0("PL_DEGREE_",as.character(i -1 ),"_PVALUE",sep="")
     p_value <- data.frame(p_value)
-    significative <- significative & p_value < ssEnv$alpha
+    significative <- significative & p_value < as.numeric(ssEnv$alpha)
     colnames(p_value) <- pval_name
     res <- cbind(res, p_value)
   }
@@ -133,9 +124,9 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   # ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
   #   ggplot2::geom_point( color = ssEnv$color_palette[1] ) + ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE)) +
   #   ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions), color = ssEnv$color_palette[2]) +
-  #   ggplot2::geom_point(data = data.frame(train.data,model$residuals) , ggplot2::aes(y = model$residuals), color = "cyan")
+  #   ggplot2::geom_point(data = data.frame(train.data,polynomial_model_result$residuals) , ggplot2::aes(y = polynomial_model_result$residuals), color = "cyan")
   #
   return (res)
 }
 
-# polynomial_model("polynomial_4_0.8", sample_sheet, "DELTARQ_HYPO ~ Age")
+# polynomial_model_result("polynomial_4_0.8", sample_sheet, "DELTARQ_HYPO ~ Age")

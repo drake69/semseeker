@@ -27,12 +27,16 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   j <- 0
   k <- 0
   z <- 0
-  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
-
   arguments <- list(...)
   areas_selection <- c()
   if(!is.null(arguments[["areas_selection"]]))
+  {
     areas_selection <-arguments$areas_selection
+    arguments[["areas_selection"]] <- NULL
+  }
+
+  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
+
 
 
   localKeys <- ssEnv$keys_markers_figures
@@ -272,7 +276,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrame <- tempDataFrame[-1,]
                     if(length(areas_selection)>0)
                     {
-                      # # browser()
+                      # browser()
                       # check if areas_selection is a range
                       if(length(areas_selection)==1)
                       {
@@ -382,7 +386,7 @@ save_result <- function(results,fileNameResults, family_test, filter_p_value ){
         results <- results[order(results$PVALUE_ADJ),]
 
     if(filter_p_value)
-      results <- subset(results, results$PVALUE < ssEnv$alpha | results$PVALUE_ADJ < ssEnv$alpha)
+      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results$PVALUE_ADJ < as.numeric(ssEnv$alpha))
   }
 
 

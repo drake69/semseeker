@@ -26,7 +26,7 @@ covariates_removal <- function(signal_values, covariates, sample_sheet, result_f
     coeffs <- summary(model)$coefficients
     coeffs <- coeffs[,1]
     p_value <- summary(model)$coefficients[,4]
-    mask <- p_value < ssEnv$alpha
+    mask <- p_value < as.numeric(ssEnv$alpha)
     n_values <- length(covariates) + 1
     #
     mask <- mask[2:n_values]

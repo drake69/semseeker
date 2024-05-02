@@ -40,9 +40,9 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(sample_sheet))
 
-  variables_to_export <- c("sample_sheet", "signal_data", "analyze_single_sample", "ssEnv",
+  variables_to_export <- c("sample_sheet", "signal_data", "semseeker:::analyze_single_sample", "ssEnv",
                             "signal_superior_thresholds","deltar_single_sample","signal_inferior_thresholds","iqr","signal_median_values",
-                           "bt","bonferroni_threshold", "probe_features", "analyze_single_sample_both", "delta_single_sample", "progress_bar",
+                           "bt","bonferroni_threshold", "probe_features", "semseeker:::analyze_single_sample_both", "delta_single_sample", "progress_bar",
                            "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_single_sample",
                            "get_session_info")
   i <- 1

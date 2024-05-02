@@ -81,7 +81,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "analyze_population",
+  variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "semseeker:::analyze_population",
     "populationControlRangeBetaValues", "PROBES", "create_multiple_bed","probe_features")
   # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
   for (i in 1:length(ssEnv$keys_sample_groups[,1]))
@@ -96,7 +96,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
     }
     else
     {
-      resultPopulation <- analyze_population(
+      resultPopulation <- semseeker:::analyze_population(
         signal_data = signal_data[, populationMatrixColumns],
         sample_sheet = populationSampleSheet,
         signal_thresholds = populationControlRangeBetaValues,

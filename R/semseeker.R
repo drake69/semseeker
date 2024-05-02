@@ -60,7 +60,7 @@ semseeker <- function(sample_sheet,
     else
       signal_data_local <- stats::na.omit(signal_data[[batch_id]])
     signal_data_local <- signal_data_local[rownames(signal_data_local) %in% probes_to_preserve,]
-    sample_sheet_local <- analyze_batch(signal_data_local, sample_sheet_local, batch_id)
+    sample_sheet_local <- semseeker:::analyze_batch(signal_data_local, sample_sheet_local, batch_id)
     if(exists("sample_sheet_result"))
       sample_sheet_result <- plyr::rbind.fill(sample_sheet_result, sample_sheet_local)
     else
@@ -82,7 +82,7 @@ semseeker <- function(sample_sheet,
   ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
   update_session_info(ssEnv)
 
-  annotate_bed()
+  semseeker:::annotate_bed()
   create_excel_pivot()
 
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "Starting inference Analysis.")
