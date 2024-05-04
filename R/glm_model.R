@@ -12,7 +12,7 @@ glm_model <- function(family_test, tempDataFrame, sig.formula)
   res$aic_value <- (result_glm$aic)
   res$std.error <- summary(result_glm)$coeff[-1, 2][1]
 
-  box.plot(dataFrameToPlot, independent_variable,burdenValue, transformation, family_test)
+  # box.plot(dataFrameToPlot, independent_variable,burdenValue, transformation, family_test)
   # calculate rmse
 
   if(family_test=="gaussian")

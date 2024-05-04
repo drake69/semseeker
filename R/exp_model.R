@@ -14,8 +14,10 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
   independent_variable <- dep_var[[3]]
 
 
-  tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1
-  tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1
+  bias_dependent_variable <- min(tempDataFrame[, dependent_variable])
+  bias_independent_variable <- min(tempDataFrame[, independent_variable])
+  tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1 - ifelse(bias_dependent_variable < 0, bias_dependent_variable, 0)
+  tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1 - ifelse(bias_independent_variable < 0, bias_independent_variable, 0)
 
   # Split the data into training and test set
   training.samples <- caret::createDataPartition(tempDataFrame[, dependent_variable], p=partition_percentage, list=FALSE)

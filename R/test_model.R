@@ -75,7 +75,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     kw_result <- stats::pairwise.wilcox.test(dependent_variable, group)
     PVALUE_KW <- kw_result$p.value
 
-    pvalue <- 0
+    kw_pvalue_max <- 0
     significative <- TRUE
     # for each group combination extract the p-value
     for (i in 1:nrow(PVALUE_KW)) {
@@ -87,7 +87,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
         col <- as.character(colnames(PVALUE_KW)[j])
         pval_name <- paste0("PVALUE_KW_",as.character(row),"_",as.character(col),sep="")
         significative <- significative & p_value < as.numeric(ssEnv$alpha)
-        pvalue <- max(pvalue, p_value)
+        kw_pvalue_max <- max(kw_pvalue_max, p_value)
         p_value <- data.frame(p_value)
         colnames(p_value) <- pval_name
         if (exists("res"))
@@ -98,7 +98,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     }
 
     res$significative <- significative
-    res$pvalue <- pvalue
+    res$kw_pvalue_max <- kw_pvalue_max
     # remove rowname from res
     rownames(res) <- NULL
 
@@ -141,15 +141,34 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
 
+    ## calculate the JSD
+    sample1 <- SPLIT[[1]]
+    sample2 <- SPLIT[[2]]
+
+    # Combine the unique elements from both samples to create a common event space
+    common_events <- unique(c(sample1, sample2))
+
+    # Create adjusted frequency tables for both samples
+    frequency_table1_adjusted <- tabulate(match(sample1, common_events), nbins = length(common_events))
+    frequency_table2_adjusted <- tabulate(match(sample2, common_events), nbins = length(common_events))
+
+    # Convert adjusted frequencies to probabilities
+    probability_distribution1_adjusted <- frequency_table1_adjusted / sum(frequency_table1_adjusted)
+    probability_distribution2_adjusted <- frequency_table2_adjusted / sum(frequency_table2_adjusted)
+
+    # Calculate the Jensen-Shannon distance
+    res$jsd <- suppressMessages(suppressWarnings(philentropy::JSD(rbind(probability_distribution1_adjusted, probability_distribution2_adjusted))))
+
     # Calculate effect size
     es_res <- effsize::VD.A(SPLIT[[1]], SPLIT[[2]])
     res$effect_size_estimate <- es_res$estimate
     res$effect_size_magnitude <- es_res$magnitude
+    # res$cohen_d <- effsize::cohen.d(SPLIT[[1]], SPLIT[[2]], pooled=TRUE, paired=FALSE, na.rm=TRUE)
 
     # Calculate the statistic parameter
     res$statistic_parameter <- median(SPLIT[[1]]) - median(SPLIT[[2]])
     # Calculate rank-biserial correlation as effect size
-    res$rbc <- result_w$statistic / (length(SPLIT[[1]]) * length(SPLIT[[2]]))
+    res$rank_biserial_correlation <- result_w$statistic / (length(SPLIT[[1]]) * length(SPLIT[[2]]))
     # Calculate power
     power_result = pwr::pwr.t2n.test(d = res$statistic_parameter, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = as.numeric(ssEnv$alpha), power = NULL)
     res$power <- power_result$power

@@ -34,7 +34,7 @@ compute_quantile_delta_permutation <- function(sig.formula,df, shuffle = FALSE, 
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable)
+quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot =FALSE)
 {
   quantile_params <- unlist(strsplit(as.character(family_test),"_"))
 
@@ -48,8 +48,8 @@ quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   n_permutations <- as.numeric(quantile_params[3])
   conf.level <- as.numeric(quantile_params[4])
   res$conf.level <- conf.level
-  quantile <- as.numeric(quantile_params[5])
-  res$quantile <- quantile
+  tau <- as.numeric(quantile_params[5])
+  res$tau <- tau
 
   res$independent_variable <- as.character(all.vars(sig.formula)[2])
 
@@ -58,15 +58,15 @@ quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   pvalue_limit_sup <- 1 - (pvalue_limit/2)
 
   # Compute signal and p-value for n_permutations replications
-  statistic_parameter <-  compute_quantile_delta_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle = FALSE)
-  permutation_vector <- replicate(n_permutations_test, compute_quantile_delta_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle = TRUE, quantile = quantile))
+  res$statistic_parameter <-  compute_quantile_delta_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle = FALSE)
+  permutation_vector <- replicate(n_permutations_test, compute_quantile_delta_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle = TRUE, quantile = tau))
   res$pvalue <- mean(abs(permutation_vector) >= abs(statistic_parameter))
   res$statistic_parameter <- statistic_parameter
   if (pvalue>1)
     res$pvalue <- 1
   # Compute average signal and p-value
   if ((pvalue < pvalue_limit) && (n_permutations_test < n_permutations))
-    permutation_vector <- replicate(n_permutations, compute_quantile_delta_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle=TRUE, quantile = quantile))
+    permutation_vector <- replicate(n_permutations, compute_quantile_delta_permutation(sig.formula=sig.formula, df=tempDataFrame, shuffle=TRUE, quantile = tau))
   res$r_model <- "quantile_permutation_model"
   if(length(permutation_vector) == n_permutations_test)
     res$n_permutations <- n_permutations_test
@@ -75,5 +75,13 @@ quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   res$ci.lower <- ci[1]
   res$ci.upper <- ci[2]
 
-  return (data.frame(ci.lower,ci.upper, pvalue, statistic_parameter,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations))
+  independent_variable <- as.character(all.vars(sig.formula)[2])
+  dependent_variable <- as.character(all.vars(sig.formula)[1])
+
+  predicted_values <-predict(model, tempDataFrame)
+  res <- quantile_regression_metrics(predicted_values = predicted_values, expected_values = tempDataFrame[,dependent_variable],
+    tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = transformation,
+    dependent_variable = dependent_variable, permutation_vector = permutation_vector, plot = FALSE)
+
+  return(res)
 }

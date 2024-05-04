@@ -53,7 +53,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll perform:",g_end - length(covariates)," tests." )
 
   result_temp <- foreach::foreach(g = g_start:g_end, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
-  # result_temp <- foreach::foreach(g = g_start:g_end, .combine =  plyr::rbind.fill) %dofuture%
   # for(g in g_start:g_end)
   {
     burdenValue <- cols[g]

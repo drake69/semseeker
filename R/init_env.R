@@ -49,6 +49,8 @@ init_env <- function(result_folder, maxResources = 90, ...)
   log_event("INFO: ##############################################################################")
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
 
+
+  arguments <- set_env_variable(arguments,"plot_format",".png")
   arguments <- set_env_variable(arguments,"alpha",0.05)
   arguments <- set_env_variable(arguments,"verbosity",1)
   arguments <- set_env_variable(arguments,"sex_chromosome_remove",FALSE)
@@ -68,7 +70,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"cluster_workers",NULL)
   model_metrics <- c("MAE", "RMSE","MSLE", "SSE","R_SQUARED_ADJ","R_SQUARED","MAPE","MPE","R_SQUARED_COMPL","R_SQUARED_ADJ_COMPL","MSE",
     "MAE_TEST", "RMSE_TEST","MSLE_TEST", "SSE_TEST","R_SQUARED_ADJ_TEST","R_SQUARED_TEST","MAPE_TEST","MPE_TEST","R_SQUARED_COMPL_TEST","R_SQUARED_ADJ_COMPL_TEST","MSE_TEST",
-    "EFFECT_SIZE_ESTIMATE","EFFECT_SIZE_MAGNITUDE", "RBC", "POWER", "STD.ERROR","STATISTIC_PARAMETER")
+    "EFFECT_SIZE_ESTIMATE","EFFECT_SIZE_MAGNITUDE", "RBC", "POWER", "STD.ERROR","STATISTIC_PARAMETER","JSD")
   arguments <- set_env_variable(arguments,"model_metrics",model_metrics)
 
   # get ssEnv

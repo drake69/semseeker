@@ -3,6 +3,8 @@ compare_inference_association_cross_studies <- function(inference_detail, studie
   adjust_globally = F,pvalue_column="PVALUE_ADJ_ALL_BH", adjustment_method = "BH",
   result_folder, ...)
 {
+
+  # browser()
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   color_palette <- ssEnv$color_palette
   localKeys <- ssEnv$keys_areas_subareas_markers_figures
@@ -65,12 +67,14 @@ compare_inference_association_cross_studies <- function(inference_detail, studie
         # table(is.na(results_inference_comb))
         area_set <- na.omit(area_set)
         categories <- unique(na.omit(area_set$STUDY))
+        # remove _
+        categories <- gsub("_", " ", categories)
         if(length(categories)==1)
           next
         SPLIT <- split(area_set$AREA_OF_TEST, area_set$STUDY)
         filename <-
           paste(
-            ssEnv$result_folderInference,  "/",
+            ssEnv$result_folderChart,  "/",
             keys[i, ]$AREA,
             "_",
             keys[i, ]$SUBAREA,
