@@ -47,14 +47,14 @@ pathway_WebGestalt <- function(study,
           next
 
         if(keys[i,]$SUBAREA=="WHOLE")
-          gene_set <- results_inference[results_inference$SUBAREA==keys[i,]$SUBAREA,c("AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE"),]
+          gene_set <- results_inference[results_inference$SUBAREA==keys[i,]$SUBAREA,]
         else
-          gene_set <- results_inference[results_inference$SUBAREA!=keys[i,]$SUBAREA,c("AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE"),]
+          gene_set <- results_inference[results_inference$SUBAREA!=keys[i,]$SUBAREA,]
 
         if(keys[i,]$FIGURE=="BOTH" | keys[i,]$FIGURE=="MEAN")
-          gene_set <- results_inference[results_inference$FIGURE==keys[i,]$FIGURE,c("AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE"),]
+          gene_set <- results_inference[results_inference$FIGURE==keys[i,]$FIGURE,]
         else
-          gene_set <- results_inference[results_inference$FIGURE!="BOTH" & results_inference$FIGURE!="MEAN",c("AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE"),]
+          gene_set <- results_inference[results_inference$FIGURE!="BOTH" & results_inference$FIGURE!="MEAN",]
 
         if (nrow(results_inference)==0)
           next

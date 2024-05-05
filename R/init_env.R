@@ -68,9 +68,11 @@ init_env <- function(result_folder, maxResources = 90, ...)
   darker_colors <- c("blue","red","purple","green","yellow","orange","brown")
   arguments <- set_env_variable(arguments,"color_palette_darker",darker_colors)
   arguments <- set_env_variable(arguments,"cluster_workers",NULL)
-  model_metrics <- c("MAE", "RMSE","MSLE", "SSE","R_SQUARED_ADJ","R_SQUARED","MAPE","MPE","R_SQUARED_COMPL","R_SQUARED_ADJ_COMPL","MSE",
+  # browser()
+  model_metrics <- toupper(c("MAE", "RMSE","MSLE", "SSE","R_SQUARED_ADJ","R_SQUARED","MAPE","MPE","R_SQUARED_COMPL","R_SQUARED_ADJ_COMPL","MSE",
     "MAE_TEST", "RMSE_TEST","MSLE_TEST", "SSE_TEST","R_SQUARED_ADJ_TEST","R_SQUARED_TEST","MAPE_TEST","MPE_TEST","R_SQUARED_COMPL_TEST","R_SQUARED_ADJ_COMPL_TEST","MSE_TEST",
-    "EFFECT_SIZE_ESTIMATE","EFFECT_SIZE_MAGNITUDE", "RBC", "POWER", "STD.ERROR","STATISTIC_PARAMETER","JSD")
+    "EFFECT_SIZE_ESTIMATE","EFFECT_SIZE_MAGNITUDE", "RBC","RANK_BESERIAL_CORRELATION","POWER", "STD.ERROR","STATISTIC_PARAMETER","JSD","pinball_loss","below_quantile",
+    "qq_distance","qq_correlation"))
   arguments <- set_env_variable(arguments,"model_metrics",model_metrics)
 
   # get ssEnv

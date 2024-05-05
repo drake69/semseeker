@@ -1,5 +1,5 @@
 get_results_areas_inference <- function (inference_details, marker , pvalue = 0.05, adjust_per_area = F, adjust_globally = F,
-  pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE")
+  pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE", omit_na = TRUE)
 {
   ssEnv <- semseeker:::get_session_info()
   resultFolder <- ssEnv$result_folderInference
@@ -26,8 +26,10 @@ get_results_areas_inference <- function (inference_details, marker , pvalue = 0.
     return(data.frame())
   }
 
+  metrics_name_collect(results_inference)
+
   results_inference <- subset(results_inference,DEPTH==3)
-  results_inference <- results_inference[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE","DEPTH")]
+  # results_inference <- results_inference[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE","DEPTH")]
 
   results_inference[results_inference$AREA==area,"AREA_OF_TEST"] <- gsub(results_inference[results_inference$AREA==area,"AREA_OF_TEST"] , pattern="_", replacement="-")
 
@@ -50,7 +52,9 @@ get_results_areas_inference <- function (inference_details, marker , pvalue = 0.
     }
 
   results_inference <- subset(results_inference, results_inference[,pvalue_column] < pvalue)
-  results_inference <- na.omit(results_inference)
+
+  if(omit_na)
+    results_inference <- na.omit(results_inference)
 
 
   return(results_inference)

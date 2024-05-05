@@ -8,6 +8,7 @@ glm_model <- function(family_test, tempDataFrame, sig.formula)
 {
   result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
   res <- data.frame("pvalue" = summary(result_glm)$coeff[-1, 4][1])
+  # browser()
   res$statistic_parameter <- (summary(result_glm)$coeff[-1, 1][1])
   res$aic_value <- (result_glm$aic)
   res$std.error <- summary(result_glm)$coeff[-1, 2][1]

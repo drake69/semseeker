@@ -70,7 +70,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_fisher <- suppressWarnings(stats::kruskal.test(x = dependent_variable, g = group))
     res$pvalue <- result_fisher$p.value
     res$r_model <- "stats_kruskal.test"
-    statistic_parameter <- result_fisher$statistic
     res$statistic_parameter <- statistic_parameter
     kw_result <- stats::pairwise.wilcox.test(dependent_variable, group)
     PVALUE_KW <- kw_result$p.value
@@ -137,6 +136,10 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
 
     result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
     res$pvalue <- result_w$p.value
+
+    # browser()
+    res[1,"Wilcox_Value"] <- result_w$statistic
+
     res$r_model <- "stats_wilcox.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
     SPLIT <- split(tempDataFrame[,dep_var[[2]]], tempDataFrame[,dep_var[[3]]])
@@ -165,12 +168,10 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     res$effect_size_magnitude <- es_res$magnitude
     # res$cohen_d <- effsize::cohen.d(SPLIT[[1]], SPLIT[[2]], pooled=TRUE, paired=FALSE, na.rm=TRUE)
 
-    # Calculate the statistic parameter
-    res$statistic_parameter <- median(SPLIT[[1]]) - median(SPLIT[[2]])
     # Calculate rank-biserial correlation as effect size
     res$rank_biserial_correlation <- result_w$statistic / (length(SPLIT[[1]]) * length(SPLIT[[2]]))
     # Calculate power
-    power_result = pwr::pwr.t2n.test(d = res$statistic_parameter, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = as.numeric(ssEnv$alpha), power = NULL)
+    power_result = pwr::pwr.t2n.test(d = res$effect_size_estimate, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = as.numeric(ssEnv$alpha), power = NULL)
     res$power <- power_result$power
   }
 

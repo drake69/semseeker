@@ -1,22 +1,27 @@
 markers_performace <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",aggr_fun ="mean", ...)
 {
-  for (id in 1:length(inference_details))
+  ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
+  # for each marker read the file and extract the metrics and bind
+  # them in a single dataframe
+  markers <- unique(ssEnv$keys_markers_figures$MARKER)
+  # browser()
+  model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
+  selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
+  inference_details <- as.data.frame(inference_details)
+  # browser()
+
+  for (id in 1:nrow(inference_details))
   {
+    # browser()
     inference_detail <- inference_details[id,]
     depth_analysis <- inference_detail$depth_analysis
     family_test <- inference_detail$family_test
-    transformation <- inference_detail$transformation
-
-    ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
-    # for each marker read the file and extract the metrics and bind
-    # them in a single dataframe
-    markers <- unique(ssEnv$keys_markers_figures$MARKER)
-    model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
-
-    # browser()
+    transformation <- as.character(inference_detail$transformation)
+    filtered_metrics <- filter_metrics(model_metrics, as.character(transformation))
 
     for (marker in markers)
     {
+
       # marker <- "DELTAQ"
       # message(marker)
       # inference_detail <- inference_details[1,]
@@ -29,9 +34,14 @@ markers_performace <- function(inference_details, result_folder, pvalue_column="
       }
       # read the file
       file <- read.csv2(file_name)
+
+      metrics_name_collect(file)
+
       file <- file[file$DEPTH == depth_analysis,]
       # file$COUNT <- 1
       file$KEY <- paste(file$FIGURE,file$AREA,file$SUBAREA, sep="_")
+      # browser()
+      file <- file[file$FIGURE %in% selected_figures,]
       # bind the metrics
       if (!exists("final"))
         final <- file
@@ -40,7 +50,13 @@ markers_performace <- function(inference_details, result_folder, pvalue_column="
     }
 
     if (!exists("final"))
-      return(NULL)
+      next
+
+    if(nrow(final) == 0)
+      next
+
+    # mantain only existng markers
+    markers <- unique(final$MARKER)
 
     # count the number of rows for each marker, figure
     count <- aggregate(!(final$MARKER==""), by=list(final$MARKER, final$FIGURE), FUN=sum)
@@ -52,6 +68,8 @@ markers_performace <- function(inference_details, result_folder, pvalue_column="
 
     # remove rows where p_value_colimn has NA
     final <- final[!is.na(final[,pvalue_column]),]
+    if(nrow(final) == 0)
+      next
 
     # count NA in the pvalue_column for each marker, figure
     count_na <- aggregate(final[,pvalue_column], by=list(final$MARKER, final$FIGURE), FUN=function(x) sum(is.na(x)))
@@ -78,12 +96,12 @@ markers_performace <- function(inference_details, result_folder, pvalue_column="
 
 
     # check which exists in columns dataframe
-    model_metrics <- unique(model_metrics[model_metrics %in% colnames(final)])
+    filtered_metrics <- unique(filtered_metrics[filtered_metrics %in% colnames(final)])
     if(depth_analysis > 2)
-      model_metrics <- c(model_metrics, c("COUNT","COUNT_MISSED"))
-    model_metrics <- unique(sort(model_metrics))
+      filtered_metrics <- c(filtered_metrics, c("COUNT_SIGN","COUNT_MISSED"))
+    filtered_metrics <- unique(sort(filtered_metrics))
 
-    if(any("EFFECT_SIZE_MAGNITUDE" %in% model_metrics)){
+    if(any("EFFECT_SIZE_MAGNITUDE" %in% filtered_metrics)){
       # replace large with 4 medium with 3 small with 2 and neglibible with 1
       final$EFFECT_SIZE_MAGNITUDE <- as.character(final$EFFECT_SIZE_MAGNITUDE)
       final$EFFECT_SIZE_MAGNITUDE[final$EFFECT_SIZE_MAGNITUDE=="large"] <- 4
@@ -106,13 +124,14 @@ markers_performace <- function(inference_details, result_folder, pvalue_column="
     row <- 0
     # remove  NA from figures and from metrics
     figures <- figures[!is.na(figures)]
-    model_metrics <- model_metrics[!is.na(model_metrics)]
+    filtered_metrics <- filtered_metrics[!is.na(filtered_metrics)]
+    scores <- data.frame("MARKER"="","FIGURE"="","METRIC"="","SCORE"="")[-1,]
     for (fig in figures)
     {
       row <- row  + 1
       col <- 0
       # fig <- "HYPO"
-      for(metric in model_metrics){
+      for(metric in filtered_metrics){
         col <- col + 1
         # metric <- "MAE"
         final_temp <- final[final$FIGURE==fig,]
@@ -123,6 +142,13 @@ markers_performace <- function(inference_details, result_folder, pvalue_column="
           next
         final_temp <- aggregate(final_temp[,metric], by = list(final_temp[,"MARKER"]), FUN = ifelse(metric %in% c("COUNT_MISSED","COUNT_SIGN"),mean, aggr_fun))
         colnames(final_temp) <- c("MARKER", "REBASED")
+
+        # if any REBASE is not a number then skip
+        if(any(is.na(final_temp$REBASED)))
+          next
+
+        scores <- metrics_ranking(metric,final_temp, scores, fig)
+
         bar_colors <- ssEnv$color_palette[1:length(unique(final_temp$MARKER))]
 
         min_rebased <- min(final_temp$REBASED, na.rm = TRUE)
@@ -151,19 +177,42 @@ markers_performace <- function(inference_details, result_folder, pvalue_column="
       }
     }
 
+    # browser()
+    prfx <- paste(family_test, transformation, paste0(markers,collapse="_"))
+    # save scores
+    path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKER_COMPARISON")
+    write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
+
+    # aggregate scores by MARKER and sum RANK
+    scores_agg <- aggregate(scores$SCORE, by = list(scores$MARKER), FUN = sum)
+    # sort scores by SCORE descending
+    scores_agg <- scores_agg[order(scores_agg$x, decreasing = TRUE),]
+    colnames(scores_agg) <- c("MARKER","TOTAL")
+
+    # aggregate scores by MARKER and sum RANK
+    # scores_agg_fig <- aggregate(scores$SCORE, by = list(scores$MARKER, scores$FIGURE), FUN = sum)
+    # create a pivot table with MARKER as rows and FIGURE as columns
+    scores_agg_fig <- reshape2::dcast(scores, MARKER ~ FIGURE, value.var = "SCORE", fun.aggregate = sum)
+    scores_agg_fig <- merge(scores_agg_fig,scores_agg, by="MARKER")
+    # sort by SCORE descending
+    scores_agg_fig <- scores_agg_fig[order(scores_agg_fig$TOTAL, decreasing = TRUE),]
+    # save scores
+    write.csv(scores_agg_fig, file = paste0(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv"), row.names = FALSE)
+
+
     if(length(plot_list) == 0)
       return(NULL)
 
     # build  a panel from plot list
-    gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(model_metrics))
+    gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(filtered_metrics))
 
     # browser()
-    # column_labels <- as.data.frame(model_metrics)
+    # column_labels <- as.data.frame(filtered_metrics)
     #
     # # Use grid.arrange to arrange the plots with labels
     # gge <- gridExtra::grid.arrange(
     #   grobs = lapply(plot_list, ggplot2::ggplotGrob),
-    #   ncol = length(model_metrics),
+    #   ncol = length(filtered_metrics),
     #   top = gridExtra::tableGrob(tibble::tibble(column_labels), theme = tibble::tibble(padding = ggplot2::unit(1, "lines"))),
     #   left = gridExtra::textGrob(row_labels, rot = 90, vjust = 1)
     # )

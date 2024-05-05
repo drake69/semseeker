@@ -1,9 +1,17 @@
 family_test_performance <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH", ...)
 {
-
+  inference_details <- as.data.frame(inference_details)
   # all families must have the same scale
   transformations <- unique(inference_details$transformation)
-  depths <- unique(inference_details_selection$depth_analysis)
+  depths <- unique(inference_details$depth_analysis)
+  # ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE)
+  ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
+  # for each family test, read the file and extract the metrics and bind
+  # them in a single dataframe
+  # browser()
+  markers <- unique(ssEnv$keys_markers_figures$MARKER)
+  model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
+  selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
 
   for ( d in 1:length(depths))
   {
@@ -11,6 +19,8 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
     for (i in 1:length(transformations))
     {
       transformation <-transformations[i]
+      filtered_metrics <- filter_metrics(model_metrics, transformation)
+
       inference_details_selection <- inference_details[inference_details$transformation==transformation & inference_details$depth_analysis==depth,]
       # check different families.test
       families.test <- unique(inference_details_selection$family_test)
@@ -18,13 +28,6 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
       if (length(families.test)!=nrow(inference_details_selection))
         stop("All families.test must be different.")
 
-      # ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE)
-      ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
-      # for each family test, read the file and extract the metrics and bind
-      # them in a single dataframe
-      # browser()
-      markers <- unique(ssEnv$keys_markers_figures$MARKER)
-      model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
 
       for (marker in markers)
       {
@@ -44,7 +47,9 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
           file <- read.csv2(file_name)
           file <- file[file$DEPTH == depths,]
           # file$FAMILY.TEST <- paste(family_test, inference_detail$independent_variable, sep="_")
+          metrics_name_collect(file)
           file$KEY <- paste(file$FIGURE,file$AREA,file$SUBAREA, sep="_")
+          file <- file[file$FIGURE %in% selected_figures,]
           # bind the metrics
           if (!exists("final"))
             final <- file
@@ -65,9 +70,9 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
 
 
       # check which exists in columns dataframe
-      model_metrics <- unique(model_metrics[model_metrics %in% colnames(final)])
+      filtered_metrics <- unique(filtered_metrics[filtered_metrics %in% colnames(final)])
 
-      if(any("EFFECT_SIZE_MAGNITUDE" %in% model_metrics)){
+      if(any("EFFECT_SIZE_MAGNITUDE" %in% filtered_metrics)){
         # replace large with 4 medium with 3 small with 2 and neglibible with 1
         final$EFFECT_SIZE_MAGNITUDE <- as.character(final$EFFECT_SIZE_MAGNITUDE)
         final$EFFECT_SIZE_MAGNITUDE[final$EFFECT_SIZE_MAGNITUDE=="large"] <- 4
@@ -88,7 +93,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         # creat empty list to store plots
         plot_list <- list()
         # loop over metrics
-        for (m in model_metrics)
+        for (m in filtered_metrics)
         {
           # m <- "MAE"
           # create a plot
@@ -106,7 +111,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         }
 
         # build  a panel from plot list
-        gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(model_metrics))
+        gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(filtered_metrics))
 
         path <- dir_check_and_create(ssEnv$result_folderChart, "FAMILY.TEST_PERFORMANCE")
         # file_name <- inference_file_name(inference_detail, marker,path ,file_extension="png", prefix = "", suffix="")

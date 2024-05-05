@@ -1,0 +1,24 @@
+metrics_name_collect <- function(data_frame)
+{
+  # browser
+  metrics_temp <- toupper(colnames(data_frame))
+  metrics <- semseeker::metrics
+  #remove from temp existing metrics and all with PVALUE inside
+  metrics_temp <- metrics_temp[!(metrics_temp %in% metrics$NAME)]
+  metrics_temp <- metrics_temp[!(grepl("PVALUE",metrics_temp))]
+  if (length(metrics_temp)>0)
+  {
+    metrics_temp <- data.frame("NAME"=metrics_temp)
+    metrics_temp$IS_A_METRIC <- NA
+    metrics_temp$SCALE_AFFECTED <- NA
+    metrics_temp$THE_LOWER_THE_BETTER <- NA
+    metrics <- rbind(metrics, metrics_temp)
+    # sort by name
+    metrics <- metrics[order(metrics$NAME),]
+    # write.csv(metrics, file = "metrics.csv", row.names = FALSE)
+    usethis::use_data(metrics, overwrite = TRUE,compress = "bzip2")
+    write.csv2(metrics, file = "~/Desktop/metrics.csv")
+    # save to semseeker::metrics
+    # semseeker::metrics <<- metrics
+  }
+}
