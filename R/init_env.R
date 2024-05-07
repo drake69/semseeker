@@ -36,10 +36,10 @@ init_env <- function(result_folder, maxResources = 90, ...)
     ssEnv <- list()
   }
   else
-    ssEnv <- semseeker:::get_session_info(result_folder)
+    ssEnv <- get_session_info(result_folder)
 
-  ssEnv$session_folder <-  semseeker:::dir_check_and_create(result_folder,c("Log"))
-  semseeker:::update_session_info(ssEnv)
+  ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
+  update_session_info(ssEnv)
 
   # utils::data("PROBES")
   # utils::data("PROBES_CHR_CHR")
@@ -88,13 +88,13 @@ init_env <- function(result_folder, maxResources = 90, ...)
   tmp <- tempdir()
   log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y")," data will saved in this folder:", result_folder)
   ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
-  ssEnv$result_folderData <-  semseeker:::dir_check_and_create(result_folder, "Data")
-  ssEnv$result_folderChart <-    semseeker:::dir_check_and_create(result_folder, "Chart")
-  ssEnv$result_folderInference <-    semseeker:::dir_check_and_create(result_folder, "Inference")
-  ssEnv$result_folderPathway <-    semseeker:::dir_check_and_create(result_folder, "Pathway")
-  ssEnv$result_folderPhenotype <-    semseeker:::dir_check_and_create(result_folder, "Phenotype")
-  ssEnv$result_folderEuristic <-  semseeker:::dir_check_and_create(result_folder,"Euristic")
-  ssEnv$session_folder <-  semseeker:::dir_check_and_create(result_folder,c("Log"))
+  ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
+  ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
+  ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
+  ssEnv$result_folderPathway <-    dir_check_and_create(result_folder, "Pathway")
+  ssEnv$result_folderPhenotype <-    dir_check_and_create(result_folder, "Phenotype")
+  ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
+  ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
 
   if (sink.number() != 0)
@@ -258,9 +258,9 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv$keys_for_pathway <- keys
 
 
-  ssEnv$functionToExport <- c( "semseeker:::analyze_single_sample","deltar_single_sample",
+  ssEnv$functionToExport <- c( "analyze_single_sample","deltar_single_sample",
     "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
-    "file_path_build","semseeker:::analyze_single_sample_both",
+    "file_path_build","analyze_single_sample_both",
     "sort_by_chr_and_start", "test_match_order", "lesions_get",
     "mutations_get")
 
@@ -293,7 +293,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"parallel_strategy","sequential")
   parallel_session()
 
-  semseeker:::update_session_info(ssEnv)
+  update_session_info(ssEnv)
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will focus on:", paste(unique(keys_markers_figures$MARKER), collapse = " ", sep =" "), " due to ",  paste(unique(keys_markers_figures$FIGURE), collapse = " ", sep =" "), " of ",  paste(areas, collapse = " ", sep =" "))
 
   # check length of arguments
@@ -313,7 +313,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
     stop("INFO: Dry run is requested. Exiting now.")
   }
 
-  semseeker:::update_session_info(ssEnv)
+  update_session_info(ssEnv)
 
   return(ssEnv)
 }

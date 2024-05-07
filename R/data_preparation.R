@@ -12,7 +12,7 @@
 data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis)
 {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   transformation <- as.character(transformation)
   independentVariableIsFactor <- FALSE

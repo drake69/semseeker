@@ -2,7 +2,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
 {
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id)
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   # #
   signal_data <- as.data.frame(signal_data)
@@ -16,7 +16,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work on:", nrow(signal_data), " PROBES.")
 
-  probe_features <- semseeker:::probe_features_get("PROBE")
+  probe_features <- probe_features_get("PROBE")
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " loaded probe_features: PROBES")
   probe_features <- probe_features[(probe_features$PROBE %in% rownames(signal_data)),]
   signal_data <- signal_data[rownames(signal_data) %in% probe_features$PROBE, ]
@@ -66,8 +66,8 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   {
     populationControlRangeBetaValues <- as.data.frame(signal_range_values(referencePopulationMatrix))
     gc()
-    # utils::write.table(x = gzfile(populationControlRangeBetaValues), file = semseeker:::file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds","csv"), add_gz = TRUE), sep=";")
-    fst::write.fst(x = populationControlRangeBetaValues, path = semseeker:::file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"fst"), compress = 100)
+    # utils::write.table(x = gzfile(populationControlRangeBetaValues), file = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds","csv"), add_gz = TRUE), sep=";")
+    fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"fst"), compress = 100)
   }
   else
   {
@@ -81,7 +81,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   sample_sheet <- rbind(otherSamples, referenceSamples)
 
   i <- 0
-  variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "semseeker:::analyze_population",
+  variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "analyze_population",
     "populationControlRangeBetaValues", "PROBES", "create_multiple_bed","probe_features")
   # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
   for (i in 1:length(ssEnv$keys_sample_groups[,1]))
@@ -96,7 +96,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
     }
     else
     {
-      resultPopulation <- semseeker:::analyze_population(
+      resultPopulation <- analyze_population(
         signal_data = signal_data[, populationMatrixColumns],
         sample_sheet = populationSampleSheet,
         signal_thresholds = populationControlRangeBetaValues,

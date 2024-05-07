@@ -16,7 +16,7 @@ semseeker <- function(sample_sheet,
                       ... ) {
 
   init_env( result_folder= result_folder, ...)
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet_original.csv"), row.names = FALSE)
 
   # set digits to 22
@@ -60,7 +60,7 @@ semseeker <- function(sample_sheet,
     else
       signal_data_local <- stats::na.omit(signal_data[[batch_id]])
     signal_data_local <- signal_data_local[rownames(signal_data_local) %in% probes_to_preserve,]
-    sample_sheet_local <- semseeker:::analyze_batch(signal_data_local, sample_sheet_local, batch_id)
+    sample_sheet_local <- analyze_batch(signal_data_local, sample_sheet_local, batch_id)
     if(exists("sample_sheet_result"))
       sample_sheet_result <- plyr::rbind.fill(sample_sheet_result, sample_sheet_local)
     else
@@ -78,11 +78,11 @@ semseeker <- function(sample_sheet,
     sample_groups <- c("Control","Case")
 
   # seems to change the ssEnv reducing the items TODO
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
   update_session_info(ssEnv)
 
-  semseeker:::annotate_bed()
+  annotate_bed()
   create_excel_pivot()
 
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "Starting inference Analysis.")

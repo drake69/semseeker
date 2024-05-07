@@ -1,6 +1,6 @@
 log_event <- function(...)
 {
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   # append log_event to log file
   log_events <- list(...)
   log_event_to_save <- ""

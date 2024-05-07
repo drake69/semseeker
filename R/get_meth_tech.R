@@ -1,6 +1,6 @@
 get_meth_tech <- function(signal_data)
 {
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   if(nrow(signal_data) == 485512)
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " seems a 450k dataset.")

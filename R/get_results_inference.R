@@ -1,7 +1,7 @@
 get_results_areas_inference <- function (inference_details, marker , pvalue = 0.05, adjust_per_area = F, adjust_globally = F,
   pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE", omit_na = TRUE)
 {
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   resultFolder <- ssEnv$result_folderInference
 
   inferenceFile <- inference_file_name(inference_details, marker, ssEnv$result_folderInference)

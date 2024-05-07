@@ -9,13 +9,13 @@
 #'
 read_multiple_bed <- function(sample_group, marker, figure)
 {
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   f <- paste0(marker,"_", figure, sep="")
-  souceFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderData, c(as.character(sample_group),f))
+  souceFolder <- dir_check_and_create(ssEnv$result_folderData, c(as.character(sample_group),f))
 
   col_names <- c("CHR", "START", "END","VALUE","SAMPLEID")
-  fileName <- semseeker:::file_path_build(souceFolder,c("MULTIPLE",as.character(marker),as.character(figure)),"fst")
+  fileName <- file_path_build(souceFolder,c("MULTIPLE",as.character(marker),as.character(figure)),"fst")
 
   if(file.exists(fileName))
   {

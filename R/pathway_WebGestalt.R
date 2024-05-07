@@ -8,9 +8,9 @@ pathway_WebGestalt <- function(study,
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = start_fresh, ...)
 
   keys <- unique(ssEnv$keys_for_pathway)
-  path <- semseeker:::dir_check_and_create(ssEnv$result_folderPathway,"WebGestalt")
+  path <- dir_check_and_create(ssEnv$result_folderPathway,"WebGestalt")
   tmp <- tempdir()
-  tempFolder <- semseeker:::dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
+  tempFolder <- dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
 
 
   #check if optional package is installed
@@ -33,7 +33,7 @@ pathway_WebGestalt <- function(study,
       for ( em in 1:length(enrich_methods))
       {
         projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, pvalue)
-        filenameResult = semseeker:::file_path_build(path,projectName,"csv")
+        filenameResult = file_path_build(path,projectName,"csv")
         if(file.exists(filenameResult))
           next
 
@@ -91,14 +91,24 @@ pathway_WebGestalt <- function(study,
 
           if(min(enrichResult$FDR) < as.numeric(ssEnv$alpha))
           {
-            plotFileName = semseeker:::file_path_build(path,projectName,"png")
+            plotFileName = file_path_build(path,projectName,"png")
             grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")
             enrichResult <- as.data.frame(enrichResult)
             enrichResult <- enrichResult[order(enrichResult$expect),]
             graphics::par(mar = c(5, 30, 5, 5)) # Set the margin on all sides to 6
             par(cex.lab = 4)
-            graphics::barplot(height=enrichResult$expect, names=wrap_it(paste0(enrichResult$description,"(FDR=", round(enrichResult$FDR,2),")", sep=" "),25) , horiz=T, las = 1 ,cex.names= 2, space=0.1)
-            graphics::mtext( paste0(keys[i,"AREA"],keys[i,"SUBAREA"], keys[i,"MARKER"], keys[i,"FIGURE"],pvalue_column,sep=" "), side = 3, line = 1, cex = 2)
+            # Create a color vector based on the condition FDR < 0.05
+            bar_colors <- ifelse(enrichResult$FDR < as.numeric(ssEnv$alpha), ssEnv$color_palette[1], ssEnv$color_palette[2])
+            # Generate the barplot with colors
+            graphics::barplot(height = enrichResult$expect,
+              names = wrap_it(paste0(enrichResult$description, "(FDR=", round(enrichResult$FDR, 2), ")", sep=" "), 25),
+              horiz = TRUE,
+              las = 1,
+              cex.names = 2,
+              space = 0.1,
+              col = bar_colors) # Use the color vector here
+            # graphics::barplot(height=enrichResult$expect, names=wrap_it(paste0(enrichResult$description,"(FDR=", round(enrichResult$FDR,2),")", sep=" "),25) , horiz=T, las = 1 ,cex.names= 2, space=0.1)
+            graphics::mtext( paste0(keys[i,"AREA"]," ",keys[i,"SUBAREA"]," ", keys[i,"MARKER"], " ",keys[i,"FIGURE"]," ",pvalue_column,sep=" "), side = 3, line = 1, cex = 2)
             grDevices::dev.off()
           }
           file.remove(geneFile)
@@ -121,7 +131,7 @@ pathway_WebGestalt <- function(study,
     if(exists("enrichResultFinal"))
     {
       projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, pvalue)
-      filenameResult = semseeker:::file_path_build(path,projectName,"csv")
+      filenameResult = file_path_build(path,projectName,"csv")
       write.csv2(enrichResultFinal, filenameResult)
       rm(enrichResultFinal)
     }

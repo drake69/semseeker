@@ -6,7 +6,7 @@ compare_pathway_association <- function(result_folder, ...){
   studies_to_comb <- na.omit(unique(pathway_inference$STUDY))
   for( j in length(studies_to_comb):1)
   {
-    studies_comb <- combn(studies_to_comb, j)
+    studies_comb <- combinat::combn(studies_to_comb, j)
     if (j==length(studies_to_comb))
       studies_comb <- data.frame("st"=studies_comb)
     log_event(studies_comb)
@@ -108,7 +108,7 @@ compare_pathway_association <- function(result_folder, ...){
           sep = ""
         )
       # Chart
-      venn.diagram(
+      VennDiagram::venn.diagram(
         x = SPLIT,
         category.names = categories,
         filename = filename,

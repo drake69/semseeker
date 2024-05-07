@@ -28,7 +28,7 @@ compute_mean_delta_permutation_cpu <- function(sig.formula,df, shuffle = FALSE)
 
 compute_mean_delta_permutation_gpu_single <- function(sig.formula,df, n_permutations, shuffle=FALSE)
 {
-    ssEnv <- semseeker:::get_session_info()
+    ssEnv <- get_session_info()
 
 
     burden_var <- as.character(all.vars(sig.formula)[1])
@@ -119,7 +119,7 @@ compute_mean_delta_permutation_gpu_single <- function(sig.formula,df, n_permutat
 
 compute_mean_delta_permutation_gpu <- function(sig.formula,df, n_permutations, shuffle=FALSE)
 {
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   # burden_var <- as.character(all.vars(sig.formula)[1])
   independent_var <- as.character(all.vars(sig.formula)[2])
@@ -181,7 +181,7 @@ compute_mean_delta_permutation_gpu <- function(sig.formula,df, n_permutations, s
 #'
 mean_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable)
 {
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   n_permutations <- NA
   n_permutations_test <- NA
   ci.lower <- NA

@@ -6,18 +6,18 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE,
     figures="BOTH", areas="PROBE", ...)
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, tech = tech)
-  chart_folder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_PROBE")
+  chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_PROBE")
 
   create_excel_pivot()
-  result_folderPivot <- semseeker:::dir_check_and_create(ssEnv$result_folderData,"Pivots")
+  result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
 
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
   for(k in 1:length(localKeys)){
     marker <- as.character(localKeys[k])
-    pivot_subfolder <- semseeker:::dir_check_and_create(result_folderPivot,marker)
-    fname <- semseeker:::file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
+    pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
+    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
     if (!file.exists(fname))
       tempKeys <- tempKeys[-k]
   }
@@ -25,8 +25,8 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   # remove SIGNAL from tempKeys
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
 
-  signal_data <- readRDS(semseeker:::file_path_build( ssEnv$result_folderData, "1_signal_data","rds"))
-  threshold_data <- fst::read_fst(semseeker:::file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))
+  signal_data <- readRDS(file_path_build( ssEnv$result_folderData, "1_signal_data","rds"))
+  threshold_data <- fst::read_fst(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))
 
   colnames(signal_data) <- gsub("-","_", colnames(signal_data))
   if(max_sample!=0)
@@ -57,8 +57,8 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   for(j in 1:length(tempKeys))
   {
     marker <- as.character(tempKeys[j])
-    pivot_subfolder <- semseeker:::dir_check_and_create(result_folderPivot,marker)
-    fname <- semseeker:::file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
+    pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
+    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
     message("Reading file ", fname)
     marker_data <- utils::read.csv2(fname, sep  =  ";")
     marker_data <- marker_data[-1,colnames(marker_data) %in% colnames(signal_data)]
@@ -79,7 +79,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
       ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5)) +
       ggplot2::scale_x_continuous(limits = c(1, NA)) # Adjust the limits to exclude 0
 
-    plot_filename <- semseeker:::file_path_build(chart_folder,c(probe_name,marker),".png")
+    plot_filename <- file_path_build(chart_folder,c(probe_name,marker),".png")
     ggplot2::ggsave(filename =plot_filename,plot = pp,units = "in", width = 6, height = 2, dpi=300)
   }
 
@@ -122,7 +122,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
     ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5)) +
     ggplot2::scale_x_continuous(limits = c(1, NA)) # Adjust the limits to exclude 0
 
-  plot_filename <- semseeker:::file_path_build(chart_folder,c(probe_name,"SIGNAL_OUTLIER"),".png")
+  plot_filename <- file_path_build(chart_folder,c(probe_name,"SIGNAL_OUTLIER"),".png")
   ggplot2::ggsave(filename = plot_filename,plot = pp,units = "in", width = 6, height = 4, dpi=300)
 
 

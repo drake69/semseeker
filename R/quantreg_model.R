@@ -24,7 +24,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
     res$ci.lower <- summary_qr[2,"lower bound"]
     res$ci.upper <- summary_qr[2,"upper bound"]
 
-    # predicted_values <-predict(model, tempDataFrame)
+    # predicted_values <- stats::predict(model, tempDataFrame)
     # res <- quantile_regression_metrics(predicted_values = model$fitted.values, expected_values = tempDataFrame[[independent_variable]],
     #   tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = "quantile",
     #   dependent_variable = independent_variable, permutation_vector = c(), plot = FALSE)
@@ -41,7 +41,7 @@ quantile_regression_metrics <- function(predicted_values, expected_values, tau, 
 
   ###########
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   pinball_loss <- function(expected_values, predicted_values, tau) {
     residuals <- expected_values - predicted_values
@@ -63,24 +63,24 @@ quantile_regression_metrics <- function(predicted_values, expected_values, tau, 
 
   if(plot)
   {
-    chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  semseeker:::file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
+    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
 
     # Save the plot
     grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-    plot(expected_values, predicted_values, main = "Observed vs. Predicted Quantiles",
+    graphics::plot(expected_values, predicted_values, main = "Observed vs. Predicted Quantiles",
       xlab = "Observed Quantiles", ylab = "Predicted Quantiles", pch = 19)
-    abline(0, 1, col = ssEnv$color_palette_darker[1] )  # Adding a 45-degree line for reference
+    graphics::abline(0, 1, col = ssEnv$color_palette_darker[1] )  # Adding a 45-degree line for reference
     grDevices::dev.off()
 
     # plot histograms of betas
     if (length(permutation_vector) > 0)
     {
-      chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-      filename  =  semseeker:::file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, "HISTOGRAM"),"png")
+      chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
+      filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, "HISTOGRAM"),"png")
 
       grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-      hist(expected_values - predicted_values, main = "Histogram of Betas",
+      graphics::hist(expected_values - predicted_values, main = "Histogram of Betas",
         xlab = "Betas", ylab = "Frequency", col = ssEnv$color_palette[1])
       grDevices::dev.off()
     }
@@ -89,7 +89,7 @@ quantile_regression_metrics <- function(predicted_values, expected_values, tau, 
   ###########
 
   # Calculate correlation
-  correlation <- cor(expected_values, predicted_values)
+  correlation <- stats::cor(expected_values, predicted_values)
   res$qq_correlation <- correlation
 
   ###########

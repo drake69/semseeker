@@ -78,7 +78,7 @@ quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   independent_variable <- as.character(all.vars(sig.formula)[2])
   dependent_variable <- as.character(all.vars(sig.formula)[1])
 
-  predicted_values <-predict(model, tempDataFrame)
+  predicted_values <- stats::predict(model, tempDataFrame)
   res <- quantile_regression_metrics(predicted_values = predicted_values, expected_values = tempDataFrame[,dependent_variable],
     tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = transformation,
     dependent_variable = dependent_variable, permutation_vector = permutation_vector, plot = FALSE)

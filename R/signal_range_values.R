@@ -7,7 +7,7 @@
 
 signal_range_values <- function(populationMatrix) {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   # populationMatrixDim <- dim(populationMatrix)
   populatioinMatrix <- as.data.frame(populationMatrix)
@@ -24,7 +24,7 @@ signal_range_values <- function(populationMatrix) {
   export = c("progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv")
   r <- 1
 
-  if(ncol(signal_values) > 500)
+  if(ncol(signal_values) > 2000)
   {
     # for(r in 1:1000)
     result <- foreach::foreach(r = 1:nrow(signal_values), .combine = "rbind", .export = export) %dorng%

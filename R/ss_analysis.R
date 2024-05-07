@@ -28,9 +28,9 @@ ss_analysis <-
     sample_groups <- c("Reference", "Control", "Case")
 
     create_excel_pivot()
-    result_folderPivot <- semseeker:::dir_check_and_create(ssEnv$result_folderData, "Pivots")
+    result_folderPivot <- dir_check_and_create(ssEnv$result_folderData, "Pivots")
 
-    study_summary <-   utils::read.csv2(semseeker:::file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+    study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
     study_summary <- study_summary[, c("Sample_ID",independent_variable)]
 
     markers <- unique(ssEnv$keys_markers_figures$MARKER)
@@ -40,8 +40,8 @@ ss_analysis <-
     for (a in 1:length(markers))
     {
       # a <- 2
-      fileNameResults <- semseeker:::file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),independent_variable, "sensitivity_specificity_analisys"),extension = "csv")
-      fileNameResultsTemp <- semseeker:::file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),independent_variable,"sensitivity_specificity_analisys","tmp"),extension = "csv")
+      fileNameResults <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),independent_variable, "sensitivity_specificity_analisys"),extension = "csv")
+      fileNameResultsTemp <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),independent_variable,"sensitivity_specificity_analisys","tmp"),extension = "csv")
 
       localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
       keys <- localKeys_1[localKeys_1$MARKER == markers[a], ]
@@ -66,8 +66,8 @@ ss_analysis <-
         {
           # k <- 3
           key <- keys [k, ]
-          pivot_subfolder <- semseeker:::dir_check_and_create(result_folderPivot, key$MARKER)
-          fname <- semseeker:::file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv")
+          pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
+          fname <- file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv")
           if (file.exists(fname))
           {
             log_event("INFO: ",
@@ -122,7 +122,7 @@ ss_analysis <-
 
             labels <- unique(tempDataFrame[,independent_variable])
             # get all the combinations of two over all labels
-            combinations <- combn(labels, 2)
+            combinations <- combinat::combn(labels, 2)
             for ( comb in 1:ncol(combinations))
             {
 
@@ -238,16 +238,16 @@ ss_analysis <-
               }
               # append to csv file
               if(!file.exists(fileNameResultsTemp))
-                write.table(x =  results_temp, file = fileNameResultsTemp, append = FALSE, row.names = FALSE, sep="\t")
+                utils::write.table(x =  results_temp, file = fileNameResultsTemp, append = FALSE, row.names = FALSE, sep="\t")
               else
-                write.table(x =  results_temp, file = fileNameResultsTemp, append = TRUE, row.names = FALSE, sep="\t", col.names = FALSE)
+                utils::write.table(x =  results_temp, file = fileNameResultsTemp, append = TRUE, row.names = FALSE, sep="\t", col.names = FALSE)
             }
           }
         }
 
 
       if(file.exists(fileNameResultsTemp))
-        results <-  read.csv2(file = fileNameResultsTemp, header = TRUE , stringsAsFactors = FALSE, sep="\t")
+        results <-  utils::read.csv2(file = fileNameResultsTemp, header = TRUE , stringsAsFactors = FALSE, sep="\t")
 
       # drop column if all is na
       if (!exists("results"))
@@ -272,7 +272,7 @@ ss_analysis <-
 
       # sort by SCORE descending
       results <- results[order(-results$SCORE),]
-      write.csv2(x = results, file = fileNameResults,row.names = FALSE)
+      utils::write.csv2(x = results, file = fileNameResults,row.names = FALSE)
       rm(results)
       if(file.exists(fileNameResultsTemp))
         file.remove(fileNameResultsTemp)

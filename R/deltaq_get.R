@@ -1,14 +1,14 @@
 #' @importFrom doRNG %dorng%
 deltaq_get <- function(resultPopulation){
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   # local_deltaq <- paste0("DELTAQ",ssEnv$epiquantile, sep="")
   #create multiple file bed
   variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "ssEnv", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
                            ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
                            ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-                           ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","semseeker:::probe_features_get")
+                           ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probe_features_get")
 
   Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
@@ -27,8 +27,8 @@ deltaq_get <- function(resultPopulation){
   for(i in 1:nrow(localKeys))
   {
     key <- localKeys[i,]
-    tempresult_folderData <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
-    fileToRead <- semseeker:::file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), as.character(key$EXT))
+    tempresult_folderData <- dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
+    fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), as.character(key$EXT))
     if(file.exists(fileToRead))
     {
       deltaq_temp <- fst::read.fst(fileToRead, as.data.table = T)
@@ -78,8 +78,8 @@ deltaq_get <- function(resultPopulation){
       {
         colnames(localFileRes) <- c("CHR","START","END","VALUE","SAMPLEID")
 
-        tempresult_folderData <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTAQ",key$SUFFIX,"_",as.character(key$FIGURE),sep="")))
-        fileToWrite <- semseeker:::file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"),key$SUFFIX, as.character(key$FIGURE)),  as.character(key$EXT))
+        tempresult_folderData <- dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste("DELTAQ",key$SUFFIX,"_",as.character(key$FIGURE),sep="")))
+        fileToWrite <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character("DELTAQ"),key$SUFFIX, as.character(key$FIGURE)),  as.character(key$EXT))
         fst::write.fst( x= localFileRes, fileToWrite, compress = 100)
         log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Created DELTAQ multiple annotated file!", fileToWrite)
 

@@ -1,5 +1,5 @@
 pathway_pathfindR <- function(study,
-  path_db,  iterations = 10, exclude_beta= FALSE,
+  path_db,  iterations = 10, exclude_beta= TRUE,
   pvalue = 0.05, adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
 {
@@ -51,7 +51,7 @@ pathway_pathfindR <- function(study,
         if (nrow(results_inference)==0)
           next
 
-        
+
         key <- paste(keys[i,]$AREA,keys[i,]$SUBAREA,keys[i,]$MARKER,keys[i,]$FIGURE, sep="_")
         if (nrow(results_inference)==0)
           next
@@ -63,8 +63,8 @@ pathway_pathfindR <- function(study,
           suffix = "without_signal_"
 
         phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, pvalue)
-        path <- semseeker:::dir_check_and_create(ssEnv$result_folderPathway,"pathfindR")
-        pathway_report_path <- semseeker:::file_path_build(path,phenotype_analysis_name,"csv")
+        path <- dir_check_and_create(ssEnv$result_folderPathway,"pathfindR")
+        pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
 
         if(file.exists(pathway_report_path))
         {

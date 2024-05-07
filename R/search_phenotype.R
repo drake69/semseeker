@@ -26,8 +26,8 @@ search_phenotype <- function(search_term = 'noonan syndrome', show_query = FALSE
   if (show_query){
     log_event(my_query)
   }
-  my_result   <- read_xml(my_query) %>% xmlParse(.)
-  my_list     <- xmlToList(my_result)
+  my_result   <- XML::read_xml(my_query) %>% XML::xmlParse(.)
+  my_list     <- XML::xmlToList(my_result)
   my_total    <- as.numeric(my_list$searchResponse$totalResults)
   tmp         <- rapply(my_list, function(x) x)
   my_omim     <- as.vector(tmp[grep('phenotypeMimNumber', names(tmp))])
@@ -43,8 +43,8 @@ search_phenotype <- function(search_term = 'noonan syndrome', show_query = FALSE
       start     <- start + 20
       my_start  <- paste('start=', start, sep='')
       my_query  <- paste(my_search, my_include, my_key, my_start, my_limit, sep = "&")
-      my_result <- read_xml(my_query) %>% xmlParse(.)
-      my_list   <- xmlToList(my_result)
+      my_result <- XML::read_xml(my_query) %>% XML::xmlParse(.)
+      my_list   <- XML::xmlToList(my_result)
       my_total  <- as.numeric(my_list$searchResponse$totalResults)
       tmp       <- rapply(my_list, function(x) x)
       my_omim   <- c(my_omim, as.vector(tmp[grep('phenotypeMimNumber', names(tmp))]))

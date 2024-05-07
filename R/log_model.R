@@ -1,7 +1,7 @@
 log_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot)
 {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   # plynomial_degree_partition-partition_percentage
   log_params <- unlist(strsplit(as.character(family_test),"_"))
   partition_percentage <- as.numeric(log_params[2])
@@ -42,8 +42,8 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
 
   if(plot)
   {
-    chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  semseeker:::file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
+    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
 
     # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
     ggp <- ggplot2::ggplot(train.data, ggplot2::aes(((independent_variable)), ((dependent_variable))) ) +

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dir_check_and_create.R
 \name{dir_check_and_create}
 \alias{dir_check_and_create}
-\title{semseeker:::dir_check_and_create}
+\title{dir_check_and_create}
 \usage{
 dir_check_and_create(baseFolder, subFolders)
 }
@@ -15,5 +15,5 @@ dir_check_and_create(baseFolder, subFolders)
 full path
 }
 \description{
-semseeker:::dir_check_and_create
+dir_check_and_create
 }

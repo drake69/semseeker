@@ -7,7 +7,7 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
     model_result <- glm_model(family_test, tempDataFrame, sig.formula )
 
   if(family_test=="wilcoxon" | family_test=="t.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman" | family_test=="jsd"
-    | family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test")
+    | family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test" | family_test=="bartlett.test")
     model_result <- test_model(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable, transformation, plot )
 
   if(grepl("mean-permutation",family_test))

@@ -6,7 +6,7 @@
 lesions_get <- function(grouping_column, mutation_annotated_sorted)
 {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   if( is.null(mutation_annotated_sorted))
     return (mutation_annotated_sorted)

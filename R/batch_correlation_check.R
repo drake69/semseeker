@@ -1,13 +1,13 @@
 batch_correlation_check <- function() {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   y <- g <- 1
   i <- 1
   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
   localKeys <- expand.grid("FIGURE"=ssEnv$keys_figures_default[,1],"MARKER"= ssEnv$keys_markers[,1])
 
-  batch_analysis_folder <- semseeker:::dir_check_and_create(ssEnv$result_folderData,"Batch_Analysis")
-  chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,"BATCH")
+  batch_analysis_folder <- dir_check_and_create(ssEnv$result_folderData,"Batch_Analysis")
+  chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"BATCH")
 
   to_export <- c("localKeys", "sample_sheet", "%dorng%", "g", "dir_check_and_create", "ssEnv", "file_path_build",
     "batch_analysis_folder", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName", "getDoParName",
@@ -25,8 +25,8 @@ batch_correlation_check <- function() {
       # for(g in 1:length(sample_groups))
       {
         pop <- sample_groups[g]
-        tempresult_folderData <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c(as.character(pop) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
-        file_to_read <- semseeker:::file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), "fst")
+        tempresult_folderData <- dir_check_and_create(ssEnv$result_folderData,c(as.character(pop) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
+        file_to_read <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), "fst")
         if(file.exists(file_to_read))
         {
           temp <- fst::read_fst(file_to_read, as.data.table = T)
@@ -104,7 +104,7 @@ batch_correlation_check <- function() {
       pca_contrib$Batch_ID <- as.factor(pca_contrib$Batch_ID)
     }
     pca_contrib <- as.data.frame(pca_contrib)
-    result_file <- semseeker:::file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$MARKER), as.character(key$FIGURE)), "csv", add_gz=TRUE)
+    result_file <- file_path_build(batch_analysis_folder, c("pca_contrib", as.character(key$MARKER), as.character(key$FIGURE)), "csv", add_gz=TRUE)
     utils::write.csv2(gzfile(pca_contrib),result_file,row.names = F)
 
     if(length(unique(t(unique(stats::na.omit(pca_contrib[,!(colnames(pca_contrib) %in% c("Batch_ID"))])))))==1
@@ -167,7 +167,7 @@ batch_correlation_check <- function() {
     result_cor <- merge(result_cor, dunn.results, by="dim")
     rm(dunn.results)
 
-    result_file <- semseeker:::file_path_build(batch_analysis_folder, c("batch_cor", as.character(key$MARKER), as.character(key$FIGURE)), "csv", add_gz=TRUE)
+    result_file <- file_path_build(batch_analysis_folder, c("batch_cor", as.character(key$MARKER), as.character(key$FIGURE)), "csv", add_gz=TRUE)
     utils::write.csv2(gzfile(result_cor),result_file,row.names = F)
 
     result_cor <- subset(result_cor, result_cor$p.value < as.numeric(ssEnv$alpha))
@@ -184,7 +184,7 @@ batch_correlation_check <- function() {
       summary_cor <- result_cor
     # result_cor
   }
-  result_file <- semseeker:::file_path_build(batch_analysis_folder, c("result","cor"), "csv", add_gz=TRUE)
+  result_file <- file_path_build(batch_analysis_folder, c("result","cor"), "csv", add_gz=TRUE)
   utils::write.csv2(gzfile(summary_cor),result_file,row.names = F)
 
 }

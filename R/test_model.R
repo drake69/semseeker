@@ -9,7 +9,7 @@
 test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot )
 {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   res <- data.frame(pvalue=1)
   if(family_test=="chisq.test")
   {
@@ -31,6 +31,27 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     res$statistic_parameter <- result_chisq$statistic
     degrees_of_freedom <- result_chisq$parameter
     effect_size <- sqrt(result_chisq$statistic/nrow(tempDataFrame))
+    rea$effect_size <- effect_size
+    power_result <- pwr::pwr.chisq.test(w = effect_size, N = nrow(tempDataFrame) , df = degrees_of_freedom, sig.level = as.numeric(ssEnv$alpha), power = )
+    res$power <- power_result$power
+  }
+
+  if(family_test=="bartlett.test")
+  {
+    if (plot)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test)
+
+    tempDataFrame <- as.data.frame(tempDataFrame)
+    dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
+    dependent_variable <- dep_var[[2]]
+    independent_variable <- dep_var[[3]] # sample_group
+
+    bartlett.test <- suppressWarnings(stats::bartlett.test(x = dependent_variable, g = independent_variable))
+    res$pvalue <- bartlett.test$p.value
+    res$r_model <- "bartlett.test"
+    res$statistic_parameter <- bartlett.test$statistic
+    degrees_of_freedom <- bartlett.test$parameter
+    effect_size <- sqrt(bartlett.test$statistic/nrow(tempDataFrame))
     rea$effect_size <- effect_size
     power_result <- pwr::pwr.chisq.test(w = effect_size, N = nrow(tempDataFrame) , df = degrees_of_freedom, sig.level = as.numeric(ssEnv$alpha), power = )
     res$power <- power_result$power
@@ -70,7 +91,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_fisher <- suppressWarnings(stats::kruskal.test(x = dependent_variable, g = group))
     res$pvalue <- result_fisher$p.value
     res$r_model <- "stats_kruskal.test"
-    res$statistic_parameter <- statistic_parameter
+    res$kw_runk_sum <- result_fisher$kw_runk_sum
     kw_result <- stats::pairwise.wilcox.test(dependent_variable, group)
     PVALUE_KW <- kw_result$p.value
 
@@ -100,7 +121,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     res$kw_pvalue_max <- kw_pvalue_max
     # remove rowname from res
     rownames(res) <- NULL
-
 
   }
 

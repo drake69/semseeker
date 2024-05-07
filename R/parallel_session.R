@@ -1,7 +1,7 @@
 parallel_session <- function()
 {
   # browser()
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   parallel_strategy <- ssEnv$parallel_strategy
 
   # check if os is macos

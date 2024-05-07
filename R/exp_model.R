@@ -1,7 +1,7 @@
 exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot)
 {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   exp_params <- unlist(strsplit(as.character(family_test),"_"))
 
   partition_percentage <- as.numeric(exp_params[2])
@@ -31,12 +31,12 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
 
   exp_model_result <- NA
   tryCatch({
-    nls.control(warnOnly = TRUE)
-    nls.control(maxiter = 1000)
-    nls.control(minFactor = 1e-8)
+    stats::nls.control(warnOnly = TRUE)
+    stats::nls.control(maxiter = 1000)
+    stats::nls.control(minFactor = 1e-8)
     # Fit the exponential model
     formula <- as.formula(paste0(dependent_variable," ~ a * exp(b * ",independent_variable,")"))
-    exp_model_result <- nls(formula = formula , start = list(a = start_a, b = start_b), data = train.data)
+    exp_model_result <- stats::nls(formula = formula , start = list(a = start_a, b = start_b), data = train.data)
   }, error = function(e) {
 
   })
@@ -110,8 +110,8 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
 
   if(plot)
   {
-    chartFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  semseeker:::file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
+    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
 
     ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
       ggplot2::geom_point( color = ssEnv$color_palette[1] ) +

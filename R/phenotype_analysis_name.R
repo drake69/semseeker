@@ -1,6 +1,6 @@
 phenotype_analysis_name <- function(inference_detail, key,prefix = "", suffix="", pvalue_column, pvalue)
 {
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
 
   covariates <- inference_detail$covariates
   covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))

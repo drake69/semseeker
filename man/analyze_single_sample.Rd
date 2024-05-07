@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyze_single_sample.R
 \name{analyze_single_sample}
 \alias{analyze_single_sample}
-\title{semseeker:::analyze_single_sample}
+\title{analyze_single_sample}
 \usage{
 analyze_single_sample(
   values,
@@ -27,5 +27,5 @@ analyze_single_sample(
 list of lesion count  and probe_features count
 }
 \description{
-semseeker:::analyze_single_sample
+analyze_single_sample
 }

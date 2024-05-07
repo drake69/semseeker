@@ -55,7 +55,7 @@ convertTextToNumeric <- function(text) {
 
 
 text_value <-  "1,200,000.34"
- semseeker:::convertTextToNumeric(text_value)==1200000.34
+ convertTextToNumeric(text_value)==1200000.34
 
 text_value <-  "1.200.000,34"
-semseeker:::convertTextToNumeric(text_value)==1200000.34
+convertTextToNumeric(text_value)==1200000.34

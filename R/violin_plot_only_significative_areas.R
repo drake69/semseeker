@@ -5,7 +5,7 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
   group <- ""
   s <- ""
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   inference_file_name <- inference_inference_file(inference_detail, ssEnv$result_folderInference)
 
   # violin plot only significative areas

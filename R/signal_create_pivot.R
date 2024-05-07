@@ -1,12 +1,12 @@
 #' #' @importFrom doRNG %dorng%
 #' signal_create_pivot <-  function( figures, markers, subGroups, probes_prefix, mainGroupLabel, subGroupLabel ) {
 #'
-#'   ssEnv <- semseeker:::get_session_info()
+#'   ssEnv <- get_session_info()
 #'   i <- 0
 #'   k <- 0
 #'
 #'   keys <- subset(ssEnv$keys,markers=="SIGNAL")
-#'   reportFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderData,"Pivots")
+#'   reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 #'
 #'   toExport <- c("ssEnv", "tempPopData", "subGroupLabel", "SAMPLE_GROUP", "reportFolder", "mainGroupLabel","sheetList","dir_check_and_create")
 #'   foreach::foreach(k=1:nrow(keys), .export = toExport) %dorng%
@@ -29,7 +29,7 @@
 #'           {
 #'             tempDataFrame <- reshape2::dcast(data = tempDataFrame, formula = SAMPLEID + SAMPLE_GROUP ~ KEY, value.var = "VALUE",fun.aggregate = mean, drop = TRUE)
 #'
-#'             pivot_subfolder <- semseeker:::dir_check_and_create(reportFolder, marker)
+#'             pivot_subfolder <- dir_check_and_create(reportFolder, marker)
 #'             fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
 #'             utils::write.table(t(tempDataFrame), fileName, row.names = T, col.names = F, sep=";")
 #'             tempDataFrame <- as.data.frame( cbind(colnames(tempDataFrame), t(tempDataFrame)))

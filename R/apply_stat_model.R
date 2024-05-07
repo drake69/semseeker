@@ -21,7 +21,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 {
   # browser()
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   arguments <- list(...)
 
   g_end <- ncol(tempDataFrame)
@@ -63,8 +63,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
 
       # browser()
-      sig.formula <- semseeker:::apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-      model_result <- semseeker:::execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5))
+      sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
+      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5))
 
 
       local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)

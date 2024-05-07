@@ -13,11 +13,11 @@
 pivot_to_long_format <- function (marker, figure, group,subgroup, phenotype_column,sample_sheet, areas_selection=NULL)
 {
 
-  ssEnv <- semseeker:::get_session_info()
+  ssEnv <- get_session_info()
   area_pivot <- get_pivot(marker, figure, group, subgroup)
 
   area_pivot <- subset(area_pivot, area_pivot$SAMPLEID=="SAMPLE_GROUP" | area_pivot$SAMPLEID %in% areas_selection)
-  study_summary <-   utils::read.csv2(semseeker:::file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+  study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
   area_pivot <- area_pivot[-1,]
   for( s in 2: ncol(area_pivot))
   {
