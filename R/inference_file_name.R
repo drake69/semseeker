@@ -2,6 +2,7 @@ inference_file_name <- function(inference_detail, marker, folder,file_extension=
 {
   ssEnv <- get_session_info()
 
+  # 
   covariates <- inference_detail$covariates
   covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
   family_test <- inference_detail$family_test

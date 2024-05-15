@@ -19,7 +19,7 @@
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal,
                               session_folder, independent_variable, depth_analysis=3, ...)
 {
-  # browser()
+  # 
 
   ssEnv <- get_session_info()
   arguments <- list(...)
@@ -62,11 +62,11 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>=2){
 
 
-      # browser()
+      # 
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
       model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5))
 
-
+      # 
       local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
       local_result$MARKER <- as.character(key$MARKER)
       local_result$FIGURE <-  as.character(key$FIGURE)
@@ -80,7 +80,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       if (is.family_dicotomic(family_test))
         {
-        # browser()
+        # 
         selector <- tempDataFrame[, independent_variable]==independent_variable1stLevel
         independent_variableData1stLevel <- stats::na.omit(tempDataFrame[selector,burdenValue])
         selector <- tempDataFrame[, independent_variable]==independent_variable2ndLevel
@@ -93,13 +93,13 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         }
 
         local_result$CASE.LABEL <- if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA
-        local_result$COUNT.CASE <- length(independent_variableData1stLevel)
-        local_result$MEAN.CASE <- (mean(independent_variableData1stLevel))
-        local_result$SD.CASE <- (stats::sd(independent_variableData1stLevel))
+        local_result$COUNT_CASE <- length(independent_variableData1stLevel)
+        local_result$MEAN_CASE <- (mean(independent_variableData1stLevel))
+        local_result$SD_CASE <- (stats::sd(independent_variableData1stLevel))
         local_result$CONTROL.LABEL <- as.character(independent_variable2ndLevel)
-        local_result$COUNT.CONTROL <- length(stats::na.omit(independent_variableData2ndLevel))
-        local_result$MEAN.CONTROL <- (mean(independent_variableData2ndLevel))
-        local_result$SD.CONTROL <- (stats::sd(independent_variableData2ndLevel))
+        local_result$COUNT_CONTROL <- length(stats::na.omit(independent_variableData2ndLevel))
+        local_result$MEAN_CONTROL <- (mean(independent_variableData2ndLevel))
+        local_result$SD_CONTROL <- (stats::sd(independent_variableData2ndLevel))
       }
 
       if (!is.family_dicotomic(family_test))

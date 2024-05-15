@@ -33,17 +33,19 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
   # Redirect output to the null device
   sink(null_device)
   if (grepl("quantreg-permutation", family_test))
-    model_result <- quantreg_permutation_model(family_test, sig.formula, tempDataFrame, independent_variable)
+    model_result <- quantreg_permutation_model(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot )
   sink()
 
-  if (grepl("quantreg", family_test))
-    model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable)
+  if (grepl("quantreg", family_test) & !grepl("quantreg-permutation", family_test))
+    model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot)
 
   #   return (model_result)
   # }, error = function(e) {
   #   return (model_result)
   # })
 
+  # 
+  model_result <- as.data.frame(model_result)
   return (model_result)
 
 }

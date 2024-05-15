@@ -1,5 +1,6 @@
-get_results_areas_inference <- function (inference_details, marker , pvalue = 0.05, adjust_per_area = F, adjust_globally = F,
-  pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE", omit_na = TRUE)
+get_results_areas_inference <- function (inference_details, marker, adjust_per_area = F, adjust_globally = F,
+  pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE",
+  omit_na = TRUE, sql_condition = "", significance = TRUE)
 {
   ssEnv <- get_session_info()
   resultFolder <- ssEnv$result_folderInference
@@ -19,6 +20,8 @@ get_results_areas_inference <- function (inference_details, marker , pvalue = 0.
 
 
   results_inference <- read.csv2(inferenceFile, sep=";", dec=",", row.names = NULL, header = TRUE, stringsAsFactors = FALSE)
+  colnames(results_inference) <- gsub("[.]", "_", colnames(results_inference))
+
   # check columns exist
   if((!pvalue_column %in% colnames(results_inference)))
   {
@@ -43,19 +46,28 @@ get_results_areas_inference <- function (inference_details, marker , pvalue = 0.
     adjustment_text= "adjusted_globally"
   # markers <- unique(keys$MARKER)
 
+  areas <- unique(results_inference$AREA)
   if(adjust_per_area)
-    for (a in unique(results_inference$AREA))
+    for (a in 1:length(areas))
     {
-      results_inference_area <- results_inference[results_inference$AREA==a,]
+      area <- areas[a]
+      results_inference_area <- results_inference[results_inference$AREA==area,]
       results_inference_area[,pvalue_column] <- p.adjust(results_inference_area[, pvalue_column], method = adjustment_method)
-      results_inference[results_inference$AREA==a,] <- results_inference_area
+      results_inference[results_inference$AREA==area,] <- results_inference_area
     }
 
-  results_inference <- subset(results_inference, results_inference[,pvalue_column] < pvalue)
+  #
+  # preserve only subareas selected
+  results_inference <- results_inference[results_inference$SUBAREA %in% unique(ssEnv$keys_areas_subareas$SUBAREA),]
+  if (significance)
+    results_inference <- subset(results_inference, results_inference[,pvalue_column] < as.numeric(ssEnv$alpha))
+  else
+    results_inference <- subset(results_inference, results_inference[,pvalue_column] >= as.numeric(ssEnv$alpha))
+  # if(omit_na)
+  #   results_inference <- na.omit(results_inference)
 
-  if(omit_na)
-    results_inference <- na.omit(results_inference)
-
-
+  #
+  results_inference <- filter_sql(sql_condition, results_inference)
+  log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," inference file loaded:", inferenceFile)
   return(results_inference)
 }

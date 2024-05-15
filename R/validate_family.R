@@ -26,10 +26,10 @@ validate_family_test <- function(family_test){
   if (grepl("quantile-permutation",family_test))
   {
     quantile_params <- unlist(strsplit(as.character(family_test),"_"))
-    if (length(quantile_params) != 5)
-      log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "quantile-permutation family_test must have been with the follwing syntax quantile-permutation_quantile_n.permutations.test_n.permutations_conf.level")
-    else
+    if (length(quantile_params) == 5)
       return(TRUE)
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "quantile-permutation family_test must have been with the follwing syntax quantile-permutation_quantile_n.permutations.test_n.permutations_conf.level")
+    return(FALSE)
   }
 
   if (grepl("quantreg-permutation",family_test))

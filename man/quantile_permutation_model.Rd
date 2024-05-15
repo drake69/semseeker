@@ -10,7 +10,7 @@ quantile_permutation_model(
   tempDataFrame,
   independent_variable,
   transformation,
-  plot = FALSE
+  plot = plot
 )
 }
 \arguments{

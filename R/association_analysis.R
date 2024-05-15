@@ -52,8 +52,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   # foreach::foreach(z  =  1:nrow(inference_details), .export  =  variables_to_export) %dorng%
   for(z in 1:nrow(inference_details))
   {
+    start_time <- Sys.time()
+    processed_items <- 0
     inference_detail <- inference_details[z,]
-
     filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
 
     covariates <- inference_detail$covariates
@@ -115,7 +116,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           }
           else
           {
-            #tramsform in factor not numeric covariate
+            #transform in factor not numeric covariate
             for(cc in 1:length(covariates))
             {
               cname <- covariates[cc]
@@ -167,7 +168,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
               fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
 
-              # browser()
+              # 
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
               # clean keys from already done association
               if(file_good)
@@ -189,6 +190,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   column_selectors <- c(independent_variable, covariates, key$COMBINED)
                   # remove empty items
                   column_selectors <- column_selectors[column_selectors != ""]
+                  processed_items <- processed_items + ncol(study_summary_local) - g_start
                   result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
                     key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
                   if (exists("results"))
@@ -200,7 +202,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   # if(independent_variable  ==  "Sample_Group")
                   #   study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
                   # chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"SAMPLE_GROUP_COMPARISON")
-                  # filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),"png")
+                  # filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),ssEnv$plot_format)
                   # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
                   # # graphics::par(mfrow = c(1,3))
                   # study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")] <- as.numeric(study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")])
@@ -232,7 +234,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             }
 
 
-            # browser()
+            # 
             # execute for all the areas
             if(depth_analysis>1)
             {
@@ -276,7 +278,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrame <- tempDataFrame[-1,]
                     if(length(areas_selection)>0)
                     {
-                      # browser()
+                      # 
                       # check if areas_selection is a range
                       if(length(areas_selection)==1)
                       {
@@ -326,6 +328,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                         stop("ERROR: I'm stopping here data to associate are not correct, file a bug!")
                       colnames(tempDataFrameBatch) <- cols
                       g_start <- 2 + length(covariates)
+                      processed_items <- processed_items + ncol(tempDataFrameBatch) - g_start
                       result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
                         key  =  key, transformation =  transformation, dototal  =  dototal,
                         session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
@@ -337,6 +340,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     }
                   }
                   save_result(results,fileNameResults, family_test, filter_p_value )
+                  association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
                 }
 
               if (exists("old_results"))
@@ -348,12 +352,10 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 rm(old_results)
               }
 
-              if(!exists("results") | is.null(results))
-                next
-
               save_result(results,fileNameResults, family_test, filter_p_value )
             }
-            save_result(results,fileNameResults, family_test, filter_p_value )
+            if(exists("results"))
+              save_result(results,fileNameResults, family_test, filter_p_value )
 
             if(exists("result_temp_foreach"))
               rm(result_temp_foreach)
@@ -366,48 +368,41 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         }
       }
     }
+    total_time <- difftime(Sys.time(), start_time, units  =  "mins")
+    end_time <- Sys.time()
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Finished processing association analysis for ", processed_items, " items in ", total_time, " minutes." )
   }
-
   close_env()
 }
 
-save_result <- function(results,fileNameResults, family_test, filter_p_value ){
+save_result <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
+
+  # 
+  if(!exists("results") | is.null(results))
+    return
 
   results <- unique(results)
 
-  # check column PVALUE exists
-  if("PVALUE" %in% colnames(results))
+  pvalue_columns <- colnames(results)[grepl("PVALUE", colnames(results)) & !grepl("_ADJ", colnames(results))]
+  if (exists("results") & length(pvalue_columns)>0)
   {
-    results[,"PVALUE_ADJ_ALL_BH"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BH")
-    results[,"PVALUE_ADJ_ALL_BY"] <- stats::p.adjust(results[,"PVALUE"],method  =  "BY")
-    results[,"PVALUE_ADJ_ALL_FDR"] <- stats::p.adjust(results[,"PVALUE"],method  =  "fdr")
-    if (exists("results"))
-      if (nrow(results)>0)
-        results <- results[order(results$PVALUE_ADJ),]
+    for (p in 1:length(pvalue_columns))
+    {
+      methods <- c("BY", "fdr","BH")
+      for(method in 1:3)
+      {
+        col_p <- paste0(pvalue_columns[p], "_ADJ_ALL_", methods[method])
+        results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  methods[method])
+      }
+    }
+
+    if (nrow(results)>0)
+      results <- results[order(results$PVALUE_ADJ_ALL_fdr),]
 
     if(filter_p_value)
-      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results$PVALUE_ADJ < as.numeric(ssEnv$alpha))
+      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results$PVALUE_ADJ_ALL_fdr < as.numeric(ssEnv$alpha))
   }
 
-
-  if(family_test=="kruskal.test")
-  {
-    # get columns where colnames start with PVALUE_KW_
-    kw_columns <- colnames(results)[grepl("^PVALUE_KW_", colnames(results))]
-    for (colname in kw_columns)
-    {
-
-      # colname <- kw_columns[c]
-      if (grepl(colname,"_ADJ_BH"))
-        next
-      adj_colname <- paste0(colname,"_ADJ_BH")
-      results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BH")
-      adj_colname <- paste0(colname,"_ADJ_BY")
-      results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "BY")
-      adj_colname <- paste0(colname,"_ADJ_fdr")
-      results[,adj_colname] <- stats::p.adjust(results[,colname],method  =  "fdr")
-    }
-  }
 
   results$DEPTH <- 3
   results[results$SUBAREA=="SAMPLE","DEPTH"] <- 1
@@ -418,5 +413,32 @@ save_result <- function(results,fileNameResults, family_test, filter_p_value ){
   # remove columns where all rows are NA
   results <- results[, colSums(is.na(results)) < nrow(results)]
   utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
+
+}
+
+association_analysis_log <- function(inference_detail, start_time, end_time, processed_items)
+{
+  ssEnv <- get_session_info()
+  log_folder <- ssEnv$session_folder
+  association_file <- paste0(log_folder, "/association_analysis.csv")
+  inference_detail$node_name <- as.character(Sys.info()["nodename"])
+  inference_detail$session_id <- ssEnv$session_id
+  # inference_detail$start_time <- as.character(format(start_time, "%a %b %d %X %Y"))
+  # inference_detail$end_time <- as.character(format(end_time, "%a %b %d %X %Y"))
+  inference_detail$processed_time <- as.numeric(difftime(end_time, start_time, units  =  "mins"))
+  inference_detail$processed_items <- processed_items
+  if(!file.exists(association_file))
+  {
+    write.table(inference_detail, file  =  association_file, sep  =  ",", row.names  =  FALSE, col.names  =  TRUE)
+  } else
+  {
+    # convert all columns of inference detail as character
+    tryCatch({
+      association_file_data <- plyr::rbind.fill(inference_detail, association_file_data)
+      write.table(association_file_data, file  =  association_file, sep  =  ",", row.names  =  FALSE, col.names  =  TRUE)
+    }, error = function(e) {
+      # print("ERROR: I'm stopping here, data to associate are not correct, file a bug!")
+    })
+  }
 
 }

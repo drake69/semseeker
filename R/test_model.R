@@ -91,22 +91,22 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_fisher <- suppressWarnings(stats::kruskal.test(x = dependent_variable, g = group))
     res$pvalue <- result_fisher$p.value
     res$r_model <- "stats_kruskal.test"
-    res$kw_runk_sum <- result_fisher$kw_runk_sum
+    res$kw_runk_sum <- result_fisher$statistic
     kw_result <- stats::pairwise.wilcox.test(dependent_variable, group)
-    PVALUE_KW <- kw_result$p.value
+    kruska_wallis_summary <- kw_result$p.value
 
     kw_pvalue_max <- 0
     significative <- TRUE
     # for each group combination extract the p-value
-    for (i in 1:nrow(PVALUE_KW)) {
+    for (i in 1:nrow(kruska_wallis_summary)) {
       # i <-1
-      for (j in 1:ncol(PVALUE_KW)) {
+      for (j in 1:ncol(kruska_wallis_summary)) {
         # j <- 1
-        p_value <- PVALUE_KW[i,j][1]
-        row <- as.character(rownames(PVALUE_KW)[i])
-        col <- as.character(colnames(PVALUE_KW)[j])
+        p_value <- kruska_wallis_summary[i,j][1]
+        row <- as.character(rownames(kruska_wallis_summary)[i])
+        col <- as.character(colnames(kruska_wallis_summary)[j])
         pval_name <- paste0("PVALUE_KW_",as.character(row),"_",as.character(col),sep="")
-        significative <- significative & p_value < as.numeric(ssEnv$alpha)
+        significative <- significative & (p_value < as.numeric(ssEnv$alpha))
         kw_pvalue_max <- max(kw_pvalue_max, p_value)
         p_value <- data.frame(p_value)
         colnames(p_value) <- pval_name
@@ -157,7 +157,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
     res$pvalue <- result_w$p.value
 
-    # browser()
+    # 
     res[1,"Wilcox_Value"] <- result_w$statistic
 
     res$r_model <- "stats_wilcox.test"

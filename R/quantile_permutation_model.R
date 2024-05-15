@@ -34,7 +34,7 @@ compute_quantile_delta_permutation <- function(sig.formula,df, shuffle = FALSE, 
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot =FALSE)
+quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot =plot)
 {
   quantile_params <- unlist(strsplit(as.character(family_test),"_"))
 
@@ -75,13 +75,14 @@ quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   res$ci.lower <- ci[1]
   res$ci.upper <- ci[2]
 
-  independent_variable <- as.character(all.vars(sig.formula)[2])
-  dependent_variable <- as.character(all.vars(sig.formula)[1])
+  # independent_variable <- as.character(all.vars(sig.formula)[2])
+  # dependent_variable <- as.character(all.vars(sig.formula)[1])
 
-  predicted_values <- stats::predict(model, tempDataFrame)
-  res <- quantile_regression_metrics(predicted_values = predicted_values, expected_values = tempDataFrame[,dependent_variable],
-    tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = transformation,
-    dependent_variable = dependent_variable, permutation_vector = permutation_vector, plot = FALSE)
+  # predicted_values <- lqmm::predict.lqm(model, tempDataFrame[,independent_variable])
+  # expected_values <- quantile(tempDataFrame[,independent_variable], tau)
+  # res <- quantreg_metrics(predicted_values = predicted_values, expected_values = expected_values,
+  #   tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = transformation,
+  #   dependent_variable = dependent_variable, permutation_vector = permutation_vector, plot = plot)
 
   return(res)
 }

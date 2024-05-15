@@ -8,12 +8,17 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
   res<- data.frame("PARTITION_PERC" = as.numeric(partition_percentage))
 
   tempDataFrame <- as.data.frame(tempDataFrame)
-  dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
-  dependent_variable <- dep_var[[2]]
-  independent_variable <- dep_var[[3]]
+  dep_var <- sig.formula_vars(sig.formula)
+  dependent_variable <- dep_var$dependent_variable
+  independent_variable <- dep_var$independent_variable
 
+  # bias_dependent_variable <- min(tempDataFrame[, dependent_variable])
+  # tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1 - ifelse(bias_dependent_variable < 0, bias_dependent_variable, 0)
   tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1
-  tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1
+
+  bias_independent_variable <- min(tempDataFrame[, independent_variable])
+  tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1 - ifelse(bias_independent_variable < 0, bias_independent_variable, 0)
+  # tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1
 
   # Split the data into training and test set
   training.samples <- tempDataFrame[, dependent_variable] %>% caret::createDataPartition(p = partition_percentage, list = FALSE)
@@ -43,12 +48,14 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
   if(plot)
   {
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
+    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
 
     # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
     ggp <- ggplot2::ggplot(train.data, ggplot2::aes(((independent_variable)), ((dependent_variable))) ) +
       ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
-      ggplot2::stat_smooth(method = lm, formula = y ~ log(x), se = FALSE, color = ssEnv$color_palette_darker[2])
+      ggplot2::stat_smooth(method = lm, formula = y ~ log(x), se = TRUE, color = ssEnv$color_palette_darker[2]) +
+      ggplot2::xlab(independent_variable) +
+      ggplot2::ylab(dependent_variable)
 
     if (nrow(test.data) != 0)
       ggp <- ggp + ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions_test, x = eval(parse(text=independent_variable))), color = ssEnv$color_palette_darker[3]) +
@@ -64,9 +71,13 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
       units = c("px"),
       dpi = 144
     )
+
+    # data_to_save <- cbind(train.data, predicted = apply(train.data[,independent_variable],1, function(x) (start_a * exp(start_b * x))))
+    # colnames(data_to_save) <- c("Independent_Variable","Dependent_Variable","Predicted")
+
   }
 
-  # browser()
+  # 
   # Coefficients and Confidence Intervals
   coefficients <- coef(summary(log_model_result))
   # conf_int <- confint(log_model_result)

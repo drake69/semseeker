@@ -8,7 +8,8 @@ create_multiple_bed <- function(sample_sheet){
   Sample_Group <- as.data.frame(unique(sample_sheet$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
   # multiple bed i created only for probes must be taken into account all markers
-  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figure_default,Sample_Group)
+  # 
+  localKeys <- as.data.frame(reshape::expand.grid.df(as.data.frame(ssEnv$keys_markers_figures_default),Sample_Group))
   # localKeys <- subset(localKeys, MARKER!="SIGNAL")
 
   if(ssEnv$showprogress)
@@ -17,12 +18,12 @@ create_multiple_bed <- function(sample_sheet){
     progress_bar <- ""
 
   to_export <- c("localKeys", "dir_check_and_create", "ssEnv", "file_path_build", "sample_sheet","progress_bar",
-    "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace")
+    "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","log_event")
 
   foreach::foreach(i = 1:nrow(localKeys), .export = to_export) %dorng%
   # for(i in 1:nrow(localKeys))
   {
-    # browser()
+    # 
     # i <- 1
     key <- localKeys[i,]
     marker <- as.character(key$MARKER)
@@ -56,7 +57,7 @@ create_multiple_bed <- function(sample_sheet){
         }
       }
 
-      # browser()
+      # 
       if(file.exists(temp_file))
       {
         fst::write.fst(x = utils::read.table(temp_file, sep = "\t"),path = fileToWrite, compress = 100)

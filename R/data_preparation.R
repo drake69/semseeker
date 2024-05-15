@@ -20,7 +20,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   if (is.family_dicotomic(family_test))
     {
       test_factor <- as.factor(tempDataFrame[, independent_variable])
-      # browser()
+      # 
       independent_variableLevels <- NA
       independentVariableIsFactor <- FALSE
       if(length(levels(test_factor))<4)

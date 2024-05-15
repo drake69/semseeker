@@ -13,7 +13,7 @@ batch_correlation_check <- function() {
     "batch_analysis_folder", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName", "getDoParName",
     "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion", ".getRNG", ".getRNGattribute", "hasRNG",
     "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-    ".RNGkind_length", "tail", "RNGstr")
+    ".RNGkind_length", "tail", "RNGstr","log_event")
 
   # summary_cor <- foreach::foreach(i = 1:nrow(localKeys), .combine = rbind ) %dorng%
   for(i in 1:nrow(localKeys))

@@ -32,18 +32,9 @@ compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable)
+quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot)
 {
-  n_permutations <- NA
-  ci.lower <- NA
-  ci.upper <- NA
-  aic_value <- NA
-  residuals <- NA
-  shapiro_pvalue <- NA
-  std.error <- NA
-  not_permutated_regression_coefficient <- NA
-  pvalue <- NA
-  summary_results <- NA
+  # 
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
@@ -53,8 +44,12 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   {
     log_event("ERROR: number of parameter incorrect for quantreg-permutation expected:
       quantreg-permutation + quantile + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_regression_coefficient")
-    exit()
+    stop()
   }
+
+  dep_var <- sig.formula_vars(sig.formula)
+  dependent_variable <- dep_var$dependent_variable
+  independent_variable <- dep_var$independent_variable
 
   tau <- as.numeric(quantreg_params[2])
   n_permutations_test <- as.numeric(quantreg_params[3])
@@ -70,31 +65,41 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   })
   summary_qr <- suppressMessages(summary(model)$tTable)
   not_permutated_regression_coefficient <- summary_qr[2,"Value"]
-  std.error <- summary_qr[2,"Std. Error"]
-  ci.lower <- summary_qr[2,"lower bound"]
-  ci.upper <- summary_qr[2,"upper bound"]
-  pvalue <- summary_qr[2,"Pr(>|t|)"]
+  res <- data.frame("not_permutated_regression_coefficient" = not_permutated_regression_coefficient)
+  res$std.error <- summary_qr[2,"Std. Error"]
+  res$ci.lower <- summary_qr[2,"lower bound"]
+  res$ci.upper <- summary_qr[2,"upper bound"]
+  res$pvalue <- summary_qr[2,"Pr(>|t|)"]
+  res$conf.level <- conf.level
+
 
   if(n_permutations > n_permutations_test)
   {
     permutated_regression_coefficient <- suppressMessages(replicate(n_permutations_test, compute_quantreg_permutation(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
     summary_results <- exact_pvalue(permutated_regression_coefficient, not_permutated_regression_coefficient, conf.level = conf.level)
-    pvalue <- summary_results[3]
+    res$pvalue <- summary_results[3]
   }
-  if(pvalue < pvalue_limit)
+  if(res$pvalue < pvalue_limit)
   {
     permutated_regression_coefficient <- suppressMessages(replicate(n_permutations, compute_quantreg_permutation(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
     summary_results <- exact_pvalue(permutated_regression_coefficient, not_permutated_regression_coefficient, conf.level = conf.level)
-    pvalue <- summary_results[3]
+    res$pvalue <- summary_results[3]
   }
-  ci.lower <- summary_results[1]
-  ci.upper <- summary_results[2]
+  res$ci.lower <- summary_results[1]
+  res$ci.upper <- summary_results[2]
+
+  predicted_values <- lqmm::predict.lqm(model, tempDataFrame)
+  expected_values <- tempDataFrame[,dependent_variable]
+  res <- quantreg_metrics(predicted_values = predicted_values, expected_values = expected_values,
+    tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = transformation,
+    dependent_variable = dependent_variable, permutation_vector = permutated_regression_coefficient, plot = plot)
 
   if(length(permutated_regression_coefficient) == n_permutations_test)
     n_permutations <- n_permutations_test
 
-  r_model <- "lqmm_lqm"
+  res$n_permutations <- n_permutations
+  res$r_model <- "lqmm_lqm"
 
-  return (data.frame(ci.lower,ci.upper, pvalue, not_permutated_regression_coefficient,aic_value,residuals,shapiro_pvalue,r_model,std.error,n_permutations))
+  return (res)
 
 }

@@ -4,7 +4,14 @@
 \alias{quantreg_model}
 \title{Title}
 \usage{
-quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable)
+quantreg_model(
+  family_test,
+  sig.formula,
+  tempDataFrame,
+  independent_variable,
+  transformation,
+  plot
+)
 }
 \arguments{
 \item{family_test}{family lqmm, quantreg}

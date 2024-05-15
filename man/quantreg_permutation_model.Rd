@@ -8,7 +8,9 @@ quantreg_permutation_model(
   family_test,
   sig.formula,
   tempDataFrame,
-  independent_variable
+  independent_variable,
+  transformation,
+  plot
 )
 }
 \arguments{

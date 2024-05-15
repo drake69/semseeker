@@ -8,7 +8,8 @@ file_path_build <- function(baseFolder, detailsFilename, extension, add_gz = FAL
   detailsFilename <- paste0(detailsFilename, collapse = "_")
   # remove final _
   detailsFilename <- gsub("_$","", detailsFilename)
-  fileName <- paste0( detailsFilename,".",extension, sep="")
+  if(extension!="")
+    fileName <- paste0( detailsFilename,".",extension, sep="")
   fileName <- gsub("__","_", fileName)
 
   if(add_gz){

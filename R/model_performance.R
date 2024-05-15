@@ -24,13 +24,10 @@ model_performance <- function(fitted_values, expected_values, prediction_values,
 
   # calculate r-squared the higher the better - goodness of fit
   res$r_squared <- 1 - res$sse / sum((expected_values - mean(expected_values))^2)
-  # complement of r-squared the lower the better
-  res$r_squared_compl <- res$sse / sum((expected_values - mean(expected_values))^2)
 
   # calculate adjusted r-squared
-  res$r_squared_adj <- 1 - (1 - res$r_squared) * (length(expected_values) - 1) / (length(expected_values) - length(fitted_values) - 1)
-  # complement of adjusted r-squared the lower the better
-  res$r_squared_adj_compl <- (1 - res$r_squared) * (length(expected_values) - 1) / (length(expected_values) - length(fitted_values) - 1)
+  # res$r_squared_adj <- 1 - ((1 - res$r_squared) * (length(expected_values) - 1)) / (length(expected_values) - length(fitted_values) - 1)
+  res$r_squared_adj <- 1 - ((1 - res$r_squared) * (length(expected_values) - 1)) / (length(expected_values) -1 -1 )
 
   # Calculate Mean Squared Log Error (MSLE) the lower the better
   res$msle <- mean((log(fitted_values + 1) - log(expected_values + 1))^2, na.rm = TRUE)
@@ -67,17 +64,15 @@ model_performance <- function(fitted_values, expected_values, prediction_values,
 
     # calculate adjusted r-squared
     res$r_squared_adj_test <- 1 - (1 - res$r_squared_test) * (length(expected_values) - 1) / (length(expected_values) - length(fitted_values) - 1)
-    # complement of adjusted r-squared the lower the better
-    res$r_squared_adj_compl_test <- (1 - res$r_squared_test) * (length(expected_values) - 1) / (length(expected_values) - length(fitted_values) - 1)
 
     # Calculate Mean Squared Log Error (MSLE) the lower the better
     res$msle_test <- mean((log(fitted_values + 1) - log(expected_values + 1))^2, na.rm = TRUE)
 
-    if (rse$mse > rse$mse_test | rse$rmse > rse$rmse_test |
-        rse$mape > rse$mape_test | rse$mpe > rse$mpe_test |
-        rse$mae > rse$mae_test | rse$r_squared < rse$r_squared_test |
-        rse$r_squared_adj < rse$r_squared_adj_test |
-        rse$msle > rse$msle_test)
+    if (res$mse > res$mse_test | res$rmse > res$rmse_test |
+        res$mape > res$mape_test | res$mpe > res$mpe_test |
+        res$mae > res$mae_test | res$r_squared < res$r_squared_test |
+        res$r_squared_adj < res$r_squared_adj_test |
+        res$msle > res$msle_test)
       res$overfitting <- TRUE
     else
       res$overfitting <- FALSE

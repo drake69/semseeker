@@ -1,7 +1,7 @@
-compare_pathway_association <- function(result_folder, ...){
+compare_pathway_cross_studies <- function(result_folder, ...){
 
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
-  library(VennDiagram)
+  # library(VennDiagram)
   pathway_inference <- pathway_inference[pathway_inference$occurrence >= occurrence_threshold,]
   studies_to_comb <- na.omit(unique(pathway_inference$STUDY))
   for( j in length(studies_to_comb):1)

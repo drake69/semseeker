@@ -1,7 +1,7 @@
 apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_variable, covariates)
 {
 
-  # browser()
+  # 
   if(family_test=="wilcoxon" | family_test=="t.test" | family_test =="jsd" | family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test")
   {
     covariates_model <- independent_variable

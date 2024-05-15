@@ -35,7 +35,8 @@ analyze_single_sample_both <- function( sample_detail, marker) {
   if(nrow(data_to_save) == 0)
   {
     end_time_single_sample <- Sys.time()
-    time_taken <- end_time_single_sample - start_time_single_sample
+    time_taken <- difftime(end_time_single_sample,start_time_single_sample, units = "mins")
+    log_event("DEBUG: Completed figure BOTH for sample in ", as.numeric(time_taken), "minutes.")
     return()
   }
 
@@ -68,8 +69,8 @@ analyze_single_sample_both <- function( sample_detail, marker) {
   }
 
   end_time_single_sample <- Sys.time()
-  time_taken <- end_time_single_sample - start_time_single_sample
-  # log_event(sample_detail$Sample_ID, " ", "Completed sample ", time_taken)
+  time_taken <- difftime(end_time_single_sample,start_time_single_sample, units = "mins")
+  log_event("DEBUG: Completed figure BOTH for sample in ", as.numeric(time_taken), "minutes.")
 
   return(result)
 }

@@ -8,13 +8,13 @@ deltarq_get <- function(resultPopulation){
   variables_to_export <- c("localKeys", "resultPopulation", "dir_check_and_create", "ssEnv", "file_path_build","%dorng%","getdorng","iter", "RNGseed", "checkRNGversion", "getRNG", "%||%",
     ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
     ".getRNG", ".getRNGattribute", "hasRNG", "isNumber", "isReal", "isInteger", "nextRNG", ".foreachGlobals", "RNGkind", "setRNG", "RNGprovider",
-    ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probe_features_get")
+    ".RNGkind_length", "tail", "RNGstr","update_multiple_bed","probe_features_get","log_event")
 
   Sample_Group=as.data.frame(unique(resultPopulation$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
 
-  # must use keys_markers_figure_default because the selected marker could exclude deltar which is basic for deltarq
-  localKeys <- reshape::expand.grid.df(ssEnv$keys_markers_figure_default,Sample_Group)
+  # must use keys_markers_figures_default because the selected marker could exclude deltar which is basic for deltarq
+  localKeys <- reshape::expand.grid.df(as.data.frame(ssEnv$keys_markers_figures_default),Sample_Group)
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAR")
   localKeys <- subset(localKeys, localKeys$FIGURE!="BOTHSUM")
   localKeys <- subset(localKeys, localKeys$FIGURE!="BOTH")
@@ -57,7 +57,7 @@ deltarq_get <- function(resultPopulation){
   deltarq_both_sum$FIGURE <- "BOTHSUM"
   deltarq <- rbind(deltarq, deltarq_both, deltarq_both_sum)
 
-  localKeys <-   reshape::expand.grid.df(ssEnv$keys_markers_figure_default, data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
+  localKeys <-   reshape::expand.grid.df(as.data.frame(ssEnv$keys_markers_figures_default), data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTARQ")
 

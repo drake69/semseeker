@@ -130,7 +130,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     #   ggplot2::theme_classic() +
     #   ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
 
-    plot_filename <- file_path_build(chart_folder,c(sample_name,marker),"png")
+    plot_filename <- file_path_build(chart_folder,c(sample_name,marker),ssEnv$plot_format)
     ggplot2::ggsave(filename =plot_filename,plot = pp,units = "in", width = 6, height = 2, dpi=300)
   }
 

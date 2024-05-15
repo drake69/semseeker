@@ -9,9 +9,9 @@ euristic_analysis_phenolizer <- function(result_folder, rule, cutoff)
   geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
 
   markers <- c("MUTATIONS","LESIONS")
-  for (marker in markers)
+  for ( m in 1:length(markers))
   {
-
+    marker <- markers[m]
     # marker <- "LESIONS"
     geneAnnotated <-subset(geneAnnotatedFile,geneAnnotatedFile$MARKER == marker)
     tempDataFrame <- as.data.frame(reshape2::dcast(data = geneAnnotated, SAMPLEID  ~ GENE, value.var = "freq", sum))

@@ -9,7 +9,7 @@ create_heatmap <- function() {
   sample_group_comb <- utils::combn(ssEnv$keys_sample_groups, 2)
   for (g in 1:sample_group_comb)
   {
-    localKeys <- reshape::expand.grid.df(ssEnv$keys_areas_subareas_markers_figures, sample_group_comb )
+    localKeys <- reshape::expand.grid.df(as.data.frame(ssEnv$keys_areas_subareas_markers_figures), sample_group_comb )
     variables_to_export <- c("markers", "annotatedData", "sample_group_comb", "chartFolder", "figures",
       "%dorng%", "j", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName",
       "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",

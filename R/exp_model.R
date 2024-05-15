@@ -1,23 +1,28 @@
 exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot)
 {
 
+  #
   ssEnv <- get_session_info()
   exp_params <- unlist(strsplit(as.character(family_test),"_"))
-
+  # log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " exp model fitting executing: ", as.character(sig.formula))
   partition_percentage <- as.numeric(exp_params[2])
 
   res<- data.frame("PARTITION_PERC" = as.numeric(partition_percentage))
 
   tempDataFrame <- as.data.frame(tempDataFrame)
-  dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
-  dependent_variable <- dep_var[[2]]
-  independent_variable <- dep_var[[3]]
+
+  dep_var <- sig.formula_vars(sig.formula)
+  dependent_variable <- dep_var$dependent_variable
+  independent_variable <- dep_var$independent_variable
 
 
   bias_dependent_variable <- min(tempDataFrame[, dependent_variable])
-  bias_independent_variable <- min(tempDataFrame[, independent_variable])
   tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1 - ifelse(bias_dependent_variable < 0, bias_dependent_variable, 0)
-  tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1 - ifelse(bias_independent_variable < 0, bias_independent_variable, 0)
+  # tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1
+
+  # bias_independent_variable <- min(tempDataFrame[, independent_variable])
+  # tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1 - ifelse(bias_independent_variable < 0, bias_independent_variable, 0)
+  tempDataFrame[, independent_variable] <- tempDataFrame[, independent_variable] + 1
 
   # Split the data into training and test set
   training.samples <- caret::createDataPartition(tempDataFrame[, dependent_variable], p=partition_percentage, list=FALSE)
@@ -46,33 +51,10 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
     return(res)
 
   predictions <- stats::predict(exp_model_result)
-
-  # # Calculate residuals
-  # model_residuals <- predictions - train.data[, dependent_variable]
-  # # calculate residuals homoschedadasticity
-  # # model_for_test <- stats::lm(residuals ~ train.data[, independent_variable])
-  # # res$residuals_breusch_pagan_pvalue_compl <- 1- lmtest::bptest(model_for_test)$p.value
-  # # test omoschedasticity
-  # # res$residuals_bartlett_pvalue_compl <- ifelse((length(model_residuals)>3 & length(unique(model_residuals))>3),1-(stats::bartlett.test(model_for_test)$p.value),NA)
-  # # Calculate Sum of Squares due to Error (SSE)
-  # res$sse <- sum(model_residuals^2)
-  # # Calculate Root Mean Square Error (RMSE)
-  # res$rmse <- sqrt(mean((model_residuals)^2))
-  # # Goodness-of-Fit Statistics (R-squared)
-  # res$r_squared = caret::R2(predictions, train.data[,dependent_variable])
-  # # Calculate Mean Absolute Error (MAE)
-  # res$mae <- mean(abs(model_residuals))
-  # # Calculate Mean Squared Log Error (MSE)
-  # res$msle <- mean((log(predictions + 1) - log(train.data[, dependent_variable] + 1))^2)
-  #
   if(nrow(test.data) != 0)
   {
     # Make predictions
     predictions_test <- stats::predict(exp_model_result, newdata = test.data)
-    # # Calculate RMSE test
-    # res$rmse_test = caret::RMSE(predictions_test, test.data[,dependent_variable])
-    # # Calculate Root Mean Square Error (RMSE)
-    # res$r_squared_test = caret::R2(predictions_test, test.data[,dependent_variable])
     res <- cbind(res, model_performance(predictions, train.data[,dependent_variable], predictions_test, test.data[,dependent_variable]))
   }
   else
@@ -94,7 +76,7 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
     significative <- significative & p_value < as.numeric(ssEnv$alpha)
 
     exp_coef_estimate <- data.frame(exp_a_estimate = coefficients[i,1])
-    colnames(exp_coef_estimate) <- paste0("EXP_",row_name,"_ESTIMATE",sep="")
+    colnames(exp_coef_estimate) <- toupper(paste0("EXP_",row_name,"_ESTIMATE",sep=""))
 
     res <- cbind(res, p_value, exp_coef_estimate)
   }
@@ -108,14 +90,14 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
   rownames(res) <- NULL
   # res$sig.fromula <- as.character(sig.formula)
 
-  if(plot)
+  if(plot & !any(is.na(predictions)))
   {
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),"png")
-
+    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
+    #
     ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
       ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
-      ggplot2::stat_function(fun = function(x) (start_a * exp(start_b * x))  , color = ssEnv$color_palette_darker[2]) +
+      ggplot2::stat_function( na.rm = TRUE, fun = function(x) (res$EXP_A_ESTIMATE * exp(res$EXP_B_ESTIMATE * x))  , color = ssEnv$color_palette_darker[3]) +
       ggplot2::ggtitle("") +
       ggplot2::xlab(independent_variable) +
       ggplot2::ylab(dependent_variable)
@@ -123,6 +105,7 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
     if(nrow(test.data) != 0)
     {
       ggp <- ggp + ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions_test, x = eval(parse(text=independent_variable))), color = ssEnv$color_palette_darker[3])+
+        ggplot2::geom_point(data = test.data, ggplot2::aes(y = dependent_variable, x = eval(parse(text=independent_variable))), color = ssEnv$ssEnv$color_palette[2])+
         ggplot2::xlab(independent_variable) +
         ggplot2::ylab(dependent_variable)
     }
@@ -136,6 +119,11 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
       units = c("px"),
       dpi = 144
     )
+
+    # data_to_save <- cbind(train.data, predicted = apply(train.data[,independent_variable],1, function(x) (start_a * exp(start_b * x))))
+    # colnames(data_to_save) <- c("Independent_Variable","Dependent_Variable","Predicted")
+
+
   }
   return (res)
 }

@@ -5,7 +5,10 @@ create_excel_pivot <-  function() {
   ssEnv <- get_session_info()
   reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
   localKeys <- ssEnv$keys_areas_subareas_markers_figures
-  # areas <- ssEnv$keys_areas
+
+  if (!is.null(ssEnv$keys_areas_subareas_markers_figures_missed))
+    # remove the missed keys from the localKeys
+    localKeys <- localKeys[!(localKeys$COMBINED %in% ssEnv$keys_areas_subareas_markers_figures_missed$COMBINED),]
 
   sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
 
@@ -21,7 +24,7 @@ create_excel_pivot <-  function() {
     "progress_bar_ann","progression_index", "progression", "progressor_uuid",
     "owner_session_uuid", "trace","file_path_build", "read_annotated_bed")
 
-  log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y"),"Creating Excel ", nrow(localKeys) ,  " Pivots")
+  log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," Creating Excel ", nrow(localKeys) ,  " Pivots")
   # for (k in 1:nrow(localKeys))
   created <- foreach::foreach(k = 1:nrow(localKeys), .export = variables_to_export, .combine = max) %dorng%
   {
@@ -39,7 +42,7 @@ create_excel_pivot <-  function() {
       annotatedData <-  read_annotated_bed(figure,marker,area,subarea)
       annotatedData <- subset(annotatedData, annotatedData$VALUE != 0 )
 
-      # browser()
+      #
       if(!plyr::empty(annotatedData))
       {
           if(marker=="SIGNAL")
@@ -60,5 +63,5 @@ create_excel_pivot <-  function() {
   }
   gc()
   end_time <- Sys.time()
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y") , " Finished to create ", created,  " excel pivot - Time taken: ", round(end_time - start_time) , " minutes.")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y") , " Finished to create ", created,  " excel pivot - Time taken: ", difftime(end_time,start_time, units = "mins") , " minutes.")
 }

@@ -109,6 +109,8 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
 
     if(ssEnv$showprogress)
       progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
+
+    sample_status_temp[is.na(sample_status_temp)] <- 0
     sample_status_temp
   }
 
@@ -121,8 +123,8 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population analysis ")
   end_time <- Sys.time()
-  time_taken <- (end_time - start_time)
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population with summary - Time taken: ", round(time_taken), " minutes.")
+  time_taken <- difftime(end_time,start_time, units = "mins")
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population with summary - Time taken: ", time_taken, " minutes.")
 
   return(summary_population)
 }

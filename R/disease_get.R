@@ -4,14 +4,24 @@ disease_get <- function(disease, vocabulary="HPO")
   # check if exisists pehnotype.hpoa file if not exit
   if (!file.exists("~/Downloads/phenotype.hpoa"))
   {
-    log_event("Phenolizer: phenotype.hpoa file not found")
+    log_event("ERROR: Phenolizer: phenotype.hpoa file not found")
     return(data.frame("DISEASE"="")[-1,])
   }
   # read file and skip first 4 rows
-  diseases <- read.csv2("~/Downloads/phenotype.hpoa", header = TRUE, stringsAsFactors = FALSE, sep ="\t", skip = 4)
+  diseases_original <- read.csv2("~/Downloads/phenotype.hpoa", header = TRUE, stringsAsFactors = FALSE, sep ="\t", skip = 4)
+  #
   message(disease)
   # subset diseases based on disease name contained in the disease column
-  diseases <- diseases[grep(disease, diseases$disease_name, ignore.case = TRUE),]
+  diseases <- diseases_original[grep(disease, diseases_original$disease_name, ignore.case = TRUE),]
+
+  # look into hpo_id column if no disease is found
+  if(nrow(diseases)==0)
+    diseases <- diseases_original[grep(disease, diseases_original$hpo_id, ignore.case = TRUE),]
+
+  # look into hpo_id column if no disease is found
+  if(nrow(diseases)==0)
+    diseases <- diseases_original[grep(disease, diseases_original$database_id, ignore.case = TRUE),]
+
   if (is.null(nrow(diseases)))
     return(data.frame("DISEASE"="")[-1,])
 

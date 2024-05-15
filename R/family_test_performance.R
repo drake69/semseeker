@@ -8,7 +8,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   # for each family test, read the file and extract the metrics and bind
   # them in a single dataframe
-  # browser()
+  # 
   markers <- unique(ssEnv$keys_markers_figures$MARKER)
   model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
   selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
@@ -29,8 +29,9 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         stop("All families.test must be different.")
 
 
-      for (marker in markers)
+      for (m in 1:length(markers))
       {
+        marker <- markers[m]
         # marker <- "DELTAQ"
         for (i in 1:nrow(inference_details_selection))
         {
@@ -82,8 +83,9 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         final$EFFECT_SIZE_MAGNITUDE <- as.numeric(final$EFFECT_SIZE_MAGNITUDE)
       }
 
-      for (marker in markers)
+      for (m in 1:length(markers))
       {
+        marker <- markers[m]
         if (nrow(final[final$MARKER==marker,]) == 0)
         {
           log_event("DEBUG: No data for marker: ", marker, " skipping")
@@ -93,28 +95,29 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         # creat empty list to store plots
         plot_list <- list()
         # loop over metrics
-        for (m in filtered_metrics)
+        for ( m in 1:length(filtered_metrics))
         {
-          # m <- "MAE"
+          filtered_metric <- filtered_metrics[m]
+          # filtered_metric <- "MAE"
           # create a plot
-          p <- ggplot2::ggplot(final[final$MARKER==marker,c("FAMILY.TEST",m)], ggplot2::aes_string(x="FAMILY.TEST", y=m, fill="FAMILY.TEST")) +
+          p <- ggplot2::ggplot(final[final$MARKER==marker,c("FAMILY.TEST",filtered_metric)], ggplot2::aes_string(x="FAMILY.TEST", y=filtered_metric, fill="FAMILY.TEST")) +
             ggplot2::geom_boxplot() +
             ggplot2::theme_minimal() +
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
               legend.position = "none") +
             ggplot2::labs(title = "") +
-            ggplot2::ylab(m) +
+            ggplot2::ylab(filtered_metric) +
             ggplot2::xlab("") +
             ggplot2::scale_fill_manual(values = ssEnv$color_palette)
           # store the plot in the list
-          plot_list[[m]] <- p
+          plot_list[[filtered_metric]] <- p
         }
 
         # build  a panel from plot list
         gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(filtered_metrics))
 
         path <- dir_check_and_create(ssEnv$result_folderChart, "FAMILY.TEST_PERFORMANCE")
-        # file_name <- inference_file_name(inference_detail, marker,path ,file_extension="png", prefix = "", suffix="")
+        # file_name <- inference_file_name(inference_detail, marker,path ,file_extension=ssEnv$plot_format, prefix = "", suffix="")
         file_name <- file.path(path, paste0(transformation,"_", marker,"_",paste0(families.test, collapse="_"),"_FAMILY_TEST_PERFORMANCE.png"))
         # save the panel
         ggplot2::ggsave(file = file.path(file_name), gge, width = 2048, height = 1024, units = "px")
