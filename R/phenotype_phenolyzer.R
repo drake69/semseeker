@@ -1,6 +1,6 @@
 phenotype_phenolyzer <- function(study,
   disease,phenolyzer_folder_bin,minimum_score = 0.5, statistic_parameter = "",
- adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
+  adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details, significance = TRUE, sql_condition="")
 {
 
@@ -17,7 +17,7 @@ phenotype_phenolyzer <- function(study,
 
   tmp <- tempdir()
 
-  # 
+  #
   diseases <- disease_get(disease =  disease,vocabulary =  "HPO")
   disease_label <- gsub(":","_",disease)
 
@@ -48,9 +48,9 @@ phenotype_phenolyzer <- function(study,
     base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer"))
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "scores")
     annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_scores")
-    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_",disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
     phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
-    # 
+    #
     if(file.exists(phenotype_report_path))
       next
 
@@ -107,7 +107,7 @@ phenotype_phenolyzer <- function(study,
     write.table(unique(gene_set[,"AREA_OF_TEST"]), file_genes, quote = FALSE, row.names = FALSE, col.names = FALSE)
     write.table(diseases, file_term, quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-    # 
+    #
     nCore <-  ssEnv$parallel$nCore
     # perl disease_annotation.pl alzheimer -p -ph -logistic -out ex8 -addon DB_DISGENET_GENE_DISEASE_SCORE,DB_GAD_GENE_DISEASE_SCORE -addon_weight 0.25
     pcommand <-
@@ -141,85 +141,84 @@ phenotype_phenolyzer <- function(study,
         sink(null_device)
         system(pcommand)
         sink()
-
-        # 
-        annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_list")
-        if(!file.exists(annotated_gene_file))
-        {
-          log_event("INFO:" , format(Sys.time(), "%a %b %d %X %Y"), "No annotated gene file found !")
-          next
-          }
-        annotated_genes <-  utils::read.csv2(annotated_gene_file, sep = "\t")
-
-
-        annotated_genes_temp <- annotated_genes[annotated_genes$Status=="SeedGene",]
-
-        if(nrow(annotated_genes_temp)==0)
-          annotated_genes_temp <- annotated_genes[annotated_genes$Score>=minimum_score,]
-
-        if(nrow(annotated_genes_temp)==0)
-          next
-
-        seq <- seq + 1
-        if(nrow(annotated_genes)==0)
-          next()
-        annotated_genes$key <- key
-        annotated_genes$seq <- seq
-        annotated_genes$gene_count <- nrow(gene_set)
-        annotated_genes$order <- 1:nrow(annotated_genes)
-        annotated_genes$diseases <- paste(diseases$DISEASE, collapse = ";")
-
-        phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease_label,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
-        path <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
-        phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
-        write.csv2(annotated_genes, phenotype_report_path)
-
-
-        path <- dir_check_and_create(baseFolder = base_path, subFolders = "scores")
-        annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_scores")
-        phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
-        phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
-        file.copy(annotated_gene_file, phenotype_report_path, overwrite = TRUE)
-
-
-        path <- dir_check_and_create(baseFolder = base_path, subFolders = "worldcloud")
-        # copy all files ending with _wordcloud.png to the worldcloud folder
-        wordcloud_files <- list.files(tempFolder, pattern = "_wordcloud.png", full.names = TRUE)
-        for (w in 1:length(wordcloud_files))
-        {
-          wordcloud_file <- wordcloud_files[w]
-          phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease_label,"_wordcloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
-          phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"png")
-          # local_path <- dir_check_and_create(baseFolder = base_path, subFolders = keys[i,"COMBINED"])
-          file.copy(wordcloud_file, phenotype_report_path, overwrite = TRUE)
-        }
-
-        # path <- dir_check_and_create(baseFolder = base_path, subFolders = "disease")
-        # copy all files ending with _diseases.png to the worldcloud folder
-        diseases_files <- list.files(tempFolder, pattern = "_diseases", full.names = TRUE)
-        
-        for (w in 1:length(diseases_files))
-        {
-          diseases_file <- diseases_files[w]
-          local_path <- dir_check_and_create(baseFolder = base_path, subFolders = keys[i,"COMBINED"])
-          # file.copy(diseases_file, local_path, overwrite = TRUE)
-          disease_temp <- read.csv2(diseases_file, sep = "\t")
-          colnames(disease_temp) <- c("Description","Score")
-          disease_temp$key <- key
-          disease_temp$HPO <- disease
-          diseases_summary <- plyr::rbind.fill(diseases_summary, disease_temp)
-
-          projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
-          filenameResult = file_path_build(base_path,projectName,"csv")
-          write.csv2(disease_temp, filenameResult)
-        }
-
-        # phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease,"_gene_cloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha)
-        # cloud_gene_file <- file.path(tempFolder,"out.annotated_gene_scores")
-        # file.copy(cloud_gene_file, phenotype_report_path, overwrite = TRUE)
-
       }
     )
+
+    annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_list")
+    if(!file.exists(annotated_gene_file))
+    {
+      log_event("INFO:" , format(Sys.time(), "%a %b %d %X %Y"), "No annotated gene file found !")
+      next
+    }
+    # browser()
+    annotated_genes <-  utils::read.csv2(annotated_gene_file, sep = "\t")
+    annotated_genes_temp <- annotated_genes[annotated_genes$Status=="SeedGene",]
+
+    if(nrow(annotated_genes_temp)==0)
+      annotated_genes_temp <- annotated_genes[annotated_genes$Score>=minimum_score,]
+
+    if(nrow(annotated_genes_temp)==0)
+      next
+    seq <- seq + 1
+    if(nrow(annotated_genes)==0)
+      next()
+
+    annotated_genes$key <- key
+    annotated_genes$seq <- seq
+    annotated_genes$gene_count <- nrow(gene_set)
+    annotated_genes$order <- 1:nrow(annotated_genes)
+    annotated_genes$diseases <- paste(diseases$DISEASE, collapse = ";")
+
+    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_", disease_label,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+    path <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
+    phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
+    write.csv2(annotated_genes, phenotype_report_path)
+
+
+    path <- dir_check_and_create(baseFolder = base_path, subFolders = "scores")
+    annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_scores")
+    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_", disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+    phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
+    file.copy(annotated_gene_file, phenotype_report_path, overwrite = TRUE)
+
+
+    path <- dir_check_and_create(baseFolder = base_path, subFolders = "worldcloud")
+    # copy all files ending with _wordcloud.png to the worldcloud folder
+    wordcloud_files <- list.files(tempFolder, pattern = "_wordcloud.png", full.names = TRUE)
+    for (w in 1:length(wordcloud_files))
+    {
+      wordcloud_file <- wordcloud_files[w]
+      phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease_label,"_wordcloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+      phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"png")
+      # local_path <- dir_check_and_create(baseFolder = base_path, subFolders = keys[i,"COMBINED"])
+      file.copy(wordcloud_file, phenotype_report_path, overwrite = TRUE)
+    }
+
+    # path <- dir_check_and_create(baseFolder = base_path, subFolders = "disease")
+    # copy all files ending with _diseases.png to the worldcloud folder
+    diseases_files <- list.files(tempFolder, pattern = "_diseases", full.names = TRUE)
+
+    for (w in 1:length(diseases_files))
+    {
+      # browser()
+      diseases_file <- diseases_files[w]
+      local_path <- dir_check_and_create(baseFolder = base_path, subFolders = keys[i,"COMBINED"])
+      # file.copy(diseases_file, local_path, overwrite = TRUE)
+      disease_temp <- read.csv2(diseases_file, sep = "\t", header = FALSE)
+      colnames(disease_temp) <- c("Description","Score")
+      disease_temp$key <- key
+      disease_temp$HPO <- disease
+      diseases_summary <- plyr::rbind.fill(diseases_summary, disease_temp)
+
+      projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix= disease_label  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
+      filenameResult = file_path_build(base_path,projectName,"csv")
+      write.csv2(disease_temp, filenameResult)
+    }
+
+    # phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease,"_gene_cloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha)
+    # cloud_gene_file <- file.path(tempFolder,"out.annotated_gene_scores")
+    # file.copy(cloud_gene_file, phenotype_report_path, overwrite = TRUE)
+
     unlink(tempFolder, recursive = TRUE)
   }
 
@@ -236,4 +235,3 @@ phenotype_phenolyzer <- function(study,
   # diseases_summary <- unique(diseases_summary)
   # write.csv2(diseases_summary, phenotype_report_path)
 }
-

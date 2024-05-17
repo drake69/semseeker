@@ -28,6 +28,9 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
   if(grepl("log",family_test))
     model_result <- log_model(family_test, tempDataFrame, sig.formula, transformation, plot)
 
+  if(grepl("mediation-quantreg",family_test))
+    model_result <- mediation_quantreg_model(family_test, tempDataFrame, sig.formula, transformation, plot)
+
   # Determine the null device for the current platform
   null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
   # Redirect output to the null device
@@ -44,7 +47,7 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
   #   return (model_result)
   # })
 
-  # 
+  #
   model_result <- as.data.frame(model_result)
   return (model_result)
 

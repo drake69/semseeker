@@ -141,7 +141,18 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           ######################################################################################################
           # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
           # binomiale che si vuole usare per la regressione logistica
-
+          # browser()
+          min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
+          if(length(covariates)>min_covariates_length)
+          # check collinearity of covariates
+          {
+            collinearity_score <- calculate_collinearity_score(study_summary[,covariates])
+            if(collinearity_score > 0.7)
+            {
+              log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Collinearity score of covariates is too high!")
+              stop()
+            }
+          }
           markers <- unique(localKeys$MARKER)
           if (exists("results"))
             rm(results)
@@ -168,7 +179,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
               fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
 
-              # 
+              #
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
               # clean keys from already done association
               if(file_good)
@@ -234,7 +245,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             }
 
 
-            # 
+            #
             # execute for all the areas
             if(depth_analysis>1)
             {
@@ -278,7 +289,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrame <- tempDataFrame[-1,]
                     if(length(areas_selection)>0)
                     {
-                      # 
+                      #
                       # check if areas_selection is a range
                       if(length(areas_selection)==1)
                       {
@@ -377,7 +388,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
 save_result <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
 
-  # 
+  #
   if(!exists("results") | is.null(results))
     return
 

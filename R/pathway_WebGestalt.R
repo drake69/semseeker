@@ -4,7 +4,7 @@ pathway_WebGestalt <- function(study,
   inference_details,significance,sql_condition="")
 {
 
-  # 
+  #
   # start_fresh <- FALSE
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = start_fresh, ...)
   ssEnv <- get_session_info()
@@ -40,7 +40,7 @@ pathway_WebGestalt <- function(study,
         if(file.exists(filenameResult))
           next
 
-        # 
+        #
 
         enrich_method <- enrich_methods[em]
         if(ssEnv$showprogress)
@@ -56,7 +56,7 @@ pathway_WebGestalt <- function(study,
           adjustment_method= adjustment_method,
           sql_condition = sql_condition)
 
-        # 
+        #
 
         if (nrow(results_inference)==0)
           next
@@ -124,54 +124,54 @@ pathway_WebGestalt <- function(study,
             maxNum = 2000,
             minNum = 5
           )
-
-          enrichResult$alpha <- as.numeric(ssEnv$alpha)
-          enrichResult$pvalue_column <- pvalue_column
-          enrichResult$type <- type
-          enrichResult$enrich_method <- enrich_method
-          enrichResult$key <- key
-          enrichResult$MARKER <- keys[i,]$MARKER
-          enrichResult$FIGURE <- keys[i,]$FIGURE
-          enrichResult$AREA <- keys[i,]$AREA
-          enrichResult$SUBAREA <- keys[i,]$SUBAREA
-
-          # format FDR to use scientific notation
-
-          enrichResultToPlot <- enrichResult[1:15,]
-          # browser
-          # if(min(enrichResultToPlot$FDR) < as.numeric((ssEnv$alpha)))
-          # {
-          plotFileName = file_path_build(path,projectName,ssEnv$plot_format)
-          grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")
-          enrichResultToPlot <- as.data.frame(enrichResultToPlot)
-          enrichResultToPlot <- enrichResultToPlot[order(enrichResultToPlot$expect),]
-          graphics::par(mar = c(5, 30, 5, 5)) # Set the margin on all sides to 6
-          par(cex.lab = 4)
-          # Create a color vector based on the condition FDR < 0.05
-          bar_colors <- ifelse(enrichResultToPlot$FDR < as.numeric((ssEnv$alpha)), ssEnv$color_palette[1], ssEnv$color_palette[2])
-          # Generate the barplot with colors
-          graphics::barplot(height = enrichResultToPlot$expect,
-            names = enrichResultToPlot$description,
-            # names = wrap_it(paste0(enrichResultToPlot$description,
-            #   " (FDR=", format(enrichResultToPlot$FDR, scientific = TRUE), ")",
-            #   " (Enr. Ratio = ", round(enrichResultToPlot$enrichmentRatio, 2), ")",
-            #   sep=" "), 25),
-            horiz = TRUE,
-            las = 1,
-            cex.names = 2,
-            space = 0.1,
-            col = bar_colors) # Use the color vector here
-          # graphics::barplot(height=enrichResultToPlot$expect, names=wrap_it(paste0(enrichResultToPlot$description,"(FDR=", round(enrichResultToPlot$FDR,2),")", sep=" "),25) , horiz=T, las = 1 ,cex.names= 2, space=0.1)
-          graphics::mtext( paste0(keys[i,"AREA"]," ",keys[i,"SUBAREA"]," ", keys[i,"MARKER"], " ",keys[i,"FIGURE"]," ",pvalue_column,sep=" "), side = 3, line = 1, cex = 2)
-          grDevices::dev.off()
-          # }
-          file.remove(geneFile)
         },
           catch = function(e) {
             log_event(paste("Error in WebGestaltR: ",e))
             return()
           }
         )
+
+        enrichResult$alpha <- as.numeric(ssEnv$alpha)
+        enrichResult$pvalue_column <- pvalue_column
+        enrichResult$type <- type
+        enrichResult$enrich_method <- enrich_method
+        enrichResult$key <- key
+        enrichResult$MARKER <- keys[i,]$MARKER
+        enrichResult$FIGURE <- keys[i,]$FIGURE
+        enrichResult$AREA <- keys[i,]$AREA
+        enrichResult$SUBAREA <- keys[i,]$SUBAREA
+
+        # format FDR to use scientific notation
+
+        enrichResultToPlot <- enrichResult[1:15,]
+        # browser
+        # if(min(enrichResultToPlot$FDR) < as.numeric((ssEnv$alpha)))
+        # {
+        plotFileName = file_path_build(path,projectName,ssEnv$plot_format)
+        grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")
+        enrichResultToPlot <- as.data.frame(enrichResultToPlot)
+        enrichResultToPlot <- enrichResultToPlot[order(enrichResultToPlot$expect),]
+        graphics::par(mar = c(5, 30, 5, 5)) # Set the margin on all sides to 6
+        par(cex.lab = 4)
+        # Create a color vector based on the condition FDR < 0.05
+        bar_colors <- ifelse(enrichResultToPlot$FDR < as.numeric((ssEnv$alpha)), ssEnv$color_palette[1], ssEnv$color_palette[2])
+        # Generate the barplot with colors
+        graphics::barplot(height = enrichResultToPlot$expect,
+          names = enrichResultToPlot$description,
+          # names = wrap_it(paste0(enrichResultToPlot$description,
+          #   " (FDR=", format(enrichResultToPlot$FDR, scientific = TRUE), ")",
+          #   " (Enr. Ratio = ", round(enrichResultToPlot$enrichmentRatio, 2), ")",
+          #   sep=" "), 25),
+          horiz = TRUE,
+          las = 1,
+          cex.names = 2,
+          space = 0.1,
+          col = bar_colors) # Use the color vector here
+        # graphics::barplot(height=enrichResultToPlot$expect, names=wrap_it(paste0(enrichResultToPlot$description,"(FDR=", round(enrichResultToPlot$FDR,2),")", sep=" "),25) , horiz=T, las = 1 ,cex.names= 2, space=0.1)
+        graphics::mtext( paste0(keys[i,"AREA"]," ",keys[i,"SUBAREA"]," ", keys[i,"MARKER"], " ",keys[i,"FIGURE"]," ",pvalue_column,sep=" "), side = 3, line = 1, cex = 2)
+        grDevices::dev.off()
+        # }
+        file.remove(geneFile)
 
         unlink(geneFile)
 

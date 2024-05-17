@@ -4,13 +4,16 @@ sig.formula_vars <- function(sig.formula){
   dependent_variable <- dep_var[[2]]
   independent_variable <- dep_var[[3]]
   # check if contains +
+  covariates <- c()
   if(grepl("\\+",independent_variable))
   {
-    independent_variable <- strsplit(independent_variable,"\\+")
-    independent_variable <- unlist(independent_variable)
+    vars <- strsplit(independent_variable,"\\+")
+    vars <- unlist(vars)
     # take the first
-    independent_variable <- independent_variable[1]
+    independent_variable <- vars[1]
+    # the second to the end
+    covariates <- vars[-1]
   }
-  return(list(dependent_variable=dependent_variable,independent_variable=independent_variable))
+  return(list(dependent_variable=dependent_variable,independent_variable=independent_variable, covariates=covariates))
 
 }

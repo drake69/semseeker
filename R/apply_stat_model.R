@@ -19,7 +19,7 @@
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal,
                               session_folder, independent_variable, depth_analysis=3, ...)
 {
-  # 
+  #
 
   ssEnv <- get_session_info()
   arguments <- list(...)
@@ -62,11 +62,11 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>=2){
 
 
-      # 
+      #
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
       model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5))
 
-      # 
+      #
       local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
       local_result$MARKER <- as.character(key$MARKER)
       local_result$FIGURE <-  as.character(key$FIGURE)
@@ -80,7 +80,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       if (is.family_dicotomic(family_test))
         {
-        # 
+        #
         selector <- tempDataFrame[, independent_variable]==independent_variable1stLevel
         independent_variableData1stLevel <- stats::na.omit(tempDataFrame[selector,burdenValue])
         selector <- tempDataFrame[, independent_variable]==independent_variable2ndLevel

@@ -1,21 +1,9 @@
 #' @export
 markers_performance_pathway_analyser <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
-  significance = TRUE, ...)
+  significance = TRUE,disease, ...)
 {
-  # #
-  # inference_details <- expand.grid(
-  #   "independent_variable"= c("Sample_Group"),
-  #   "covariates"=c(""),
-  #   "family_test"=c("wilcoxon"),
-  #   "transformation"=c("scale","none"),
-  #   "depth_analysis"=3,
-  #   "filter_p_value" = FALSE
-  # )
-  # pvalue_column="PVALUE_ADJ_ALL_BH"
-  # result_folder <- "~/Documents/Dati_Lavoro/pediatric_leukemia/results/BALLBM/"
-  # ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE)
 
-
+  disease_original <- gsub("[:]","_",disease)
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   keys <- unique(ssEnv$keys_for_pathway)
   inference_details <- as.data.frame(inference_details)
@@ -25,6 +13,12 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
   #
   for (pt in 1:nrow(key_pathway))
   {
+    if(pt==3)
+      disease <- disease_original
+    else
+      disease <- ""
+
+    # browser()
     if(key_pathway[pt,"type"]=="Pathway")
       path <- dir_check_and_create(ssEnv$result_folderPathway,key_pathway[pt,"label"])
     else
@@ -48,24 +42,34 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
       for (i in 1:nrow(keys))
       {
-        # i <- 1
-        # i <- 2
-        file_name <- phenotype_analysis_name(inference_detail = inference_detail,key = keys[i,], prefix="",suffix="",
+        file_name <- phenotype_analysis_name(inference_detail = inference_detail,key = keys[i,], prefix="",
+          suffix=ifelse(disease=="","",paste("_",disease,sep="")),
           pvalue_column=pvalue_column, alpha = ssEnv$alpha, significance = significance)
         file_name = file_path_build(path,file_name,"csv")
+        # chech agin with disease without underscore
+        if(!file.exists(file_name))
+        {
+          file_name <- phenotype_analysis_name(inference_detail = inference_detail,key = keys[i,], prefix="",
+            suffix=ifelse(disease=="","",paste(disease,sep="")),
+            pvalue_column=pvalue_column, alpha = ssEnv$alpha, significance = significance)
+          file_name = file_path_build(path,file_name,"csv")
+        }
+
         # #
         if (!file.exists(file_name))
         {
-          log_event("DEBUG: patwhay_result ", file_name, " is missed !")
+          log_event("DEBUG: pathway_result ", file_name, " is missed !")
           next
         }
-        # read the patwhay_result
-        patwhay_result <- read.csv2(file_name)
-        # patwhay_result$key <- paste(patwhay_result$MARKER,patwhay_result$FIGURE,patwhay_result$AREA,patwhay_result$SUBAREA,sep="_")
+
+        # read the pathway_result
+        pathway_result <- read.csv2(file_name)
+        pathway_result$MARKER <- keys[i,"MARKER"]
+        # pathway_result$key <- paste(pathway_result$MARKER,pathway_result$FIGURE,pathway_result$AREA,pathway_result$SUBAREA,sep="_")
         if (!exists("aggregated_patwhay_result_total"))
-          aggregated_patwhay_result_total <- patwhay_result
+          aggregated_patwhay_result_total <- pathway_result
         else
-          aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, patwhay_result)
+          aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
       }
 
       if (!exists("aggregated_patwhay_result_total"))
@@ -74,10 +78,8 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         next
 
       aggregated_patwhay_result <- aggregated_patwhay_result_total
-      #
       fdr <- aggregate(aggregated_patwhay_result[, column_of_pvalue], by = list(aggregated_patwhay_result[,column_of_id]), FUN = max)
       colnames(fdr) <- c( column_of_id, column_of_pvalue)
-      # #
       aggregated_patwhay_result <- unique(aggregated_patwhay_result[,c(column_of_id,"key",column_of_description)])
       aggregated_patwhay_result <- na.omit(aggregated_patwhay_result)
       categories <- unique(na.omit(aggregated_patwhay_result$key))
@@ -117,18 +119,16 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
       # change colname of column_of_id to column_of_id
       colnames(aggregated_patwhay_result)[which(colnames(aggregated_patwhay_result)==column_of_id)] <- "column_of_id_label"
       key_gene_set_pivot <- reshape2::dcast(aggregated_patwhay_result, column_of_id_label ~ key , value.var = "column_of_id_label", fun.aggregate = length)
-      key_gene_set_pivot_summary <- reshape2::dcast(aggregated_patwhay_result, column_of_id_label ~ MARKER , value.var = "column_of_id_label", fun.aggregate = length)
       #change back colname of column_of_id to column_of_id
-      colnames(key_gene_set_pivot)[which(colnames(key_gene_set_pivot)=="column_of_id_label")] <- column_of_id
       colnames(aggregated_patwhay_result)[which(colnames(aggregated_patwhay_result)=="column_of_id_label")] <- column_of_id
+
+      colnames(key_gene_set_pivot)[which(colnames(key_gene_set_pivot)=="column_of_id_label")] <- column_of_id
 
       # merge with geneSet name
       tt <- unique(aggregated_patwhay_result[,c(column_of_id,column_of_description)])
       tt <- merge(tt, fdr, by=column_of_id)
-      key_gene_set_pivot_summary <- merge(key_gene_set_pivot_summary,fdr, by=column_of_id)
-      #
-      key_gene_set_pivot <- merge(tt,key_gene_set_pivot)
-      key_gene_set_pivot_summary <- merge(tt,key_gene_set_pivot_summary)
+      key_gene_set_pivot <- merge(tt,key_gene_set_pivot, by=column_of_id)
+
       # add a column with the total number of gene sets
       key_gene_set_pivot$total <- rowSums(key_gene_set_pivot[,4:ncol(key_gene_set_pivot)])
 
@@ -143,10 +143,18 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
       }
       key_gene_set_pivot <- key_gene_set_pivot[order(key_gene_set_pivot$total, decreasing = FALSE),]
 
-      filename <- paste(path, "/",file_prfx,"_pivot_",key_pathway[pt,"label"],".csv",sep = "")
+      filename <- paste(path, "/",file_prfx,"_pivot_",key_pathway[pt,"label"],ifelse(disease=="","", paste("_", disease, sep="")), ".csv",sep = "")
       write.csv2(key_gene_set_pivot, filename)
 
-      filename <- paste(path, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"],".csv",sep = "")
+      # browser()
+      colnames(aggregated_patwhay_result_total)[which(colnames(aggregated_patwhay_result_total)==column_of_id)] <- "column_of_id_label"
+      key_gene_set_pivot_summary <- reshape2::dcast(aggregated_patwhay_result_total, column_of_id_label ~ MARKER , value.var = "column_of_id_label", fun.aggregate = length)
+      #change back colname of column_of_id to column_of_id
+      colnames(key_gene_set_pivot_summary)[which(colnames(key_gene_set_pivot_summary)=="column_of_id_label")] <- column_of_id
+      key_gene_set_pivot_summary <- merge(key_gene_set_pivot_summary,fdr, by=column_of_id)
+      key_gene_set_pivot_summary <- merge(key_gene_set_pivot_summary,key_gene_set_pivot[,c(column_of_id,"total")], by=column_of_id)
+      key_gene_set_pivot_summary <- unique(merge(key_gene_set_pivot_summary,aggregated_patwhay_result[,c(column_of_id,column_of_description)], by=column_of_id, all.x = TRUE))
+      filename <- paste(path, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
       write.csv2(key_gene_set_pivot_summary, filename)
 
       # key_gene_set_pivot <- subset(key_gene_set_pivot, total < 3)[, colSums(key_gene_set_pivot[,4:ncol(key_gene_set_pivot)]) > 0,]
