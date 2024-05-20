@@ -89,7 +89,7 @@ pathway_pathfindR <- function(study,
         else
           gene_set <- results_inference[results_inference$FIGURE==keys[i,]$FIGURE,]
 
-        gene_set <- na.omit(gene_set)
+        # gene_set <- na.omit(gene_set)
         if (statistic_parameter=="")
         {
           gene_set <- gene_set[,c("AREA_OF_TEST",pvalue_column)]
@@ -99,6 +99,8 @@ pathway_pathfindR <- function(study,
         else
         {
           #
+          if(nrow(gene_set)<2)
+            next
           gene_set <- gene_set[,c("AREA_OF_TEST",statistic_parameter,pvalue_column)]
           # aggregate the gene set using the max of pvalue_columns
           gene_set_pval <- aggregate(gene_set[,pvalue_column], by = list(gene_set$AREA_OF_TEST), mean)
@@ -110,6 +112,7 @@ pathway_pathfindR <- function(study,
           # browser()
         }
 
+        gene_set <- na.omit(gene_set)
         gene_set <- unique(gene_set)
         gene_set <- gene_set[order(gene_set[,pvalue_column],decreasing = FALSE),]
 

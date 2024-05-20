@@ -37,9 +37,9 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
       tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = transformation,
       dependent_variable = dependent_variable, permutation_vector = c(), plot = plot)
   })
-  res$r_model <- "lqmm_lqm"
+  res$r_model <- family_test
 
-  # 
+  #
   res <- as.data.frame(res)
   return (res)
 

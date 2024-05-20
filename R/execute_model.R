@@ -31,15 +31,19 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
   if(grepl("mediation-quantreg",family_test))
     model_result <- mediation_quantreg_model(family_test, tempDataFrame, sig.formula, transformation, plot)
 
-  # Determine the null device for the current platform
-  null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
-  # Redirect output to the null device
-  sink(null_device)
-  if (grepl("quantreg-permutation", family_test))
-    model_result <- quantreg_permutation_model(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot )
-  sink()
+  if(grepl("mediation-linear",family_test))
+    model_result <- mediation_linear_model(family_test, tempDataFrame, sig.formula, transformation, plot)
 
-  if (grepl("quantreg", family_test) & !grepl("quantreg-permutation", family_test))
+  if (grepl("quantreg-permutation", family_test))
+  {
+    # Determine the null device for the current platform
+    null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
+    # Redirect output to the null device
+    sink(null_device)
+    model_result <- quantreg_permutation_model(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot )
+    sink()
+  }
+  if (grepl("quantreg", family_test) & !grepl("quantreg-permutation", family_test)  & !grepl("mediation-quantreg", family_test))
     model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot)
 
   #   return (model_result)

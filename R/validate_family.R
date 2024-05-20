@@ -1,16 +1,16 @@
 validate_family_test <- function(family_test){
 
-  if( is.null(family_test) || length(family_test)  ==  0)
-    {
-      log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " One test family_test is missed! Skipped.", family_test)
-      return(FALSE)
-    }
+  if( is.null(family_test) || length(family_test)  ==  0 || is.na(family_test))
+  {
+    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " One test family_test is missed! Skipped.", family_test)
+    return(FALSE)
+  }
 
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " family_test: " , as.character(family_test))
 
 
   if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="jsd" | family_test=="t.test" | family_test=="poisson" |
-     family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman" |
+      family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman" |
       family_test=="wilcoxon")
     return(TRUE)
 
@@ -40,6 +40,9 @@ validate_family_test <- function(family_test){
     else
       return(TRUE)
   }
+
+  if (grepl("mediation-linear", family_test))
+    return(TRUE)
 
   if (grepl("spearman-permutation",family_test))
     return(TRUE)

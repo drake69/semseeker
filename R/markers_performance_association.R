@@ -37,8 +37,6 @@ markers_performance_association <- function(inference_details, result_folder, pv
       # read the file
       file <- read.csv2(file_name)
 
-      # filter using the sql condition
-      file <- filter_sql(sql_conditions, file)
 
       # filter the metrics
       metrics_name_collect(file)
@@ -55,8 +53,13 @@ markers_performance_association <- function(inference_details, result_folder, pv
         final <- plyr::rbind.fill(final, file)
     }
 
+
     if (!exists("final"))
       next
+
+    # filter using the sql condition
+    final <- filter_sql(sql_conditions, final)
+
 
     if(nrow(final) == 0)
       next
@@ -136,7 +139,6 @@ markers_performance_association <- function(inference_details, result_folder, pv
         fig <- figures[f]
         row <- row  + 1
         col <- 0
-        # fig <- "HYPO"
         for( m in 1:length(filtered_metrics)){
           metric <- filtered_metrics[m]
           col <- col + 1
@@ -153,7 +155,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
           ##############
           # browser()
           final_temp <- metrics_ranking(metric,final_temp, fig, metric)
-          scores_temp <- aggregate(final_temp[,"SCORE"], by = list(final_temp[,"MARKER"]), FUN = sum)
+          scores_temp <- aggregate(final_temp[,"SCORE"], by = list(final_temp[,"MARKER"]), FUN = aggr_fun)
           scores_temp[,"FIGURE"] <- fig
           colnames(scores_temp) <- c("MARKER", "SCORE","FIGURE")
           scores <- rbind(scores, scores_temp)

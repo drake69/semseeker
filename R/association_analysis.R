@@ -143,6 +143,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # binomiale che si vuole usare per la regressione logistica
           # browser()
           min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
+          min_covariates_length <- ifelse(grepl("mediation-linear", family_test), 2, 1 )
           if(length(covariates)>min_covariates_length)
           # check collinearity of covariates
           {
@@ -404,14 +405,15 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
       {
         col_p <- paste0(pvalue_columns[p], "_ADJ_ALL_", methods[method])
         results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  methods[method])
+        colnames(results) <- toupper(colnames(results))
       }
     }
 
     if (nrow(results)>0)
-      results <- results[order(results$PVALUE_ADJ_ALL_fdr),]
+      results <- results[order(results$PVALUE_ADJ_ALL_FDR),]
 
     if(filter_p_value)
-      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results$PVALUE_ADJ_ALL_fdr < as.numeric(ssEnv$alpha))
+      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results$PVALUE_ADJ_ALL_FDR < as.numeric(ssEnv$alpha))
   }
 
 
@@ -424,6 +426,7 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
   # remove columns where all rows are NA
   results <- results[, colSums(is.na(results)) < nrow(results)]
   utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
+
 
 }
 

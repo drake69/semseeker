@@ -40,7 +40,7 @@ To install semseeker, you can use devtools; upcoming releases will be accessible
 <!-- "pwr","philentropy","caret")) -->
 
 
-<!-- install.packages("~/Documents/Progetti_Sviluppo/semseeker_0.10.11.tar.gz", repos = NULL, type = "source") -->
+<!-- install.packages("~/Documents/Progetti_Sviluppo/semseeker_0.10.15.tar.gz", repos = NULL, type = "source") -->
 
 Install the latest release:
 

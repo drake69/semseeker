@@ -1,6 +1,6 @@
 parallel_session <- function()
 {
-  # 
+  #
   ssEnv <- get_session_info()
   parallel_strategy <- ssEnv$parallel_strategy
 
@@ -12,7 +12,7 @@ parallel_session <- function()
     {
       log_event("ERROR: Setting OBJC_DISABLE_INITIALIZE_FORK_SAFETY must be YES to work in multiprocess. \n
         execute: export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES at shell or
-        Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES') ! ")
+         Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES') ! ")
       # Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES")
       stop()
     }
@@ -36,7 +36,7 @@ parallel_session <- function()
   # permutation cluster
   outFile <- file.path(ssEnv$session_folder, "cluster_r.out")
 
-  # 
+  #
   ssEnv$parallel <- data.frame("parallel_strategy"="")
   ssEnv$parallel$parallel_strategy <- parallel_strategy
   ssEnv$parallel$nCore <- nCore

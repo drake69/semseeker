@@ -34,7 +34,7 @@ compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
 #'
 quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot)
 {
-  # 
+  #
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
@@ -98,7 +98,7 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
     n_permutations <- n_permutations_test
 
   res$n_permutations <- n_permutations
-  res$r_model <- "lqmm_lqm"
+  res$r_model <- family_test
 
   return (res)
 

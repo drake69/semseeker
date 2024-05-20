@@ -106,8 +106,12 @@ pathway_WebGestalt <- function(study,
           "MF"="geneontology_Molecular_Function"
         )
 
-        tryCatch({
-          enrichResult <- WebGestaltR::WebGestaltR(
+        if(nrow(gene_set)<5)
+          next
+
+        # browser()
+        enrichResult <- tryCatch({
+          WebGestaltR::WebGestaltR(
             enrichMethod=enrich_method,
             organism="hsapiens",
             enrichDatabase= enrichDataBase,
@@ -122,15 +126,20 @@ pathway_WebGestalt <- function(study,
             fdrThr = 1,
             topThr = 200,
             maxNum = 2000,
-            minNum = 5
+            minNum = 1
           )
         },
           catch = function(e) {
             log_event(paste("Error in WebGestaltR: ",e))
-            return()
+            NULL
+          },
+          finally = {
+            # log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " WebGestaltR done for key: ", keys[i,])
           }
         )
 
+        if(is.null(enrichResult))
+          next
         enrichResult$alpha <- as.numeric(ssEnv$alpha)
         enrichResult$pvalue_column <- pvalue_column
         enrichResult$type <- type

@@ -6,7 +6,7 @@ metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED
     "PINBALL_LOSS","QQ_DISTANCE"))
 
   # R_SQUARED	R_SQUARED_ADJ
-  the_higher_the_better_markers <- toupper(c("R_SQUARED_ADJ","R_SQUARED","COUNT_SIGN","Edata_frameECT_SIZE_ESTIMATE","Edata_frameECT_SIZE_MAGNITUDE",
+  the_higher_the_better_markers <- toupper(c("R_SQUARED_ADJ","R_SQUARED","COUNT_SIGN","EFFECT_SIZE_ESTIMATE","EFFECT_SIZE_MAGNITUDE",
     "RBC", "POWER", "STATISTIC_PARAMETER","JSD","QQ_CORRELATION",
     "RANK_BESERIAL_CORRELATION","Wilcox_Value","kw_runk_sum","R_SQUARED_ADJ_TEST","R_SQUARED_TEST"))
 
@@ -14,7 +14,8 @@ metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED
   if(grepl("PVALUE",metric))
     the_lower_the_better_markers <- c(the_lower_the_better_markers, metric)
 
-  data_frame[,column_to_rank] <- abs(data_frame[,column_to_rank])
+  metric <- toupper(metric)
+  # data_frame[,column_to_rank] <- abs(data_frame[,column_to_rank])
   if(metric %in% the_lower_the_better_markers){
     data_frame <- data_frame[order(data_frame[,column_to_rank], decreasing = T),]
   }else if(metric %in% the_higher_the_better_markers){
@@ -23,18 +24,14 @@ metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED
     log_event("ERROR: Metric not found")
     stop()
   }
+
+  # browser()
+  values_to_rank <- unique(data_frame[,column_to_rank])
+  values_to_rank <- data.frame("VALUE"=values_to_rank)
   # create a new column with the rank
-  data_frame$RANK <- 1:nrow(data_frame)
-
-  # get only duplicates of column_to_rank
-  duplicates <- data_frame[duplicated(data_frame[,column_to_rank]) | duplicated(data_frame[,column_to_rank], fromLast = T),column_to_rank]
-  duplicates <- unique(duplicates)
-
-  for (r in 1:length(duplicates)){
-    duplicate_value <- duplicates[r]
-    # assign the same rank where REBASED is the same
-    data_frame[data_frame[,column_to_rank] == duplicate_value,"RANK"] <- data_frame[r,"RANK"]
-  }
+  values_to_rank$RANK <- 1:nrow(values_to_rank)
+  # merge the rank with the data frame
+  data_frame <- merge(data_frame, values_to_rank, by.x=column_to_rank, by.y="VALUE", all.x=TRUE)
 
   # # add the marker and figure to the data frame
   # scores <- rbind(scores, )

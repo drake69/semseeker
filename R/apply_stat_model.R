@@ -45,7 +45,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "data_preparation","apply_stat_model_sig.formula","quantreg_permutation_model",
     "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
     "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv","g_start",
-    "execute_model", "is.family_dicotomic", "log_event")
+    "execute_model", "is.family_dicotomic", "log_event","mediate","mediation")
 
   result_columns <- c("MARKER", "FIGURE", "AREA", "SUBAREA", "AREA_OF_TEST", "CI.LOWER", "CI.UPPER", "PVALUE", "STATISTIC_PARAMETER", "AIC_VALUE", "RESIDUALS", "SHAPIRO_PVALUE", "R_MODEL", "STD.ERROR", "N_PERMUTATIONS", "N_PERMUTATIONS_TEST")
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Starting foreach with: ", g_end, " items")
