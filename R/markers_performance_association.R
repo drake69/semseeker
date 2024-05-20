@@ -14,12 +14,15 @@ markers_performance_association <- function(inference_details, result_folder, pv
 
   for (id in 1:nrow(inference_details))
   {
+    # browser()
     #
     inference_detail <- inference_details[id,]
     depth_analysis <- inference_detail$depth_analysis
     family_test <- inference_detail$family_test
     transformation <- as.character(inference_detail$transformation)
     filtered_metrics <- filter_metrics(model_metrics, as.character(transformation))
+    covariates <- paste0(inference_detail$covariates, collapse = "_")
+    independent_variable <- inference_detail$independent_variable
 
     for (m in 1:length(markers))
     {
@@ -57,6 +60,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
     if (!exists("final"))
       next
 
+    colnames(final) <- toupper(colnames(final))
     # filter using the sql condition
     final <- filter_sql(sql_conditions, final)
 
@@ -200,8 +204,8 @@ markers_performance_association <- function(inference_details, result_folder, pv
         }
       }
 
-      #
-      prfx <- paste(family_test, transformation,area, subarea, paste0(markers,collapse="_"))
+      # create a prefix for the file name
+      prfx <- paste( independent_variable, transformation,family_test,covariates, area, subarea, paste0(markers,collapse="_"))
       if(length(plot_list) != 0)
       {
 
@@ -220,8 +224,8 @@ markers_performance_association <- function(inference_details, result_folder, pv
         scores$SCORE <- round(100*scores$SCORE/score_max)
         # #
         # save scores
-        path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKER_COMPARISON")
-        write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
+        path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKERS_PERFORMANCE")
+        # write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
 
 
         # aggregate scores by MARKER and sum RANK

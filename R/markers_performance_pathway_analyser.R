@@ -36,7 +36,10 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
       inference_detail <- inference_details[id,]
       family_test <- inference_detail$family_test
       transformation <- as.character(inference_detail$transformation)
-      file_prfx <- paste(pvalue_column,ssEnv$alpha,transformation, family_test,sep="_")
+      independent_variable <- inference_detail$independent_variable
+      covariates <- paste(inference_detail$covariates, collapse="_")
+
+      file_prfx <- paste( independent_variable, transformation,family_test,covariates, pvalue_column,ssEnv$alpha, sep="_")
       if (exists("aggregated_patwhay_result_total"))
         rm(aggregated_patwhay_result_total)
 
@@ -162,11 +165,32 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
       key_gene_set_pivot_summary <- unique(merge(key_gene_set_pivot_summary,aggregated_patwhay_result[,c(column_of_id,column_of_description)], by=column_of_id, all.x = TRUE))
       key_gene_set_pivot_summary <- merge(key_gene_set_pivot_summary, fdr, by=column_of_id, all.x=TRUE)
 
+      tryCatch(
+        expr = {
+          browser()
+          if(ssEnv$openai_api_key !="")
+          {
+            # Create a prompt asking about the connection between each item and the phenotype
+            prompt <- paste("Which of the following items is connected with", disease, "?", "\n", paste(list_of_items, collapse = "\n"))
+            # Call the OpenAI API
+            response <- openai::complete(prompt, temperature = 0, max_tokens = 1)
+            # Extract the selected item from the response
+            selected_item <- response$choices[[1]]$text
+            key_gene_set_pivot_summary[,"openai_suggested_item"] <- key_gene_set_pivot_summary[,column_of_description] == selected_item
+          }
+        },
+        finally = {
+        }
+      )
+
+
       if(key_pathway[pt,"type"]=="Pathway")
         filename <- paste(ssEnv$result_folderPathway, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
       else
         filename <- paste(ssEnv$result_folderPhenotype, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
       write.csv2(key_gene_set_pivot_summary, filename)
+
+
 
       # key_gene_set_pivot <- subset(key_gene_set_pivot, total < 3)[, colSums(key_gene_set_pivot[,4:ncol(key_gene_set_pivot)]) > 0,]
       # filename <- paste(path, "/",file_prfx,"_reduced_pivot_",key_pathway[pt,"label"],".csv",sep = "")

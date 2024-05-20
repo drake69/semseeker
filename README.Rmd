@@ -37,7 +37,7 @@ Semseeker aims to identify all variants that are enriched and localized in methy
 To install semseeker, you can use devtools; upcoming releases will be accessible via CRAN.
 
 <!-- install.packages(c("doFuture", "FactoMineR", "factoextra", "FSA", "fst", "future", "future.apply", "ggplot2", "gridExtra", "gtools", "Hmisc", "lqmm", "progressr", "reshape2", "zoo", "VennDiagram", "effsize", "pwr", "combinat", "philentropy", "parallelly", "knitr", "lmtest", "usethis","wordcloud","WebGestaltR","sqldf","effsize", -->
-<!-- "pwr","philentropy","caret")) -->
+<!-- "pwr","philentropy","caret","openai","glmnet")) -->
 
 
 <!-- install.packages("~/Documents/Progetti_Sviluppo/semseeker_0.10.15.tar.gz", repos = NULL, type = "source") -->

@@ -1,6 +1,6 @@
 #' @export
 gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_globally_s, pvalue_columns, adjustment_methods,alphas,
-  study, significance,statistic_parameter, sql_condition,path_dbs, phenolyzer_folder_bin,disease,
+  study, significance,statistic_parameter, sql_condition="",path_dbs, phenolyzer_folder_bin,disease,
   phenolyser=F, webgestalt=F, pathfindr=F,
   result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
@@ -30,7 +30,7 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
       adjust_per_area <- adjust_per_area_s[i]
       adjust_globally <- adjust_globally_s[i]
 
-      # 
+      #
       if (webgestalt)
         pathway_WebGestalt(
           study = study,

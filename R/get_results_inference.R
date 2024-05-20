@@ -20,7 +20,8 @@ get_results_areas_inference <- function (inference_details, marker, adjust_per_a
 
 
   results_inference <- read.csv2(inferenceFile, sep=";", dec=",", row.names = NULL, header = TRUE, stringsAsFactors = FALSE)
-  colnames(results_inference) <- gsub("[.]", "_", colnames(results_inference))
+  colnames(results_inference) <- toupper(gsub("[.]", "_", colnames(results_inference)))
+  pvalue_column <- toupper(pvalue_column)
 
   # check columns exist
   if((!pvalue_column %in% colnames(results_inference)))

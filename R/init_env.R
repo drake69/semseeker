@@ -72,6 +72,8 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"tech","")
   arguments <- set_env_variable(arguments,"showprogress",FALSE)
   arguments <- set_env_variable(arguments,"signal_intrasample",FALSE)
+  arguments <- set_env_variable(arguments,"openai_api_key","")
+
   original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8', '#ffefb6', '#cfebb6','#b9ef92')
   original_colors <- rep(original_colors, 2)
   # original_colors <- khroma::color("bright", n = 20)
