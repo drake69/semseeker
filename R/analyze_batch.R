@@ -127,6 +127,9 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   resultSampleSheet <- deltaq_get(resultSampleSheet)
   resultSampleSheet <- deltarq_get(resultSampleSheet)
 
+  resultSampleSheet <- deltap_get(resultSampleSheet)
+  resultSampleSheet <- deltarp_get(resultSampleSheet)
+
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)
   samplesID <- sample_sheet$Sample_ID

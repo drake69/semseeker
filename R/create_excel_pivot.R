@@ -6,6 +6,7 @@ create_excel_pivot <-  function() {
   reportFolder <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
   localKeys <- ssEnv$keys_areas_subareas_markers_figures
 
+  # browser()
   if (!is.null(ssEnv$keys_areas_subareas_markers_figures_missed))
     # remove the missed keys from the localKeys
     localKeys <- localKeys[!(localKeys$COMBINED %in% ssEnv$keys_areas_subareas_markers_figures_missed$COMBINED),]

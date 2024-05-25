@@ -106,8 +106,8 @@ pathway_WebGestalt <- function(study,
           "MF"="geneontology_Molecular_Function"
         )
 
-        if(nrow(gene_set)<5)
-          next
+        # if(nrow(gene_set)<5)
+        #   next
 
         # browser()
         enrichResult <- tryCatch({

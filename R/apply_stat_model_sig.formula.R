@@ -1,7 +1,7 @@
 apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_variable, covariates)
 {
 
-  # 
+  #
   if(family_test=="wilcoxon" | family_test=="t.test" | family_test =="jsd" | family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test")
   {
     covariates_model <- independent_variable
@@ -34,7 +34,7 @@ apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_
   }
 
   if(family_test=="gaussian" | family_test=="poisson" | grepl("quantreg", family_test) | grepl("polynomial",family_test) | grepl("exp",family_test)
-    | grepl("log",family_test))
+    | grepl("log",family_test) | grepl("mediation-ridge",family_test) )
   {
     if(is.null(covariates) || length(covariates)==0)
       covariates_model <- independent_variable

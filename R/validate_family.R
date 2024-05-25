@@ -41,6 +41,9 @@ validate_family_test <- function(family_test){
       return(TRUE)
   }
 
+  if (grepl("mediation-ridge", family_test))
+    return(TRUE)
+
   if (grepl("mediation-linear", family_test))
     return(TRUE)
 

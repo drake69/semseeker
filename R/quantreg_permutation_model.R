@@ -36,6 +36,7 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
 {
   #
 
+  # browser()
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
 
@@ -72,19 +73,19 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   res$pvalue <- summary_qr[2,"Pr(>|t|)"]
   res$conf.level <- conf.level
 
+  perms <- sort(unique(c(n_permutations, n_permutations_test)), decreasing = F)
 
-  if(n_permutations > n_permutations_test)
+  for(p in 1:length(perms))
   {
-    permutated_regression_coefficient <- suppressMessages(replicate(n_permutations_test, compute_quantreg_permutation(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
+    perm <- perms[p]
+    res$n_permutations <- perm
+    permutated_regression_coefficient <- suppressMessages(replicate(perm, compute_quantreg_permutation(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
     summary_results <- exact_pvalue(permutated_regression_coefficient, not_permutated_regression_coefficient, conf.level = conf.level)
     res$pvalue <- summary_results[3]
+    if(res$pvalue > ssEnv$alpha)
+      break
   }
-  if(res$pvalue < pvalue_limit)
-  {
-    permutated_regression_coefficient <- suppressMessages(replicate(n_permutations, compute_quantreg_permutation(sig.formula,as.data.frame(tempDataFrame), tau, lqm_control)))
-    summary_results <- exact_pvalue(permutated_regression_coefficient, not_permutated_regression_coefficient, conf.level = conf.level)
-    res$pvalue <- summary_results[3]
-  }
+
   res$ci.lower <- summary_results[1]
   res$ci.upper <- summary_results[2]
 

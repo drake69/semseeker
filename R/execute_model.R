@@ -31,6 +31,9 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
   if(grepl("mediation-quantreg",family_test))
     model_result <- mediation_quantreg_model(family_test, tempDataFrame, sig.formula, transformation, plot)
 
+  if(grepl("mediation-ridge",family_test))
+    model_result <- mediation_ridge_model(family_test, tempDataFrame, sig.formula, transformation, plot)
+
   if(grepl("mediation-linear",family_test))
     model_result <- mediation_linear_model(family_test, tempDataFrame, sig.formula, transformation, plot)
 

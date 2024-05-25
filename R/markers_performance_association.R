@@ -7,6 +7,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
   # them in a single dataframe
   markers <- unique(ssEnv$keys_areas_subareas_markers_figures$MARKER)
   # #
+  browser()
   model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
   selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
   inference_details <- as.data.frame(inference_details)
@@ -205,7 +206,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
       }
 
       # create a prefix for the file name
-      prfx <- paste( independent_variable, transformation,family_test,covariates, area, subarea, paste0(markers,collapse="_"))
+      prfx <- paste( independent_variable, transformation,family_test, ssEnv$alpha ,covariates, area, subarea, paste0(markers,collapse="_"))
       if(length(plot_list) != 0)
       {
 

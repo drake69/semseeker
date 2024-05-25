@@ -1,15 +1,16 @@
 keys_create <- function(ssEnv, arguments)
 {
 
-  # 
+  browser()
+  #
   ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Reference","Control","Case"))
   ##### MANAGE MARKERS AND FIGURES #####
   # set default values
   keys_figures_default_discrete <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH","BOTHSUM"))
-  keys_markers_default_discrete <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAQ","DELTARQ"))
-  keys_markers_default_discrete$SUFFIX <-  rep("",4)
+  keys_markers_default_discrete <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAQ","DELTARQ","DELTAP","DELTARP"))
+  keys_markers_default_discrete$SUFFIX <-  rep("",6)
   # keys_markers_default$SUFFIX <-  c("","","","", ssEnv$epiquantile ,"",ssEnv$epiquantile)
-  keys_markers_default_discrete$EXT <-  c("bed","bed","bed","bed")
+  keys_markers_default_discrete$EXT <-  c("bed","bed","bed","bed","bed","bed")
   keys_markers_figures_default_discrete <- merge(keys_markers_default_discrete, keys_figures_default_discrete, by = NULL)
   rm(keys_figures_default_discrete, keys_markers_default_discrete)
 
@@ -53,7 +54,7 @@ keys_create <- function(ssEnv, arguments)
   keys_gene_subareas_default <- data.frame("AREA"="GENE", "SUBAREA"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
   keys_island_subareas_default <- data.frame("AREA"="ISLAND","SUBAREA"=c("N_SHORE","S_SHORE","N_SHELF","S_SHELF", "WHOLE"))
   keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c("WHOLE"))
-  keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("WHOLE"))
+  keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("WHOLE","CYTOBAND"))
   keys_probe_subareas_default <- data.frame("AREA"="PROBE","SUBAREA"=c("WHOLE"))
 
   keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default)

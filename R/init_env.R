@@ -60,6 +60,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
 
 
+  arguments <- set_env_variable(arguments,"bins",10)
   arguments <- set_env_variable(arguments,"plot_format","png")
   arguments <- set_env_variable(arguments,"alpha",0.05)
   arguments <- set_env_variable(arguments,"verbosity",1)

@@ -5,7 +5,8 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
   result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
   start_fresh <- FALSE
-  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = start_fresh, ...)
+  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy,
+    start_fresh = start_fresh, ...)
 
   arguments <- list(...)
 

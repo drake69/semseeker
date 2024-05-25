@@ -144,8 +144,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # browser()
           min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
           min_covariates_length <- ifelse(grepl("mediation-linear", family_test), 2, 1 )
+          min_covariates_length <- ifelse(grepl("mediation-ridge", family_test), length(covariates),1 )
           if(length(covariates)>min_covariates_length)
-          # check collinearity of covariates
+            # check collinearity of covariates
           {
             collinearity_score <- calculate_collinearity_score(study_summary[,covariates])
             if(collinearity_score > 0.7)
@@ -283,29 +284,31 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   fname <- file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv", add_gz=TRUE)
                   if (file.exists(fname))
                   {
+                    areas_selection_temp <- areas_selection
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", fname,".")
                     tempDataFrame <- utils::read.table(gzfile(fname), sep  =  ";", header  =  T)
                     tempDataFrame <- plyr::rename(tempDataFrame, c("SAMPLEID"  =  "Sample_ID"))
                     #removes area name (eg. sample_group name)
                     tempDataFrame <- tempDataFrame[-1,]
-                    if(length(areas_selection)>0)
+                    # browser()
+                    if(length(areas_selection_temp)>0)
                     {
                       #
-                      # check if areas_selection is a range
-                      if(length(areas_selection)==1)
+                      # check if areas_selection_temp is a range
+                      if (any(grepl(":",areas_selection_temp)))
                       {
-                        if (grepl(":",areas_selection))
-                        {
-                          areas_selection <- unlist(strsplit(areas_selection,":"))
-                          areas_selection <- seq(from  =  as.numeric(areas_selection[1]), to  =  as.numeric(areas_selection[2]))
-                          tempDataFrame <- tempDataFrame[areas_selection, ]
-                        }
+                        areas_selection_temp <- areas_selection_temp[grepl(":",areas_selection_temp)][1]
+                        areas_selection_temp <- unlist(strsplit(areas_selection_temp,":"))
+                        min_col <- min(as.numeric(areas_selection_temp[1]), nrow(tempDataFrame))
+                        max_col <- min(as.numeric(areas_selection_temp[2]), nrow(tempDataFrame))
+                        areas_selection_temp <- seq(from  =  min_col, to  = max_col )
+                        tempDataFrame <- tempDataFrame[areas_selection_temp, ]
                       }
                       else
                       {
-                        areas_selection <- gsub(":","_",gsub("'","_",gsub("-","_",areas_selection)))
-                        names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
-                        tempDataFrame <- tempDataFrame[ names_area %in% areas_selection, ]
+                        # areas_selection_temp <- gsub(":","_",gsub("'","_",gsub("-","_",areas_selection_temp)))
+                        # names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
+                        tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection_temp[,1], ]
                       }
                     }
                     if(is.null(dim(tempDataFrame)))
@@ -350,6 +353,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       else
                         results <- plyr::rbind.fill(results, result_temp_local_batch)
                     }
+                    save_result(results,fileNameResults, family_test, filter_p_value )
                   }
                   save_result(results,fileNameResults, family_test, filter_p_value )
                   association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
@@ -396,6 +400,10 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
   results <- unique(results)
 
   pvalue_columns <- colnames(results)[grepl("PVALUE", colnames(results)) & !grepl("_ADJ", colnames(results))]
+
+  # remove all existing column adjusted all pvalues
+  results <- results[,!grepl("_ADJ_ALL_", colnames(results))]
+
   if (exists("results") & length(pvalue_columns)>0)
   {
     for (p in 1:length(pvalue_columns))
@@ -403,7 +411,7 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
       methods <- c("BY", "fdr","BH")
       for(method in 1:3)
       {
-        col_p <- paste0(pvalue_columns[p], "_ADJ_ALL_", methods[method])
+        col_p <- toupper(paste0(pvalue_columns[p], "_ADJ_ALL_", methods[method]))
         results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  methods[method])
         colnames(results) <- toupper(colnames(results))
       }

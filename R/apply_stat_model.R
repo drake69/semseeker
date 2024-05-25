@@ -48,7 +48,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "execute_model", "is.family_dicotomic", "log_event","mediate","mediation")
 
   result_columns <- c("MARKER", "FIGURE", "AREA", "SUBAREA", "AREA_OF_TEST", "CI.LOWER", "CI.UPPER", "PVALUE", "STATISTIC_PARAMETER", "AIC_VALUE", "RESIDUALS", "SHAPIRO_PVALUE", "R_MODEL", "STD.ERROR", "N_PERMUTATIONS", "N_PERMUTATIONS_TEST")
-  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Starting foreach with: ", g_end, " items")
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Starting foreach with: ", g_end - length(covariates), " items")
 
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll perform:",g_end - length(covariates)," tests." )
 
@@ -88,7 +88,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
         if(length(stats::na.omit(independent_variableData2ndLevel))==0 | length(stats::na.omit(independent_variableData1stLevel))==0)
         {
-          log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll stop because one of the two groups is empty." )
+          log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " I stop because one of the two groups is empty." )
           stop()
         }
 

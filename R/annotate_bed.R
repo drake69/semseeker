@@ -12,7 +12,7 @@ annotate_bed <- function ()
   dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
 
-  # 
+  #
   if (!is.null(ssEnv$keys_areas_subareas_markers_figures_missed))
     # remove the missed keys from the localKeys
     localKeys <- localKeys[!(localKeys$COMBINED %in% ssEnv$keys_areas_subareas_markers_figures_missed$COMBINED),]
@@ -27,6 +27,10 @@ annotate_bed <- function ()
     "progress_bar","progression_index", "progression", "progressor_uuid",
     "owner_session_uuid", "trace","probe_features_get","dest_folder", "localKeys",
     "file_path_build","%>%","get_session_info","log_event")
+
+  # browser()
+  if(nrow(localKeys)==0)
+    return()
 
   # for(i in 1:nrow(localKeys))
   missed_keys <- foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export, .combine = plyr::rbind.fill) %dorng%
@@ -54,6 +58,7 @@ annotate_bed <- function ()
           dataToAnnotate <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
           if(!is.null(dataToAnnotate))
           {
+            # browser()
             if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
               dataToAnnotate <- merge(dataToAnnotate, probe_features, by = c("CHR", "START","END"))
             else
@@ -127,7 +132,7 @@ annotate_bed <- function ()
         missed_keys
     }
 
-  # 
+  #
   if(exists("missed_keys"))
     if(!is.null(missed_keys))
       if(nrow(missed_keys)>0)

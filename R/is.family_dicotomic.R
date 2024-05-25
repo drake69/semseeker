@@ -4,7 +4,7 @@ is.family_dicotomic <- function(family_test) {
       family_test=="kendall" | grepl("quantreg-permutation", family_test) | grepl("quantreg", family_test)
     | family_test=="poisson"  | grepl("mean-permutation", family_test) |
       grepl("polynomial", family_test) | grepl("exp", family_test)  | grepl("log", family_test) | family_test=="spearman-permutation" | family_test=="quantile-permutation"
-    | grepl("mediation-quantreg", family_test) | grepl("mediation-linear", family_test))
+    | grepl("mediation-quantreg", family_test) | grepl("mediation-linear", family_test) | grepl("mediation-ridge", family_test))
     return(FALSE)
 
   if(family_test=="wilcoxon" | family_test=="t.test" | family_test =="jsd" | family_test=="chisq.test"

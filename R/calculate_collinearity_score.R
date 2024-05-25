@@ -31,6 +31,8 @@ calculate_collinearity_score <- function(df) {
     log_event("ERROR: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), " - Collinearity check failed. VIF: ", vif_score, ", Condition Index: ", condition_index_score, ", PCA: ", pca_score)
   }
 
+  total_score <- total_score / 5  # Normalize to 0-1 scale
+
   return(total_score)
 }
 
