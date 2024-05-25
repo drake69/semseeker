@@ -49,13 +49,15 @@ deltap_get <- function(resultPopulation){
     stop("Something wrong with multiple bed files!")
   }
 
+
   browser()
+  deltap$VALUE <- as.numeric(deltap$VALUE)
   # calculate bins for DELTAS
   max_deltas <- max(deltap$VALUE)
   min_deltas <- min(deltap$VALUE)
   bin <- (max_deltas - min_deltas) / as.numeric(ssEnv$bins)
   # calculate DELTAP assigning to each DELTAS the bin it belongs to
-  deltap$DELTAP <- apply(deltap, 1, function(x) ceiling((x["VALUE"] - min_deltas) / bin))
+  deltap$DELTAP <- future::apply(deltap, 2, function(x) ceiling((x["VALUE"] - min_deltas) / bin))
 
   # deltap$DELTAP <- as.numeric(dplyr::ntile(x=deltap[,"VALUE"] , n= as.numeric(ssEnv$epiquantile)))
   deltap_both <- deltap

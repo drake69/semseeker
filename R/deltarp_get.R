@@ -50,12 +50,13 @@ deltarp_get <- function(resultPopulation){
   }
 
   browser()
+  deltap$VALUE <- as.numeric(deltap$VALUE)
   # calculate bins for DELTAS
   max_deltas <- max(deltarp$VALUE)
   min_deltas <- min(deltarp$VALUE)
   bin <- (max_deltas - min_deltas) / as.numeric(ssEnv$bins)
   # calculate DELTARP assigning to each DELTAS the bin it belongs to
-  deltarp$DELTARP <- apply(deltarp, 1, function(x) ceiling((x["VALUE"] - min_deltas) / bin))
+  deltarp$DELTARP <- future::apply(deltarp, 2, function(x) ceiling((x["VALUE"] - min_deltas) / bin))
 
   # deltarp$DELTARP <- as.numeric(dplyr::ntile(x=deltarp[,"VALUE"] , n= as.numeric(ssEnv$epiquantile)))
   deltarp_both <- deltarp
