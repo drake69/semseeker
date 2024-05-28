@@ -19,7 +19,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
     for (i in 1:length(transformations))
     {
       transformation <-transformations[i]
-      filtered_metrics <- filter_metrics(model_metrics, transformation)
+      filtered_metrics <- metrics_filter(model_metrics, transformation)
 
       inference_details_selection <- inference_details[inference_details$transformation==transformation & inference_details$depth_analysis==depth,]
       # check different families.test

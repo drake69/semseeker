@@ -12,7 +12,6 @@ annotate_bed <- function ()
   dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
 
-  #
   if (!is.null(ssEnv$keys_areas_subareas_markers_figures_missed))
     # remove the missed keys from the localKeys
     localKeys <- localKeys[!(localKeys$COMBINED %in% ssEnv$keys_areas_subareas_markers_figures_missed$COMBINED),]
@@ -90,12 +89,6 @@ annotate_bed <- function ()
                 final_bed <- dataToAnnotate
               # gc()
             }
-          } else
-          {
-            if(!exists("missed_keys"))
-              missed_keys <- localKeys[i,]
-            else
-              missed_keys <- rbind(localKeys[i,],missed_keys)
           }
           if(ssEnv$showprogress)
             progress_bar(sprintf("Annotating multiple files."))
@@ -115,6 +108,12 @@ annotate_bed <- function ()
             log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " annotated file to ", bedFileName)
           }
           rm(final_bed)
+        }
+        else{
+          if(!exists("missed_keys"))
+            missed_keys <- localKeys[i,]
+          else
+            missed_keys <- rbind(localKeys[i,],missed_keys)
         }
         # gc()
       }

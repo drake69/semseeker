@@ -78,9 +78,9 @@ semseeker <- function(sample_sheet,
     sample_groups <- c("Control","Case")
 
   # seems to change the ssEnv reducing the items TODO
-  ssEnv <- get_session_info()
-  ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
-  update_session_info(ssEnv)
+  # ssEnv <- get_session_info()
+  # ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
+  # update_session_info(ssEnv)
 
   annotate_bed()
   create_excel_pivot()
@@ -95,6 +95,9 @@ semseeker <- function(sample_sheet,
 
   # if(length(signal_data)>1)
   #   batch_correlation_check(ssEnv)
+
+  marker_quantization_metric()
+  marker_fit_to_distribution()
 
   close_env()
 }

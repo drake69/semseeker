@@ -3,6 +3,7 @@
 export(association_analysis)
 export(bayes_analysis)
 export(build_data_set_from_geo)
+export(distribution_info)
 export(gene_impact_analysis)
 export(manhattan_plot_per_area)
 export(markers_performance_association)

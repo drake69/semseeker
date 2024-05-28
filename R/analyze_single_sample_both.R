@@ -49,7 +49,7 @@ analyze_single_sample_both <- function( sample_detail, marker) {
     data_to_save_both$VALUE <- 1
 
     dump_sample_as_bed_file(
-      data_to_dump = data_to_save,
+      data_to_dump = data_to_save_both,
       fileName = fileName
     )
     result <- data.frame_add.column(result, paste(marker,"_","BOTH",sep=""),sum(data_to_save_both$VALUE))

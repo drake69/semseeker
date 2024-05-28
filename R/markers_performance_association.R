@@ -7,7 +7,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
   # them in a single dataframe
   markers <- unique(ssEnv$keys_areas_subareas_markers_figures$MARKER)
   # #
-  browser()
+  # browser()
   model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
   selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
   inference_details <- as.data.frame(inference_details)
@@ -21,7 +21,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
     depth_analysis <- inference_detail$depth_analysis
     family_test <- inference_detail$family_test
     transformation <- as.character(inference_detail$transformation)
-    filtered_metrics <- filter_metrics(model_metrics, as.character(transformation))
+    filtered_metrics <- metrics_filter(model_metrics, as.character(transformation))
     covariates <- paste0(inference_detail$covariates, collapse = "_")
     independent_variable <- inference_detail$independent_variable
 
@@ -167,6 +167,14 @@ markers_performance_association <- function(inference_details, result_folder, pv
 
           final_temp <- scores_temp[c("MARKER","SCORE")]
           colnames(final_temp) <- c("MARKER", "REBASED")
+          # fill missed MARKER with metrics set to zero
+          missed_markers <- setdiff(unique(final$MARKER), unique(final_temp$MARKER))
+          if(length(missed_markers) > 0)
+          {
+            # browser()
+            missed_markers <- data.frame("MARKER"=missed_markers, "REBASED"=rep(0,length(missed_markers)))
+            final_temp <- rbind(final_temp, missed_markers)
+          }
 
           ##############
 
@@ -221,12 +229,12 @@ markers_performance_association <- function(inference_details, result_folder, pv
 
       if(nrow(scores) != 0)
       {
-        score_max <- sum(scores$SCORE)
-        scores$SCORE <- round(100*scores$SCORE/score_max)
+        # score_max <- sum(scores$SCORE)
+        # scores$SCORE <- round(100*scores$SCORE/score_max)
         # #
         # save scores
         path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKERS_PERFORMANCE")
-        # write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
+        write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
 
 
         # aggregate scores by MARKER and sum RANK

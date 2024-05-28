@@ -1,9 +1,10 @@
 pathway_pathfindR <- function(study,
-  path_db,  iterations = 10, statistic_parameter="",
+  path_dbs,  iterations = 10, statistic_parameter="",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details, significance = TRUE,sql_condition = "")
 {
 
+  # browser()
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
 
@@ -19,7 +20,7 @@ pathway_pathfindR <- function(study,
     return()
   }
 
-  total_progress <- nrow(keys)*length(path_db)*nrow(inference_details)
+  total_progress <- nrow(keys)*length(path_dbs)*nrow(inference_details)
   progress <- 0
 
   if(ssEnv$showprogress)
@@ -33,10 +34,10 @@ pathway_pathfindR <- function(study,
     for(i in 1:nrow(keys))
     {
       seq <- 0
-      for(k in 1:length(path_db))
+      for(k in 1:length(path_dbs))
       {
         progress <- progress + 1
-        db <- path_db[k]
+        db <- path_dbs[k]
         # i <- 13
         # db <- "KEGG"
         # pvalue_column <- "PVALUE_ADJ_ALL_BH"
@@ -121,10 +122,12 @@ pathway_pathfindR <- function(study,
         if(nrow(gene_set)<2)
           next
 
+        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Started pathfindR analysis")
+
         try(
           {
             output_temp <- pathfindR::run_pathfindR( gene_set ,
-              path_db[k],
+              path_dbs[k],
               max_gset_size = nrow(gene_set),
               iterations = iterations,
               output_dir = paste( tempFolder,"/pathfindR/",
@@ -138,7 +141,7 @@ pathway_pathfindR <- function(study,
             output_temp$key <- key
             output_temp$seq <- seq
             output_temp$gene_count <- nrow(gene_set)
-            output_temp$source <- path_db[k]
+            output_temp$source <- path_dbs[k]
             output_temp$order <- 1:nrow(output_temp)
             if(exists("result_pathway"))
               result_pathway <- rbind(result_pathway,output_temp)
@@ -148,6 +151,7 @@ pathway_pathfindR <- function(study,
 
         )
 
+        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Done pathfindR analysis")
 
       }
       if(exists("result_pathway"))

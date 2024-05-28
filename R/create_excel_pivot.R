@@ -11,10 +11,9 @@ create_excel_pivot <-  function() {
     # remove the missed keys from the localKeys
     localKeys <- localKeys[!(localKeys$COMBINED %in% ssEnv$keys_areas_subareas_markers_figures_missed$COMBINED),]
 
-  sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
-
-  create_multiple_bed(sample_sheet)
-  annotate_bed()
+  # sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
+  # create_multiple_bed(sample_sheet)
+  # annotate_bed()
 
   if(ssEnv$showprogress)
     progress_bar_ann <- progressr::progressor(along=1:nrow(localKeys))
@@ -56,6 +55,8 @@ create_excel_pivot <-  function() {
               fun.aggregate = sum, drop = TRUE)
 
           utils::write.table(t(annotatedData), gzfile(pivot_file_name), row.names = T, col.names = F, sep=";")
+          end_time <- Sys.time()
+          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y") , " Finished to create form marker:", marker ," and figure:", figure, " - Time taken: ", difftime(end_time,start_time, units = "mins") , " minutes.")
       }
     }
     if(ssEnv$showprogress)

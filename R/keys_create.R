@@ -1,7 +1,7 @@
 keys_create <- function(ssEnv, arguments)
 {
 
-  browser()
+  # browser()
   #
   ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Reference","Control","Case"))
   ##### MANAGE MARKERS AND FIGURES #####

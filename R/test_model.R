@@ -189,7 +189,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     # res$cohen_d <- effsize::cohen.d(SPLIT[[1]], SPLIT[[2]], pooled=TRUE, paired=FALSE, na.rm=TRUE)
 
     # Calculate rank-biserial correlation as effect size
-    res$rank_biserial_correlation <- result_w$statistic / (length(SPLIT[[1]]) * length(SPLIT[[2]]))
+    res$RANK_BISERIAL_CORRELATION <- result_w$statistic / (length(SPLIT[[1]]) * length(SPLIT[[2]]))
     # Calculate power
     power_result = pwr::pwr.t2n.test(d = res$effect_size_estimate, n1 = length(SPLIT[[1]]), n2=length(SPLIT[[2]]), sig.level = as.numeric(ssEnv$alpha), power = NULL)
     res$power <- power_result$power

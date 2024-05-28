@@ -1,14 +1,10 @@
 metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED"){
 
   #
-  the_lower_the_better_markers <- toupper(c("COUNT_MISSED","MAE", "RMSE","MSLE", "SSE","MAPE","MPE","MSE",
-    "MAE_TEST", "RMSE_TEST","MSLE_TEST", "SSE_TEST","MAPE_TEST","MPE_TEST","MSE_TEST","STD.ERROR","BELOW_QUANTILE",
-    "PINBALL_LOSS","QQ_DISTANCE"))
+  the_lower_the_better_markers <- toupper(metrics_properties[metrics_properties$Higher_the_Better==FALSE,"Metric"])
 
   # R_SQUARED	R_SQUARED_ADJ
-  the_higher_the_better_markers <- toupper(c("R_SQUARED_ADJ","R_SQUARED","COUNT_SIGN","EFFECT_SIZE_ESTIMATE","EFFECT_SIZE_MAGNITUDE",
-    "RBC", "POWER", "STATISTIC_PARAMETER","JSD","QQ_CORRELATION",
-    "RANK_BESERIAL_CORRELATION","Wilcox_Value","kw_runk_sum","R_SQUARED_ADJ_TEST","R_SQUARED_TEST"))
+  the_higher_the_better_markers <-  toupper(metrics_properties[metrics_properties$Higher_the_Better==TRUE,"Metric"])
 
 
   if(grepl("PVALUE",metric))
@@ -29,7 +25,9 @@ metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED
   values_to_rank <- unique(data_frame[,column_to_rank])
   values_to_rank <- data.frame("VALUE"=values_to_rank)
   # create a new column with the rank
-  values_to_rank$RANK <- 1:nrow(values_to_rank)
+  # values_to_rank$RANK <- 1:nrow(values_to_rank)
+
+  values_to_rank$RANK <- cut(values_to_rank$VALUE, breaks = 100, right = FALSE, labels = FALSE)
   # merge the rank with the data frame
   data_frame <- merge(data_frame, values_to_rank, by.x=column_to_rank, by.y="VALUE", all.x=TRUE)
 

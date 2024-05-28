@@ -37,8 +37,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 
-
-
   localKeys <- ssEnv$keys_markers_figures
   sample_groups <- c("Reference","Control","Case")
 
@@ -55,6 +53,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     start_time <- Sys.time()
     processed_items <- 0
     inference_detail <- inference_details[z,]
+    collinearity_check <- ifelse(is.null(inference_detail$collinearity_check),FALSE,inference_detail$collinearity_check)
     filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
 
     covariates <- inference_detail$covariates
@@ -74,7 +73,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
       if(independent_variable %in% covariates)
       {
         log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " The independent variable is also present as covariate!")
-        stop()
+        next
       }
 
       if( is.null(independent_variable) || length(independent_variable)  ==  0)
@@ -141,18 +140,18 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           ######################################################################################################
           # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
           # binomiale che si vuole usare per la regressione logistica
-          # browser()
-          min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
-          min_covariates_length <- ifelse(grepl("mediation-linear", family_test), 2, 1 )
-          min_covariates_length <- ifelse(grepl("mediation-ridge", family_test), length(covariates),1 )
-          if(length(covariates)>min_covariates_length)
+          # # browser()
+          # min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
+          # min_covariates_length <- ifelse(grepl("mediation-linear", family_test), 2, 1 )
+          # min_covariates_length <- ifelse(grepl("mediation-ridge", family_test), length(covariates),1 )
+          if(collinearity_check)
             # check collinearity of covariates
           {
             collinearity_score <- calculate_collinearity_score(study_summary[,covariates])
             if(collinearity_score > 0.7)
             {
               log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Collinearity score of covariates is too high!")
-              stop()
+              next
             }
           }
           markers <- unique(localKeys$MARKER)
@@ -251,6 +250,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             # execute for all the areas
             if(depth_analysis>1)
             {
+              # browser()
+
               localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
               keys <- localKeys_1[localKeys_1$MARKER==markers[a],]
 
@@ -290,7 +291,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrame <- plyr::rename(tempDataFrame, c("SAMPLEID"  =  "Sample_ID"))
                     #removes area name (eg. sample_group name)
                     tempDataFrame <- tempDataFrame[-1,]
-                    # browser()
+                    # # browser()
                     if(length(areas_selection_temp)>0)
                     {
                       #
@@ -355,7 +356,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     }
                     save_result(results,fileNameResults, family_test, filter_p_value )
                   }
-                  save_result(results,fileNameResults, family_test, filter_p_value )
+                  if (exists("results"))
+                    save_result(results,fileNameResults, family_test, filter_p_value )
                   association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
                 }
 
@@ -366,9 +368,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                 else
                   results <- old_results
                 rm(old_results)
+                save_result(results,fileNameResults, family_test, filter_p_value )
               }
-
-              save_result(results,fileNameResults, family_test, filter_p_value )
             }
             if(exists("results"))
               save_result(results,fileNameResults, family_test, filter_p_value )
@@ -456,6 +457,7 @@ association_analysis_log <- function(inference_detail, start_time, end_time, pro
   {
     # convert all columns of inference detail as character
     tryCatch({
+      association_file_data <- read.table(association_file, header  =  TRUE, sep  =  ",", stringsAsFactors  =  FALSE)
       association_file_data <- plyr::rbind.fill(inference_detail, association_file_data)
       write.table(association_file_data, file  =  association_file, sep  =  ",", row.names  =  FALSE, col.names  =  TRUE)
     }, error = function(e) {
