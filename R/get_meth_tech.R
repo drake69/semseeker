@@ -32,6 +32,16 @@ get_meth_tech <- function(signal_data)
 
   log_event(msg)
   ssEnv$tech <- tech
+
+  # get abs max
+  max_data <- max(abs(signal_data), na.rm = TRUE)
+  if (max_data>1)
+  {
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " The data is not beta values.")
+    ssEnv$beta <- FALSE
+  }
+  ssEnv$probes_count <- nrow(signal_data)
+
   update_session_info(ssEnv)
 
   return(ssEnv)

@@ -1,10 +1,10 @@
 metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED"){
 
   #
-  the_lower_the_better_markers <- toupper(metrics_properties[metrics_properties$Higher_the_Better==FALSE,"Metric"])
+  the_lower_the_better_markers <- toupper(semseeker::metrics_properties[semseeker::metrics_properties$Higher_the_Better==FALSE,"Metric"])
 
   # R_SQUARED	R_SQUARED_ADJ
-  the_higher_the_better_markers <-  toupper(metrics_properties[metrics_properties$Higher_the_Better==TRUE,"Metric"])
+  the_higher_the_better_markers <-  toupper(semseeker::metrics_properties[semseeker::metrics_properties$Higher_the_Better==TRUE,"Metric"])
 
 
   if(grepl("PVALUE",metric))

@@ -35,6 +35,7 @@ deltap_get <- function(resultPopulation){
       colnames(deltas_temp) <- c("CHR","START","END","VALUE","SAMPLEID")
       deltas_temp$FIGURE <- key$FIGURE
       deltas_temp$SAMPLE_GROUP <- key$SAMPLE_GROUP
+      log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "deltap_get:", key)
       if(exists("deltap"))
         deltap <- rbind(deltap, deltas_temp)
       else
@@ -67,6 +68,7 @@ deltap_get <- function(resultPopulation){
   localKeys <-   reshape::expand.grid.df(as.data.frame(ssEnv$keys_markers_figures_default), data.frame("SAMPLE_GROUP"=unique(resultPopulation$Sample_Group)))
   localKeys$EXT <- "fst"
   localKeys <- subset(localKeys, localKeys$MARKER=="DELTAP")
+
 
   progress_bar <- ""
   if(ssEnv$showprogress)

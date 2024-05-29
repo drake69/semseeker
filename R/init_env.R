@@ -85,7 +85,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"cluster_workers",NULL)
   #
   # browser()
-  model_metrics <- toupper(as.vector(metrics_properties$Metric))
+  model_metrics <- toupper(as.vector(semseeker::metrics_properties$Metric))
   arguments <- set_env_variable(arguments,"model_metrics",model_metrics)
 
   # get ssEnv
@@ -122,7 +122,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv <- get_session_info()
 
   ssEnv$functionToExport <- c( "analyze_single_sample","deltar_single_sample",
-    "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
+    " dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
     "file_path_build","analyze_single_sample_both",
     "sort_by_chr_and_start", "test_match_order", "lesions_get",
     "mutations_get")

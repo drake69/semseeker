@@ -33,9 +33,9 @@ marker_quantization_metric <- function()
 
   # browser()
   to_export <- c("keys","result_folderPivot","ssEnv","file_path_build","progress_bar", "progression_index","progression","progressor_uuid","owner_session_uuid","trace")
-  res <- data.frame()
-  result_temp <- foreach::foreach(k = 1:nkeys, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
-  # for (k in 1:nkeys)
+  result_temp <- data.frame()
+  # result_temp <- foreach::foreach(k = 1:nkeys, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
+  for (k in 1:nkeys)
   {
 
     # k <- 1
@@ -131,8 +131,8 @@ marker_quantization_metric <- function()
     if(ssEnv$showprogress)
       progress_bar(sprintf("Doing comparison."))
 
-    res_temp
-    # res <- plyr::rbind.fill(res, res_temp)
+    # res_temp
+    result_temp <- plyr::rbind.fill(result_temp, res_temp)
 
     # Errore Assoluto Medio (MAE)
     # •	Willmott, C. J., & Matsuura, K. (2005). Advantages of the mean absolute error (MAE) over the root mean square error (RMSE) in assessing average model performance. Climate Research, 30(1), 79-82.
@@ -145,6 +145,7 @@ marker_quantization_metric <- function()
 
 
   }
+  browser
   colnames(result_temp) <- toupper(colnames(result_temp))
   dataFolder <- dir_check_and_create(ssEnv$result_folderData,c("Distributions"))
   filename  =  file_path_build(dataFolder,c("DISTRIBUTION", "ANALYSIS"),"csv")

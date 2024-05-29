@@ -55,6 +55,7 @@ semseeker <- function(sample_sheet,
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Working on batch:",batch_id)
     sample_sheet_local <- sample_sheet[[batch_id]]
     signal_intrasample <- TRUE
+    signal_data[[batch_id]] <- substitute(signal_data[[batch_id]])
     if (ssEnv$signal_intrasample)
       signal_data_local <- signal_data[[batch_id]]
     else
@@ -96,8 +97,8 @@ semseeker <- function(sample_sheet,
   # if(length(signal_data)>1)
   #   batch_correlation_check(ssEnv)
 
-  marker_quantization_metric()
-  marker_fit_to_distribution()
+  # marker_quantization_metric()
+  # marker_fit_to_distribution()
 
   close_env()
 }

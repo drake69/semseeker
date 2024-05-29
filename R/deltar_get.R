@@ -14,14 +14,27 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   result <- data.frame()
   result <- result[-1]
 
+  chk1 <- any(is.na(high_thresholds))
+  chk2 <- any(is.na(low_thresholds))
+  if(chk1 | chk2)
+  {
+    browser()
+  }
 
   dividend <- high_thresholds - low_thresholds
   names(dividend) <- "DIVIDEND"
-  dividend[dividend==0] <- 0.000000001
 
-  if(any(dividend<0))
+  chk3 <- any(is.na(dividend))
+  chk4 <- any(dividend<0)
+  if(chk3 | chk4)
+  {
+    browser()
     stop("ERROR: I'm stopping here the dividend have negative values!")
+  }
 
+  chk0 <- any(dividend==0)
+  if(chk0)
+    dividend[dividend==0] <- 0.000000001
 
   ### get deltar HYPER #########################################################
   deltar_hyper <- data.frame("DELTA"= (values - high_thresholds)/dividend, row.names = probe_features$PROBE)

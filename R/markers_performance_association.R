@@ -213,44 +213,44 @@ markers_performance_association <- function(inference_details, result_folder, pv
         }
       }
 
-      # create a prefix for the file name
-      prfx <- paste( independent_variable, transformation,family_test, ssEnv$alpha ,covariates, area, subarea, paste0(markers,collapse="_"))
-      if(length(plot_list) != 0)
-      {
+    }
+    # create a prefix for the file name
+    prfx <- paste( independent_variable, transformation,family_test, ssEnv$alpha ,covariates, area, subarea, paste0(markers,collapse="_"))
+    if(length(plot_list) != 0)
+    {
 
-        # build  a panel from plot list
-        gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(filtered_metrics))
+      # build  a panel from plot list
+      gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(filtered_metrics))
 
-        path <- dir_check_and_create(ssEnv$result_folderChart, "MARKERS_PERFORMANCE")
-        file_name <- inference_file_name(inference_detail, prfx,path,file_extension=ssEnv$plot_format, prefix = "", suffix=aggr_fun)
-        # save the panel
-        ggplot2::ggsave(file = file.path(file_name), gge, width = 4960, height = 2480, units = "px")
-      }
+      path <- dir_check_and_create(ssEnv$result_folderChart, "MARKERS_PERFORMANCE")
+      file_name <- inference_file_name(inference_detail, prfx,path,file_extension=ssEnv$plot_format, prefix = "", suffix=aggr_fun)
+      # save the panel
+      ggplot2::ggsave(file = file.path(file_name), gge, width = 4960, height = 2480, units = "px")
+    }
 
-      if(nrow(scores) != 0)
-      {
-        # score_max <- sum(scores$SCORE)
-        # scores$SCORE <- round(100*scores$SCORE/score_max)
-        # #
-        # save scores
-        path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKERS_PERFORMANCE")
-        write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
+    if(nrow(scores) != 0)
+    {
+      # score_max <- sum(scores$SCORE)
+      # scores$SCORE <- round(100*scores$SCORE/score_max)
+      # #
+      # save scores
+      path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKERS_PERFORMANCE")
+      write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
 
 
-        # aggregate scores by MARKER and sum RANK
-        scores_agg <- aggregate(scores$SCORE, by = list(scores$MARKER), FUN = sum)
-        # sort scores by SCORE descending
-        scores_agg <- scores_agg[order(scores_agg$x, decreasing = TRUE),]
-        colnames(scores_agg) <- c("MARKER","TOTAL")
+      # aggregate scores by MARKER and sum RANK
+      scores_agg <- aggregate(scores$SCORE, by = list(scores$MARKER), FUN = sum)
+      # sort scores by SCORE descending
+      scores_agg <- scores_agg[order(scores_agg$x, decreasing = TRUE),]
+      colnames(scores_agg) <- c("MARKER","TOTAL")
 
-        # create a pivot table with MARKER as rows and FIGURE as columns
-        scores_agg_fig <- reshape2::dcast(scores, MARKER ~ FIGURE, value.var = "SCORE", fun.aggregate = sum)
-        scores_agg_fig <- merge(scores_agg_fig,scores_agg, by="MARKER")
-        # sort by SCORE descending
-        scores_agg_fig <- scores_agg_fig[order(scores_agg_fig$TOTAL, decreasing = TRUE),]
-        # save scores
-        write.csv(scores_agg_fig, file = paste0(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv"), row.names = FALSE)
-      }
+      # create a pivot table with MARKER as rows and FIGURE as columns
+      scores_agg_fig <- reshape2::dcast(scores, MARKER ~ FIGURE, value.var = "SCORE", fun.aggregate = sum)
+      scores_agg_fig <- merge(scores_agg_fig,scores_agg, by="MARKER")
+      # sort by SCORE descending
+      scores_agg_fig <- scores_agg_fig[order(scores_agg_fig$TOTAL, decreasing = TRUE),]
+      # save scores
+      write.csv(scores_agg_fig, file = paste0(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv"), row.names = FALSE)
     }
     rm(final)
   }

@@ -1,6 +1,6 @@
 metrics_filter <- function(metrics, transformation){
 
-  affected_by_tranformation <- toupper(metrics_properties[metrics_properties$Affected_by_Scaling==TRUE,"Metric"])
+  affected_by_tranformation <- toupper(semseeker::metrics_properties[semseeker::metrics_properties$Affected_by_Scaling==TRUE,"Metric"])
 
   if (transformation!="scale")
   {
