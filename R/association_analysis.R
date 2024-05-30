@@ -203,6 +203,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   # remove empty items
                   column_selectors <- column_selectors[column_selectors != ""]
                   processed_items <- processed_items + ncol(study_summary_local) - g_start
+                  if(any(is.na(study_summary_local[, column_selectors])))
+                  {
+                    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
+                    next
+                  }
                   result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
                     key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
                   if (exists("results"))
@@ -345,6 +350,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       colnames(tempDataFrameBatch) <- cols
                       g_start <- 2 + length(covariates)
                       processed_items <- processed_items + ncol(tempDataFrameBatch) - g_start
+                      if(any(is.na(tempDataFrameBatch)))
+                      {
+                        log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
+                        next
+                      }
                       result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
                         key  =  key, transformation =  transformation, dototal  =  dototal,
                         session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)

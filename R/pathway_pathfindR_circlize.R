@@ -154,7 +154,11 @@ pathway_pathfindR_circlize <- function(
         path <- dir_check_and_create(ssEnv$result_folderChart,"pathfindR")
         pathway_report_path <- file_path_build(path,phenotype_analysis_name,"png")
         # Save the plot as a PNG file
-        grDevices::png(pathway_report_path, width = 2048, height = 2048, res = 400)
+        if(ssEnv$plot_format == "png")
+          grDevices::png(file =  pathway_report_path, width = 2480,height = 2480, pointsize  =  15, res = 400)
+        if(ssEnv$plot_format == "eps")
+          grDevices::postscript(file =  pathway_report_path, width = 2480,height = 2480, pointsize  =  15, res = 400)
+        # grDevices::png(pathway_report_path, width = 2048, height = 2048, res = 400)
 
         # Set circos parameters to adjust the gap and overall appearance
         circlize::circos.par(gap.after = c(rep(1, 23), 5, 5), track.height = link_start_height)

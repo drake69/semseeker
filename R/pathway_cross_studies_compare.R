@@ -1,4 +1,4 @@
-compare_pathway_cross_studies <- function(result_folder, ...){
+pathway_cross_studies_compare <- function(result_folder, ...){
 
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
   # library(VennDiagram)

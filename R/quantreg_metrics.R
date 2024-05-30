@@ -30,7 +30,11 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
     filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
 
     # Save the plot
-    grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
+    # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
+    if(ssEnv$plot_format == "png")
+      grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
+    if(ssEnv$plot_format == "eps")
+      grDevices::postscript(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
     graphics::plot(expected_values, predicted_values, main = "Observed vs. Predicted",
       xlab = "Observed", ylab = "Predicted", pch = 19)
     graphics::abline(0, 1, col = ssEnv$color_palette_darker[1] )  # Adding a 45-degree line for reference
@@ -42,7 +46,11 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
       chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
       filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, "HISTOGRAM"),ssEnv$plot_format)
 
-      grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
+      # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
+      if(ssEnv$plot_format == "png")
+        grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
+      if(ssEnv$plot_format == "eps")
+        grDevices::postscript(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
       graphics::hist(permutation_vector, main = "Histogram of Betas",
         xlab = "Regression Coefficent Value", ylab = "Frequency", col = ssEnv$color_palette[1])
       grDevices::dev.off()

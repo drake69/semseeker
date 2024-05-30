@@ -34,6 +34,7 @@ marker_quantization_metric <- function()
   # browser()
   to_export <- c("keys","result_folderPivot","ssEnv","file_path_build","progress_bar", "progression_index","progression","progressor_uuid","owner_session_uuid","trace")
   result_temp <- data.frame()
+  scores <- data.frame()
   # result_temp <- foreach::foreach(k = 1:nkeys, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
   for (k in 1:nkeys)
   {
@@ -88,27 +89,6 @@ marker_quantization_metric <- function()
     ssim_value <- ssim(original, quantized)
     res_temp$Structural_Similarity_Index <- ssim_value
 
-    # VI
-    variation_of_information <- function(original, quantized) {
-
-      entropy <- function(p) {
-        p <- p[p > 0]  # Rimuovi zeri per evitare log(0)
-        -sum(p * log2(p))
-      }
-
-      joint_table <- table(original, quantized)
-      joint_prob <- joint_table / sum(joint_table)
-      original_prob <- margin.table(joint_prob, 1)
-      quantized_prob <- margin.table(joint_prob, 2)
-
-      H_original <- entropy(original_prob)
-      H_quantized <- entropy(quantized_prob)
-      H_joint <- entropy(joint_prob)
-
-      VI <- H_original + H_quantized - 2 * H_joint
-      return(VI)
-    }
-
     vi_value <- variation_of_information(original, quantized)
     res_temp$variation_of_information <- vi_value
 
@@ -145,11 +125,53 @@ marker_quantization_metric <- function()
 
 
   }
-  browser
+  # browser()
   colnames(result_temp) <- toupper(colnames(result_temp))
   dataFolder <- dir_check_and_create(ssEnv$result_folderData,c("Distributions"))
   filename  =  file_path_build(dataFolder,c("DISTRIBUTION", "ANALYSIS"),"csv")
   utils::write.csv(result_temp, file = filename, row.names = FALSE)
+
+  # browser()
+  cols_to_cycke <- toupper(c("JSD", "Structural_Similarity_Index", "variation_of_information","MAPE","R-SQUARED"))
+  cols_to_cycke <- which(colnames(result_temp) %in% cols_to_cycke)
+  scores <- data.frame()
+  keys <- unique(result_temp[,c("FIGURE","MARKER")])
+  for(metric in cols_to_cycke)
+  {
+    metric <- colnames(result_temp)[metric]
+    scores_temp <- data.frame()
+    scores_temp <- metrics_ranking(metric,result_temp, "ANY", column_to_rank =metric)
+    scores_temp$FIGURE <- result_temp$FIGURE
+    scores <- plyr::rbind.fill(scores, scores_temp)
+  }
+  # for (k in 1:nrow(keys))
+  # {
+  #   key <- keys[k,]
+  #   res <- result_temp[result_temp$FIGURE == key$FIGURE & result_temp$MARKER == key$MARKER,]
+  #   fig <- key$FIGURE
+  #   for(metric in cols_to_cycke)
+  #   {
+  #     metric <- colnames(res)[metric]
+  #     scores <- metrics_ranking(metric = metric, data_frame = res,figure = fig, scores = scores)
+  #   }
+  # }
+
+  scores$SCORE <- round(scores$SCORE, 2)
+  # aggregate scores by MARKER and sum RANK
+  scores_agg <- aggregate(scores$SCORE, by = list(scores$MARKER), FUN = sum)
+  # calculate TOTAL per marker
+  scores_agg <- scores_agg[order(scores_agg$x, decreasing = TRUE),]
+  colnames(scores_agg) <- c("MARKER","TOTAL")
+
+  # create a pivot table with MARKER as rows and FIGURE as columns
+  scores_agg_fig <- reshape2::dcast(scores, MARKER ~ FIGURE, value.var = "SCORE", fun.aggregate = sum)
+  scores_agg_fig <- merge(scores_agg_fig,scores_agg, by="MARKER")
+  # sort by SCORE descending
+  scores_agg_fig <- scores_agg_fig[order(scores_agg_fig$TOTAL, decreasing = TRUE),]
+  # save scores
+  filename  =  file_path_build(dataFolder,c("DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
+  write.csv(scores_agg_fig, file = paste0(filename, ".csv"), row.names = FALSE)
+
 }
 
 
@@ -183,4 +205,25 @@ ssim <- function(x, y, K1 = 0.01, K2 = 0.03, L = 1) {
   # Calcola SSIM
   ssim_value <- luminance * contrast * structure
   return(ssim_value)
+}
+
+# VI
+variation_of_information <- function(original, quantized) {
+
+  entropy <- function(p) {
+    p <- p[p > 0]  # Rimuovi zeri per evitare log(0)
+    -sum(p * log2(p))
+  }
+
+  joint_table <- table(original, quantized)
+  joint_prob <- joint_table / sum(joint_table)
+  original_prob <- margin.table(joint_prob, 1)
+  quantized_prob <- margin.table(joint_prob, 2)
+
+  H_original <- entropy(original_prob)
+  H_quantized <- entropy(quantized_prob)
+  H_joint <- entropy(joint_prob)
+
+  VI <- H_original + H_quantized - 2 * H_joint
+  return(VI)
 }

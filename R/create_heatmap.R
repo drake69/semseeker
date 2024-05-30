@@ -63,16 +63,35 @@ create_heatmap <- function() {
           if (!plyr::empty(tt))
             if(nrow(tt) > 2 & ncol(tt) > 2)
             {
-              filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".png",sep="")
-              grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 300)
-              stats::heatmap(as.matrix(annotatedData[,3:ncol(annotatedData)]),
-                col = grDevices::cm.colors(256),
-                scale = "column",
-                RowSideColors =as.vector(annotatedData$SAMPLE_GROUP),
-                margins = c(25, 25),
-                main = mainTitle
-              )
-              grDevices::dev.off()
+
+              # Prepare the filename
+              filename <- paste0(chartFolder, "/", paste0(sample_group_comb, collapse = "_Vs_"), "_", marker, "_", figure, ".png")
+
+              # Convert the data to a long format for ggplot2
+              heatmap_data <- reshape2::melt(annotatedData, id.vars = "SAMPLE_GROUP")
+
+              # Create the ggplot heatmap
+              p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = variable, y = SAMPLE_GROUP, fill = value)) +
+                ggplot2::geom_tile() +
+                ggplot2::scale_fill_gradientn(colours = cm.colors(256)) +
+                ggplot2::theme_minimal(base_size = 15) +
+                ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1), plot.margin = unit(c(2.5, 2.5, 2.5, 2.5), "cm")) +
+                ggplot2::labs(title = mainTitle, x = "", y = "")
+
+              # Save the plot
+              ggplot2::ggsave(filename = filename, plot = p, width = 2480/300, height = 2480/300, dpi = 300)
+
+
+              # filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".png",sep="")
+              # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 300)
+              # stats::heatmap(as.matrix(annotatedData[,3:ncol(annotatedData)]),
+              #   col = grDevices::cm.colors(256),
+              #   scale = "column",
+              #   RowSideColors =as.vector(annotatedData$SAMPLE_GROUP),
+              #   margins = c(25, 25),
+              #   main = mainTitle
+              # )
+              # grDevices::dev.off()
             }
 
       }

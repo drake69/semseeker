@@ -10,26 +10,45 @@ metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED
   if(grepl("PVALUE",metric))
     the_lower_the_better_markers <- c(the_lower_the_better_markers, metric)
 
-  metric <- toupper(metric)
-  # data_frame[,column_to_rank] <- abs(data_frame[,column_to_rank])
+  # metric <- toupper(metric)
+  # # data_frame[,column_to_rank] <- abs(data_frame[,column_to_rank])
+  # if(metric %in% the_lower_the_better_markers){
+  #   data_frame <- data_frame[order(data_frame[,column_to_rank], decreasing = T),]
+  # }else if(metric %in% the_higher_the_better_markers){
+  #   data_frame <- data_frame[order(data_frame[,column_to_rank], decreasing = F),]
+  # }else{
+  #   log_event("ERROR: Metric not found")
+  #   stop()
+  # }
+  #
+  # # browser()
+  # values_to_rank <- unique(data_frame[,column_to_rank])
+  # values_to_rank <- data.frame("VALUE"=values_to_rank)
+  # # create a new column with the rank
+  # # values_to_rank$RANK <- 1:nrow(values_to_rank)
+  #
+  # values_to_rank$RANK <- cut(values_to_rank$VALUE, breaks = 100, right = FALSE, labels = FALSE)
+  # # merge the rank with the data frame
+  # data_frame <- merge(data_frame, values_to_rank, by.x=column_to_rank, by.y="VALUE", all.x=TRUE)
+
+  # Normalization functions
+  normalize_minimize <- function(x) (max(x) - x) / (max(x) - min(x))
+  normalize_maximize <- function(x) (x - min(x)) / (max(x) - min(x))
+
+  if(max(data_frame[,column_to_rank]) == min(data_frame[,column_to_rank])){
+    data_frame$RANK <- 1
+    return(data.frame("MARKER"=data_frame$MARKER,"FIGURE"=figure,"METRIC"=metric,"SCORE"=data_frame$RANK))
+  }
+
+  # browser()
   if(metric %in% the_lower_the_better_markers){
-    data_frame <- data_frame[order(data_frame[,column_to_rank], decreasing = T),]
+    data_frame$RANK <- normalize_minimize(data_frame[,column_to_rank])
   }else if(metric %in% the_higher_the_better_markers){
-    data_frame <- data_frame[order(data_frame[,column_to_rank], decreasing = F),]
+    data_frame$RANK <- normalize_maximize(data_frame[,column_to_rank])
   }else{
     log_event("ERROR: Metric not found")
     stop()
   }
-
-  # browser()
-  values_to_rank <- unique(data_frame[,column_to_rank])
-  values_to_rank <- data.frame("VALUE"=values_to_rank)
-  # create a new column with the rank
-  # values_to_rank$RANK <- 1:nrow(values_to_rank)
-
-  values_to_rank$RANK <- cut(values_to_rank$VALUE, breaks = 100, right = FALSE, labels = FALSE)
-  # merge the rank with the data frame
-  data_frame <- merge(data_frame, values_to_rank, by.x=column_to_rank, by.y="VALUE", all.x=TRUE)
 
   # # add the marker and figure to the data frame
   # scores <- rbind(scores, )

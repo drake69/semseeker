@@ -1,4 +1,4 @@
-meta_analysis_cross_studies <- function(inference_details,statistic_parameter="BETA", pvalue_column="PVALUE_ADJ_ALL_BH",studies,
+association_study_cross_studies_meta_analysis <- function(inference_details,statistic_parameter="BETA", pvalue_column="PVALUE_ADJ_ALL_BH",studies,
   studies_base_folder, result_folder)
 {
 
@@ -16,7 +16,7 @@ meta_analysis_cross_studies <- function(inference_details,statistic_parameter="B
       # g <- 1
       first_area <- areas[g]
       if(is.na(first_area))
-        
+
       results_inference_subset <- subset(results_inference_for, AREA_OF_TEST==first_area)
       # if( is.null(results_inference_subset[,"STUDY"]))
       #   next

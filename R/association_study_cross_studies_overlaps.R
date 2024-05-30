@@ -1,9 +1,10 @@
 # compare inference associations of differente studies
-consolidate_inference_association_cross_studies <- function(inference_detail, studies,pvalue = 0.05, adjust_per_area = F,
+association_cross_studies_overlaps <- function(inference_detail, studies,pvalue = 0.05, adjust_per_area = F,
   adjust_globally = F,pvalue_column="PVALUE_ADJ_ALL_BH",statistic_parameter, adjustment_method = "BH",
   result_folder, ...)
 {
 
+  browser()
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   color_palette <- ssEnv$color_palette
   localKeys <- unique(ssEnv$keys_areas_subareas_markers_figures[,c("MARKER","AREA")])
@@ -16,7 +17,7 @@ consolidate_inference_association_cross_studies <- function(inference_detail, st
     # for each study in studies
     for (s in 1:nrow(studies))
     {
-      # 
+      #
       # get the inference details for the study
       result_folder_study <- studies[s,"RESULT_FOLDER"]
       ssEnv$result_folderInference <- dir_check_and_create(result_folder_study, "Inference")
@@ -32,7 +33,7 @@ consolidate_inference_association_cross_studies <- function(inference_detail, st
   log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y")," inference files aggregated!")
   aggregated_study_results <- unique(aggregated_study_results[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","STUDY",statistic_parameter, pvalue_column)])
 
-  # 
+  #
   # change STUDY column to take int account the direction of the statistic
   # aggregated_study_results$STUDY <- as.character(paste0(aggregated_study_results$STUDY,"_", ifelse((aggregated_study_results[,statistic_parameter] > 0),"INCR","DECR") ))
   ssEnv$result_folderInference <- dir_check_and_create(result_folder, "Inference")
@@ -40,7 +41,7 @@ consolidate_inference_association_cross_studies <- function(inference_detail, st
   ssEnv <- get_session_info(result_folder)
   # reshape to a table with study as columns, area as rows and values as cell without aggreagtion
   aggregated_study_results_table <- reshape2::dcast(aggregated_study_results, AREA + SUBAREA + MARKER + FIGURE + AREA_OF_TEST ~ STUDY, value.var = pvalue_column)
-  # 
+  #
   studies_to_comb <- na.omit(unique(aggregated_study_results$STUDY))
   # calculate the mean of the pvalues
   aggregated_study_results_table[, pvalue_column] <- apply(aggregated_study_results_table[,studies_to_comb],1,function(x){
@@ -87,7 +88,7 @@ consolidate_inference_association_cross_studies <- function(inference_detail, st
     # message(studies_comb)
     for(k in 1: ncol(studies_comb))
     {
-      # 
+      #
       results_inference_comb <- subset(aggregated_study_results, STUDY %in% studies_comb[,k])
       keys <- unique(results_inference_comb[, c("SUBAREA", "AREA", "MARKER", "FIGURE")])
       study_count <- length(na.omit(unique(results_inference_comb$STUDY)))
@@ -121,7 +122,8 @@ consolidate_inference_association_cross_studies <- function(inference_detail, st
             keys[i, ]$MARKER,
             "_",
             keys[i, ]$FIGURE,
-            "_venn_diagramm.png",
+            "_venn_diagramm.",
+            ssEnv$plot_format,
             sep = ""
           )
         overlaps <- Reduce(intersect, SPLIT)
@@ -130,7 +132,7 @@ consolidate_inference_association_cross_studies <- function(inference_detail, st
           # Chart
           # Set up the Venn diagram parameters
           # color_palette <- color_palette[length(SPLIT)]
-          # 
+          #
           # Plot Venn diagram
           VennDiagram::venn.diagram(
             x = SPLIT,
@@ -149,7 +151,7 @@ consolidate_inference_association_cross_studies <- function(inference_detail, st
           log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y"),"  venn diagram completed !")
 
           filename <- inference_file_name(inference_detail, paste(keys[i, ]$AREA, keys[i, ]$SUBAREA, keys[i, ]$MARKER, keys[i, ]$FIGURE , sep="_"),ssEnv$result_folderInference,file_extension = "csv",suffix = "OVERLAPS", prefix = "")
-          # 
+          #
           overlaps <- data.frame("AREA_OF_TEST" = overlaps)
           write.csv2(overlaps, filename, append = TRUE)
         }

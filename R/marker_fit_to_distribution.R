@@ -141,7 +141,10 @@ marker_fit_to_distribution <- function()
         # Save the plot to a file
         # ggplot2::ggsave(filename, plot = p, width = 2480 / 300, height = 2480 / 300, dpi = 300)
 
-        grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
+        if(ssEnv$plot_format == "png")
+          grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15)
+        if(ssEnv$plot_format == "eps")
+          grDevices::postscript(file =  filename, width = 2480,height = 2480, pointsize  =  15)
         graphics::hist(data, breaks = 100, probability = FALSE, col = "gray", main = "Istogramma dei dati con curve di distribuzione teoriche")
         # Aggiunge curve di densità teoriche all'istogramma
 

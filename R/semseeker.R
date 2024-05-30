@@ -55,11 +55,12 @@ semseeker <- function(sample_sheet,
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Working on batch:",batch_id)
     sample_sheet_local <- sample_sheet[[batch_id]]
     signal_intrasample <- TRUE
-    signal_data[[batch_id]] <- substitute(signal_data[[batch_id]])
     if (ssEnv$signal_intrasample)
       signal_data_local <- signal_data[[batch_id]]
     else
       signal_data_local <- stats::na.omit(signal_data[[batch_id]])
+
+    signal_data_local <- substitute_infinite(signal_data_local)
     signal_data_local <- signal_data_local[rownames(signal_data_local) %in% probes_to_preserve,]
     sample_sheet_local <- analyze_batch(signal_data_local, sample_sheet_local, batch_id)
     if(exists("sample_sheet_result"))
@@ -83,8 +84,8 @@ semseeker <- function(sample_sheet,
   # ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
   # update_session_info(ssEnv)
 
-  annotate_bed()
-  create_excel_pivot()
+  # annotate_bed()
+  # create_excel_pivot()
 
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "Starting inference Analysis.")
   # inferenceAnalysis(ssEnv$result_folderData = ssEnv$result_folderData, ssEnv$session_folder= ssEnv$session_folder, inferenceDetails)

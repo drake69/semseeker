@@ -52,6 +52,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll perform:",g_end - length(covariates)," tests." )
 
+  result_temp <- data.frame()
   result_temp <- foreach::foreach(g = g_start:g_end, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
   # for(g in g_start:g_end)
   {
@@ -120,6 +121,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       colnames(local_result) <- toupper(colnames(local_result))
       gc()
       local_result
+      # result_temp <- plyr::rbind.fill(result_temp, local_result)
     }
   }
 

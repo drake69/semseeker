@@ -157,7 +157,11 @@ pathway_WebGestalt <- function(study,
         # if(min(enrichResultToPlot$FDR) < as.numeric((ssEnv$alpha)))
         # {
         plotFileName = file_path_build(path,projectName,ssEnv$plot_format)
-        grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")
+        if(ssEnv$plot_format == "png")
+          grDevices::png(file =  plotFileName, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
+        if(ssEnv$plot_format == "eps")
+          grDevices::postscript(file =  plotFileName, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
+        # grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")
         enrichResultToPlot <- as.data.frame(enrichResultToPlot)
         enrichResultToPlot <- enrichResultToPlot[order(enrichResultToPlot$expect),]
         graphics::par(mar = c(5, 30, 5, 5)) # Set the margin on all sides to 6

@@ -19,6 +19,10 @@ file_path_build <- function(baseFolder, detailsFilename, extension, add_gz = FAL
   # remove double dots
   fileName <- gsub("\\.\\.",".", fileName)
 
+  # browser()
+  fileName <- gsub(" ","_", fileName)
+  fileName <- gsub("__","_", fileName)
+
   file.path(baseFolder, fileName)
 
 }

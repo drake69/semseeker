@@ -7,7 +7,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
   # them in a single dataframe
   markers <- unique(ssEnv$keys_areas_subareas_markers_figures$MARKER)
   # #
-  # browser()
+  browser()
   model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
   selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
   inference_details <- as.data.frame(inference_details)
@@ -124,13 +124,19 @@ markers_performance_association <- function(inference_details, result_folder, pv
       final$EFFECT_SIZE_MAGNITUDE <- as.numeric(final$EFFECT_SIZE_MAGNITUDE)
     }
 
+    browser()
 
     filtered_metrics <- filtered_metrics[!is.na(filtered_metrics)]
     keys <- unique(ssEnv$keys_areas_subareas_markers_figures)
+
+    # add AREA = SAMPLE_GROUP and subarea = SAMPLE
+    keys <- plyr::rbind.fill(keys, expand.grid("MARKER"=unique(final$MARKER),"FIGURE"=unique(final$FIGURE),"AREA"="SAMPLE_GROUP","SUBAREA"="SAMPLE"))
+
     keys <- keys[keys$MARKER == marker,]
     for (k in 1:nrow(keys)) {
       # creat empty list to store plots
       plot_list <- list()
+      plot_title_list <- list()
       row <- 0
       row_labels <- c()
       key <- keys[k,]
@@ -192,8 +198,15 @@ markers_performance_association <- function(inference_details, result_folder, pv
 
           main_title <- ""
           if (row==1)
-            main_title <- paste(metric)
+          {
 
+            main_title <- gsub("_ADJ_ALL_","_ADJUSTED_",paste(metric))
+            main_title <- gsub("_","\n",paste(main_title))
+            main_title <- ggplot2::ggplot() +
+              ggplot2::annotate("text", x = 0.5, y = 0.5, label = main_title, size = 6, hjust = 0.5, vjust = 0.5) +
+              ggplot2::theme_void()
+            plot_title_list[[length(plot_title_list)+1]] <- main_title
+          }
           y_title <- ""
           if (col==1)
             y_title <- fig
@@ -202,7 +215,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
           ggp <- ggplot2::ggplot(final_temp, ggplot2::aes(x = MARKER, y = REBASED, fill = MARKER)) +
             ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge()) +
             ggplot2::scale_fill_manual(values = bar_colors) +  # Assign colors to bars
-            ggplot2::labs(title = main_title, x = "", y = y_title) +
+            ggplot2::labs(title = "", x = "", y = y_title) +
             ggplot2::theme_minimal() +
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
               legend.position = "none",
@@ -219,17 +232,25 @@ markers_performance_association <- function(inference_details, result_folder, pv
     if(length(plot_list) != 0)
     {
 
+      ggt <- gridExtra::grid.arrange(grobs = plot_title_list, nrow = 1)
+      path <- dir_check_and_create(ssEnv$result_folderChart, "MARKERS_PERFORMANCE")
+      file_name <- inference_file_name(inference_detail, prfx,path,file_extension=ssEnv$plot_format, prefix = "_TITLE_", suffix=aggr_fun)
+      # save the panel
+      ggplot2::ggsave(file = file.path(file_name), ggt, width = 4960, height = 400, units = "px")
+
       # build  a panel from plot list
       gge <- gridExtra::grid.arrange(grobs = lapply(plot_list, ggplot2::ggplotGrob), ncol = length(filtered_metrics))
-
       path <- dir_check_and_create(ssEnv$result_folderChart, "MARKERS_PERFORMANCE")
       file_name <- inference_file_name(inference_detail, prfx,path,file_extension=ssEnv$plot_format, prefix = "", suffix=aggr_fun)
       # save the panel
       ggplot2::ggsave(file = file.path(file_name), gge, width = 4960, height = 2480, units = "px")
+
     }
 
     if(nrow(scores) != 0)
     {
+
+      # browser()
       # score_max <- sum(scores$SCORE)
       # scores$SCORE <- round(100*scores$SCORE/score_max)
       # #
@@ -237,6 +258,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
       path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKERS_PERFORMANCE")
       write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
 
+      scores$SCORE <- round(scores$SCORE,2)
 
       # aggregate scores by MARKER and sum RANK
       scores_agg <- aggregate(scores$SCORE, by = list(scores$MARKER), FUN = sum)
