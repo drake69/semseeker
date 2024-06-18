@@ -15,7 +15,7 @@ lesions_get <- function(grouping_column, mutation_annotated_sorted)
   if(nrow(mutation_annotated_sorted)==0)
     return (mutation_annotated_sorted)
 
-    # browser()
+    
   mutationAnnotatedSortedLocal <- mutation_annotated_sorted
   summed <- stats::aggregate(mutationAnnotatedSortedLocal$MUTATIONS, by = list(mutationAnnotatedSortedLocal[,grouping_column]), FUN = sum)
   colnames(summed) <- c(grouping_column,"MUTATIONS_COUNT")
@@ -37,7 +37,7 @@ lesions_get <- function(grouping_column, mutation_annotated_sorted)
     return(tmp)
   }
 
-  # browser()
+  
   # calculate enrichment for each window
   mutationAnnotatedSortedLocal <- mutationAnnotatedSortedLocal %>% dplyr::group_by(eval(parse(text = grouping_column))) %>%
     dplyr::mutate(ENRICHMENT = stats::ave( .data$MUTATIONS, eval(parse(text = grouping_column)),

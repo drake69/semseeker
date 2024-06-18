@@ -29,6 +29,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
           next
         SPLIT <- split(pathway_set$ID, pathway_set$STUDY)
         studies <- paste(sort(categories), collapse = "-")
+        categories <- gsub("_", " ", names(SPLIT))
         resultFolder <- paste(result_folder, subFolder, studies, sep="/" )
         if(!file.exists(resultFolder))
           dir.create(resultFolder)
@@ -48,6 +49,10 @@ pathway_cross_studies_compare <- function(result_folder, ...){
           # Chart
           # Set up the Venn diagram parameters
           color_palette <- color_palette[length(SPLIT)]
+          # Determine the null device for the current platform
+          null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
+          # Redirect output to the null device
+          sink(null_device)
           # Plot the Venn diagram
           VennDiagram::venn.diagram(
             x = SPLIT,
@@ -62,7 +67,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
             # sub = "Example Venn diagram with custom colors",
             filename = filename
           )
-
+          sink()
           filename <-
             paste(
               resultFolder,  "/PATHWAY_",
@@ -94,6 +99,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
     if(length(categories)==1)
       next
     SPLIT <- split(pathway_set$ID, pathway_set$STUDY)
+    categories <- gsub("_", " ", names(SPLIT))
     resultFolder <- paste("~/Desktop/VENN", subFolder, sep="/" )
     overlaps <- Reduce(intersect, SPLIT)
     if(length(overlaps)>0)
@@ -107,6 +113,10 @@ pathway_cross_studies_compare <- function(result_folder, ...){
           "_venn_diagramm.png",
           sep = ""
         )
+      # Determine the null device for the current platform
+      null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
+      # Redirect output to the null device
+      sink(null_device)
       # Chart
       VennDiagram::venn.diagram(
         x = SPLIT,
@@ -116,6 +126,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
         individuals.in.intersections = TRUE,
         disable.logging = T
       )
+      sink()
     }
   }
 }

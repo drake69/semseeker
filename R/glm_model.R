@@ -4,11 +4,11 @@
 #' @param tempDataFrame data frame to use for the model
 #' @param sig.formula formula to apply the model
 #'
-glm_model <- function(family_test, tempDataFrame, sig.formula)
+glm_model <- function(family_test, tempDataFrame, sig.formula, transformation, plot)
 {
   result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
   res <- data.frame("pvalue" = summary(result_glm)$coeff[-1, 4][1])
-  # 
+  #
   res$statistic_parameter <- (summary(result_glm)$coeff[-1, 1][1])
   res$aic_value <- (result_glm$aic)
   res$std.error <- summary(result_glm)$coeff[-1, 2][1]
@@ -19,7 +19,7 @@ glm_model <- function(family_test, tempDataFrame, sig.formula)
 
   if(family_test=="gaussian")
   {
-    # 
+    #
     residuals <-  result_glm$resid
     #calculate shapiro of working residuals
     res$shapiro_pvalue_residuals <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
@@ -29,7 +29,7 @@ glm_model <- function(family_test, tempDataFrame, sig.formula)
     res <- cbind(res,model_performance(fitted_values = result_glm$fitted.values, expected_values = tempDataFrame[,independent_variable],c(),c()))
     if(plot)
     {
-      # 
+      #
       ggp <- ggplot2::ggplot(tempDataFrame, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
         ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
         ggplot2::geom_smooth(method = "lm", se = TRUE, level = 0.95, color = ssEnv$color_palette_darker[3]) +
@@ -43,12 +43,13 @@ glm_model <- function(family_test, tempDataFrame, sig.formula)
 
   }
 
+  ggp <- NULL
   if(family_test=="binomial")
   {
     if(plot)
     {
       # ggp <- box.plot(dataFrameToPlot, independent_variable,burdenValue, transformation, family_test)
-      # 
+      #
       ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
         ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
         ggplot2::geom_smooth(method = "glm", method.args = list(family = "binomial"), se = TRUE, level = 0.95, color = ssEnv$color_palette_darker[3]) +
@@ -62,10 +63,13 @@ glm_model <- function(family_test, tempDataFrame, sig.formula)
 
   }
 
-  if (plot){
+  if (!is.null(ggp) & plot==TRUE){
 
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
+    filename  =  file_path_build(
+      baseFolder =  chartFolder,
+      detailsFilename = c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),
+      extension = ssEnv$plot_format,add_gz = FALSE)
 
     ggplot2::ggsave(
       filename,

@@ -4,9 +4,10 @@ pathway_pathfindR <- function(study,
   inference_details, significance = TRUE,sql_condition = "")
 {
 
-  # browser()
+
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  pvalue_column <- name_cleaning(pvalue_column)
 
   # start_fresh <- FALSE
   # ssEnv <- init_env(result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = start_fresh, ...)
@@ -16,7 +17,9 @@ pathway_pathfindR <- function(study,
   #check if optional package is installed
   if(!requireNamespace("pathfindR", quietly = TRUE))
   {
-    log_event("pathfindR package is not installed. Please install pathfindR package to use this function")
+    log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y"),"pathfindR package is not installed. Please install pathfindR package to use this function. \n
+      install.packages('pak') # if you have not installed 'pak'
+      pak::pkg_install('pathfindR')")
     return()
   }
 
@@ -99,6 +102,8 @@ pathway_pathfindR <- function(study,
         }
         else
         {
+          if(!(statistic_parameter %in% colnames(gene_set)))
+            log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y"),  "this column", statistic_parameter, " doesn't exists.")
           #
           if(nrow(gene_set)<2)
             next
@@ -110,7 +115,7 @@ pathway_pathfindR <- function(study,
           colnames(gene_set_stat) <- c("AREA_OF_TEST",statistic_parameter)
           gene_set <- merge(gene_set_pval,gene_set_stat,by="AREA_OF_TEST")
           gene_set <- gene_set[,c("AREA_OF_TEST",statistic_parameter,pvalue_column)]
-          # browser()
+
         }
 
         gene_set <- na.omit(gene_set)
@@ -158,6 +163,7 @@ pathway_pathfindR <- function(study,
       {
         if(nrow(result_pathway)!=0)
         {
+          output_temp$FDR <- p.adjust(output_temp$highest_p, method = "fdr")
           result_pathway$PHENOTYPE <- grepl(study,result_pathway$Term_Description, ignore.case = T)
           write.csv2(result_pathway, pathway_report_path)
           rm(result_pathway)

@@ -4,7 +4,7 @@ coverage_analysis <- function(signal_data)
   # area <- c("CHR")
   # probes_prefix <- "PROBES_CHR_"
   ssEnv <- get_session_info()
-
+  
   keys <- ssEnv$keys_areas_subareas
   for ( k in 1:nrow(keys))
   {

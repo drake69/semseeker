@@ -37,7 +37,7 @@ create_excel_pivot <-  function() {
     sheetList <- foreach::foreach(k=1:nrow(tempKeys), .export = toExport, .combine= "c" , .multicombine=TRUE ) %dorng%
     # for(k in 1:nrow(tempKeys))
     {
-      # browser()
+      
       # k <- 1
       subarea <-  as.character(tempKeys[k,"SUBAREA"])
       marker <- as.character(tempKeys[k,"MARKER"])

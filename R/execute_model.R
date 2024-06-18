@@ -1,10 +1,12 @@
 execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation="", plot=FALSE){
 
+  transformation <- as.character(transformation)
+  family_test <- as.character(family_test)
   # model_result <- data.frame()
   #
   # tryCatch({
   if( family_test=="binomial" | family_test=="poisson" | family_test=="gaussian")
-    model_result <- glm_model(family_test, tempDataFrame, sig.formula )
+    model_result <- glm_model(family_test, tempDataFrame, sig.formula, transformation, plot )
 
   if(family_test=="wilcoxon" | family_test=="t.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman" | family_test=="jsd"
     | family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test" | family_test=="bartlett.test")

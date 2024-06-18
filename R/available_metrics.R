@@ -1,6 +1,6 @@
 available_metrics <- function(inference_details,result_folder, ...)
 {
-  # browser()
+  
   arguments <- list(...)
   areas_selection <- c()
   if(!is.null(arguments[["areas_selection"]]))

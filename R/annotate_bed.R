@@ -12,9 +12,9 @@ annotate_bed <- function ()
   dest_folder <- dir_check_and_create(ssEnv$result_folderData,subFolders = c("Annotated"))
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
 
-  if (!is.null(ssEnv$keys_areas_subareas_markers_figures_missed))
-    # remove the missed keys from the localKeys
-    localKeys <- localKeys[!(localKeys$COMBINED %in% ssEnv$keys_areas_subareas_markers_figures_missed$COMBINED),]
+  # if (!is.null(ssEnv$keys_areas_subareas_markers_figures_missed))
+  #   # remove the missed keys from the localKeys
+  #   localKeys <- localKeys[!(localKeys$COMBINED %in% ssEnv$keys_areas_subareas_markers_figures_missed$COMBINED),]
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotating genomic area.")
 
@@ -27,7 +27,10 @@ annotate_bed <- function ()
     "owner_session_uuid", "trace","probe_features_get","dest_folder", "localKeys",
     "file_path_build","%>%","get_session_info","log_event")
 
-  # browser()
+  # check probe features are avaialable
+  probe_features <- probe_features_get("PROBE_WHOLE")
+
+
   if(nrow(localKeys)==0)
     return()
 
@@ -57,7 +60,7 @@ annotate_bed <- function ()
           dataToAnnotate <- read_multiple_bed(marker = marker ,sample_group =   sample_group, figure = figure)
           if(!is.null(dataToAnnotate))
           {
-            # browser()
+
             if(sum(grepl("END", colnames(probe_features)))>0) #dplyr::inner_join
               dataToAnnotate <- merge(dataToAnnotate, probe_features, by = c("CHR", "START","END"))
             else
@@ -87,7 +90,9 @@ annotate_bed <- function ()
                 final_bed <- rbind(final_bed, dataToAnnotate)
               else
                 final_bed <- dataToAnnotate
-              # gc()
+
+              rm(dataToAnnotate)
+              #
             }
           }
           if(ssEnv$showprogress)
@@ -115,7 +120,7 @@ annotate_bed <- function ()
           else
             missed_keys <- rbind(localKeys[i,],missed_keys)
         }
-        # gc()
+        #
       }
       else
       {
@@ -142,6 +147,6 @@ annotate_bed <- function ()
 
   end_time <- Sys.time()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotation genomic areas file finished in ", difftime(end_time,start_time,units = "mins")," minutes.")
-  # gc()
+  #
 }
 

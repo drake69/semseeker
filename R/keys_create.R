@@ -1,20 +1,25 @@
 keys_create <- function(ssEnv, arguments)
 {
 
-  # browser()
+  # remove BOTH and BOTHSUM
   #
   ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Reference","Control","Case"))
   ##### MANAGE MARKERS AND FIGURES #####
   # set default values
-  keys_figures_default_discrete <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH","BOTHSUM"))
+  keys_figures_default_discrete <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH","BOTHSUM")) #
   keys_markers_default_discrete <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAQ","DELTARQ","DELTAP","DELTARP"))
+
+
+  keys_markers_default_discrete$Q <- c(1,NA,ssEnv$DELTAQ_Q,ssEnv$DELTARQ_Q,ssEnv$DELTAP_B,ssEnv$DELTARP_B)
+
   keys_markers_default_discrete$SUFFIX <-  rep("",6)
   # keys_markers_default$SUFFIX <-  c("","","","", ssEnv$epiquantile ,"",ssEnv$epiquantile)
   keys_markers_default_discrete$EXT <-  c("bed","bed","bed","bed","bed","bed")
   keys_markers_figures_default_discrete <- merge(keys_markers_default_discrete, keys_figures_default_discrete, by = NULL)
   rm(keys_figures_default_discrete, keys_markers_default_discrete)
 
-  keys_figures_default_continuos <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH","BOTHSUM"))
+
+  keys_figures_default_continuos <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH","BOTHSUM")) # , "BOTH","BOTHSUM"
   keys_markers_default_continuos <-  data.frame("MARKER"=c("DELTAS","DELTAR"))
   keys_markers_default_continuos$SUFFIX <-  c("","")
   # keys_markers_default$SUFFIX <-  c("","","","", ssEnv$epiquantile ,"",ssEnv$epiquantile)
@@ -30,7 +35,7 @@ keys_create <- function(ssEnv, arguments)
   keys_markers_figures_default_continuos_mono_figure <- merge(keys_markers_default_continuos_mono_figure, keys_figures_default_continuos_mono_figure, by = NULL)
   rm(keys_figures_default_continuos_mono_figure, keys_markers_default_continuos_mono_figure)
 
-  keys_markers_figures_default <- rbind(keys_markers_figures_default_discrete,
+  keys_markers_figures_default <- plyr::rbind.fill(keys_markers_figures_default_discrete,
     keys_markers_figures_default_continuos,
     keys_markers_figures_default_continuos_mono_figure)
 
@@ -53,7 +58,7 @@ keys_create <- function(ssEnv, arguments)
 
   keys_gene_subareas_default <- data.frame("AREA"="GENE", "SUBAREA"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
   keys_island_subareas_default <- data.frame("AREA"="ISLAND","SUBAREA"=c("N_SHORE","S_SHORE","N_SHELF","S_SHELF", "WHOLE"))
-  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c("WHOLE"))
+  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c("WHOLE","DMR"))
   keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("WHOLE","CYTOBAND"))
   keys_probe_subareas_default <- data.frame("AREA"="PROBE","SUBAREA"=c("WHOLE"))
 
@@ -101,7 +106,7 @@ keys_create <- function(ssEnv, arguments)
   keys$SUBAREA <- as.character(keys$SUBAREA)
   # remove "COMBINED"
   keys <- keys[,c("AREA","SUBAREA","MARKER","FIGURE")]
-  # where FIGURE is HYPO or HYPER for keys_parts set to HYPER_HYPO
+  # where FIGURE is HYPO or HYPER for FIGURE set to HYPER_HYPO
   selector <- (keys$FIGURE=="HYPER" | keys$FIGURE=="HYPO")
   if (any(selector))
     keys[selector,"FIGURE"] <- "HYPER_HYPO"
@@ -113,8 +118,13 @@ keys_create <- function(ssEnv, arguments)
   keys_whole <- keys[keys$SUBAREA=="WHOLE",]
   keys <- rbind(keys_parts,keys_whole)
   keys <- keys[!duplicated(keys),]
-  ssEnv$keys_for_pathway <- rbind(keys,ssEnv$keys_areas_subareas_markers_figures[,c("AREA","SUBAREA","MARKER","FIGURE")])
+  # remove only HYPER or only HYPO
+  keys <- keys[!(keys$FIGURE=="HYPER" | keys$FIGURE=="HYPO"),]
   keys$COMBINED <- paste(keys$AREA,keys$SUBAREA,keys$MARKER,keys$FIGURE, sep="_")
+  # remove BOTH and BOTHSUM
+  keys <- keys[!(keys$FIGURE=="BOTH" | keys$FIGURE=="BOTHSUM"),]
+  ssEnv$keys_for_pathway <- keys
+
   update_session_info(ssEnv)
 
   return(arguments)

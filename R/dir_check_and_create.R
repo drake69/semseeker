@@ -23,7 +23,7 @@ dir_check_and_create <- function  (baseFolder, subFolders)
     # if(subFolder=="c(\"Reference\", \"Control\", \"Case\")")
     #   #
 
-    # browser
+    # # browser
     if(!exists("subF"))
       subF <- file.path(subFolder)
     else

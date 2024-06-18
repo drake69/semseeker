@@ -24,40 +24,41 @@ signal_range_values <- function(populationMatrix) {
   export = c("progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv")
   r <- 1
 
-  if(ncol(signal_values) > 2000)
+  
+  # if(ncol(signal_values) < 1000)
   {
-    # for(r in 1:1000)
-    result <- foreach::foreach(r = 1:nrow(signal_values), .combine = "rbind", .export = export) %dorng%
-      {
-        signal_row <- signal_values[r,]
-        signal_row <- as.vector(t(signal_row))
-        temp <- stats::quantile(signal_row, c(0.25,0.5,0.75), na.rm=TRUE)
-        signalQ1Values <-  temp[1]
-        signalQ3Values <- temp[2]
-        signal_median_values <- temp[3]
-        signalValuesIQR <- stats::IQR(signal_row)
+    # # for(r in 1:1000)
+    # result <- foreach::foreach(r = 1:nrow(signal_values), .combine = "rbind", .export = export) %dorng%
+    #   {
+    #     signal_row <- signal_values[r,]
+    #     signal_row <- as.vector(t(signal_row))
+    #     temp <- stats::quantile(signal_row, c(0.25,0.5,0.75), na.rm=TRUE)
+    #     signalQ1Values <-  temp[1]
+    #     signalQ3Values <- temp[2]
+    #     signal_median_values <- temp[3]
+    #     signalValuesIQR <- stats::IQR(signal_row)
+    #
+    #     signal_inferior_thresholds <- max((signalQ1Values - (ssEnv$iqrTimes * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm=TRUE)
+    #     signal_superior_thresholds <- min((signalQ3Values + (ssEnv$iqrTimes * signalValuesIQR)), max(signal_row, na.rm = TRUE), na.rm=TRUE)
+    #
+    #     temp_result <- data.frame(
+    #       "signal_inferior_thresholds"= signal_inferior_thresholds,
+    #       "signal_superior_thresholds"= signal_superior_thresholds,
+    #       "signal_median_values"= signal_median_values,
+    #       "iqr" = signalValuesIQR,
+    #       "q1"= signalQ1Values,
+    #       "q3"= signalQ3Values)
+    #     row.names(temp_result) <- row.names(signal_row)
+    #     # temp_result$PROBE <- row.names(signal_row)
+    #     # colnames(temp_result) <- c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values")
+    #     if(ssEnv$showprogress)
+    #       progress_bar(sprintf("%s",names(signal_row)))
+    #     temp_result
+    #   }
 
-        signal_inferior_thresholds <- max((signalQ1Values - (ssEnv$iqrTimes * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm=TRUE)
-        signal_superior_thresholds <- min((signalQ3Values + (ssEnv$iqrTimes * signalValuesIQR)), max(signal_row, na.rm = TRUE), na.rm=TRUE)
 
-        temp_result <- data.frame(
-          "signal_inferior_thresholds"= signal_inferior_thresholds,
-          "signal_superior_thresholds"= signal_superior_thresholds,
-          "signal_median_values"= signal_median_values,
-          "iqr" = signalValuesIQR,
-          "q1"= signalQ1Values,
-          "q3"= signalQ3Values)
-        row.names(temp_result) <- row.names(signal_row)
-        # temp_result$PROBE <- row.names(signal_row)
-        # colnames(temp_result) <- c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values")
-        if(ssEnv$showprogress)
-          progress_bar(sprintf("%s",names(signal_row)))
-        temp_result
-      }
-
-    gc()
   }
-  else
+  # else
   {
     th <- future.apply::future_apply(signal_values, 1 ,  get_th <- function(signal_row)
     {
@@ -90,5 +91,6 @@ signal_range_values <- function(populationMatrix) {
   if(nrow(result) != nrow(signal_values))
     stop("I'M STOPPING HERE, No thresholds defined for the population.")
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Thresholds defined for: ", nrow(result), " probe_features.")
+  gc()
   return(result)
 }

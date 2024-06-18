@@ -3,10 +3,22 @@ probe_features_get <- function(area_subarea)
   ssEnv <- get_session_info()
 
   if(is.null(ssEnv$tech) | ssEnv$tech=="")
+  {
+    
+    # try to get from signal_data saved
+    signal_data <- readRDS(file.path(ssEnv$result_folderData, "1_signal_data.rds"))
+    rownames(signal_data) <- signal_data[,1]
+    signal_data <- signal_data[-1,1:2]
+    signal_data[,1] <- as.numeric(signal_data[,1])
+    signal_data[,2] <- as.numeric(signal_data[,2])
+    ssEnv <- get_meth_tech(signal_data)
+    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Probes get should be called once defined which tech is used.")
+    if(is.null(ssEnv$tech) | ssEnv$tech=="")
     {
       log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Probes get should be called once defined which tech is used.")
       stop()
     }
+  }
   probe_features <- semseeker::pp_tot
   probe_features <- probe_features[ probe_features[,ssEnv$tech], ]
   probe_features$END <- probe_features$START
@@ -23,7 +35,7 @@ probe_features_get <- function(area_subarea)
     probe_features$CHR_WHOLE <- paste("chr",probe_features$CHR, sep="")
 
   if(grepl("PROBE",area_subarea))
-      probe_features$PROBE_WHOLE <- probe_features$PROBE
+    probe_features$PROBE_WHOLE <- probe_features$PROBE
 
   probe_features <- probe_features[ ,-c(which(colnames(probe_features) %in% ssEnv$tech )) ]
 

@@ -11,7 +11,7 @@ validate_family_test <- function(family_test){
 
   if(family_test=="binomial" | family_test=="wilcoxon" | family_test=="jsd" | family_test=="t.test" | family_test=="poisson" |
       family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman" |
-      family_test=="wilcoxon")
+      family_test=="wilcoxon" | family_test=="gaussian")
     return(TRUE)
 
   if(grepl("mean-permutation",family_test))
@@ -62,5 +62,6 @@ validate_family_test <- function(family_test){
   if (grepl("log",family_test))
     return(TRUE)
 
+  log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "family_test is not recognized: ", family_test)
   return(FALSE)
 }

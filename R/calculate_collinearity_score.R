@@ -5,7 +5,7 @@ calculate_collinearity_score <- function(df) {
   # library(car)
   # Calculate VIF for each variable using a linear model where each variable is regressed on all others
 
-  # browser()
+  
   vif_values <- apply(df, 2, function(var) {
     lm_model <- stats::lm(var ~ ., data = df)
     return(max(car::vif(lm_model)))

@@ -5,7 +5,7 @@ pathway_pathfindR_circlize <- function(
   inference_details, significance = TRUE,sql_condition = "",
   result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
-  # browser()
+  
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
   keys <- unique(ssEnv$keys_for_pathway)
   total_progress <- nrow(keys)*nrow(inference_details)
@@ -149,7 +149,7 @@ pathway_pathfindR_circlize <- function(
         link_length <- 2
 
 
-        # browser()
+        
         phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
         path <- dir_check_and_create(ssEnv$result_folderChart,"pathfindR")
         pathway_report_path <- file_path_build(path,phenotype_analysis_name,"png")

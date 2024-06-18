@@ -13,7 +13,7 @@
 analyze_population <- function(signal_data, sample_sheet,signal_thresholds, probe_features) {
 
   ssEnv <- get_session_info()
-  # browser()
+  
   start_time <- Sys.time()
   message("INFO: ", Sys.time(), " AnalyzePopulation warmingUP ")
 

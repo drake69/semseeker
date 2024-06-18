@@ -12,7 +12,7 @@
 #   # results_inference$PVALUEADJ_ALL_BH <- p.adjust(results_inference$PVALUEADJ)
 #   keys <- unique(results_inference[, c("SUBAREA", "AREA", "MARKER", "FIGURE")])
 #   seq <- 0
-#   browser()
+#   
 #   for (k in 1:length(path_db))
 #   {
 #     for (i in 1:nrow(keys))

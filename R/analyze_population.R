@@ -110,10 +110,12 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
     if(ssEnv$showprogress)
       progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
 
+    gc()
     sample_status_temp[is.na(sample_status_temp)] <- 0
     sample_status_temp
   }
 
+  gc()
   # progress_bar$terminate()
   summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)

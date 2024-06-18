@@ -18,7 +18,7 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   chk2 <- any(is.na(low_thresholds))
   if(chk1 | chk2)
   {
-    browser()
+    
   }
 
   dividend <- high_thresholds - low_thresholds
@@ -28,7 +28,7 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
   chk4 <- any(dividend<0)
   if(chk3 | chk4)
   {
-    browser()
+    
     stop("ERROR: I'm stopping here the dividend have negative values!")
   }
 

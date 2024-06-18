@@ -13,7 +13,7 @@ box.plot <- function(dataFrameToPlot, independent_variable,dependent_variable, t
       # dataFrameToPlot[, independent_variable] <- as.factor(dataFrameToPlot[, independent_variable])
       # # dataFrameToPlot$Sample_Group  <- stats::relevel(as.factor(dataFrameToPlot$Sample_Group), "Control")
       # # Number of boxplots
-      # num_boxplots <- length(unique(dataFrameToPlot[, independent_variable]))
+      num_boxplots <- length(unique(dataFrameToPlot[, independent_variable]))
       # # Define the labels for the independent variables
       # # labels <- levels(independent_variable)
       # # replace underscore with space

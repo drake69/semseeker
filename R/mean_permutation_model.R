@@ -113,7 +113,7 @@ compute_mean_delta_permutation_gpu_single <- function(sig.formula,df, n_permutat
     # log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y"), " Execution OPENCL done !")
     # system.time(res_ok <- apply(burden_permutated, 1, function(x) mean(x[phenotype == 0]) - mean(x[phenotype == 1])))
     # all.equal(res, res_ok)
-    # gc()
+    # 
     return(res)
 }
 
@@ -165,7 +165,7 @@ compute_mean_delta_permutation_gpu <- function(sig.formula,df, n_permutations, s
   # log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y"), " Execution OPENCL done !")
   # system.time(res_ok <- apply(burden_permutated, 1, function(x) mean(x[phenotype == 0]) - mean(x[phenotype == 1])))
   # all.equal(res, res_ok)
-  # gc()
+  # 
   return(res)
 }
 

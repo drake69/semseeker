@@ -21,8 +21,9 @@
 #'
 #' @importFrom doRNG %dorng%
 #' @export
-association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
+association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession",start_fresh = FALSE, ...)
 {
+
 
   j <- 0
   k <- 0
@@ -37,9 +38,17 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 
+  log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will perform the association analysys for project \n in ", ssEnv$result_folderData)
+
+  if(start_fresh)
+    unlink(ssEnv$result_folderInference, recursive = TRUE)
+  dir_check_and_create(ssEnv$result_folderInference,c())
+
   localKeys <- ssEnv$keys_markers_figures
   sample_groups <- c("Reference","Control","Case")
 
+
+  annotate_bed()
   create_excel_pivot()
 
   inference_details <- unique(inference_details)
@@ -140,7 +149,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           ######################################################################################################
           # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
           # binomiale che si vuole usare per la regressione logistica
-          # # browser()
+          #
           # min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
           # min_covariates_length <- ifelse(grepl("mediation-linear", family_test), 2, 1 )
           # min_covariates_length <- ifelse(grepl("mediation-ridge", family_test), length(covariates),1 )
@@ -155,13 +164,10 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             }
           }
           markers <- unique(localKeys$MARKER)
-          if (exists("results"))
-            rm(results)
-          for (a in 1:length(markers) )
+          for (a in 1:length(markers))
           {
-            if (exists("results"))
-              rm(results)
 
+            results <- data.frame()
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
             cols <- keys$COMBINED
@@ -178,7 +184,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               else
                 study_summary_local <- study_summary
 
-              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
+              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
 
               #
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
@@ -210,37 +216,17 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   }
                   result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
                     key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
-                  if (exists("results"))
-                    results <- plyr::rbind.fill(results, result_temp)
-                  else
-                    results <- result_temp
-
-                  # study_summaryToPlot <- study_summary_local
-                  # if(independent_variable  ==  "Sample_Group")
-                  #   study_summaryToPlot$Sample_Group  <- stats::relevel(as.factor(study_summaryToPlot$Sample_Group), "Control")
-                  # chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"SAMPLE_GROUP_COMPARISON")
-                  # filename  =  file_path_build(chartFolder,c(file_result_prefix,as.character(transformation), key$MARKER, key$FIGURE),ssEnv$plot_format)
-                  # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = 300)
-                  # # graphics::par(mfrow = c(1,3))
-                  # study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")] <- as.numeric(study_summaryToPlot[,paste(key$MARKER,"_", key$FIGURE, sep="")])
-                  # formula <- as.formula(paste(key$MARKER,"_", key$FIGURE,"~",independent_variable, sep=""))
-                  # title <- paste(key$MARKER," ", key$FIGURE, sep="")
-                  # graphics::boxplot( formula , main = title, data  =  study_summaryToPlot, cex = 2)
-                  # grDevices::dev.off()
+                  results <- plyr::rbind.fill(results, result_temp)
                 }
 
-              if (exists("results"))
-                if (!is.null(dim(results)))
-                  if (nrow(results)>0)
-                    if("PVALUE_ADJ" %in% colnames(results))
-                      results <- results[order(results$PVALUE_ADJ),]
+              if (!is.null(dim(results)))
+                if (nrow(results)>0)
+                  if("PVALUE_ADJ" %in% colnames(results))
+                    results <- results[order(results$PVALUE_ADJ),]
 
               if (exists("old_results"))
               {
-                if (exists("results"))
-                  results <- plyr::rbind.fill(results, old_results)
-                else
-                  results <- old_results
+                results <- plyr::rbind.fill(results, old_results)
                 rm(old_results)
               }
 
@@ -255,13 +241,13 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             # execute for all the areas
             if(depth_analysis>1)
             {
-              # browser()
+
 
               localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
               keys <- localKeys_1[localKeys_1$MARKER==markers[a],]
 
               # clean keys from already done association
-              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference)
+              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  >10
               dototal <- TRUE
               # clean keys from already done association
@@ -296,7 +282,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrame <- plyr::rename(tempDataFrame, c("SAMPLEID"  =  "Sample_ID"))
                     #removes area name (eg. sample_group name)
                     tempDataFrame <- tempDataFrame[-1,]
-                    # # browser()
+                    #
                     if(length(areas_selection_temp)>0)
                     {
                       #
@@ -359,30 +345,17 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                         key  =  key, transformation =  transformation, dototal  =  dototal,
                         session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
 
-                      if(!exists("results"))
-                        results <- result_temp_local_batch
-                      else
-                        results <- plyr::rbind.fill(results, result_temp_local_batch)
+                      results <- plyr::rbind.fill(results, result_temp_local_batch)
                     }
-                    save_result(results,fileNameResults, family_test, filter_p_value )
                   }
-                  if (exists("results"))
-                    save_result(results,fileNameResults, family_test, filter_p_value )
+                  else
+                    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " File not found:", fname,".")
                   association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
                 }
 
               if (exists("old_results"))
-              {
-                if (exists("results"))
-                  results <- plyr::rbind.fill(results, old_results)
-                else
-                  results <- old_results
-                rm(old_results)
-                save_result(results,fileNameResults, family_test, filter_p_value )
-              }
+                results <- plyr::rbind.fill(results, old_results)
             }
-            if(exists("results"))
-              save_result(results,fileNameResults, family_test, filter_p_value )
 
             if(exists("result_temp_foreach"))
               rm(result_temp_foreach)
@@ -390,6 +363,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               rm(result_temp_local_batch)
             if(exists("tempDataFrame"))
               rm(tempDataFrame)
+            save_result(results,fileNameResults, family_test, filter_p_value )
 
           }
         }
@@ -404,9 +378,13 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
 save_result <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
 
-  #
-  if(!exists("results") | is.null(results))
-    return
+
+  # check if results is empty
+  if(is.null(results))
+    return()
+
+  if(nrow(results)==0)
+    return()
 
   results <- unique(results)
 

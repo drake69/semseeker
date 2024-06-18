@@ -36,7 +36,7 @@ analyze_single_sample_both <- function( sample_detail, marker) {
   {
     end_time_single_sample <- Sys.time()
     time_taken <- difftime(end_time_single_sample,start_time_single_sample, units = "mins")
-    log_event("DEBUG: Completed figure BOTH for sample in ", as.numeric(time_taken), "minutes.")
+    log_event("DEBUG: Completed figure BOTH for sample in ", as.numeric(time_taken), " minutes.")
     return()
   }
 
@@ -70,7 +70,7 @@ analyze_single_sample_both <- function( sample_detail, marker) {
 
   end_time_single_sample <- Sys.time()
   time_taken <- difftime(end_time_single_sample,start_time_single_sample, units = "mins")
-  log_event("DEBUG: Completed figure BOTH for sample in ", as.numeric(time_taken), "minutes.")
+  log_event("DEBUG: Completed figure BOTH for sample in ", as.numeric(time_taken), " minutes.")
 
   return(result)
 }

@@ -11,7 +11,7 @@ test_that("analyze_population", {
   ####################################################################################
 
 
-  # browser()
+  
   sp <- semseeker:::analyze_population(
     signal_data=signal_data,
     signal_thresholds = signal_thresholds,

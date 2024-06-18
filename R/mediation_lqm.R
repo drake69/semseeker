@@ -57,7 +57,7 @@ mediation_quantreg_model <- function(family_test,tempDataFrame, sig.formula, tra
 
   perms <- sort(unique(c(permutations_test, permutations)))
 
-  # browser()
+  
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
 
 
@@ -132,7 +132,7 @@ mediation_quantreg_model <- function(family_test,tempDataFrame, sig.formula, tra
           return(mediation_res)
         }
 
-        # browser()
+        
         # calculate the mediation effect
         mediation_res <- boot::boot(data=df_outcome, statistic = mediation_fun, R=permutations, parallel = "no", ncpus=1)
         boot.res <- boot::boot.ci(mediation_res, type="bca")

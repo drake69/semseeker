@@ -7,6 +7,7 @@ phenotype_phenolyzer <- function(study,
   # start_fresh <- FALSE
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = start_fresh, ...)
   ssEnv <- get_session_info()
+  pvalue_column <- name_cleaning(pvalue_column)
 
   # check existence of phenolyzer
   if (!file.exists(phenolyzer_folder_bin))
@@ -126,7 +127,7 @@ phenotype_phenolyzer <- function(study,
     message(pcommand)
     try(
       {
-        # sudo cpan App::cpanminus IO::String Bio::OntologyIO Graph::Directed
+        # sudo cpan App::cpanminus IO::String Bio::OntologyIO Graph::Directed JSON Parallel::ForkManager
         # biotools:phenolyzer
         # cpan Module::Name
         # cd /usr/local/lib/
@@ -150,7 +151,7 @@ phenotype_phenolyzer <- function(study,
       log_event("INFO:" , format(Sys.time(), "%a %b %d %X %Y"), "No annotated gene file found !")
       next
     }
-    # browser()
+
     annotated_genes <-  utils::read.csv2(annotated_gene_file, sep = "\t")
     annotated_genes_temp <- annotated_genes[annotated_genes$Status=="SeedGene",]
 
@@ -200,7 +201,7 @@ phenotype_phenolyzer <- function(study,
 
     for (w in 1:length(diseases_files))
     {
-      # browser()
+
       diseases_file <- diseases_files[w]
       local_path <- dir_check_and_create(baseFolder = base_path, subFolders = keys[i,"COMBINED"])
       # file.copy(diseases_file, local_path, overwrite = TRUE)

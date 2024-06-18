@@ -49,7 +49,7 @@ deltaq_get <- function(resultPopulation){
      stop("Something wrong with multiple bed files!")
   }
 
-  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n= as.numeric(ssEnv$epiquantile)))
+  deltaq$DELTAQ <- as.numeric(dplyr::ntile(x=deltaq[,"VALUE"] , n= as.numeric(ssEnv$DELTAQ_Q)))
   deltaq_both <- deltaq
   deltaq_both$FIGURE <- "BOTH"
   deltaq_both_sum <- deltaq

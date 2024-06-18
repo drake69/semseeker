@@ -49,9 +49,9 @@ deltarp_get <- function(resultPopulation){
     stop("Something wrong with multiple bed files!")
   }
 
-  # browser()
+
   deltarp$VALUE <- as.numeric(deltarp$VALUE)
-  num_bins <- as.numeric(ssEnv$bins)
+  num_bins <- as.numeric(ssEnv$DELTARP_B)
   deltarp$DELTARP <- cut(deltarp$VALUE, breaks=num_bins, labels=FALSE)
   deltarp$DELTARP <- as.numeric(deltarp$DELTARP)
 

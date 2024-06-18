@@ -12,7 +12,7 @@ test_that("deltaq_get", {
   sliding_window_size <- 11
   bonferroni_threshold <- 0.01
 
-  # browser()
+  
   sp <- semseeker:::analyze_population(signal_data=signal_data,
     signal_thresholds = signal_thresholds,
     sample_sheet = mySampleSheet,

@@ -86,7 +86,7 @@ mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, trans
 
   # remove environment
   rm(env)
-  gc()
+  
 
   # Return the summary of the mediation analysis
   return(res)

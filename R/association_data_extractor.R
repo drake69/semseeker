@@ -1,7 +1,7 @@
 association_data_extractor <- function(inference_details, sql_conditions=c(),destination_folder, result_folder, ...)
 {
 
-  # browser()
+  
   arguments <- list(...)
   areas_selection <- c()
   if(!is.null(arguments[["areas_selection"]]))

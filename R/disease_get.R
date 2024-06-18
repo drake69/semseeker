@@ -4,7 +4,7 @@ disease_get <- function(disease, vocabulary="HPO")
   # check if exisists pehnotype.hpoa file if not exit
   if (!file.exists("~/Downloads/phenotype.hpoa"))
   {
-    log_event("ERROR: Phenolizer: phenotype.hpoa file not found")
+    log_event("ERROR:",format(Sys.time(), "%a %b %d %X %Y"), "Phenolizer: phenotype.hpoa file not found, \n expected in ~/Downlods folder, \n look here: https://hpo.jax.org/data/annotations")
     return(data.frame("DISEASE"="")[-1,])
   }
   # read file and skip first 4 rows

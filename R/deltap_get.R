@@ -51,9 +51,9 @@ deltap_get <- function(resultPopulation){
   }
 
 
-  # browser()
+
   deltap$VALUE <- as.numeric(deltap$VALUE)
-  num_bins <- as.numeric(ssEnv$bins)
+  num_bins <- as.numeric(ssEnv$DELTAP_B)
   deltap$DELTAP <- cut(deltap$VALUE, breaks=num_bins, labels=FALSE)
   deltap$DELTAP <- as.numeric(deltap$DELTAP)
 

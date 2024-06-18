@@ -19,6 +19,14 @@ init_env <- function(result_folder, maxResources = 90, ...)
     }
   )
 
+  # suppress warnings messages of packages
+  PKGs<- c("future","doRNG","doParallel","progressr","data.table","ggplot2","dplyr",
+    "readr","readxl","stringr","tidyr","tibble","purrr","ggpubr","ggrepel","ggsci","foreach","VennDiagram")
+  tt <- lapply(PKGs, suppressWarnings(suppressMessages))
+  tt <- lapply(PKGs, suppressPackageStartupMessages)
+
+
+
   arguments <- list(...)
   arguments[["areas_selection"]] <- NULL
 
@@ -56,24 +64,28 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv$seed <- 7658776
   set.seed(ssEnv$seed)
 
-  log_event("INFO: ##############################################################################")
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Job Started !")
+  
+  arguments <- set_env_variable(arguments,"verbosity",1)
+  arguments <- set_env_variable(arguments,"q_b_param",data.frame("DELTAP_B"=4,"DELTARP_B"=4,"DELTAQ_Q"=4,"DELTARQ_Q"=4))
+  arguments <- set_env_variable(arguments,"DELTAP_B",4)
+  arguments <- set_env_variable(arguments,"DELTARP_B",4)
+  arguments <- set_env_variable(arguments,"DELTAQ_Q",4)
+  arguments <- set_env_variable(arguments,"DELTARQ_Q",4)
 
-
-  arguments <- set_env_variable(arguments,"bins",10)
   arguments <- set_env_variable(arguments,"plot_format","png")
   arguments <- set_env_variable(arguments,"alpha",0.05)
-  arguments <- set_env_variable(arguments,"verbosity",1)
   arguments <- set_env_variable(arguments,"sex_chromosome_remove",FALSE)
   arguments <- set_env_variable(arguments,"opencl",FALSE)
   arguments <- set_env_variable(arguments,"bonferroni_threshold",0.05)
   arguments <- set_env_variable(arguments,"iqrTimes",3)
   arguments <- set_env_variable(arguments,"sliding_window_size",11)
-  arguments <- set_env_variable(arguments,"epiquantile",4)
   arguments <- set_env_variable(arguments,"tech","")
   arguments <- set_env_variable(arguments,"showprogress",FALSE)
   arguments <- set_env_variable(arguments,"signal_intrasample",FALSE)
   arguments <- set_env_variable(arguments,"openai_api_key","")
+
+  if (!is.null(ssEnv$openai_api_key))
+    Sys.setenv(OPENAI_API_KEY = ssEnv$openai_api_key)
 
   original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8', '#ffefb6', '#cfebb6','#b9ef92')
   original_colors <- rep(original_colors, 2)
@@ -83,8 +95,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   darker_colors <- c("blue","red","purple","green","yellow","orange","brown")
   arguments <- set_env_variable(arguments,"color_palette_darker",darker_colors)
   arguments <- set_env_variable(arguments,"cluster_workers",NULL)
-  #
-  # browser()
+
   model_metrics <- toupper(as.vector(semseeker::metrics_properties$Metric))
   arguments <- set_env_variable(arguments,"model_metrics",model_metrics)
 
@@ -152,7 +163,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
     }
   }
 
-  arguments <- set_env_variable(arguments,"maxResources",90)
+  arguments <- set_env_variable(arguments,"maxResources",maxResources)
   arguments <- set_env_variable(arguments,"parallel_strategy","sequential")
   parallel_session()
   ssEnv <- get_session_info()

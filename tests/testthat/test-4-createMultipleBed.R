@@ -17,7 +17,7 @@ test_that("create_multiple_bed", {
     probe_features = probe_features
   )
 
-  markers <-c("MUTATIONS","DELTAS","DELTAQ","DELTARQ","DELTAR")
+  markers <-c("MUTATIONS","DELTAS","DELTAQ","DELTARQ","DELTAR","DELTAP","DELTARP")
   figures <- c("HYPO","HYPER","BOTH")
   sample_groups <- c("Control","Reference","Case")
 

@@ -10,7 +10,6 @@
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot)
 {
 
-  # browser()
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
   res <- data.frame()
@@ -19,7 +18,7 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
 
   dep_var <- sig.formula_vars(sig.formula)
   dependent_variable <- dep_var$dependent_variable
-  independent_variable <- dep_var$independent_variable
+  inddependent_variable <- dep_var$independent_variable
 
   try({
     model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)

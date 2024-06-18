@@ -157,7 +157,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
     res$pvalue <- result_w$p.value
 
-    # 
+    #
     res[1,"Wilcox_Value"] <- result_w$statistic
 
     res$r_model <- "stats_wilcox.test"
@@ -213,9 +213,10 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
   {
     result_cor <- stats::cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independent_variable]), method = as.character(family_test))
-    pvalue <- result_cor$p.value
-    r_model <- "stats_cor.test"
+    res$pvalue <- result_cor$p.value
+    res$r_model <- "stats_cor.test"
     statistic_parameter <- result_cor$estimate
+    res$rho <- statistic_parameter
     power_result <- pwr::pwr.r.test(n = nrow(tempDataFrame) , r = statistic_parameter , sig.level = as.numeric(ssEnv$alpha) , power = NULL)
     res$power <- power_result$power
   }

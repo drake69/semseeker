@@ -2,6 +2,9 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
 {
   ssEnv <- get_session_info()
 
+  if(ncol(signal_data) >100)
+    return()
+
   # save signal as rds and as pivot
   sample_sheet <- subset(sample_sheet, sample_sheet$Sample_Group != "Reference")
   sample_info <- sample_sheet[,c("Sample_ID","Sample_Group")]

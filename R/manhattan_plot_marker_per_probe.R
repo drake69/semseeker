@@ -8,18 +8,36 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, tech = tech)
   chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_PROBE")
 
+  browser()
+  annotate_bed()
   create_excel_pivot()
   result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
 
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
+  high_signal_probes <- 0
   for(k in 1:length(localKeys)){
     marker <- as.character(localKeys[k])
     pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
-    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
+    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz = TRUE)
     if (!file.exists(fname))
       tempKeys <- tempKeys[-k]
+    else
+    {
+      if(high_signal_probes==0)
+      {
+        # get the row woth the max count of values
+        count_m <- read.csv(fname, sep=";", skip = 2, row.names = 1)
+        # count per each row the number of no zero values
+        count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
+        if(max(count_r)>high_signal_probes)
+        {
+          high_signal_probes <- max(count_r)
+          probe_name <- names(which.max(count_r))
+        }
+      }
+    }
   }
 
   # remove SIGNAL from tempKeys
@@ -33,6 +51,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
     signal_data <- signal_data[,min_sample:max_sample]
   samples <- as.vector(colnames(signal_data))
   samples <- samples[-1]
+
 
   probe_signal <- as.vector(t(signal_data[signal_data$SAMPLEID==probe_name,]))
   probe_signal <- probe_signal[-1]
@@ -58,7 +77,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   {
     marker <- as.character(tempKeys[j])
     pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
-    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
+    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz=TRUE)
     message("Reading file ", fname)
     marker_data <- utils::read.csv2(fname, sep  =  ";")
     marker_data <- marker_data[-1,colnames(marker_data) %in% colnames(signal_data)]

@@ -48,7 +48,21 @@ parallel_session <- function()
   # options(future.globals.resolve = TRUE)
   #allow export of object of 32gb with future
   options(future.globals.maxSize= 32 * 1024^3)
+
+
+  # check if future is registered
+  # backend_name <- foreach::getDoParName()
+  # if (!is.null(backend_name)) {
+  #   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " doFuture is registered as the %dopar% backend.")
+  # } else {
+  #   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " doFuture is not registered as the %dopar% backend.")
+  #   doFuture::registerDoFuture()
+  # }
   doFuture::registerDoFuture()
+
+  # get the future plan
+  future_plan <- future::plan()
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Future Plan: ", future_plan)
 
   # TODO: improve planning parallel management using also cluster
   if(parallel_strategy=="multisession")

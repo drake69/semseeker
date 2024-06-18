@@ -25,7 +25,7 @@
 #'       missed_samples <- c("SAMPLEID",sample_names) [ !(c("SAMPLEID",sample_names) %in% colnames(tempDataFrame))]
 #'       if(length(missed_samples)>0)
 #'       {
-#'         # browser()
+#'         
 #'         to_fill <- as.data.frame(matrix(nrow = nrow(tempDataFrame), ncol = length(missed_samples)))
 #'         to_fill [is.na(to_fill)] <- 0
 #'         colnames(to_fill) <- missed_samples

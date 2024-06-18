@@ -1,4 +1,4 @@
-metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED"){
+metrics_ranking <- function (metric,data_frame, column_to_rank ="REBASED"){
 
   #
   the_lower_the_better_markers <- toupper(semseeker::metrics_properties[semseeker::metrics_properties$Higher_the_Better==FALSE,"Metric"])
@@ -21,38 +21,43 @@ metrics_ranking <- function (metric,data_frame, figure, column_to_rank ="REBASED
   #   stop()
   # }
   #
-  # # browser()
+  #
   # values_to_rank <- unique(data_frame[,column_to_rank])
   # values_to_rank <- data.frame("VALUE"=values_to_rank)
   # # create a new column with the rank
-  # # values_to_rank$RANK <- 1:nrow(values_to_rank)
+  # # values_to_rank$SCORE <- 1:nrow(values_to_rank)
   #
-  # values_to_rank$RANK <- cut(values_to_rank$VALUE, breaks = 100, right = FALSE, labels = FALSE)
+  # values_to_rank$SCORE <- cut(values_to_rank$VALUE, breaks = 100, right = FALSE, labels = FALSE)
   # # merge the rank with the data frame
   # data_frame <- merge(data_frame, values_to_rank, by.x=column_to_rank, by.y="VALUE", all.x=TRUE)
 
   # Normalization functions
   normalize_minimize <- function(x) (max(x) - x) / (max(x) - min(x))
   normalize_maximize <- function(x) (x - min(x)) / (max(x) - min(x))
+  data_frame$METRIC <- metric
 
   if(max(data_frame[,column_to_rank]) == min(data_frame[,column_to_rank])){
-    data_frame$RANK <- 1
-    return(data.frame("MARKER"=data_frame$MARKER,"FIGURE"=figure,"METRIC"=metric,"SCORE"=data_frame$RANK))
+    data_frame$SCORE <- 1
+    return(data_frame)
   }
 
-  # browser()
+
   if(metric %in% the_lower_the_better_markers){
-    data_frame$RANK <- normalize_minimize(data_frame[,column_to_rank])
+    data_frame$SCORE <- normalize_minimize(data_frame[,column_to_rank])
   }else if(metric %in% the_higher_the_better_markers){
-    data_frame$RANK <- normalize_maximize(data_frame[,column_to_rank])
+    data_frame$SCORE <- normalize_maximize(data_frame[,column_to_rank])
   }else{
     log_event("ERROR: Metric not found")
     stop()
   }
 
+  if(max(data_frame$SCORE)>1)
+  {
+    
+  }
+  data_frame$SCORE <- round(data_frame$SCORE, 2)
   # # add the marker and figure to the data frame
   # scores <- rbind(scores, )
-  scores <- data.frame("MARKER"=data_frame$MARKER,"FIGURE"=figure,"METRIC"=metric,"SCORE"=data_frame$RANK)
 
-  return(scores)
+  return(data_frame)
 }

@@ -33,7 +33,7 @@ get_meth_tech <- function(signal_data)
   log_event(msg)
   ssEnv$tech <- tech
 
-  # browser()
+  
 
   # get abs max
   max_data <- max(abs(signal_data[,-(ncol(signal_data))]), na.rm = TRUE)

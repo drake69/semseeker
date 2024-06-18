@@ -9,6 +9,7 @@ association_analysis(
   result_folder,
   maxResources = 90,
   parallel_strategy = "multisession",
+  start_fresh = FALSE,
   ...
 )
 }

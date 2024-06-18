@@ -8,7 +8,7 @@ pathway_WebGestalt <- function(study,
   # start_fresh <- FALSE
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = start_fresh, ...)
   ssEnv <- get_session_info()
-
+  pvalue_column <- name_cleaning(pvalue_column)
   keys <- unique(ssEnv$keys_for_pathway)
   path <- dir_check_and_create(ssEnv$result_folderPathway,"WebGestalt")
   tmp <- tempdir()
@@ -37,14 +37,24 @@ pathway_WebGestalt <- function(study,
         projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  ,
           pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
         filenameResult = file_path_build(path,projectName,"csv")
+        # if(file.exists(filenameResult))
+        #   next
+
         if(file.exists(filenameResult))
+        {
+          pp <- read.csv2(filenameResult,stringsAsFactors = FALSE)
+          if(nrow(pp)==0)
+            next
+          pp <- enrichment_analysy_add_category("WebGestalt",pp)
+          write.csv2(pp,filenameResult,row.names = FALSE)
           next
+        }
 
         #
 
         enrich_method <- enrich_methods[em]
         if(ssEnv$showprogress)
-          progress_bar(sprintf("Searching for disease using webgestalt: %s with %s and %s",keys[i,]$COMBINED,enrich_method,type))
+          progress_bar(sprintf("Searching for disease using WebGestalt: %s with %s and %s",keys[i,]$COMBINED,enrich_method,type))
         key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
 
         results_inference <- get_results_areas_inference(
@@ -106,10 +116,10 @@ pathway_WebGestalt <- function(study,
           "MF"="geneontology_Molecular_Function"
         )
 
-        # if(nrow(gene_set)<5)
-        #   next
+        if(nrow(gene_set)<2)
+          next
 
-        # browser()
+
         enrichResult <- tryCatch({
           WebGestaltR::WebGestaltR(
             enrichMethod=enrich_method,
@@ -140,6 +150,9 @@ pathway_WebGestalt <- function(study,
 
         if(is.null(enrichResult))
           next
+
+        if(nrow(enrichResult)==0)
+          next
         enrichResult$alpha <- as.numeric(ssEnv$alpha)
         enrichResult$pvalue_column <- pvalue_column
         enrichResult$type <- type
@@ -153,39 +166,43 @@ pathway_WebGestalt <- function(study,
         # format FDR to use scientific notation
 
         enrichResultToPlot <- enrichResult[1:15,]
-        # browser
+        # # browser
         # if(min(enrichResultToPlot$FDR) < as.numeric((ssEnv$alpha)))
         # {
         plotFileName = file_path_build(path,projectName,ssEnv$plot_format)
-        if(ssEnv$plot_format == "png")
-          grDevices::png(file =  plotFileName, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
-        if(ssEnv$plot_format == "eps")
-          grDevices::postscript(file =  plotFileName, width = 2480,height = 2480, pointsize  =  15, res = 300, bg = "transparent")
         # grDevices::png(file= plotFileName, width=2048,height=2048, bg = "transparent")
         enrichResultToPlot <- as.data.frame(enrichResultToPlot)
         enrichResultToPlot <- enrichResultToPlot[order(enrichResultToPlot$expect),]
-        graphics::par(mar = c(5, 30, 5, 5)) # Set the margin on all sides to 6
-        par(cex.lab = 4)
-        # Create a color vector based on the condition FDR < 0.05
-        bar_colors <- ifelse(enrichResultToPlot$FDR < as.numeric((ssEnv$alpha)), ssEnv$color_palette[1], ssEnv$color_palette[2])
-        # Generate the barplot with colors
-        graphics::barplot(height = enrichResultToPlot$expect,
-          names = enrichResultToPlot$description,
-          # names = wrap_it(paste0(enrichResultToPlot$description,
-          #   " (FDR=", format(enrichResultToPlot$FDR, scientific = TRUE), ")",
-          #   " (Enr. Ratio = ", round(enrichResultToPlot$enrichmentRatio, 2), ")",
-          #   sep=" "), 25),
-          horiz = TRUE,
-          las = 1,
-          cex.names = 2,
-          space = 0.1,
-          col = bar_colors) # Use the color vector here
-        # graphics::barplot(height=enrichResultToPlot$expect, names=wrap_it(paste0(enrichResultToPlot$description,"(FDR=", round(enrichResultToPlot$FDR,2),")", sep=" "),25) , horiz=T, las = 1 ,cex.names= 2, space=0.1)
-        graphics::mtext( paste0(keys[i,"AREA"]," ",keys[i,"SUBAREA"]," ", keys[i,"MARKER"], " ",keys[i,"FIGURE"]," ",pvalue_column,sep=" "), side = 3, line = 1, cex = 2)
-        grDevices::dev.off()
-        # }
-        file.remove(geneFile)
 
+
+        # i think plot os too much
+        # # Create a new column for bar colors based on the FDR condition
+        # enrichResultToPlot <- enrichResultToPlot %>%
+        #   plyr::mutate(bar_colors = ifelse(FDR < as.numeric(ssEnv$alpha), ssEnv$color_palette[1], ssEnv$color_palette[2]))
+        #
+        #
+        # # Generate the ggplot
+        # gg <- ggplot2::ggplot(enrichResultToPlot, ggplot2::aes(x = expect, y = reorder(description, expect), fill = bar_colors)) +
+        #   ggplot2::geom_bar(stat = "identity", color = "black") +
+        #   ggplot2::scale_fill_identity() +
+        #   ggplot2::labs(
+        #     title = paste0(keys[i, "AREA"], " ", keys[i, "SUBAREA"], " ", keys[i, "MARKER"], " ", keys[i, "FIGURE"], " ", pvalue_column),
+        #     x = "Expected",
+        #     y = ""
+        #   ) +
+        #   ggplot2::theme_minimal() +
+        #   ggplot2::theme(
+        #     axis.text.y = ggplot2::element_text(size = 12),
+        #     axis.title.x = ggplot2::element_text(size = 12),
+        #     plot.title = ggplot2::element_text(size = 16, hjust = 0.5),
+        #     legend.position = "none"
+        #   )
+        #
+        #
+        # # Save the plot
+        # ggplot2::ggsave(plotFileName, gg, width = 4096, height = 2048, units = "px", dpi = 300)
+
+        file.remove(geneFile)
         unlink(geneFile)
 
         if(exists("enrichResult"))
@@ -215,6 +232,3 @@ wrap_it <- function(x, len)
     collapse = "\n"),
     USE.NAMES = FALSE)
 }
-
-
-

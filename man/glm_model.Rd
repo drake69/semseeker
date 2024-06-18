@@ -4,7 +4,7 @@
 \alias{glm_model}
 \title{Title}
 \usage{
-glm_model(family_test, tempDataFrame, sig.formula)
+glm_model(family_test, tempDataFrame, sig.formula, transformation, plot)
 }
 \arguments{
 \item{family_test}{regression model to apply}

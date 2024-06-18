@@ -1,7 +1,13 @@
 substitute_infinite <- function(x) {
-  # browser()
+
   x <- as.matrix(x)
   inf_vals <- !is.finite(x)
+
+  # count the number of infinite values
+  n_inf_values <- sum(inf_vals)
+  if(n_inf_values == 0)
+    return(as.data.frame(x))
+
   # get row and column of infinite values
   inf_values <- which(inf_vals, arr.ind = TRUE)
   # count the number of infinite values

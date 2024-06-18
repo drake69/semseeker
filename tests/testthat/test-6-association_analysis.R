@@ -5,8 +5,7 @@ test_that("association_analysis", {
 
   ####################################################################################
 
-  semseeker:::semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
-    markers=c("DELTAQ"), areas=c("PROBE","CHR","GENE"), start_fresh = TRUE, showprogress=showprogress, verbosity=verbosity)
+  semseeker:::semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, areas=c("PROBE","CHR","GENE"), start_fresh = TRUE, showprogress=showprogress, verbosity=verbosity)
 
   ####################################################################################
 

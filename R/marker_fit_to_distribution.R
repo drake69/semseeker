@@ -3,7 +3,7 @@
 marker_fit_to_distribution <- function()
 {
   # result_folder, maxResources = 90, parallel_strategy  = "multisession", ...
-  # browser()
+
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
   ssEnv <- get_session_info()
 
@@ -24,12 +24,17 @@ marker_fit_to_distribution <- function()
   res <- data.frame()
   for (rz in 1:2)
   {
+    if(ssEnv$showprogress)
+      progress_bar <- progressr::progressor(along = 1:nkeys)
+    else
+      progress_bar <- ""
+
     result_temp <- foreach::foreach(k = 1:nkeys, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
       # for (k in 1:nkeys)
       {
         # k <- 1
         key <- keys [k,]
-        message(key)
+        log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y"), "Processing key: ", key$MARKER," ", key$FIGURE," ", key$AREA," ", key$SUBAREA)
         if(key$EXT == "bed")
           distributions <- list(
             Poisson = list(name = "pois"),
@@ -80,7 +85,7 @@ marker_fit_to_distribution <- function()
           # Calcola AIC per ogni distribuzione
           aic_values <- sapply(fits, function(fit) { fit$distname = round(fit$aic,0)})
           aic_values <- t(as.data.frame(aic_values))
-          # browser()
+
           # salva i valori di AIC
           if(length(aic_values) > 0)
             res_temp <- cbind (res_temp, aic_values)
@@ -109,7 +114,7 @@ marker_fit_to_distribution <- function()
         }
 
         colors_dist <- c("magenta", "red", "green", "purple", "orange", "brown")
-        chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("DISTRIBUTIONS"))
+        chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("Distributions"))
         if(remove_zeros[rz])
           filename  =  file_path_build(chartFolder,c(key$MARKER,key$FIGURE,key$AREA,key$SUBAREA, "HISTOGRAM","ZERO","REMOVED"),ssEnv$plot_format)
         else
@@ -177,14 +182,18 @@ marker_fit_to_distribution <- function()
         #   }
         # }
 
+        if(ssEnv$showprogress)
+          progress_bar(sprintf("Doing fitting: %s", stringr::str_pad(key$MARKER, 10, pad = " ")))
+
+        # result_temp <- plyr::rbind.fill(result_temp, res_temp)
         res_temp
       }
-    # res <- plyr::rbind.fill(res, res_temp)
   }
+  # res <- plyr::rbind.fill(res, res_temp)
   dataFolder <- dir_check_and_create(ssEnv$result_folderData,c("Distributions"))
   # close_env()
   filename  =  file_path_build(dataFolder,c("SUMMARY", "HISTOGRAM"),"csv")
-  utils::write.csv(res, file = filename, row.names = FALSE)
+  utils::write.csv(result_temp, file = filename, row.names = FALSE)
 }
 
 # Funzione per aggiungere curve di distribuzione teoriche
