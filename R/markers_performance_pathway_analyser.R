@@ -2,9 +2,11 @@
 markers_performance_pathway_analyser <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
   significance = TRUE,disease_hpo, disease_description,keywords,stop_keywords,alphas,top=50, ...)
 {
-
   #
-  disease_original <- gsub("[:]","_",disease_hpo)
+  if(length(disease_hpo)>0)
+    disease_original <- gsub("[:]","_",disease_hpo)
+  else
+  disease_original <- ""
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   keys <- unique(ssEnv$keys_for_pathway)
   inference_details <- as.data.frame(inference_details)
@@ -120,12 +122,10 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
             # remove item with the stop kewywords where by_keyword is TRUE
             pathway_result[pathway_result$by_keyword,"by_keyword"] <- sapply(pathway_result[pathway_result$by_keyword,column_of_description], function(x) !any(grepl(paste(stop_keywords, collapse = "|"), x, ignore.case = TRUE)))
 
-          if (!exists("aggregated_patwhay_result_total"))
-            aggregated_patwhay_result_total <- pathway_result
-          else
             aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
         }
 
+        
         if(nrow(aggregated_patwhay_result_total)==0)
           next
 
@@ -348,8 +348,8 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
         #
         key_gene_set_pivot_summary <- unique(merge(key_gene_set_pivot_summary, aggregated_patwhay_result_total[,c(column_of_id,"by_keyword")], by=column_of_id, all.x=TRUE))
-
-        key_gene_set_pivot_summary <- subset(key_gene_set_pivot_summary, by_keyword == TRUE)
+        if(any(key_gene_set_pivot_summary$by_keyword == TRUE))
+          key_gene_set_pivot_summary <- subset(key_gene_set_pivot_summary, by_keyword == TRUE)
 
         # # calculate min excludinf Inf
         # key_gene_set_pivot_summary$min <- apply(key_gene_set_pivot_summary[,which(colnames(key_gene_set_pivot_summary) %in% unique(ssEnv$keys_markers_figures$MARKER))],
@@ -359,6 +359,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # key_gene_set_pivot_summary$total <- apply(key_gene_set_pivot_summary[,which(colnames(key_gene_set_pivot_summary) %in% unique(ssEnv$keys_markers_figures$MARKER))],
         #   1, function(x) colnames(key_gene_set_pivot_summary)[which(x==min(x, na.rm = TRUE))])
 
+        
         # put in total the column name of the lowest value excluding Inf
         key_gene_set_pivot_summary$total <- apply(key_gene_set_pivot_summary[,which(colnames(key_gene_set_pivot_summary) %in% unique(ssEnv$keys_markers_figures$MARKER))],
           1, function(x) {
@@ -380,6 +381,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
 
 
+        
         if(key_pathway[pt,"type"]=="Pathway")
           filename <- paste(ssEnv$result_folderPathway, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
         else

@@ -8,7 +8,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, tech = tech)
   chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_PROBE")
 
-  browser()
+  
   annotate_bed()
   create_excel_pivot()
   result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")

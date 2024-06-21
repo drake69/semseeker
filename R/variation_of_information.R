@@ -48,7 +48,7 @@ variation_of_information <- function(original, quantized) {
   # VI <- H_original + H_quantized - 2 * H_joint
 
   # if(VI<0)
-  #   browser()
+  #   
 
   # Return the calculated Variation of Information
 
