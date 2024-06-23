@@ -20,7 +20,7 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   if (is.family_dicotomic(family_test))
     {
       test_factor <- as.factor(tempDataFrame[, independent_variable])
-      # 
+      #
       independent_variableLevels <- NA
       independentVariableIsFactor <- FALSE
       if(length(levels(test_factor))<4)
@@ -66,8 +66,8 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
     }
   }
 
-  if(transformation == "log")
-    burden_values <- burden_values + 0.001
+  if(grepl("log",transformation))
+    burden_values <- burden_values + min(burden_values[burden_values>0])
 
   transformation <- as.character(transformation)
   if(is.null(transformation) | length(transformation)==0 | is.na(transformation))

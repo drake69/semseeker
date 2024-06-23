@@ -1,6 +1,7 @@
 polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot)
 {
 
+  # browser()
   ssEnv <- get_session_info()
 
   # plynomial_degree_partition-partition_percentage
@@ -22,6 +23,7 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   dep_var <- sig.formula_vars(sig.formula)
   dependent_variable <- dep_var$dependent_variable
   independent_variable <- dep_var$independent_variable
+  covariates <- dep_var$covariates
 
   if(length(polynomial_params)==4)
     if(polynomial_params[4]=="predictor")
@@ -36,8 +38,25 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   train.data  <- tempDataFrame[training.samples, ]
   test.data <- tempDataFrame[-training.samples, ]
 
-  # Build the polynomial_model_result
-  polynomial_model_result <- stats::lm(eval(parse(text=dependent_variable)) ~ stats::poly(eval(parse(text=independent_variable)), degree, raw = TRUE), data = train.data)
+  # browser()
+  # Build the formula for the model
+  if(length(covariates)>0)
+  {
+    formula <- as.formula(
+      paste(
+        dependent_variable,
+        "~ stats::poly(", independent_variable, ",", degree, ", raw = TRUE) +",
+        paste(covariates, collapse = " + ")
+      )
+    )
+    # Build the polynomial model with covariates
+    polynomial_model_result <- stats::lm(formula, data = train.data)
+  }
+  else
+    # Build the polynomial_model_result
+    polynomial_model_result <- stats::lm(eval(parse(text=dependent_variable)) ~ stats::poly(eval(parse(text=independent_variable)), degree, raw = TRUE), data = train.data)
+
+
 
   # check id polynomial_model_result is null
   if(is.null(polynomial_model_result))
@@ -57,12 +76,14 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   coefficients <- coef(summary(polynomial_model_result))
   # conf_int <- confint(polynomial_model_result)
 
+  res$pvalue <- 0
   significative <- TRUE
   # for each degree extract the p-value
-  for (i in 1:nrow(coefficients)) {
+  for (i in 1:(degree+1)) {
     # i <- 1
     p_value <- coefficients[i,4]
     row_name <- rownames(coefficients)[i]
+    # browser()
     if (row_name =="(Intercept)")
       pval_name <- "PL_INTERCEPT_PVALUE"
     else
@@ -71,9 +92,9 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     significative <- significative & p_value < as.numeric(ssEnv$alpha)
     colnames(p_value) <- pval_name
     res <- cbind(res, p_value)
+    res$pvalue <- max(c(res$pvalue, p_value[1,1]))
   }
 
-  res$pvalue <- max(coefficients[,4])
   colnames(significative) <- "SIGNIFICATIVE"
   res <- cbind(res, significative)
   # remove rowname from res
@@ -82,25 +103,34 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   {
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
     filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
-    # Plotting the fitted curve
-    # ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
-    #   ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
-    #   ggplot2::stat_function(fun = function(x) start_a * exp(start_b * x), color = ssEnv$color_palette[1]) +
-    #   ggplot2::ggtitle("Fitted Exponential Curve") +
-    #   ggplot2::xlab(independent_variable) +
-    #   ggplot2::ylab(dependent_variable)
 
-    # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
-    ggp <- ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
-      ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
-      ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE), color = ssEnv$color_palette_darker[2]) +
-      ggplot2::xlab(independent_variable) +
-      ggplot2::ylab(dependent_variable)
+    # Predict the values for the plot
+    train.data$predicted <- predict(polynomial_model_result, newdata = train.data)
+
+    if(length(covariates)>0)
+    {    library(ggplot2)
+      # Plot the data and the polynomial fit
+      ggp <- ggplot(train.data, aes_string(x = independent_variable, y = dependent_variable)) +
+        geom_point(color = "cyan") +
+        geom_line(aes_string(y = "predicted"), color = "red") +
+        xlab(independent_variable) +
+        ylab(dependent_variable) +
+        ggtitle("Polynomial Fit with Covariates")
+    }
+    else
+    {
+      # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
+      ggp <- ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
+        ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
+        ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE), color = ssEnv$color_palette_darker[2]) +
+        ggplot2::xlab(independent_variable) +
+        ggplot2::ylab(dependent_variable)
+    }
 
     if (nrow(test.data) != 0)
       ggp <- ggp + ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions_test, x = eval(parse(text=independent_variable))), color = ssEnv$color_palette_darker[3]) +
-                ggplot2::xlab(independent_variable) +
-                ggplot2::ylab(dependent_variable)
+      ggplot2::xlab(independent_variable) +
+      ggplot2::ylab(dependent_variable)
 
 
     ggplot2::ggsave(

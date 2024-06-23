@@ -146,6 +146,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             sample_names <-   unique(sample_names[, c("Sample_ID", independent_variable)])
             colnames(sample_names) <- c("Sample_ID", independent_variable)
           }
+          # remove samples with missed values
+          sample_names <- sample_names[complete.cases(sample_names),]
+
           ######################################################################################################
           # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
           # binomiale che si vuole usare per la regressione logistica
@@ -212,7 +215,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   if(any(is.na(study_summary_local[, column_selectors])))
                   {
                     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
-                    next
+                    # remove rows with missing values
+                    study_summary_local <- study_summary_local[complete.cases(study_summary_local[, column_selectors]),]
+                    # browser()
                   }
                   result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
                     key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
@@ -278,11 +283,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   {
                     areas_selection_temp <- areas_selection
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", fname,".")
-                    tempDataFrame <- utils::read.table(gzfile(fname), sep  =  ";", header  =  T)
+                    tempDataFrame <- utils::read.table(gzfile(fname), sep  =  ";", header  =  T, skip = 1)
+                    header <- utils::read.table(gzfile(fname), sep  =  ";", header  =  T, nrows = 1)
+                    colnames(tempDataFrame) <- colnames(header)
+                    rm(header)
                     tempDataFrame <- plyr::rename(tempDataFrame, c("SAMPLEID"  =  "Sample_ID"))
-                    #removes area name (eg. sample_group name)
-                    tempDataFrame <- tempDataFrame[-1,]
-                    #
                     if(length(areas_selection_temp)>0)
                     {
                       #
@@ -313,10 +318,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     # {
                     # tempDataFrameBatch <- tempDataFrame[ (1+h*max_row_count):min((h+1)*max_row_count,nrow(tempDataFrame)), ]
                     tempDataFrameBatch <- tempDataFrame
+                    header_areas <- tempDataFrameBatch[,1]
+                    tempDataFrameBatch <- tempDataFrameBatch[,-1]
                     tempDataFrameBatch <- t(tempDataFrameBatch)
                     tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                    colnames(tempDataFrameBatch) <- tempDataFrameBatch[1,]
-                    tempDataFrameBatch <- tempDataFrameBatch[-1,]
+                    colnames(tempDataFrameBatch) <- header_areas
                     tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
                     if(nrow(tempDataFrameBatch)>1)
@@ -339,7 +345,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       if(any(is.na(tempDataFrameBatch)))
                       {
                         log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
-                        next
+                        # next
                       }
                       result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
                         key  =  key, transformation =  transformation, dototal  =  dototal,
