@@ -1,15 +1,15 @@
 enrichment_analysy_add_category <- function(source, data)
 {
 
+  ssEnv <- get_session_info()
   #TO DO: normalize naming of differente data sources
-
   if(source=="phenolyzer")
     return(data)
 
   data$SS_CATEGORY <- NA
   if(any(source %in% c("WebGestalt","Phenolyzer_WebGestalt")))
   {
-    # 
+    #
     data$type <- toupper(data$type)
     data[data$type=='BP',"SS_CATEGORY"] <- "PROCESS"
     data[data$type=='CC',"SS_CATEGORY"] <- "COMPONENT"
@@ -18,7 +18,7 @@ enrichment_analysy_add_category <- function(source, data)
 
   if(source=="pathfindR")
   {
-    # 
+    #
     data$sources <- toupper(data$sources)
     data[data$source=='GO-BP',"SS_CATEGORY"] <- "PROCESS"
     data[data$source=='GO-MF',"SS_CATEGORY"] <- "FUNCTION"
@@ -28,7 +28,7 @@ enrichment_analysy_add_category <- function(source, data)
 
   if(any(source %in% c("STRINGdb","Phenolyzer_STRINGdb")))
   {
-    # 
+    #
     data$category <- toupper(data$category)
     data$SS_CATEGORY <- data$category
     data[data$category=='PROCESS',"SS_CATEGORY"] <- "PROCESS"
@@ -40,12 +40,7 @@ enrichment_analysy_add_category <- function(source, data)
   with_category <- data[!is.na(data$SS_CATEGORY),]
   categories <- na.omit(unique(with_category$SS_CATEGORY))
 
-  key_pathway <- data.frame("type"="Pathway", "label"="STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment")
-  key_pathway <- rbind(key_pathway,data.frame("type"="Pathway", "label"="Phenolyzer_STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment"))
-  key_pathway <- rbind(key_pathway, data.frame("type"="Pathway","label"="WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
-  key_pathway <- rbind(key_pathway, data.frame("type"="Pathway","label"="Phenolyzer_WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
-  key_pathway <- rbind(key_pathway, data.frame("type"="Phenotype","label"="phenolyzer","column_of_id"="Description","column_of_description"="Description","column_of_pvalue"="Score","column_of_enrichment"="Score"))
-  key_pathway <- rbind(key_pathway,data.frame("type"="Pathway", "label"="pathfindR","column_of_id"="ID","column_of_description"="Term_Description", "column_of_pvalue"="PVALUE_ADJ_ALL_FDR","column_of_enrichment"="Fold_Enrichment"))
+  key_enrichment_format <- ssEnv$key_enrichment_format
 
 
   # Normalization functions
@@ -58,13 +53,13 @@ enrichment_analysy_add_category <- function(source, data)
   {
 
     # fdr
-    column_to_rank <- key_pathway[key_pathway$label==source,"column_of_pvalue"]
+    column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_pvalue"]
     if(max(with_category[,column_to_rank]) == min(with_category[,column_to_rank]))
       with_category$SCORE_FDR <- 1
     else
       with_category$SCORE_FDR <- normalize_minimize(with_category[,column_to_rank])
 
-    column_to_rank <- key_pathway[key_pathway$label==source,"column_of_enrichment"]
+    column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_enrichment"]
     if(max(with_category[,column_to_rank]) == min(with_category[,column_to_rank]))
       with_category$SCORE_ENRICHMENT <- 1
     else

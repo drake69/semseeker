@@ -125,6 +125,18 @@ keys_create <- function(ssEnv, arguments)
   keys <- keys[!(keys$FIGURE=="BOTH" | keys$FIGURE=="BOTHSUM"),]
   ssEnv$keys_for_pathway <- keys
 
+  ########################################################################################################################
+  # prepare keys for enrichment analysis report format
+  key_enrichment_format <- data.frame("type"="Pathway", "label"="STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment")
+  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="Phenolyzer_STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment"))
+  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Pathway","label"="WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
+  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Pathway","label"="Phenolyzer_WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
+  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Phenotype","label"="phenolyzer","column_of_id"="Description","column_of_description"="Description","column_of_pvalue"="Score","column_of_enrichment"="Score"))
+  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="pathfindR","column_of_id"="ID","column_of_description"="Term_Description", "column_of_pvalue"="PVALUE_ADJ_ALL_FDR","column_of_enrichment"="Fold_Enrichment"))
+
+  ssEnv$key_enrichment_format <- key_enrichment_format
+
+
   update_session_info(ssEnv)
 
   return(arguments)
