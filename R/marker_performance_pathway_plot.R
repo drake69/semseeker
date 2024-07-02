@@ -1,4 +1,4 @@
-marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease)
+marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease, performance_category="MARKER")
 {
 
   ssEnv <- get_session_info()
@@ -28,6 +28,8 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease)
   data <- data %>%
     mutate(log_fdr = -log10(P_Value))
 
+  # sort by P_Value desc
+  data <- data[order(data$log_fdr, decreasing = TRUE),]
 
   figures <- unique(data$FIGURE)
   categories <- unique(data$SS_CATEGORY)
@@ -85,11 +87,13 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease)
       library(ggstance)  # Assuming position_dodgev is from ggstance
 
       # sort data by SS_RANK ascending
-      data_to_plot <- data_to_plot[order(data_to_plot$SS_RANK),]
+      # data_to_plot <- data_to_plot[order(data_to_plot$SS_RANK),]
+      # Ensure the data_to_plot$Description is a factor and reorder it based on log_fdr
+      data_to_plot$Description <- reorder(data_to_plot$Description, data_to_plot$log_fdr)
 
       # Create the lollipop plot with vertical dodge and shapes based on key
-      ggplot(data_to_plot, aes(x = log_fdr, y = Description, size = Enrichment, color = MARKER)) +
-        geom_point(aes(shape = MARKER),
+      ggplot(data_to_plot, aes(x = log_fdr, y = Description, size = Enrichment, color = eval(parse(text=performance_category)))) +
+        geom_point(aes(shape = eval(parse(text=performance_category))),
           fill = NA,
           position = position_dodgev(height = 0.5),
           stroke = 1.5) +
@@ -100,7 +104,9 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease)
         labs(
           title = "",
           x = '-log10(P_Value)',
-          y = 'Description'
+          y = 'Description',
+          shape = performance_category,  # Set the shape legend title dynamically
+          color = performance_category   # Set the color legend title dynamically
         ) +
         guides(shape = guide_legend(override.aes = list(size = 5))) + # Show the shape legend
         theme_minimal() +

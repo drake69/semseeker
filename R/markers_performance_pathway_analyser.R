@@ -50,7 +50,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         independent_variable <- inference_detail$independent_variable
         covariates <- paste(inference_detail$covariates, collapse="_")
 
-        file_prfx <- paste( independent_variable, transformation,family_test,covariates, pvalue_column,ssEnv$alpha, sep="_")
+        file_prfx <- paste(independent_variable, transformation,family_test,covariates, pvalue_column,ssEnv$alpha, sep="_")
 
         aggregated_patwhay_result_total <- data.frame()
         missed_keys <- data.frame()
@@ -115,7 +115,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
             pathway_result$PVALUE_ADJ_ALL_FDR <- p.adjust(pathway_result[,"highest_p"], method = "fdr")
 
           }
-
+          pathway_result$by_keyword <- FALSE
           if(length(keywords)>0)
             pathway_result[,"by_keyword"] <- sapply(pathway_result[,column_of_description], function(x) any(grepl(paste(keywords, collapse = "|"), x, ignore.case = TRUE)))
           if(length(stop_keywords)>0)
@@ -125,7 +125,8 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
             aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
         }
 
-        
+        # browser()
+
         if(nrow(aggregated_patwhay_result_total)==0)
           next
 
@@ -133,24 +134,27 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # TO DO: manage comparison of pathways by FIGURE
         aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, FIGURE =="HYPER_HYPO")
 
-        # keep only first fifty pathway
+        aggregated_patwhay_result_total_sign <- subset(aggregated_patwhay_result_total, aggregated_patwhay_result_total[,column_of_pvalue] < ssEnv$alpha)
+
+
+        # browser()
+        # keep only first top taxonomies
         if(key_pathway[pt,"label"]!="phenolyzer")
           aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, SS_RANK <= top)
 
-        # remove rows where column_of_pvalue is greater than alpha
-        if(key_pathway[pt,"label"]=="phenolyzer")
-        {
-          #
-          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] > 0.33,]
-        }
-        else
+        if(key_pathway[pt,"label"]!="phenolyzer" & length(keywords)>0)
           aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] <= 0.05,]
 
-        if(key_pathway[pt,"label"]=="pathfindR")
-        {
+        # remove rows where column_of_pvalue is greater than alpha
+        if(key_pathway[pt,"label"]=="phenolyzer")
+          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] > 0.33,]
 
+        if(key_pathway[pt,"label"]=="pathfindR")
           aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total$support > 0.5,]
-        }
+
+        # browser()
+        if(any(aggregated_patwhay_result_total$by_keyword == TRUE))
+          aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, by_keyword == TRUE)
 
         if (!exists("aggregated_patwhay_result_total"))
           next
@@ -160,7 +164,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
         #
         if (significance & key_pathway[pt,"label"]!="phenolyzer")
-          marker_performance_pathway_plot(aggregated_patwhay_result_total, key_pathway[pt,],file_prfx,path, disease)
+          marker_performance_pathway_plot(aggregated_patwhay_result_total, key_pathway[pt,],file_prfx,path, disease, performance_category="MARKER")
 
         # for each missed key add an empty row
         if(nrow(missed_keys)>0)
@@ -270,86 +274,83 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # remove all columns with NA
         # key_gene_set_pivot_summary <- key_gene_set_pivot_summary[,colSums(is.na(key_gene_set_pivot_summary))<nrow(key_gene_set_pivot_summary)]
 
-        tryCatch(
-          expr = {
-
-            if(ssEnv$openai_api_key !="")
-            {
-
-              #
-              # prompt_text <- paste(" I have a list of specific biological pathways and molecular functions, and I would like to understand if ",
-              #   disease," is associated with each one.",
-              #   " Can you identify which pathways or molecular functions from the list are linked to this disease and and provide the list of those linked ? ",
-              #   " If none of the items on the list are linked, please return an empty string. \n", paste(batch, collapse = "\n"))
-
-
-              # Function to create a prompt and get the response from OpenAI
-              get_openai_response <- function(batch, disease) {
-                #
-                prompt_text <- paste("Give me back, just the list, of the passed items which are associated with ",
-                  disease,".","  If none are connected, give me back an empty string. \n", paste(batch, collapse = "\n"))
-
-                # prompt_text <- paste("I have a list of biological pathways or molecular function I'm passing to you. Give me back a list of those items which are associated with ",
-                #   disease,".","  If none are connected, give me back an empty string. \n", paste(batch, collapse = "\n"))
-
-                # prompt_text <- paste(" I have a list of specific biological pathways and molecular functions, and I would like to understand if ",
-                #   disease," is associated with each one.",
-                #   " Can you identify which pathways or molecular functions from the list are linked to this disease and provide back the list of those linked ? ",
-                #   " If none of the items on the list are linked, please return an empty string. \n", paste(batch, collapse = "\n"))
-
-                # prompt_text <- paste("I have a list of specific biological pathways and molecular functions, and I would like to understand if ",
-                #   disease, " is associated with each one. ",
-                #   "Can you identify which pathways or molecular functions from the list are linked to this disease and provide the list of those linked along with the likelihood of each association? ",
-                #   "If none of the items on the list are linked, please return an empty string.\n",
-                #   paste(batch, collapse = "\n"))
-
-                response <- openai::create_chat_completion(
-                  model = "gpt-4o",
-                  messages = list(
-                    list(role = "user", content = prompt_text)
-                  ),
-                  max_tokens = 1000,
-                  temperature = 0
-                )
-                response_text <- response$choices$message.content
-                # split string by comma and remove whitespace
-                response_vector <- unlist(strsplit(response_text, "\n"))
-                rr <- batch %in% response_vector
-                return(rr)
-              }
-
-              # Process the items in batches
-              batch_size <- 200  # Adjust batch size as needed
-              descriptions <- key_gene_set_pivot_summary[, column_of_description]
-              num_batches <- ceiling(length(descriptions) / batch_size)
-              responses <- logical(length(descriptions))
-
-              for (i in 1:num_batches) {
-                start_idx <- (i - 1) * batch_size + 1
-                end_idx <- min(i * batch_size, length(descriptions))
-                batch <- descriptions[start_idx:end_idx]
-                responses[start_idx:end_idx] <- get_openai_response(batch, disease_description)
-              }
-
-              #
-              # # Create a prompt asking about the connection between each item and the phenotype
-              # prompt <- paste("Give me back a vector of TRUE/FALSE to mark which of the passed items is connected with", disease, "\n", paste(key_gene_set_pivot_summary[,column_of_description], collapse = "\n"))
-              # # Call the OpenAI API
-              # response <- openai::create_completion(prompt, temperature = 0, max_tokens = 1)
-              # # Extract the selected item from the response
-              # selected_item <- response$choices[[1]]$text
-              key_gene_set_pivot_summary[,"openai_suggested_item"] <- responses
-            }
-          },
-          finally = {
-          }
-        )
-
+        # tryCatch(
+        #   expr = {
+        #
+        #     if(ssEnv$openai_api_key !="")
+        #     {
+        #
+        #       #
+        #       # prompt_text <- paste(" I have a list of specific biological pathways and molecular functions, and I would like to understand if ",
+        #       #   disease," is associated with each one.",
+        #       #   " Can you identify which pathways or molecular functions from the list are linked to this disease and and provide the list of those linked ? ",
+        #       #   " If none of the items on the list are linked, please return an empty string. \n", paste(batch, collapse = "\n"))
+        #
+        #
+        #       # Function to create a prompt and get the response from OpenAI
+        #       get_openai_response <- function(batch, disease) {
+        #         #
+        #         prompt_text <- paste("Give me back, just the list, of the passed items which are associated with ",
+        #           disease,".","  If none are connected, give me back an empty string. \n", paste(batch, collapse = "\n"))
+        #
+        #         # prompt_text <- paste("I have a list of biological pathways or molecular function I'm passing to you. Give me back a list of those items which are associated with ",
+        #         #   disease,".","  If none are connected, give me back an empty string. \n", paste(batch, collapse = "\n"))
+        #
+        #         # prompt_text <- paste(" I have a list of specific biological pathways and molecular functions, and I would like to understand if ",
+        #         #   disease," is associated with each one.",
+        #         #   " Can you identify which pathways or molecular functions from the list are linked to this disease and provide back the list of those linked ? ",
+        #         #   " If none of the items on the list are linked, please return an empty string. \n", paste(batch, collapse = "\n"))
+        #
+        #         # prompt_text <- paste("I have a list of specific biological pathways and molecular functions, and I would like to understand if ",
+        #         #   disease, " is associated with each one. ",
+        #         #   "Can you identify which pathways or molecular functions from the list are linked to this disease and provide the list of those linked along with the likelihood of each association? ",
+        #         #   "If none of the items on the list are linked, please return an empty string.\n",
+        #         #   paste(batch, collapse = "\n"))
+        #
+        #         response <- openai::create_chat_completion(
+        #           model = "gpt-4o",
+        #           messages = list(
+        #             list(role = "user", content = prompt_text)
+        #           ),
+        #           max_tokens = 1000,
+        #           temperature = 0
+        #         )
+        #         response_text <- response$choices$message.content
+        #         # split string by comma and remove whitespace
+        #         response_vector <- unlist(strsplit(response_text, "\n"))
+        #         rr <- batch %in% response_vector
+        #         return(rr)
+        #       }
+        #
+        #       # Process the items in batches
+        #       batch_size <- 200  # Adjust batch size as needed
+        #       descriptions <- key_gene_set_pivot_summary[, column_of_description]
+        #       num_batches <- ceiling(length(descriptions) / batch_size)
+        #       responses <- logical(length(descriptions))
+        #
+        #       for (i in 1:num_batches) {
+        #         start_idx <- (i - 1) * batch_size + 1
+        #         end_idx <- min(i * batch_size, length(descriptions))
+        #         batch <- descriptions[start_idx:end_idx]
+        #         responses[start_idx:end_idx] <- get_openai_response(batch, disease_description)
+        #       }
+        #
+        #       #
+        #       # # Create a prompt asking about the connection between each item and the phenotype
+        #       # prompt <- paste("Give me back a vector of TRUE/FALSE to mark which of the passed items is connected with", disease, "\n", paste(key_gene_set_pivot_summary[,column_of_description], collapse = "\n"))
+        #       # # Call the OpenAI API
+        #       # response <- openai::create_completion(prompt, temperature = 0, max_tokens = 1)
+        #       # # Extract the selected item from the response
+        #       # selected_item <- response$choices[[1]]$text
+        #       key_gene_set_pivot_summary[,"openai_suggested_item"] <- responses
+        #     }
+        #   },
+        #   finally = {
+        #   }
+        # )
+        #
 
         #
-        key_gene_set_pivot_summary <- unique(merge(key_gene_set_pivot_summary, aggregated_patwhay_result_total[,c(column_of_id,"by_keyword")], by=column_of_id, all.x=TRUE))
-        if(any(key_gene_set_pivot_summary$by_keyword == TRUE))
-          key_gene_set_pivot_summary <- subset(key_gene_set_pivot_summary, by_keyword == TRUE)
 
         # # calculate min excludinf Inf
         # key_gene_set_pivot_summary$min <- apply(key_gene_set_pivot_summary[,which(colnames(key_gene_set_pivot_summary) %in% unique(ssEnv$keys_markers_figures$MARKER))],
@@ -359,7 +360,8 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # key_gene_set_pivot_summary$total <- apply(key_gene_set_pivot_summary[,which(colnames(key_gene_set_pivot_summary) %in% unique(ssEnv$keys_markers_figures$MARKER))],
         #   1, function(x) colnames(key_gene_set_pivot_summary)[which(x==min(x, na.rm = TRUE))])
 
-        
+        key_gene_set_pivot_summary <- unique(merge(key_gene_set_pivot_summary, aggregated_patwhay_result_total[,c(column_of_id,"by_keyword")], by=column_of_id, all.x=TRUE))
+
         # put in total the column name of the lowest value excluding Inf
         key_gene_set_pivot_summary$total <- apply(key_gene_set_pivot_summary[,which(colnames(key_gene_set_pivot_summary) %in% unique(ssEnv$keys_markers_figures$MARKER))],
           1, function(x) {
@@ -381,7 +383,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
 
 
-        
+
         if(key_pathway[pt,"type"]=="Pathway")
           filename <- paste(ssEnv$result_folderPathway, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
         else
