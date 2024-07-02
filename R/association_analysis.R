@@ -21,7 +21,7 @@
 #'
 #' @importFrom doRNG %dorng%
 #' @export
-association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession",start_fresh = FALSE, ...)
+association_analysis <- function(inference_details,result_folder,sql_condition, maxResources = 90, parallel_strategy  = "multisession",start_fresh = FALSE, ...)
 {
 
 
@@ -118,6 +118,10 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         }
         else
         {
+          # browser()
+          # filter samples using sql_condition
+          study_summary <- filter_sql(sql_condition, study_summary)
+
           if(is.null(covariates) || length(covariates)  ==  0)
           {
             sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable)])
@@ -146,6 +150,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             sample_names <-   unique(sample_names[, c("Sample_ID", independent_variable)])
             colnames(sample_names) <- c("Sample_ID", independent_variable)
           }
+
           # remove samples with missed values
           sample_names <- sample_names[complete.cases(sample_names),]
 
@@ -187,7 +192,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               else
                 study_summary_local <- study_summary
 
-              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
+              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,
+                prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
 
               #
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
@@ -252,7 +258,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               keys <- localKeys_1[localKeys_1$MARKER==markers[a],]
 
               # clean keys from already done association
-              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
+              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,
+                prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
+
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  >10
               dototal <- TRUE
               # clean keys from already done association
