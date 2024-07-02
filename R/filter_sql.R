@@ -1,7 +1,8 @@
 filter_sql <- function(sql_conditions, data_frame)
 {
 
-  
+  # browser()
+
   # check if sql_conditions is am empty string
   if (length(sql_conditions) == 0)
     return(data_frame)
@@ -12,7 +13,7 @@ filter_sql <- function(sql_conditions, data_frame)
     if(!is.null(sql_condition))
       if (sql_condition != "")
       {
-        sql_condition <- toupper(sql_condition)
+        # sql_condition <- toupper(sql_condition)
         sql_condition <- gsub("  ", " ", sql_condition)
         if (grepl("FROM", sql_condition))
         {

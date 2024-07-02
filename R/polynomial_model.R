@@ -102,7 +102,7 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   if(plot)
   {
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
+    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, covariates),ssEnv$plot_format)
 
     # Predict the values for the plot
     train.data$predicted <- predict(polynomial_model_result, newdata = train.data)
@@ -111,18 +111,30 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     {    library(ggplot2)
       # Plot the data and the polynomial fit
       ggp <- ggplot(train.data, aes_string(x = independent_variable, y = dependent_variable)) +
-        geom_point(color = "cyan") +
-        geom_line(aes_string(y = "predicted"), color = "red") +
+        geom_point(color = ssEnv$color_palette[1]) +
+        geom_line(aes_string(y = "predicted"), color = ssEnv$color_palette_darker[2]) +
+        ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE), color = ssEnv$color_palette_darker[3]) +
         xlab(independent_variable) +
         ylab(dependent_variable) +
-        ggtitle("Polynomial Fit with Covariates")
+        ggtitle("")
+      # browser()
+      # formula_string <- paste0(dependent_variable, " ~ poly(", independent_variable, ", ", degree, ", raw = TRUE)",
+      #   ifelse(length(covariates) > 0, paste0(" + ", paste(covariates, collapse = " + ")), ""))
+      #
+      # ggp <- ggplot(train.data, aes(x = independent_variable, y = dependent_variable)) +
+      #   ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
+      #   stat_smooth(method = lm,
+      #     formula = formula,
+      #     color = ssEnv$color_palette_darker[2]) +
+      #   theme_minimal()
     }
     else
     {
       # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
       ggp <- ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
         ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
-        ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE), color = ssEnv$color_palette_darker[2]) +
+        ggplot2::geom_line(aes_string(y = "predicted"), color = ssEnv$color_palette_darker[2]) +
+        ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE), color = ssEnv$color_palette_darker[3]) +
         ggplot2::xlab(independent_variable) +
         ggplot2::ylab(dependent_variable)
     }

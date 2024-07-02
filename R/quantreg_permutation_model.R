@@ -51,6 +51,8 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   dep_var <- sig.formula_vars(sig.formula)
   dependent_variable <- dep_var$dependent_variable
   independent_variable <- dep_var$independent_variable
+  # independent_variable <- dep_var$dependent_variable
+  # dependent_variable <- dep_var$independent_variable
 
   tau <- as.numeric(quantreg_params[2])
   n_permutations_test <- as.numeric(quantreg_params[3])

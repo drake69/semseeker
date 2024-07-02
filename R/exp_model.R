@@ -15,6 +15,13 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
   dependent_variable <- dep_var$dependent_variable
   independent_variable <- dep_var$independent_variable
 
+  if(length(exp_params)==3)
+    if(exp_params[3]=="predictor")
+    {
+      dependent_variable <- dep_var$independent_variable
+      independent_variable <- dep_var$dependent_variable
+    }
+
 
   bias_dependent_variable <- min(tempDataFrame[, dependent_variable])
   tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1 - ifelse(bias_dependent_variable < 0, bias_dependent_variable, 0)

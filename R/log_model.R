@@ -12,6 +12,13 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
   dependent_variable <- dep_var$dependent_variable
   independent_variable <- dep_var$independent_variable
 
+  if(length(log_params)==3)
+    if(log_params[3]=="predictor")
+    {
+      dependent_variable <- dep_var$independent_variable
+      independent_variable <- dep_var$dependent_variable
+    }
+
   # bias_dependent_variable <- min(tempDataFrame[, dependent_variable])
   # tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1 - ifelse(bias_dependent_variable < 0, bias_dependent_variable, 0)
   tempDataFrame[, dependent_variable] <- tempDataFrame[, dependent_variable] + 1
@@ -77,7 +84,7 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
 
   }
 
-  # 
+  #
   # Coefficients and Confidence Intervals
   coefficients <- coef(summary(log_model_result))
   # conf_int <- confint(log_model_result)

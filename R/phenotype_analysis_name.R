@@ -14,9 +14,11 @@ phenotype_analysis_name <- function(inference_detail, key,prefix = "", suffix=""
   else
     file_suffix <- paste(covariates, collapse = "_")
 
-  file_suffix = paste(file_suffix, suffix, sep = "")
+  file_suffix = paste(file_suffix, suffix, sep = "_")
 
   analysis_name <- paste(as.character(key$MARKER),as.character(key$FIGURE),as.character(key$AREA),as.character(key$SUBAREA), pvalue_column, significance_label, alpha, prefix , as.character(transformation), as.character(family_test), file_suffix, sep="_")
+
+  analysis_name <- name_cleaning(analysis_name)
 
   return(analysis_name)
 }
