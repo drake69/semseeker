@@ -1,4 +1,4 @@
-execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation="", plot=FALSE){
+execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation="", plot=FALSE, samples_sql_condition){
 
   transformation <- as.character(transformation)
   family_test <- as.character(family_test)
@@ -22,13 +22,13 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
     model_result <- spearman_permutation(family_test, sig.formula, tempDataFrame, independent_variable)
 
   if(grepl("polynomial",family_test))
-    model_result <- polynomial_model(family_test, tempDataFrame, sig.formula, transformation, plot)
+    model_result <- polynomial_model(family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition)
 
   if(grepl("exp",family_test))
-    model_result <- exp_model(family_test, tempDataFrame, sig.formula, transformation, plot)
+    model_result <- exp_model(family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition)
 
   if(grepl("log",family_test))
-    model_result <- log_model(family_test, tempDataFrame, sig.formula, transformation, plot)
+    model_result <- log_model(family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition)
 
   if(grepl("mediation-quantreg",family_test))
     model_result <- mediation_quantreg_model(family_test, tempDataFrame, sig.formula, transformation, plot)
