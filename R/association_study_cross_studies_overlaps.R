@@ -1,8 +1,10 @@
 # compare inference associations of differente studies
-association_cross_studies_overlaps <- function(inference_detail, studies,pvalue = 0.05, adjust_per_area = F,
+association_cross_studies_overlaps <- function(inference_detail, studies,alpha = 0.05, adjust_per_area = F,
   adjust_globally = F,pvalue_column="PVALUE_ADJ_ALL_BH",statistic_parameter, adjustment_method = "BH",
-  result_folder, ...)
+  result_folder, areas_sql_condition, ...)
 {
+
+
 
   pvalue_column <- name_cleaning(pvalue_column)
   if (nrow(inference_detail) >1)
@@ -15,6 +17,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,pvalue 
   }
 
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
+  cross_study_env <- ssEnv
 
   log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will perform the cross study association analysys for projects \n ", paste0(studies$STUDY, collapse = ", "))
 
@@ -31,24 +34,24 @@ association_cross_studies_overlaps <- function(inference_detail, studies,pvalue 
       # for each study in studies
       for (s in 1:nrow(studies))
       {
-        #
         # get the inference details for the study
         result_folder_study <- studies[s,"RESULT_FOLDER"]
-        ssEnv$result_folderInference <- dir_check_and_create(result_folder_study, "Inference")
-        update_session_info(ssEnv)
-        temp_res <- get_results_areas_inference(inference_details = inference_detail, marker = MARKER, area= AREA,
+        ssEnv <- init_env( result_folder =  result_folder_study, start_fresh = FALSE,alpha=alpha, ...)
+
+
+        temp_res <- get_results_areas_inference(inference_detail = inference_detail, marker = MARKER, area= AREA,
           adjust_per_area = adjust_per_area, adjust_globally = adjust_globally, pvalue_column= pvalue_column,
-          adjustment_method = adjustment_method, significance = signif)
+          adjustment_method = adjustment_method, significance = signif, areas_sql_condition = areas_sql_condition)
         if(nrow(temp_res) != 0)
           temp_res$STUDY <- studies[s,"STUDY"]
         aggregated_study_results <- plyr::rbind.fill(aggregated_study_results, temp_res)
       }
     }
 
+
     # change STUDY column to take int account the direction of the statistic
     # aggregated_study_results$STUDY <- as.character(paste0(aggregated_study_results$STUDY,"_", ifelse((aggregated_study_results[,statistic_parameter] > 0),"INCR","DECR") ))
-    ssEnv$result_folderInference <- dir_check_and_create(result_folder, "Inference")
-    update_session_info(ssEnv)
+    update_session_info(cross_study_env)
     ssEnv <- get_session_info(result_folder)
 
 
@@ -60,17 +63,17 @@ association_cross_studies_overlaps <- function(inference_detail, studies,pvalue 
     if(signif)
       for (m in unique(aggregated_study_results$MARKER))
       {
-        # 
+        #
         tt <- subset(aggregated_study_results, MARKER == m)
         if(statistic_parameter!="")
         {
           tt <- tt[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","DEPTH",statistic_parameter, pvalue_column)]
           # summirise grouping by "AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST" and calculate the max of the pvalues and the mean of the statistic parameter
-          # tt <- plyr::ddply(tt, .(AREA, SUBAREA, MARKER, FIGURE, AREA_OF_TEST), summarise, pvalue = max(get(pvalue_column), na.rm = T),
+          # tt <- plyr::ddply(tt, .(AREA, SUBAREA, MARKER, FIGURE, AREA_OF_TEST), summarise, alpha = max(get(pvalue_column), na.rm = T),
           #   statistic_parameter = mean(get(statistic_parameter), na.rm = T))
           tt <- tt %>%
             dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE, AREA_OF_TEST,DEPTH) %>%
-            dplyr::summarise(pvalue = max(get(pvalue_column), na.rm = TRUE),
+            dplyr::summarise(alpha = max(get(pvalue_column), na.rm = TRUE),
               statistic_parameter = mean(get(statistic_parameter), na.rm = TRUE)) %>%
             dplyr::ungroup()
         }
@@ -80,14 +83,27 @@ association_cross_studies_overlaps <- function(inference_detail, studies,pvalue 
           # summirise grouping by "AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST" and calculate the max of the pvalues
           tt <- tt %>%
             dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE, AREA_OF_TEST,DEPTH) %>%
-            dplyr::summarise(pvalue = max(get(pvalue_column), na.rm = TRUE)) %>%
+            dplyr::summarise(alpha = max(get(pvalue_column), na.rm = TRUE)) %>%
             dplyr::ungroup()
         }
         # rename pvalue_column to the original name
-        colnames(tt)[colnames(tt) == "pvalue"] <- pvalue_column
+        colnames(tt)[colnames(tt) == "alpha"] <- pvalue_column
         filename <- inference_file_name(inference_detail, m, ssEnv$result_folderInference,prefix="" )
+
+        if(file.exists(filename))
+        {
+          old_results <- read.csv2(filename, header = TRUE, stringsAsFactors = FALSE)
+          # remove statistic_parameter column
+          old_results <- old_results[,!colnames(old_results) %in% c(statistic_parameter)]
+          # if pvalue_column doesn't exosts merge them
+          if(!pvalue_column %in% colnames(old_results))
+            tt <- merge(old_results, tt, all = TRUE, by = c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","DEPTH"))
+        }
         write.csv2(tt, filename, row.names = F)
       }
+
+    if(nrow(aggregated_study_results)==0)
+      next
 
     if(statistic_parameter!="")
       aggregated_study_results <- unique(aggregated_study_results[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","STUDY",statistic_parameter, pvalue_column)])
@@ -141,7 +157,8 @@ association_cross_studies_overlaps <- function(inference_detail, studies,pvalue 
       # message(studies_comb)
       # for(k in 1: ncol(studies_comb))
       {
-        #
+
+
         # results_inference_comb <- subset(aggregated_study_results, STUDY %in% studies_comb[,k])
         results_inference_comb <- aggregated_study_results
         keys <- unique(results_inference_comb[, c("SUBAREA", "AREA", "MARKER", "FIGURE")])
@@ -167,9 +184,10 @@ association_cross_studies_overlaps <- function(inference_detail, studies,pvalue 
           # remove _
 
           categories <- gsub("_", " ", categories)
+          folder <- dir_check_and_create(ssEnv$result_folderChart,"OVERLAPS")
           filename <-
             paste(
-              ssEnv$result_folderChart,  "/",
+              folder,  "/",
               keys[i, ]$AREA,
               "_",
               keys[i, ]$SUBAREA,
@@ -177,6 +195,8 @@ association_cross_studies_overlaps <- function(inference_detail, studies,pvalue 
               keys[i, ]$MARKER,
               "_",
               keys[i, ]$FIGURE,
+              "_",
+              pvalue_column,
               "_",
               ifelse(signif,"SIGNIFICANT","NOT_SIGNIFICANT"),
               "_venn_diagramm.",

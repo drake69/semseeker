@@ -1,6 +1,6 @@
 #' @export
 gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_globally_s, pvalue_columns, adjustment_methods,alphas,
-  study, significance,statistic_parameter, sql_condition="",path_dbs, phenolyzer_folder_bin,disease,
+  study, significance,statistic_parameter, areas_sql_condition="",path_dbs, phenolyzer_folder_bin,disease,
   phenolyser=F, WebGestalt=F, pathfindr=F,STRINGdb=F,Phenolyzer_STRINGdb=F,Phenolyzer_WebGestalt=F,
   result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
@@ -46,8 +46,8 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
             adjustment_method = adjustment_method,
             pvalue_column = pvalue_column,
             inference_details = inference_detail,
-            sql_condition = sql_condition,
-            significance = significance
+            significance = significance,
+            areas_sql_condition = areas_sql_condition
           )
 
         if(Phenolyzer_STRINGdb)
@@ -58,14 +58,14 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
             adjust_globally = adjust_globally,
             adjustment_method = adjustment_method,
             pvalue_column = pvalue_column,
-            inference_details = inference_detail,
-            sql_condition = sql_condition,
+            inference_detail = inference_detail,
             significance = significance,
-            disease = disease
+            disease = disease,
+            areas_sql_condition = areas_sql_condition
           )
 
 
-        if (WebGestalt)
+        if (Phenolyzer_WebGestalt)
           pathway_Phenolyzer_WebGestalt(
             study = study,
             types=c("BP","MF"),
@@ -74,10 +74,10 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
             adjust_globally = adjust_globally,
             adjustment_method = adjustment_method,
             pvalue_column = pvalue_column,
-            inference_details = inference_detail,
-            sql_condition = sql_condition,
+            inference_detail = inference_detail,
             significance = significance,
-            disease = disease
+            disease = disease,
+            areas_sql_condition = areas_sql_condition
           )
 
 
@@ -89,9 +89,9 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
             adjust_globally = adjust_globally,
             adjustment_method = adjustment_method,
             pvalue_column = pvalue_column,
-            inference_details = inference_detail,
-            sql_condition = sql_condition,
-            significance = significance
+            inference_detail = inference_detail,
+            significance = significance,
+            areas_sql_condition = areas_sql_condition
           )
 
         if(pathfindr)
@@ -105,7 +105,7 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
             adjustment_method = adjustment_method,
             pvalue_column = pvalue_column,
             inference_details = inference_detail,
-            sql_condition = sql_condition,
+            areas_sql_condition = areas_sql_condition,
             significance = significance
           )
 
@@ -119,9 +119,9 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
             adjust_globally = adjust_globally,
             adjustment_method = adjustment_method,
             pvalue_column = pvalue_column,
-            inference_details = inference_detail,
-            sql_condition = sql_condition,
-            significance = significance
+            inference_detail = inference_detail,
+            significance = significance,
+            areas_sql_condition = areas_sql_condition
           )
 
       }

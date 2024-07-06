@@ -3,10 +3,10 @@
 pathway_Phenolyzer_STRINGdb <- function(study,
   statistic_parameter="",disease,
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details, significance = TRUE,sql_condition = "")
+  inference_detail, significance = TRUE, areas_sql_condition)
 {
 
-  # 
+  #
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   pvalue_column <- name_cleaning(pvalue_column)
@@ -23,7 +23,7 @@ pathway_Phenolyzer_STRINGdb <- function(study,
     return()
   }
 
-  total_progress <- nrow(keys)*nrow(inference_details)
+  total_progress <- nrow(keys)*nrow(inference_detail)
   progress <- 0
 
   if(ssEnv$showprogress)
@@ -34,9 +34,9 @@ pathway_Phenolyzer_STRINGdb <- function(study,
   string_db <- STRINGdb::STRINGdb$new(version="11.5", species=9606, # 9606 is the taxonomy ID for Homo sapiens
     score_threshold=400, input_directory="")
 
-  for(id in 1:nrow(inference_details))
+  for(id in 1:nrow(inference_detail))
   {
-    inference_detail <- inference_details[id,]
+    inference_detail <- inference_detail[id,]
     # foreach::foreach(i = 1:nrow(keys)) %dorng%
     for(i in 1:nrow(keys))
     {
@@ -56,7 +56,7 @@ pathway_Phenolyzer_STRINGdb <- function(study,
         suffix = "without_signal_"
 
       phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
-      path <- dir_check_and_create(ssEnv$result_folderPathway,"Phenolyzer_STRINGdb")
+      path <- dir_check_and_create(ssEnv$result_folderPathway,c("Phenolyzer_STRINGdb",name_cleaning(areas_sql_condition), name_cleaning(inference_detail$samples_sql_condition)))
       pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
 
       if(file.exists(pathway_report_path))
@@ -71,7 +71,7 @@ pathway_Phenolyzer_STRINGdb <- function(study,
       #### START LOAD PHENOLYZER
       # load prioritized gene by phenolyzer
       base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer"))
-      phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_", disease,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+      phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_", disease,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
       path_phenolyzer <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
       phenotype_report_path <- file_path_build(path_phenolyzer,phenotype_analysis_name,"csv")
 

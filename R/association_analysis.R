@@ -21,7 +21,7 @@
 #'
 #' @importFrom doRNG %dorng%
 #' @export
-association_analysis <- function(inference_details,result_folder,sql_condition, maxResources = 90, parallel_strategy  = "multisession",start_fresh = FALSE, ...)
+association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession",start_fresh = FALSE, ...)
 {
 
 
@@ -71,6 +71,10 @@ association_analysis <- function(inference_details,result_folder,sql_condition, 
     covariates <- covariates[lengths(covariates)  !=  0]
     covariates <- covariates[covariates  !=  ""]
     family_test <- inference_detail$family_test
+    study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+    # filter samples using samples_sql_condition
+    study_summary <- filter_sql(inference_detail$samples_sql_condition, study_summary)
+    results <- data.frame()
     if (validate_family_test(family_test))
     {
       transformation <- inference_detail$transformation
@@ -98,7 +102,6 @@ association_analysis <- function(inference_details,result_folder,sql_condition, 
           log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missed DEPTH analysis inference forced to 1.")
         }
 
-        study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
 
         # transform independent variable as factor
         if(family_test  ==  "binomial" || family_test  ==  "wilcoxon" || family_test  ==  "t.test")
@@ -118,9 +121,6 @@ association_analysis <- function(inference_details,result_folder,sql_condition, 
         }
         else
         {
-          # browser()
-          # filter samples using sql_condition
-          study_summary <- filter_sql(sql_condition, study_summary)
 
           if(is.null(covariates) || length(covariates)  ==  0)
           {
@@ -174,7 +174,6 @@ association_analysis <- function(inference_details,result_folder,sql_condition, 
           markers <- unique(localKeys$MARKER)
           for (a in 1:length(markers))
           {
-
             results <- data.frame()
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
@@ -226,7 +225,7 @@ association_analysis <- function(inference_details,result_folder,sql_condition, 
                     # browser()
                   }
                   result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
-                    key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
+                    key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
                   results <- plyr::rbind.fill(results, result_temp)
                 }
 
@@ -357,7 +356,7 @@ association_analysis <- function(inference_details,result_folder,sql_condition, 
                       }
                       result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
                         key  =  key, transformation =  transformation, dototal  =  dototal,
-                        session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,  ...)
+                        session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
 
                       results <- plyr::rbind.fill(results, result_temp_local_batch)
                     }
@@ -377,6 +376,10 @@ association_analysis <- function(inference_details,result_folder,sql_condition, 
               rm(result_temp_local_batch)
             if(exists("tempDataFrame"))
               rm(tempDataFrame)
+
+            # remove any column containing in the name samples_sql_condition
+            results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
+            # results$samples_sql_condition <- inference_detail$samples_sql_condition
             save_result(results,fileNameResults, family_test, filter_p_value )
 
           }
@@ -400,6 +403,7 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
   if(nrow(results)==0)
     return()
 
+  results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
   results <- unique(results)
 
   pvalue_columns <- colnames(results)[grepl("PVALUE", colnames(results)) & !grepl("_ADJ", colnames(results))]
@@ -426,6 +430,9 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
     if(filter_p_value)
       results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results$PVALUE_ADJ_ALL_FDR < as.numeric(ssEnv$alpha))
   }
+
+  if(nrow(results)==0)
+    return()
 
 
   results$DEPTH <- 3

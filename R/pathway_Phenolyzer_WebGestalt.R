@@ -1,7 +1,7 @@
 pathway_Phenolyzer_WebGestalt <- function(study,
   types=c("BP","MF"),  enrich_methods = c("ORA"),disease,
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details,significance,sql_condition="")
+  inference_detail,significance, areas_sql_condition)
 {
 
   #
@@ -10,7 +10,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
   ssEnv <- get_session_info()
   pvalue_column <- name_cleaning(pvalue_column)
   keys <- unique(ssEnv$keys_for_pathway)
-  path <- dir_check_and_create(ssEnv$result_folderPathway,"Phenolyzer_WebGestalt")
+  path <- dir_check_and_create(ssEnv$result_folderPathway,c("Phenolyzer_WebGestalt",name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
   tmp <- tempdir()
   tempFolder <- dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
 
@@ -34,7 +34,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
       type <- types[t]
       for ( em in 1:length(enrich_methods))
       {
-        projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  ,
+        projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  ,
           pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
         filenameResult = file_path_build(path,projectName,"csv")
 
@@ -60,7 +60,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
         #### START LOAD PHENOLYZER
         # load prioritized gene by phenolyzer
         base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer"))
-        phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_", disease,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+        phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_", disease,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
         path_phenolyzer <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
         phenotype_report_path <- file_path_build(path_phenolyzer,phenotype_analysis_name,"csv")
 
@@ -79,7 +79,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
 
         #### END LOAD PHENOLYZER
 
-        projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix= paste(type,enrich_method, sep="_") , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
+        projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix= paste(type,enrich_method, sep="_") , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
         geneFile <- file.path(system.file(package="WebGestaltR"),"extdata/interestingGenes.txt")
         write.table(unique(gene_set$Gene),geneFile,row.names=FALSE,col.names = FALSE,quote =FALSE)
 
@@ -126,7 +126,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
 
         if(nrow(enrichResult)==0)
           next
-        enrichResult$alpha <- as.numeric(ssEnv$alpha)
+        enrichResult$ALPHA <- as.numeric(ssEnv$alpha)
         enrichResult$pvalue_column <- pvalue_column
         enrichResult$type <- type
         enrichResult$enrich_method <- enrich_method
@@ -189,7 +189,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
 
     if(exists("enrichResultFinal"))
     {
-      projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
+      projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
       filenameResult = file_path_build(path,projectName,"csv")
       write.csv2(enrichResultFinal, filenameResult)
       rm(enrichResultFinal)

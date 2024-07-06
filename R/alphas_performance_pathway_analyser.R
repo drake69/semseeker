@@ -1,0 +1,175 @@
+#' @export
+alphas_performance_pathway_analyser <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
+  significance = TRUE,disease_hpo, disease_description,keywords,stop_keywords,alphas,top=50,pathway_alpha=0.05,areas_sql_condition, ...)
+{
+  #
+  if(length(disease_hpo)>0)
+    disease_original <- gsub("[:]","_",disease_hpo)
+  else
+    disease_original <- ""
+  ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
+  keys <- unique(ssEnv$keys_for_pathway)
+  inference_details <- as.data.frame(inference_details)
+  pvalue_column <- name_cleaning(pvalue_column)
+  key_enrichment_format <- ssEnv$key_enrichment_format
+  key_enrichment_format <- subset(key_enrichment_format, key_enrichment_format[,"label"]!="phenolyzer")
+
+  for (i in 1:nrow(keys))
+  {
+
+    for (pt in 1:nrow(key_enrichment_format))
+    {
+
+      column_of_id <- key_enrichment_format[pt,"column_of_id"]
+      column_of_pvalue <- key_enrichment_format[pt,"column_of_pvalue"]
+      column_of_description <- key_enrichment_format[pt,"column_of_description"]
+      column_of_enrichment <- key_enrichment_format[pt,"column_of_enrichment"]
+
+      for (id in 1:nrow(inference_details))
+      {
+
+        inference_detail <- inference_details[id,]
+        if(key_enrichment_format[pt,"type"]=="Pathway")
+          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+        else
+          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+
+        aggregated_patwhay_result_total <- data.frame()
+        missed_keys <- data.frame()
+        family_test <- inference_detail$family_test
+        transformation <- as.character(inference_detail$transformation)
+        independent_variable <- inference_detail$independent_variable
+        covariates <- paste(inference_detail$covariates, collapse="_")
+
+        file_prfx <- paste(independent_variable, transformation,family_test,covariates, pvalue_column,keys[i,"MARKER"], sep="_")
+
+        for (a in alphas)
+        {
+          ssEnv$alpha <- a
+          update_session_info(ssEnv)
+          file_name <- phenotype_analysis_name(inference_detail = inference_detail,key = keys[i,], prefix="",
+            suffix="",
+            pvalue_column=pvalue_column, alpha = ssEnv$alpha, significance = significance)
+          file_name = file_path_build(path,file_name,"csv")
+          # chech agin with disease without underscore
+          if(!file.exists(file_name))
+          {
+            file_name <- phenotype_analysis_name(inference_detail = inference_detail,key = keys[i,], prefix="",
+              suffix="",
+              pvalue_column=pvalue_column, alpha = ssEnv$alpha, significance = significance)
+            file_name = file_path_build(path,file_name,"csv")
+          }
+
+          # check with without_signal at the end for pathfindR
+          if(!file.exists(file_name))
+          {
+            file_name <- phenotype_analysis_name(inference_detail = inference_detail,key = keys[i,], prefix="",
+              suffix="",
+              pvalue_column=pvalue_column, alpha = ssEnv$alpha, significance = significance)
+            file_name = file_path_build(path,c(file_name,"without_signal"),"csv")
+          }
+
+
+          if (!file.exists(file_name))
+          {
+            # add a row if the file is missed it means non pathway was found !
+            missed_keys <- plyr::rbind.fill(missed_keys, keys[i,])
+            log_event("WARNING:", format(Sys.time(), "%a %b %d %X %Y") , " pathway_result ", file_name, " is missed !")
+            next
+          }
+
+          pathway_result <- read.csv2(file_name)
+
+          cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
+          # check column names contain the required columns
+          if(!all(cols_to_check %in% colnames(pathway_result)))
+          {
+
+            log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y") , " column_of_id ", column_of_id, " is missed in ", file_name)
+            next
+          }
+
+          pathway_result$MARKER <- keys[i,"MARKER"]
+          pathway_result$FIGURE <- keys[i,"FIGURE"]
+          # pathway_result$key <- paste(pathway_result$MARKER,pathway_result$FIGURE,pathway_result$AREA,pathway_result$SUBAREA,sep="_")
+
+          if(key_enrichment_format[pt,"label"]=="pathfindR")
+          {
+            # adjust pvalue
+            pathway_result$PVALUE_ADJ_ALL_FDR <- p.adjust(pathway_result[,"highest_p"], method = "fdr")
+
+          }
+          pathway_result$by_keyword <- FALSE
+          if(length(keywords)>0)
+            pathway_result[,"by_keyword"] <- sapply(pathway_result[,column_of_description], function(x) any(grepl(paste(keywords, collapse = "|"), x, ignore.case = TRUE)))
+          if(length(stop_keywords)>0)
+            # remove item with the stop kewywords where by_keyword is TRUE
+            pathway_result[pathway_result$by_keyword,"by_keyword"] <- sapply(pathway_result[pathway_result$by_keyword,column_of_description], function(x) !any(grepl(paste(stop_keywords, collapse = "|"), x, ignore.case = TRUE)))
+
+          pathway_result$ALPHA <- ssEnv$alpha
+          pathway_result <- enrichment_analysy_add_category(key_enrichment_format[pt,"label"],pathway_result)
+          aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
+        }
+
+        if(nrow(aggregated_patwhay_result_total)==0)
+          next
+
+        # TO DO: manage comparison of pathways by FIGURE
+        aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, FIGURE =="HYPER_HYPO")
+
+        # keep only first top taxonomies
+        aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, SS_RANK <= top)
+
+        if(nrow(aggregated_patwhay_result_total) == 0)
+          next
+
+        if(length(keywords)>0)
+          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] < pathway_alpha,]
+
+        if(nrow(aggregated_patwhay_result_total) == 0)
+          next
+        # browser()
+        # if(any(aggregated_patwhay_result_total$by_keyword == TRUE))
+        #   aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, by_keyword == TRUE)
+
+        if(nrow(aggregated_patwhay_result_total) == 0)
+          next
+
+        if (significance)
+          marker_performance_pathway_plot(aggregated_patwhay_result_total, key_enrichment_format[pt,],file_prfx,path, "", performance_category="ALPHA", top=top)
+      }
+    }
+  }
+}
+
+# Function to find unique gene sets for each key
+find_unique_gene_sets <- function(split_list) {
+  unique_sets <- list()
+  keys <- names(split_list)
+
+  for (k in 1:length(keys)) {
+
+    key <- keys[k]
+    # Start with the current key's gene sets
+    current_sets <- split_list[[key]]
+
+    # Get all other keys
+    other_keys <- setdiff(keys, key)
+
+    # Combine gene sets from all other keys
+    other_sets <- unlist(split_list[other_keys], use.names = FALSE)
+
+    # Find gene sets unique to the current key
+    unique_to_current <- setdiff(current_sets, other_sets)
+
+    # Store the unique gene sets with the key as the name
+    unique_sets[[key]] <- unique_to_current
+  }
+
+  # remove empty sets
+  unique_sets <- unique_sets[sapply(unique_sets, length) > 0]
+
+  return(unique_sets)
+}
+
+

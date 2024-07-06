@@ -2,10 +2,10 @@ pathway_pathfindR_circlize <- function(
     pathways_selection,
   statistic_parameter="", adjust_per_area = F, adjust_globally = F,adjustment_method = "BH",
   pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details, significance = TRUE,sql_condition = "",
+  inference_details, significance = TRUE,areas_sql_condition = "",
   result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
-  
+
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
   keys <- unique(ssEnv$keys_for_pathway)
   total_progress <- nrow(keys)*nrow(inference_details)
@@ -30,7 +30,7 @@ pathway_pathfindR_circlize <- function(
         suffix = "without_signal_"
 
       phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
-      path <- dir_check_and_create(ssEnv$result_folderPathway,"pathfindR")
+      path <- dir_check_and_create(ssEnv$result_folderPathway,c("pathfindR",name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
       pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
       message("Pathway report path: ", pathway_report_path)
       if(file.exists(pathway_report_path))
@@ -149,7 +149,7 @@ pathway_pathfindR_circlize <- function(
         link_length <- 2
 
 
-        
+
         phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
         path <- dir_check_and_create(ssEnv$result_folderChart,"pathfindR")
         pathway_report_path <- file_path_build(path,phenotype_analysis_name,"png")

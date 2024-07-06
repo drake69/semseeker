@@ -2,7 +2,7 @@ inference_file_name <- function(inference_detail, marker, folder,file_extension=
 {
   ssEnv <- get_session_info()
 
-  # 
+  #
   covariates <- inference_detail$covariates
   covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
   family_test <- inference_detail$family_test
@@ -20,6 +20,9 @@ inference_file_name <- function(inference_detail, marker, folder,file_extension=
   file_result_prefix <- paste("DEPTH",depth_analysis, file_result_prefix,sep = "_")
   file_result_prefix = paste(prefix, file_result_prefix, sep = "")
   file_suffix = paste(file_suffix, suffix, sep = "")
+
+  if(length(inference_detail$samples_sql_condition)>0)
+    folder <- dir_check_and_create(folder,name_cleaning(inference_detail$samples_sql_condition))
 
   fileNameResults <- file_path_build(folder,c(as.character(marker),file_result_prefix ,file_suffix) , file_extension)
 

@@ -1,8 +1,7 @@
-marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease, performance_category="MARKER")
+marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease, performance_category="MARKER", top=50)
 {
 
   ssEnv <- get_session_info()
-  #
   # Load necessary libraries
   library(ggplot2)
   library(dplyr)
@@ -41,8 +40,8 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
       data_to_plot <- subset(data, FIGURE == f)
       data_to_plot <- subset(data, SS_CATEGORY == c)
 
-      if(any(data_to_plot$by_keyword))
-        data_to_plot <- subset(data_to_plot, by_keyword == TRUE)
+      # if(any(data_to_plot$by_keyword))
+      #   data_to_plot <- subset(data_to_plot, by_keyword == TRUE)
 
       if(nrow(data_to_plot) == 0)
         next
@@ -88,8 +87,33 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
 
       # sort data by SS_RANK ascending
       # data_to_plot <- data_to_plot[order(data_to_plot$SS_RANK),]
+      # get for each Description the mean of log_fdr
+      data_to_plot <- data_to_plot %>%
+        group_by(Description) %>%
+        mutate(mean_log_fdr = mean(log_fdr)) %>%
+        ungroup()
+      data_to_plot <- as.data.frame(data_to_plot)
       # Ensure the data_to_plot$Description is a factor and reorder it based on log_fdr
-      data_to_plot$Description <- reorder(data_to_plot$Description, data_to_plot$log_fdr)
+      # data_to_plot$Description <- reorder(data_to_plot$Description, data_to_plot$mean_log_fdr, decreasing = TRUE)
+      # order data by mean_log_fdr descending
+      data_to_plot <- data_to_plot[order(data_to_plot$mean_log_fdr, decreasing = TRUE),]
+      data_to_plot[,performance_category] <- data_to_plot[,performance_category] %>% as.factor()
+
+      unique_description <- unique(data_to_plot$Description)[1:top]
+      data_to_plot <- data_to_plot[data_to_plot$Description %in% unique_description,]
+
+      data_to_plot <- as.data.frame(data_to_plot)
+      # count the number of unique values in the performance_category column
+      n_unique_values <- length(unique(data_to_plot[,performance_category]))
+      shape_values <- 21:(21+n_unique_values)
+
+      data_to_plot$Description <- ifelse(data_to_plot$by_keyword, paste(data_to_plot$Description, " *"), as.character(data_to_plot$Description))
+
+      # Ensure Description is a factor and preserve its order
+      data_to_plot$Description <- factor(data_to_plot$Description, levels = unique(data_to_plot$Description))
+
+      # invert the order of the Description
+      data_to_plot$Description <- factor(data_to_plot$Description, levels = rev(levels(data_to_plot$Description)))
 
       # Create the lollipop plot with vertical dodge and shapes based on key
       ggplot(data_to_plot, aes(x = log_fdr, y = Description, size = Enrichment, color = eval(parse(text=performance_category)))) +
@@ -97,10 +121,11 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
           fill = NA,
           position = position_dodgev(height = 0.5),
           stroke = 1.5) +
-        scale_shape_manual(values = c(21, 22, 23, 24, 25)) + # Customize shape values as needed
+        scale_shape_manual(values = shape_values) + # Customize shape values as needed
         scale_size_continuous(range = c(3, 10)) + # Adjust the range for point sizes
         scale_color_manual(values = custom_colors) + # Add custom colors for points
-        geom_vline(xintercept = -log10(0.05), linetype = "dashed", color = ssEnv$color_palette[1], size = 1) + # Add vertical line at FDR = 1
+        geom_vline(xintercept = -log10(0.05), linetype = "dashed", color = ssEnv$color_palette[1], size = 1) + # Add vertical line at FDR = 0.05
+        geom_vline(xintercept = -log10(0.01), linetype = "dashed", color = ssEnv$color_palette[2], size = 1) + # Add vertical line at FDR = 0.05
         labs(
           title = "",
           x = '-log10(P_Value)',

@@ -3,10 +3,10 @@
 pathway_STRINGdb <- function(study,
   statistic_parameter="",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details, significance = TRUE,sql_condition = "")
+  inference_details, significance = TRUE, areas_sql_condition)
 {
 
-  # 
+  #
   tmp <- tempdir()
   tempFolder <- paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
   pvalue_column <- name_cleaning(pvalue_column)
@@ -56,7 +56,7 @@ pathway_STRINGdb <- function(study,
         suffix = "without_signal_"
 
       phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
-      path <- dir_check_and_create(ssEnv$result_folderPathway,"STRINGdb")
+      path <- dir_check_and_create(ssEnv$result_folderPathway,c("STRINGdb",name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
       pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
 
       # if(file.exists(pathway_report_path))
@@ -72,13 +72,13 @@ pathway_STRINGdb <- function(study,
       }
 
       results_inference <- get_results_areas_inference(
-        inference_details =  inference_details,
+        inference_detail =  inference_detail,
         marker = keys[i,"MARKER"],
         adjust_per_area= adjust_per_area,
         adjust_globally = adjust_globally,
         pvalue_column=  pvalue_column,
-        adjustment_method= adjustment_method,
-        sql_condition = sql_condition)
+        adjustment_method = adjustment_method,
+        areas_sql_condition = areas_sql_condition)
 
       if (nrow(results_inference)==0)
         next
@@ -128,7 +128,7 @@ pathway_STRINGdb <- function(study,
 
       log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Number of genes in the gene set: ",nrow(gene_set), " key: ", keys[i,])
 
-      if(nrow(gene_set)<2)
+      if(nrow(gene_set)<5)
         next
 
       log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Started STRINGdb analysis")
@@ -147,6 +147,12 @@ pathway_STRINGdb <- function(study,
       # Assume total background number of genes (for Homo sapiens) is available
       # For example, let's assume the total background number of genes is 20000
       total_background_genes <- 20000
+
+      if(any(grepl("html",result_pathway[,1])))
+      {
+        log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " STRINGdb api server PROBLEM!")
+        next
+      }
 
       # Calculate fold result_pathway
       result_pathway$expected_count <- (length(mapped_genes$STRING_id) * result_pathway$number_of_genes_in_background) / total_background_genes

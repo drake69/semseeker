@@ -15,6 +15,7 @@ apply_stat_model(
   session_folder,
   independent_variable,
   depth_analysis = 3,
+  samples_sql_condition,
   ...
 )
 }

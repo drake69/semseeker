@@ -15,7 +15,7 @@ Imports: dplyr, doFuture, doRNG, FactoMineR, factoextra, foreach, FSA,
         stats, stringr, utils, withr, zoo, VennDiagram, effsize, pwr,
         combinat, philentropy, parallelly, knitr, lmtest, usethis,
         glmnet
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR, wordcloud
 Depends: R (>= 4.4.0)

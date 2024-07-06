@@ -1,4 +1,4 @@
-exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot)
+exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, sample_sql_condition)
 {
 
   #
@@ -99,12 +99,20 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
 
   if(plot & !any(is.na(predictions)))
   {
-    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(sample_sql_condition)))
     filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
     #
+    # ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
+    #   ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
+    #   ggplot2::stat_function( na.rm = TRUE, fun = function(x) (res$EXP_A_ESTIMATE * exp(res$EXP_B_ESTIMATE * x))  , color = ssEnv$color_palette_darker[3]) +
+    #   ggplot2::ggtitle("") +
+    #   ggplot2::xlab(independent_variable) +
+    #   ggplot2::ylab(dependent_variable)
+
     ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
-      ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
-      ggplot2::stat_function( na.rm = TRUE, fun = function(x) (res$EXP_A_ESTIMATE * exp(res$EXP_B_ESTIMATE * x))  , color = ssEnv$color_palette_darker[3]) +
+      ggplot2::geom_point(color = ssEnv$color_palette[1]) +
+      ggplot2::stat_function(na.rm = TRUE, fun = function(x) (res$EXP_A_ESTIMATE * exp(res$EXP_B_ESTIMATE * x)), color = ssEnv$color_palette_darker[3]) +
+      ggplot2::stat_smooth(method = "loess", color = ssEnv$color_palette[2], se = FALSE) +
       ggplot2::ggtitle("") +
       ggplot2::xlab(independent_variable) +
       ggplot2::ylab(dependent_variable)

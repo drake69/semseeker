@@ -1,6 +1,6 @@
 #' @export
 markers_performance_pathway_analyser <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
-  significance = TRUE,disease_hpo, disease_description,keywords,stop_keywords,alphas,top=50, ...)
+  significance = TRUE,disease_hpo, disease_description,keywords,stop_keywords,alphas,top=50,pathway_alpha=0.05,areas_sql_condition, ...)
 {
   #
   if(length(disease_hpo)>0)
@@ -11,40 +11,34 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
   keys <- unique(ssEnv$keys_for_pathway)
   inference_details <- as.data.frame(inference_details)
   pvalue_column <- name_cleaning(pvalue_column)
-  key_pathway <- data.frame("type"="Pathway", "label"="STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment")
-  key_pathway <- rbind(key_pathway,data.frame("type"="Pathway", "label"="Phenolyzer_STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment"))
-  key_pathway <- rbind(key_pathway, data.frame("type"="Pathway","label"="WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
-  key_pathway <- rbind(key_pathway, data.frame("type"="Pathway","label"="Phenolyzer_WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
-  key_pathway <- rbind(key_pathway, data.frame("type"="Phenotype","label"="phenolyzer","column_of_id"="Description","column_of_description"="Description","column_of_pvalue"="Score","column_of_enrichment"="Score"))
-  key_pathway <- rbind(key_pathway,data.frame("type"="Pathway", "label"="pathfindR","column_of_id"="ID","column_of_description"="Term_Description", "column_of_pvalue"="PVALUE_ADJ_ALL_FDR","column_of_enrichment"="Fold_Enrichment"))
-
+  key_enrichment_format <- ssEnv$key_enrichment_format
 
   for (a in alphas)
   {
     ssEnv$alpha <- a
     update_session_info(ssEnv)
-    for (pt in 1:nrow(key_pathway))
+    for (pt in 1:nrow(key_enrichment_format))
     {
-      if(key_pathway[pt,"label"]=="phenolyzer")
+      if(key_enrichment_format[pt,"label"]=="phenolyzer")
         disease <- disease_original
       else
         disease <- ""
 
-      if(key_pathway[pt,"type"]=="Pathway")
-        path <- dir_check_and_create(ssEnv$result_folderPathway,key_pathway[pt,"label"])
-      else
-        path <- dir_check_and_create(ssEnv$result_folderPhenotype,key_pathway[pt,"label"])
 
-      column_of_id <- key_pathway[pt,"column_of_id"]
-      column_of_pvalue <- key_pathway[pt,"column_of_pvalue"]
-      column_of_description <- key_pathway[pt,"column_of_description"]
-      column_of_enrichment <- key_pathway[pt,"column_of_enrichment"]
+      column_of_id <- key_enrichment_format[pt,"column_of_id"]
+      column_of_pvalue <- key_enrichment_format[pt,"column_of_pvalue"]
+      column_of_description <- key_enrichment_format[pt,"column_of_description"]
+      column_of_enrichment <- key_enrichment_format[pt,"column_of_enrichment"]
 
       for (id in 1:nrow(inference_details))
       {
         # id <- 1
         # id <- 2
         inference_detail <- inference_details[id,]
+        if(key_enrichment_format[pt,"type"]=="Pathway")
+          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+        else
+          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
         family_test <- inference_detail$family_test
         transformation <- as.character(inference_detail$transformation)
         independent_variable <- inference_detail$independent_variable
@@ -88,7 +82,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
             next
           }
 
-          if(key_pathway[pt,"label"]=="phenolyzer")
+          if(key_enrichment_format[pt,"label"]=="phenolyzer")
           {
             # read the pathway_result
             pathway_result <- read.csv2(file_name, dec=".")
@@ -109,7 +103,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           pathway_result$FIGURE <- keys[i,"FIGURE"]
           # pathway_result$key <- paste(pathway_result$MARKER,pathway_result$FIGURE,pathway_result$AREA,pathway_result$SUBAREA,sep="_")
 
-          if(key_pathway[pt,"label"]=="pathfindR")
+          if(key_enrichment_format[pt,"label"]=="pathfindR")
           {
             # adjust pvalue
             pathway_result$PVALUE_ADJ_ALL_FDR <- p.adjust(pathway_result[,"highest_p"], method = "fdr")
@@ -130,31 +124,30 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         if(nrow(aggregated_patwhay_result_total)==0)
           next
 
-        aggregated_patwhay_result_total <- enrichment_analysy_add_category(key_pathway[pt,"label"],aggregated_patwhay_result_total)
+        aggregated_patwhay_result_total <- enrichment_analysy_add_category(key_enrichment_format[pt,"label"],aggregated_patwhay_result_total)
         # TO DO: manage comparison of pathways by FIGURE
         aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, FIGURE =="HYPER_HYPO")
 
-        aggregated_patwhay_result_total_sign <- subset(aggregated_patwhay_result_total, aggregated_patwhay_result_total[,column_of_pvalue] < ssEnv$alpha)
 
 
         # browser()
         # keep only first top taxonomies
-        if(key_pathway[pt,"label"]!="phenolyzer")
+        if(key_enrichment_format[pt,"label"]!="phenolyzer")
           aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, SS_RANK <= top)
 
-        if(key_pathway[pt,"label"]!="phenolyzer" & length(keywords)>0)
-          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] <= 0.05,]
+        if(key_enrichment_format[pt,"label"]!="phenolyzer" & length(keywords)>0)
+          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] <= pathway_alpha,]
 
         # remove rows where column_of_pvalue is greater than alpha
-        if(key_pathway[pt,"label"]=="phenolyzer")
+        if(key_enrichment_format[pt,"label"]=="phenolyzer")
           aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] > 0.33,]
 
-        if(key_pathway[pt,"label"]=="pathfindR")
+        if(key_enrichment_format[pt,"label"]=="pathfindR")
           aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total$support > 0.5,]
 
         # browser()
-        if(any(aggregated_patwhay_result_total$by_keyword == TRUE))
-          aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, by_keyword == TRUE)
+        # if(any(aggregated_patwhay_result_total$by_keyword == TRUE))
+        #   aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, by_keyword == TRUE)
 
         if (!exists("aggregated_patwhay_result_total"))
           next
@@ -163,8 +156,8 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
 
         #
-        if (significance & key_pathway[pt,"label"]!="phenolyzer")
-          marker_performance_pathway_plot(aggregated_patwhay_result_total, key_pathway[pt,],file_prfx,path, disease, performance_category="MARKER")
+        if (significance & key_enrichment_format[pt,"label"]!="phenolyzer")
+          marker_performance_pathway_plot(aggregated_patwhay_result_total, key_enrichment_format[pt,],file_prfx,path, disease, performance_category="MARKER",top)
 
         # for each missed key add an empty row
         if(nrow(missed_keys)>0)
@@ -192,7 +185,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         if(length(categories)==1)
           next
         split <- split(aggregated_patwhay_result[,column_of_id], aggregated_patwhay_result$key)
-        filename <- paste(path, "/",file_prfx,"_venn_diagramm_",key_pathway[pt,"label"],".png",sep = "")
+        filename <- paste(path, "/",file_prfx,"_venn_diagramm_",key_enrichment_format[pt,"label"],".png",sep = "")
 
 
         # aggregated_patwhay_result$key <- gsub("_", " ", aggregated_patwhay_result$key)
@@ -223,7 +216,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         }
 
         # add support to avaluate the quality of the gene set
-        if(key_pathway[pt,"label"]=="pathfindR")
+        if(key_enrichment_format[pt,"label"]=="pathfindR")
           for (key in 1:length(kk))
           {
             pp <- aggregated_patwhay_result_total[aggregated_patwhay_result_total$key == kk[key],c(column_of_id,"support")]
@@ -234,7 +227,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # key_gene_set_pivot <- key_gene_set_pivot[order(key_gene_set_pivot$total, decreasing = FALSE),]
 
         pivot_path <- dir_check_and_create(path, "marker_perfomance")
-        filename <- paste(pivot_path, "/",file_prfx,"_pivot_",key_pathway[pt,"label"],ifelse(disease=="","", paste("_", disease, sep="")), ".csv",sep = "")
+        filename <- paste(pivot_path, "/",file_prfx,"_pivot_",key_enrichment_format[pt,"label"],ifelse(disease=="","", paste("_", disease, sep="")), ".csv",sep = "")
         write.csv2(key_gene_set_pivot, filename)
 
         # aggregate enrichment
@@ -255,7 +248,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         colnames(aggregated_patwhay_result_total)[which(colnames(aggregated_patwhay_result_total)=="column_of_id_label")] <- column_of_id
 
         colnames(aggregated_patwhay_result_total)[which(colnames(aggregated_patwhay_result_total)==column_of_id)] <- "column_of_id_label"
-        if(key_pathway[pt,"label"]!="phenolyzer")
+        if(key_enrichment_format[pt,"label"]!="phenolyzer")
           # calculate min rank
           key_gene_set_pivot_summary <- reshape2::dcast(aggregated_patwhay_result_total, column_of_id_label ~ MARKER , value.var = "SS_RANK", fun.aggregate = min)
         else
@@ -384,16 +377,16 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
 
 
-        if(key_pathway[pt,"type"]=="Pathway")
-          filename <- paste(ssEnv$result_folderPathway, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
+        if(key_enrichment_format[pt,"type"]=="Pathway")
+          filename <- paste(ssEnv$result_folderPathway, "/",file_prfx,"_pivot_summary_",key_enrichment_format[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
         else
-          filename <- paste(ssEnv$result_folderPhenotype, "/",file_prfx,"_pivot_summary_",key_pathway[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
+          filename <- paste(ssEnv$result_folderPhenotype, "/",file_prfx,"_pivot_summary_",key_enrichment_format[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
         write.csv2(key_gene_set_pivot_summary, filename)
 
 
 
         # key_gene_set_pivot <- subset(key_gene_set_pivot, total < 3)[, colSums(key_gene_set_pivot[,4:ncol(key_gene_set_pivot)]) > 0,]
-        # filename <- paste(path, "/",file_prfx,"_reduced_pivot_",key_pathway[pt,"label"],".csv",sep = "")
+        # filename <- paste(path, "/",file_prfx,"_reduced_pivot_",key_enrichment_format[pt,"label"],".csv",sep = "")
         # write.csv2(key_gene_set_pivot, filename)
 
         # plot an heatmap
@@ -411,7 +404,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         #
         if (length(differences)>0)
         {
-          filename <- paste(path, "/",file_prfx,"_differences_",key_pathway[pt,"label"],".csv",sep = "")
+          filename <- paste(path, "/",file_prfx,"_differences_",key_enrichment_format[pt,"label"],".csv",sep = "")
           for (d in 1:length(differences))
           {
             tt2 <- merge(differences[d], names(differences[d]) )

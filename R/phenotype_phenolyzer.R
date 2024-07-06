@@ -1,7 +1,7 @@
 phenotype_phenolyzer <- function(study,
   disease,phenolyzer_folder_bin,minimum_score = 0.5, statistic_parameter = "",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details, significance = TRUE, sql_condition="")
+  inference_details, significance = TRUE, areas_sql_condition)
 {
 
   # start_fresh <- FALSE
@@ -56,13 +56,13 @@ phenotype_phenolyzer <- function(study,
       next
 
     results_inference <- get_results_areas_inference(
-      inference_details =  inference_details,
+      inference_detail =  inference_detail,
       marker = keys[i,"MARKER"],
       adjust_per_area= adjust_per_area,
       adjust_globally = adjust_globally,
       pvalue_column=  pvalue_column,
       adjustment_method= adjustment_method,
-      sql_condition = sql_condition)
+      areas_sql_condition = areas_sql_condition)
 
     if (nrow(results_inference)==0)
       next

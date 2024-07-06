@@ -7,7 +7,6 @@
 association_analysis(
   inference_details,
   result_folder,
-  sql_condition,
   maxResources = 90,
   parallel_strategy = "multisession",
   start_fresh = FALSE,

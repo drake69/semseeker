@@ -1,7 +1,6 @@
-association_data_extractor <- function(inference_details, sql_conditions=c(),destination_folder, result_folder, ...)
+association_data_extractor <- function(inference_details, areas_sql_conditions=c(),destination_folder="", result_folder="", ...)
 {
 
-  
   arguments <- list(...)
   areas_selection <- c()
   if(!is.null(arguments[["areas_selection"]]))
@@ -10,9 +9,14 @@ association_data_extractor <- function(inference_details, sql_conditions=c(),des
     arguments[["areas_selection"]] <- NULL
   }
 
-  ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
+  if(result_folder!="")
+    ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
+  else
+    ssEnv <- get_session_info()
+
   localKeys <- ssEnv$keys_markers_figures
   markers <- unique(localKeys$MARKER)
+  final_results <- data.frame()
   for(z in 1:nrow(inference_details))
   {
     start_time <- Sys.time()
@@ -29,12 +33,59 @@ association_data_extractor <- function(inference_details, sql_conditions=c(),des
       {
         results_inference <- utils::read.csv2(fileNameResults, header  =  T)
         results_inference <- subset(results_inference, FIGURE %in% keys$FIGURE)
-        results_inference <- filter_sql(sql_conditions, results_inference)
+        results_inference <- filter_sql(areas_sql_conditions, results_inference)
 
-        log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," sql executed:", sql)
+        # remove any column with name containg SAMPLES_SQL_CONDITION
+        results_inference <- results_inference[,!grepl("SAMPLES_SQL_CONDITION", colnames(results_inference))]
+        utils::write.csv2(results_inference, fileNameResults, row.names = FALSE)
+
+        if(inference_detail$samples_sql_condition!="")
+          results_inference$SAMPLES_SQL_CONDITION <- inference_detail$samples_sql_condition
+
+        final_results <- plyr::rbind.fill(final_results, results_inference)
+        # log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," sql executed:", areas_sql_conditions)
         filePathResults <- file.path(destination_folder, paste0(inference_detail$family_test, "_", markers[a], ".csv"))
-        utils::write.csv2(results_inference, filePathResults, row.names = FALSE)
+        if(destination_folder != "")
+          utils::write.csv2(results_inference, filePathResults, row.names = FALSE)
       }
     }
   }
+  return(final_results)
 }
+
+
+summary_association_analysis <- function(inference_details, areas_sql_conditions=c(),destination_folder="", result_folder="", ...)
+{
+  if(result_folder!="")
+    ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
+  else
+    ssEnv <- get_session_info()
+  association_data <- association_data_extractor(inference_details, areas_sql_conditions, destination_folder, result_folder, ...)
+
+  browser()
+
+  available_metrics <- toupper(semseeker::metrics_properties[,"Metric"])
+
+  if(any(grepl("PVALUE",colnames(association_data))))
+    available_metrics <- c(available_metrics, colnames(association_data)[grepl("PVALUE",colnames(association_data))])
+
+  # remove not numeric columns metrics
+  metrics_to_remove <- colnames(association_data[,!sapply(association_data, is.numeric)])
+  available_metrics <- available_metrics[!(available_metrics %in% metrics_to_remove)]
+
+  available_metrics <- available_metrics[available_metrics %in% colnames(association_data)]
+
+  #  create a summary table for the association analysis grouping by AREA,SUBAREA,MARKER,FIGURE and SAMPLES_SQL_CONDITION if exists
+  if(any("SAMPLES_SQL_CONDITION" %in% colnames(association_data))) {
+    summary_table <- association_data %>%
+      dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE, SAMPLES_SQL_CONDITION) %>%
+      dplyr::summarise(dplyr::across(available_metrics, list( max= ~max(., na.rm=TRUE), min= ~min(., na.rm=TRUE),  mean = ~mean(., na.rm = TRUE), sd = ~sd(., na.rm = TRUE))))
+  } else {
+    summary_table <- association_data %>%
+      dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE) %>%
+      dplyr::summarise(dplyr::across(available_metrics, list( max= ~max(., na.rm=TRUE), min= ~min(., na.rm=TRUE),  mean = ~mean(., na.rm = TRUE), sd = ~sd(., na.rm = TRUE))))
+  }
+
+  return(summary_table)
+}
+

@@ -1,7 +1,7 @@
 pathway_WebGestalt <- function(study,
   types=c("BP","MF"),  enrich_methods = c("ORA"),
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details,significance,sql_condition="")
+  inference_detail,significance, areas_sql_condition)
 {
 
   #
@@ -10,7 +10,7 @@ pathway_WebGestalt <- function(study,
   ssEnv <- get_session_info()
   pvalue_column <- name_cleaning(pvalue_column)
   keys <- unique(ssEnv$keys_for_pathway)
-  path <- dir_check_and_create(ssEnv$result_folderPathway,"WebGestalt")
+  path <- dir_check_and_create(ssEnv$result_folderPathway,c("WebGestalt",name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
   tmp <- tempdir()
   tempFolder <- dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
 
@@ -34,7 +34,7 @@ pathway_WebGestalt <- function(study,
       type <- types[t]
       for ( em in 1:length(enrich_methods))
       {
-        projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  ,
+        projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  ,
           pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
         filenameResult = file_path_build(path,projectName,"csv")
         # if(file.exists(filenameResult))
@@ -58,13 +58,13 @@ pathway_WebGestalt <- function(study,
         key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
 
         results_inference <- get_results_areas_inference(
-          inference_details =  inference_details,
+          inference_detail =  inference_detail,
           marker = keys[i,"MARKER"],
           adjust_per_area= adjust_per_area,
           adjust_globally = adjust_globally,
           pvalue_column=  pvalue_column,
           adjustment_method= adjustment_method,
-          sql_condition = sql_condition)
+          areas_sql_condition = areas_sql_condition)
 
         #
 
@@ -97,7 +97,7 @@ pathway_WebGestalt <- function(study,
         log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Number of genes in the gene set: ",nrow(gene_set), " key: ", keys[i,])
         if (nrow(gene_set)==0)
           next
-        projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix= paste(type,enrich_method, sep="_") , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
+        projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix= paste(type,enrich_method, sep="_") , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
 
         # entrez <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, keys = as.vector(gene_set$AREA_OF_TEST),column = "ENTREZID", keytype = "SYMBOL")
         # entrez <- unique(entrez)
@@ -153,7 +153,7 @@ pathway_WebGestalt <- function(study,
 
         if(nrow(enrichResult)==0)
           next
-        enrichResult$alpha <- as.numeric(ssEnv$alpha)
+        enrichResult$ALPHA <- as.numeric(ssEnv$alpha)
         enrichResult$pvalue_column <- pvalue_column
         enrichResult$type <- type
         enrichResult$enrich_method <- enrich_method
@@ -216,7 +216,7 @@ pathway_WebGestalt <- function(study,
 
     if(exists("enrichResultFinal"))
     {
-      projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
+      projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
       filenameResult = file_path_build(path,projectName,"csv")
       write.csv2(enrichResultFinal, filenameResult)
       rm(enrichResultFinal)

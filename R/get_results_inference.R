@@ -1,11 +1,11 @@
-get_results_areas_inference <- function (inference_details, marker, adjust_per_area = F, adjust_globally = F,
+get_results_areas_inference <- function (inference_detail, marker, adjust_per_area = F, adjust_globally = F,
   pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE",
-  omit_na = TRUE, sql_condition = "", significance = TRUE)
+  omit_na = TRUE, significance = TRUE, areas_sql_condition="")
 {
   ssEnv <- get_session_info()
   resultFolder <- ssEnv$result_folderInference
 
-  inferenceFile <- inference_file_name(inference_details, marker, ssEnv$result_folderInference)
+  inferenceFile <- inference_file_name(inference_detail, marker, ssEnv$result_folderInference)
   if(adjust_per_area && adjust_globally)
   {
     log_event("ERROR: Can adjust per area or globbaly not both!", format(Sys.time(), "%a %b %d %X %Y"))
@@ -68,7 +68,7 @@ get_results_areas_inference <- function (inference_details, marker, adjust_per_a
   #   results_inference <- na.omit(results_inference)
 
   #
-  results_inference <- filter_sql(sql_condition, results_inference)
+  results_inference <- filter_sql(areas_sql_condition, results_inference)
   log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," inference file loaded:", inferenceFile)
   return(results_inference)
 }

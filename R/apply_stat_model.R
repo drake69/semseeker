@@ -17,7 +17,7 @@
 #'
 #'
 apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal,
-  session_folder, independent_variable, depth_analysis=3, ...)
+  session_folder, independent_variable, depth_analysis=3,samples_sql_condition, ...)
 {
   #
 
@@ -67,7 +67,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
         #
         sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-        model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5))
+        model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5), samples_sql_condition)
 
         #
         local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
