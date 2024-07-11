@@ -11,29 +11,29 @@ enrichment_analysy_add_category <- function(source, data)
   {
     #
     data$type <- toupper(data$type)
-    data[data$type=='BP',"SS_CATEGORY"] <- "PROCESS"
-    data[data$type=='CC',"SS_CATEGORY"] <- "COMPONENT"
-    data[data$type=='MF',"SS_CATEGORY"] <- "FUNCTION"
+    data[data$type=='BP',"SS_CATEGORY"] <- "GO-BP"
+    data[data$type=='CC',"SS_CATEGORY"] <- "GO-CC"
+    data[data$type=='MF',"SS_CATEGORY"] <- "GO-MF"
   }
 
   if(source=="pathfindR")
   {
     #
-    data$sources <- toupper(data$sources)
-    data[data$source=='GO-BP',"SS_CATEGORY"] <- "PROCESS"
-    data[data$source=='GO-MF',"SS_CATEGORY"] <- "FUNCTION"
-    data[data$source=='KEGG',"SS_CATEGORY"] <- "PATHWAY"
-    data[data$source=='REACTOME',"SS_CATEGORY"] <- "PATHWAY"
+    data$source <- toupper(data$source)
+    data[data$source=='GO-BP',"SS_CATEGORY"] <- "GO-BP"
+    data[data$source=='GO-MF',"SS_CATEGORY"] <- "GO-MF"
+    data[data$source=='KEGG',"SS_CATEGORY"] <- "KEGG-NTA"
+    data[data$source=='REACTOME',"SS_CATEGORY"] <- "REACTOME-NTA"
   }
 
   if(any(source %in% c("STRINGdb","Phenolyzer_STRINGdb")))
   {
-    #
     data$category <- toupper(data$category)
     data$SS_CATEGORY <- data$category
-    data[data$category=='PROCESS',"SS_CATEGORY"] <- "PROCESS"
-    data[data$category=='FUNCTION',"SS_CATEGORY"] <- "FUNCTION"
-    data[data$category=='KEGG',"SS_CATEGORY"] <- "PATHWAY"
+    data[data$category=='PROCESS',"SS_CATEGORY"] <- "GO-BP"
+    data[data$category=='FUNCTION',"SS_CATEGORY"] <- "GO-MF"
+    data[data$category=='COMPONENT',"SS_CATEGORY"] <- "GO-CC"
+    data[data$category=='KEGG',"SS_CATEGORY"] <- "KEGG-ORA"
   }
 
   data$SS_RANK <- 0

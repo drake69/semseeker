@@ -45,7 +45,7 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
             adjust_globally = adjust_globally,
             adjustment_method = adjustment_method,
             pvalue_column = pvalue_column,
-            inference_details = inference_detail,
+            inference_detail = inference_detail,
             significance = significance,
             areas_sql_condition = areas_sql_condition
           )

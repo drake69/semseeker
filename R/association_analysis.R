@@ -24,7 +24,6 @@
 association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession",start_fresh = FALSE, ...)
 {
 
-
   j <- 0
   k <- 0
   z <- 0
@@ -178,6 +177,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
             cols <- keys$COMBINED
+            fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,
+              prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
             if (sum(cols %in% colnames(study_summary))!=0)
             {
               # temporaneamente filtriamo per le colonne esistenti
@@ -191,8 +192,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               else
                 study_summary_local <- study_summary
 
-              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,
-                prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
 
               #
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
@@ -251,14 +250,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             # execute for all the areas
             if(depth_analysis>1)
             {
-
-
               localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
               keys <- localKeys_1[localKeys_1$MARKER==markers[a],]
-
-              # clean keys from already done association
-              fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,
-                prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
 
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  >10
               dototal <- TRUE

@@ -27,7 +27,6 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
 
       for (id in 1:nrow(inference_details))
       {
-
         inference_detail <- inference_details[id,]
         if(key_enrichment_format[pt,"type"]=="Pathway")
           path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
@@ -42,6 +41,7 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
         covariates <- paste(inference_detail$covariates, collapse="_")
 
         file_prfx <- paste(independent_variable, transformation,family_test,covariates, pvalue_column,keys[i,"MARKER"], sep="_")
+
 
         for (a in alphas)
         {
@@ -80,6 +80,10 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
 
           pathway_result <- read.csv2(file_name)
 
+          # add fake FDR
+          if(key_enrichment_format[pt,"label"]=="pathfindR")
+            pathway_result$PVALUE_ADJ_ALL_FDR <- p.adjust(pathway_result[,"highest_p"], method = "fdr")
+
           cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
           # check column names contain the required columns
           if(!all(cols_to_check %in% colnames(pathway_result)))
@@ -111,6 +115,7 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
           aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
         }
 
+
         if(nrow(aggregated_patwhay_result_total)==0)
           next
 
@@ -123,8 +128,8 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
         if(nrow(aggregated_patwhay_result_total) == 0)
           next
 
-        if(length(keywords)>0)
-          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] < pathway_alpha,]
+        # if(length(keywords)>0)
+        #   aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] < pathway_alpha,]
 
         if(nrow(aggregated_patwhay_result_total) == 0)
           next
@@ -135,6 +140,7 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
         if(nrow(aggregated_patwhay_result_total) == 0)
           next
 
+        path <- dir_check_and_create(ssEnv$result_folderChart,c("PATHWAYS",key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
         if (significance)
           marker_performance_pathway_plot(aggregated_patwhay_result_total, key_enrichment_format[pt,],file_prfx,path, "", performance_category="ALPHA", top=top)
       }

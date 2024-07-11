@@ -5,9 +5,10 @@
 \title{sensitivity and sensibility analysis of SEMseeker's mutations and lesions}
 \usage{
 ss_analysis(
+  samples_sql_selection = "",
+  combinations,
   result_folder,
   independent_variable = "Sample_Group",
-  control_label = "Control",
   maxResources = 90,
   parallel_strategy = "multicore",
   ...

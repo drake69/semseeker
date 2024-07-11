@@ -13,6 +13,8 @@ file_path_build <- function(baseFolder, detailsFilename, extension, add_gz = FAL
     fileName <- paste0(fileName, ".gz")
   }
 
+  # replace double dots with single dot
+  fileName <- gsub("\\.\\.", ".", fileName)
 
  fp <-  file.path(baseFolder, fileName)
 

@@ -155,9 +155,9 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           next
 
 
-        #
+        plot_path <- dir_check_and_create(ssEnv$result_folderChart,c("PATHWAYS",key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
         if (significance & key_enrichment_format[pt,"label"]!="phenolyzer")
-          marker_performance_pathway_plot(aggregated_patwhay_result_total, key_enrichment_format[pt,],file_prfx,path, disease, performance_category="MARKER",top)
+          marker_performance_pathway_plot(aggregated_patwhay_result_total, key_enrichment_format[pt,],file_prfx,plot_path, disease, performance_category="MARKER",top)
 
         # for each missed key add an empty row
         if(nrow(missed_keys)>0)

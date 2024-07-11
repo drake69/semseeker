@@ -59,7 +59,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
 
         #### START LOAD PHENOLYZER
         # load prioritized gene by phenolyzer
-        base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer"))
+        base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer",name_cleaning(areas_sql_condition)))
         phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_", disease,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
         path_phenolyzer <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
         phenotype_report_path <- file_path_build(path_phenolyzer,phenotype_analysis_name,"csv")

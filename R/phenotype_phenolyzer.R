@@ -1,7 +1,7 @@
 phenotype_phenolyzer <- function(study,
   disease,phenolyzer_folder_bin,minimum_score = 0.5, statistic_parameter = "",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details, significance = TRUE, areas_sql_condition)
+  inference_detail, significance = TRUE, areas_sql_condition)
 {
 
   # start_fresh <- FALSE
@@ -46,10 +46,10 @@ phenotype_phenolyzer <- function(study,
       progress_bar(sprintf("Searching for disease using phenolyzer: %s",keys[i,]$COMBINED))
     key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
 
-    base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer"))
+    base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer",name_cleaning(areas_sql_condition)))
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "scores")
     annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_scores")
-    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_",disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_",disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
     phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
     #
     if(file.exists(phenotype_report_path))
@@ -83,7 +83,7 @@ phenotype_phenolyzer <- function(study,
     if (nrow(results_inference)==0)
       next
 
-    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=disease_label, pvalue_column=pvalue_column, ssEnv$alpha, significance)
+    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=disease_label, pvalue_column=pvalue_column, ssEnv$alpha, significance)
     phenotype_report_path <- file_path_build(base_path,phenotype_analysis_name,"csv")
 
     if(statistic_parameter!="")
@@ -170,7 +170,7 @@ phenotype_phenolyzer <- function(study,
     annotated_genes$order <- 1:nrow(annotated_genes)
     annotated_genes$diseases <- paste(diseases$DISEASE, collapse = ";")
 
-    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_", disease_label,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_", disease_label,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
     phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
     write.csv2(annotated_genes, phenotype_report_path)
@@ -178,7 +178,7 @@ phenotype_phenolyzer <- function(study,
 
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "scores")
     annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_scores")
-    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste("_", disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+    phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_", disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
     phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
     file.copy(annotated_gene_file, phenotype_report_path, overwrite = TRUE)
 
@@ -189,9 +189,8 @@ phenotype_phenolyzer <- function(study,
     for (w in 1:length(wordcloud_files))
     {
       wordcloud_file <- wordcloud_files[w]
-      phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease_label,"_wordcloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
+      phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste(disease_label,"_wordcloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
       phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"png")
-      # local_path <- dir_check_and_create(baseFolder = base_path, subFolders = keys[i,"COMBINED"])
       file.copy(wordcloud_file, phenotype_report_path, overwrite = TRUE)
     }
 
@@ -203,28 +202,26 @@ phenotype_phenolyzer <- function(study,
     {
 
       diseases_file <- diseases_files[w]
-      local_path <- dir_check_and_create(baseFolder = base_path, subFolders = keys[i,"COMBINED"])
-      # file.copy(diseases_file, local_path, overwrite = TRUE)
       disease_temp <- read.csv2(diseases_file, sep = "\t", header = FALSE)
       colnames(disease_temp) <- c("Description","Score")
       disease_temp$key <- key
       disease_temp$HPO <- disease
       diseases_summary <- plyr::rbind.fill(diseases_summary, disease_temp)
 
-      projectName <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix= disease_label  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
+      projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix= disease_label  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
       filenameResult = file_path_build(base_path,projectName,"csv")
       write.csv2(disease_temp, filenameResult)
     }
 
-    # phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_details,key = keys[i,], prefix="",suffix=paste(disease,"_gene_cloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha)
+    # phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste(disease,"_gene_cloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha)
     # cloud_gene_file <- file.path(tempFolder,"out.annotated_gene_scores")
     # file.copy(cloud_gene_file, phenotype_report_path, overwrite = TRUE)
 
     unlink(tempFolder, recursive = TRUE)
   }
 
-  # family_test <- inference_details$family_test
-  # transformation <- inference_details$transformation
+  # family_test <- inference_detail$family_test
+  # transformation <- inference_detail$transformation
   # significance_label <- ifelse(significance, "significant", "non_significant")
   # analysis_name <- paste("summary",pvalue_column, significance_label, ssEnv$alpha, as.character(transformation), as.character(family_test), sep="_")
   # phenotype_report_path <- file_path_build(base_path,analysis_name,"csv")

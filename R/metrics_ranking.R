@@ -6,6 +6,10 @@ metrics_ranking <- function (metric,data_frame, column_to_rank ="REBASED"){
   # R_SQUARED	R_SQUARED_ADJ
   the_higher_the_better_markers <-  toupper(semseeker::metrics_properties[semseeker::metrics_properties$Higher_the_Better==TRUE,"Metric"])
 
+  # replace -Inf with 1E-300
+  data_frame[data_frame == -Inf] <- 1E-300
+  # replace Inf with 1E300
+  data_frame[data_frame == Inf] <- 1E300
 
   if(grepl("PVALUE",metric))
     the_lower_the_better_markers <- c(the_lower_the_better_markers, metric)
@@ -53,7 +57,7 @@ metrics_ranking <- function (metric,data_frame, column_to_rank ="REBASED"){
 
   if(max(data_frame$SCORE)>1)
   {
-    
+
   }
   data_frame$SCORE <- round(data_frame$SCORE, 2)
   # # add the marker and figure to the data frame

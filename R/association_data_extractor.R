@@ -62,7 +62,6 @@ summary_association_analysis <- function(inference_details, areas_sql_conditions
     ssEnv <- get_session_info()
   association_data <- association_data_extractor(inference_details, areas_sql_conditions, destination_folder, result_folder, ...)
 
-  browser()
 
   available_metrics <- toupper(semseeker::metrics_properties[,"Metric"])
 
@@ -79,13 +78,25 @@ summary_association_analysis <- function(inference_details, areas_sql_conditions
   if(any("SAMPLES_SQL_CONDITION" %in% colnames(association_data))) {
     summary_table <- association_data %>%
       dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE, SAMPLES_SQL_CONDITION) %>%
-      dplyr::summarise(dplyr::across(available_metrics, list( max= ~max(., na.rm=TRUE), min= ~min(., na.rm=TRUE),  mean = ~mean(., na.rm = TRUE), sd = ~sd(., na.rm = TRUE))))
+      dplyr::summarise(dplyr::across(available_metrics, list(
+        max= ~max(., na.rm=TRUE),
+        min= ~min(., na.rm=TRUE),
+        mean = ~mean(., na.rm = TRUE),
+        sd = ~sd(., na.rm = TRUE),
+        count_below_0.05 = ~sum(. < 0.05, na.rm = TRUE))))
   } else {
     summary_table <- association_data %>%
       dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE) %>%
-      dplyr::summarise(dplyr::across(available_metrics, list( max= ~max(., na.rm=TRUE), min= ~min(., na.rm=TRUE),  mean = ~mean(., na.rm = TRUE), sd = ~sd(., na.rm = TRUE))))
+      dplyr::summarise(dplyr::across(available_metrics, list(
+        max= ~max(., na.rm=TRUE),
+        min= ~min(., na.rm=TRUE),
+        mean = ~mean(., na.rm = TRUE),
+        sd = ~sd(., na.rm = TRUE),
+        count_below_0.05 = ~sum(. < 0.05, na.rm = TRUE))))
   }
 
+
+
+  summary_table <- as.data.frame(summary_table)
   return(summary_table)
 }
-

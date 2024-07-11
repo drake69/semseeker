@@ -105,7 +105,7 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
       data_to_plot <- as.data.frame(data_to_plot)
       # count the number of unique values in the performance_category column
       n_unique_values <- length(unique(data_to_plot[,performance_category]))
-      shape_values <- 21:(21+n_unique_values)
+      shape_values <- 21:(22+n_unique_values)
 
       data_to_plot$Description <- ifelse(data_to_plot$by_keyword, paste(data_to_plot$Description, " *"), as.character(data_to_plot$Description))
 
@@ -212,8 +212,8 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
       #     plot.title = element_text(size = 14, face = 'bold')
       #   )
 
-      dest_folder <- dir_check_and_create(ssEnv$result_folderChart,"PATHWAYS")
-      filename <- paste(dest_folder, "/",file_prfx,"_lollipop_plot_",c,"_",f,"_",rules["label"],ifelse(disease=="","", paste("_", disease, sep="")), ".png",sep = "")
+      fname <- name_cleaning(paste(file_prfx,"_lollipop_plot_",c,"_",f,"_",rules["label"],ifelse(disease=="","", paste("_", disease, sep="")), sep="_"))
+      filename <- paste(path, "/",fname, ".png",sep = "")
       ggplot2::ggsave(filename,  width = 16, height = 9, dpi = 300)
     }
   }

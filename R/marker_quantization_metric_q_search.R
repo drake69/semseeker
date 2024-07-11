@@ -22,7 +22,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
 
   dataFolder <- dir_check_and_create(dest_folder,c("Data/Distributions"))
   filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
-  message(filename)
+  # message(filename)
   result_temp <- data.frame()
   if(file.exists(filename))
     result_temp <- utils::read.csv(file = filename, sep=",",dec=".")
@@ -50,7 +50,6 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   }
   if(ssEnv$showprogress)
     progress_bar(sprintf("Doing comparison."))
-
 
   for (q in qs)
   {
@@ -133,7 +132,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
 
   colnames(result_temp) <- toupper(colnames(result_temp))
   dataFolder <- dir_check_and_create(dest_folder,c("Data","Distributions"))
-  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
+  filename  <-  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
   utils::write.csv(result_temp, file = filename, row.names = FALSE)
 
   markers <- unique(result_temp$MARKER)
@@ -190,6 +189,52 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   aggregate_pivot$Q <- rownames(aggregate_pivot)
   filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE","PIVOT"),"csv")
   write.csv(aggregate_pivot, file = filename, row.names = FALSE)
+
+
+  # calculate best marker
+
+  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
+  result_temp <- utils::read.csv(file = filename, sep=",",dec=".")
+  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
+  results_q <- read.csv2(file =filename, sep=",",dec=".")
+  results_q_max <- unique(results_q[,c("SCORE","MARKER")] %>%
+      dplyr::group_by(MARKER) %>%
+      dplyr::filter(SCORE == max(SCORE)))
+
+  # get Q corresponding to max score
+  results_q_max <- merge(results_q, results_q_max, by = c("MARKER","SCORE"))
+
+  # remove mutations
+  results_q_max <- results_q_max[results_q_max$MARKER != "MUTATIONS",]
+
+  # add MUTATIONS
+  results_q_max <- rbind(results_q_max, data.frame("MARKER"="MUTATIONS","SCORE"=5,"Q"=2))
+
+  # filter results_q with results_q_max by MARKER and SCORE
+  results_q <- merge(result_temp, results_q_max, by = c("MARKER","Q"))
+
+  # anaysis cross marker
+  cols_to_cycke <- ssEnv$model_metrics
+  cols_to_cycke <- which(colnames(results_q) %in% cols_to_cycke)
+  scores <- data.frame()
+  for(metric in cols_to_cycke)
+  {
+    metric <- colnames(results_q)[metric]
+    scores_temp <- data.frame()
+    scores_temp <- metrics_ranking(metric,results_q,column_to_rank =metric)
+    scores <- plyr::rbind.fill(scores, scores_temp)
+  }
+
+  scores$SCORE <- round(scores$SCORE, 2)
+  scores <- scores[,c("MARKER","SCORE")]
+  # sum scores per MARKER
+  scores <- scores %>%
+    dplyr::group_by(MARKER) %>%
+    dplyr::summarise(SCORE = sum(SCORE))
+  filename  =  file_path_build(dataFolder,c(study,"BEST_MARKER", "ANALYSIS","SCORE"),"csv")
+  # sort by score desc
+  scores <- scores[order(-scores$SCORE),]
+  write.csv2(scores, file = filename, row.names = FALSE)
 
   close_env()
 }

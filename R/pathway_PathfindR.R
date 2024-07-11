@@ -1,5 +1,5 @@
 pathway_pathfindR <- function(study,
-  path_dbs,  iterations = 10, statistic_parameter="",
+  path_dbs,  iterations = 20, statistic_parameter="",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details, significance = TRUE, areas_sql_condition)
 {
@@ -61,7 +61,7 @@ pathway_pathfindR <- function(study,
           suffix = "without_signal_"
 
         phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
-        path <- dir_check_and_create(ssEnv$result_folderPathway,c("pathfindR", areas_sql_condition, name_cleaning(inference_detail$samples_sql_condition)))
+        path <- dir_check_and_create(ssEnv$result_folderPathway,c("pathfindR", name_cleaning(areas_sql_condition), name_cleaning(inference_detail$samples_sql_condition)))
         pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
 
         if(file.exists(pathway_report_path))

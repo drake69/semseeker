@@ -78,7 +78,7 @@ init_env <- function(result_folder, maxResources = 90, parallel_strategy = "mult
   if(parallel_strategy=="multicore")
   {
     future::plan( future::multicore, workers = nCore)
-    message("INFO: ", Sys.time(), " I will work in muticore with:", nCore," Cores")
+    message("INFO: ", Sys.time(), " I will work in multicore with:", nCore," Cores")
   }
   if(parallel_strategy=="cluster")
   {

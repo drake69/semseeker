@@ -1,7 +1,9 @@
 get_results_areas_inference <- function (inference_detail, marker, adjust_per_area = F, adjust_globally = F,
   pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE",
-  omit_na = TRUE, significance = TRUE, areas_sql_condition="")
+  omit_na = TRUE, significance = NULL, areas_sql_condition="")
 {
+
+
   ssEnv <- get_session_info()
   resultFolder <- ssEnv$result_folderInference
 
@@ -57,17 +59,20 @@ get_results_areas_inference <- function (inference_detail, marker, adjust_per_ar
       results_inference[results_inference$AREA==area,] <- results_inference_area
     }
 
-  #
+  results_inference <- subset(results_inference,AREA==area)
+
   # preserve only subareas selected
   results_inference <- results_inference[results_inference$SUBAREA %in% unique(ssEnv$keys_areas_subareas$SUBAREA),]
-  if (significance)
-    results_inference <- subset(results_inference, results_inference[,pvalue_column] < as.numeric(ssEnv$alpha))
-  else
-    results_inference <- subset(results_inference, results_inference[,pvalue_column] >= as.numeric(ssEnv$alpha))
+  if(!is.null(significance))
+  {
+    if (significance)
+      results_inference <- subset(results_inference, results_inference[,pvalue_column] < as.numeric(ssEnv$alpha))
+    else
+      results_inference <- subset(results_inference, results_inference[,pvalue_column] >= as.numeric(ssEnv$alpha))
+  }
   # if(omit_na)
   #   results_inference <- na.omit(results_inference)
 
-  #
   results_inference <- filter_sql(areas_sql_condition, results_inference)
   log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," inference file loaded:", inferenceFile)
   return(results_inference)

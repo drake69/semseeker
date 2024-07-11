@@ -1,12 +1,25 @@
-#' Calculate stochastic epi mutations from a methylation dataset as outcome
-#' report of pivot
+#' Calculate Stochastic Epigenetic Mutations from a Methylation Dataset
 #'
-#' @param sample_sheet dataframe with at least a column Sample_ID to identify samples
-#' @param signal_data matrix of methylation data
-#' @param result_folder where the result will be saved
-#' @param ... other options to execute elaborations
+#' The `semseeker` function processes a methylation dataset to identify stochastic epigenetic mutations and generates output reports. This involves working with sample sheets and signal data to produce pivot tables and bedgraph files.
 #'
-#' @return files into the result folder with pivot table and bedgraph.
+#' @param sample_sheet A data frame containing at least a column named `Sample_ID` to identify samples. This can be a single data frame or a list of data frames.
+#' @param signal_data A matrix of methylation data. This can be a single data frame or a list of data frames.
+#' @param result_folder A string specifying the directory where the results will be saved.
+#' @param ... Additional arguments for further processing options, including:
+#'   - `parallel_strategy`: Strategy for parallel execution. Possible values are `none`, `multisession`, `sequential`, `multicore`, and `cluster`.
+#'   - `maxResources`: Percentage of available cores to be used, default is 90 percent, rounded to the lowest integer.
+#'   - `signal_intrasample`: A logical value indicating whether the signal data is intrasample. Default is `FALSE`.
+#'   - `sliding_window_size`: An integer specifying the size of the sliding window. Default is 11.
+#'   - `alpha`: A numeric value specifying the alpha threshold for the analysis. Default is 0.05.
+#'   - `showprogress`: A logical value indicating whether to show a progress bar. Default is `TRUE`.
+#'   - `iqrTimes`: A numeric value specifying the interquartile range multiplier to identify aberration in the data. Default is 3.
+#'   - `sex_chromosome_remove`: A logical value indicating whether to remove the sex chromosomes. Default is `TRUE`.
+#'   - `plot_format`: A string specifying the plot format. Default is "png".
+#'   - `verbosity`: A numeric value specifying the verbosity level. Default is 0.
+#'   - `marker`: A vector of string specifying the marker to be used for the analysis. Default are "MUTATIONS", "LESIONS","DELTARQ","DELTAQ","DELTAS","DELTAR","MEAN","DELTARP","DELTAP"
+#'   - `areas`: A vector of string specifying the areas to be used for the analysis. Default are "GENE","CHR","ISLAND","PROBE"
+#'
+#' @return The function writes multiple files to the specified `result_folder`, including the processed sample sheet and result files in CSV format, along with pivot tables and bedgraph files.
 #' @export
 #' @importFrom doRNG %dorng%
 #'

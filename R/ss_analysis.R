@@ -8,13 +8,13 @@
 #' @importFrom doRNG %dorng%
 #' @export
 ss_analysis <-
-  function(result_folder,independent_variable = "Sample_Group",control_label = "Control",maxResources = 90,parallel_strategy  = "multicore",...)
+  function(samples_sql_selection="",combinations,result_folder,independent_variable = "Sample_Group",maxResources = 90,parallel_strategy  = "multicore",...)
   {
     j <- 0
     k <- 0
     z <- 0
     arguments <- list(...)
-    ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
+    ssEnv <- init_env(result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 
 
     arguments <- list(...)
@@ -27,10 +27,12 @@ ss_analysis <-
     localKeys <- ssEnv$keys_markers_figures
     sample_groups <- c("Reference", "Control", "Case")
 
+    annotate_bed()
     create_excel_pivot()
-    result_folderPivot <- dir_check_and_create(ssEnv$result_folderData, "Pivots")
 
     study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+    study_summary <- filter_sql(samples_sql_selection, study_summary)
+
     study_summary <- study_summary[, c("Sample_ID",independent_variable)]
 
     markers <- unique(ssEnv$keys_markers_figures$MARKER)
@@ -40,16 +42,18 @@ ss_analysis <-
     for (a in 1:length(markers))
     {
       # a <- 2
-      fileNameResults <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),independent_variable, "sensitivity_specificity_analisys"),extension = "csv")
-      fileNameResultsTemp <- file_path_build(baseFolder =  ssEnv$result_folderEuristic,detailsFilename =  c(as.character(markers[a]),independent_variable,"sensitivity_specificity_analisys","tmp"),extension = "csv")
+      dest_path <- dir_check_and_create(ssEnv$result_folderEuristic, samples_sql_selection)
+      fileNameResults <- file_path_build(baseFolder =  dest_path,detailsFilename =  c( as.character(markers[a]),independent_variable, "sensitivity_specificity_analisys"),extension = "csv")
+      fileNameResultsTemp <- file_path_build(baseFolder =  dest_path,detailsFilename =  c( as.character(markers[a]),independent_variable,"sensitivity_specificity_analisys","tmp"),extension = "csv")
 
       localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
       keys <- localKeys_1[localKeys_1$MARKER == markers[a], ]
 
+      browser()
       # clean keys from already done analysis
       if (file.exists(fileNameResults))
       {
-        results <- utils::read.csv2(fileNameResults, header  =  T)
+        results <- utils::read.csv2(fileNameResults, header  =  T, sep=";")
         keys_markers_figures_areas_done <- unlist(apply(unique(results [, c("MARKER", "FIGURE", "AREA", "SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
         keys_to_be_done <-
           unlist(apply(keys[, c("MARKER", "FIGURE", "AREA", "SUBAREA")], 1, function(x)
@@ -66,8 +70,8 @@ ss_analysis <-
         {
           # k <- 3
           key <- keys [k, ]
-          pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
-          fname <- file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv")
+          pivot_subfolder <- dir_check_and_create(ssEnv$result_folderData,c("Pivots",key$MARKER))
+          fname <- file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv", add_gz = T)
           if (file.exists(fname))
           {
             log_event("INFO: ",
@@ -122,14 +126,13 @@ ss_analysis <-
 
             labels <- unique(tempDataFrame[,independent_variable])
             # get all the combinations of two over all labels
-            combinations <- combinat::combn(labels, 2)
+            # combinations <- combinat::combn(labels, 2)
             for ( comb in 1:ncol(combinations))
             {
-
-              control_label <- combinations[1,comb]
-              case_label <- combinations[2,comb]
-              control_label <- as.character(control_label)
-              case_label <- as.character(case_label)
+              control_label <- combinations[rownames(combinations)=="Control",comb]
+              case_label <- combinations[rownames(combinations)=="Case",comb]
+              # control_label <- as.character(control_label)
+              # case_label <- as.character(case_label)
 
               # reduce the dataframe to the two labels
               tempDataFrameComb <- tempDataFrame[tempDataFrame[,independent_variable] %in% c(control_label, case_label),]
@@ -165,6 +168,9 @@ ss_analysis <-
                 if(sum(predicted_labels) == length(predicted_labels))
                   conf_matrix <- cbind(conf_matrix, "FALSE"=0)
 
+                # check if conf matrix as 2x2 shape
+                if (nrow(conf_matrix) != 2 | ncol(conf_matrix) != 2)
+                  browser()
                 # Calculate sensitivity and specificity
                 sensitivity <- conf_matrix["TRUE","TRUE"] / sum(conf_matrix["TRUE", ])
                 specificity <- conf_matrix["FALSE", "FALSE"] / sum(conf_matrix["FALSE", ])
@@ -252,7 +258,6 @@ ss_analysis <-
       # drop column if all is na
       if (!exists("results"))
         next
-      results <- subset(results, results$AREA != "CHR")
       results <- results[, colSums(is.na(results)) != nrow(results)]
       results <- results[,result_colnames]
       results$SPECIFICITY <- round(as.numeric(results$SPECIFICITY),4)
@@ -271,7 +276,7 @@ ss_analysis <-
       results <- results[,result_colnames]
 
       # sort by SCORE descending
-      results <- results[order(-results$SCORE),]
+      results <- unique(results[order(-results$SCORE),])
       utils::write.csv2(x = results, file = fileNameResults,row.names = FALSE)
       rm(results)
       if(file.exists(fileNameResultsTemp))

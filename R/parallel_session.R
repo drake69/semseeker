@@ -73,7 +73,7 @@ parallel_session <- function()
   if(parallel_strategy=="multicore")
   {
     future::plan( future::multicore, workers = nCore)
-    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in muticore with:", nCore," Cores")
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work in multicore with:", nCore," Cores")
   }
   if(parallel_strategy=="cluster")
   {
