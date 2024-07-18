@@ -1,5 +1,9 @@
-name_cleaning <- function(name)
+name_cleaning <- function(name, default_empty ="")
 {
+
+  if (name=="" & default_empty!="")
+    name = default_empty
+
   name <- toupper(name)
   # replace < <= > >= and ==
   name <- gsub("!=","_diseq_",name)
