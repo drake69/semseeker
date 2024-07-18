@@ -56,7 +56,8 @@
 #     if(file.exists(phenotype_report_path))
 #       next
 #
-#     results_inference <- get_results_areas_inference(inference_detail,keys[i,"MARKER"], pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method, areas_sql_condition = areas_sql_condition)
+#     results_inference <- association_results_get(inference_detail,keys[i,"MARKER"],
+#     pvalue, adjust_per_area, adjust_globally,pvalue_column,adjustment_method, significance = TRUE)
 #
 #     if (nrow(results_inference)==0)
 #       next

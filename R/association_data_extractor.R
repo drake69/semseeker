@@ -1,4 +1,4 @@
-association_data_extractor <- function(inference_details, areas_sql_conditions=c(),destination_folder="", result_folder="", ...)
+association_data_extractor <- function(inference_details,destination_folder="", result_folder="", ...)
 {
 
   arguments <- list(...)
@@ -33,7 +33,7 @@ association_data_extractor <- function(inference_details, areas_sql_conditions=c
       {
         results_inference <- utils::read.csv2(fileNameResults, header  =  T)
         results_inference <- subset(results_inference, FIGURE %in% keys$FIGURE)
-        results_inference <- filter_sql(areas_sql_conditions, results_inference)
+        results_inference <- filter_sql(inference_detail$areas_sql_condition, results_inference)
 
         # remove any column with name containg SAMPLES_SQL_CONDITION
         results_inference <- results_inference[,!grepl("SAMPLES_SQL_CONDITION", colnames(results_inference))]
@@ -43,7 +43,7 @@ association_data_extractor <- function(inference_details, areas_sql_conditions=c
           results_inference$SAMPLES_SQL_CONDITION <- inference_detail$samples_sql_condition
 
         final_results <- plyr::rbind.fill(final_results, results_inference)
-        # log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," sql executed:", areas_sql_conditions)
+        # log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," sql executed:", areas_sql_condition)
         filePathResults <- file.path(destination_folder, paste0(inference_detail$family_test, "_", markers[a], ".csv"))
         if(destination_folder != "")
           utils::write.csv2(results_inference, filePathResults, row.names = FALSE)
@@ -54,13 +54,13 @@ association_data_extractor <- function(inference_details, areas_sql_conditions=c
 }
 
 
-summary_association_analysis <- function(inference_details, areas_sql_conditions=c(),destination_folder="", result_folder="", ...)
+summary_association_analysis <- function(inference_details,destination_folder="", result_folder="", ...)
 {
   if(result_folder!="")
     ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   else
     ssEnv <- get_session_info()
-  association_data <- association_data_extractor(inference_details, areas_sql_conditions, destination_folder, result_folder, ...)
+  association_data <- association_data_extractor(inference_details, destination_folder, result_folder, ...)
 
 
   available_metrics <- toupper(semseeker::metrics_properties[,"Metric"])

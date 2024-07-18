@@ -35,9 +35,6 @@ metrics_ranking <- function (metric,data_frame, column_to_rank ="REBASED"){
   # # merge the rank with the data frame
   # data_frame <- merge(data_frame, values_to_rank, by.x=column_to_rank, by.y="VALUE", all.x=TRUE)
 
-  # Normalization functions
-  normalize_minimize <- function(x) (max(x) - x) / (max(x) - min(x))
-  normalize_maximize <- function(x) (x - min(x)) / (max(x) - min(x))
   data_frame$METRIC <- metric
 
   if(max(data_frame[,column_to_rank]) == min(data_frame[,column_to_rank])){
@@ -59,9 +56,14 @@ metrics_ranking <- function (metric,data_frame, column_to_rank ="REBASED"){
   {
 
   }
-  data_frame$SCORE <- round(data_frame$SCORE, 2)
+  data_frame$SCORE <- rank(data_frame$SCORE, ties.method = "min")
   # # add the marker and figure to the data frame
   # scores <- rbind(scores, )
 
   return(data_frame)
 }
+
+
+# Normalization functions
+normalize_minimize <- function(x) {(max(x) - x) / (max(x) - min(x))}
+normalize_maximize <- function(x) {(x - min(x)) / (max(x) - min(x))}

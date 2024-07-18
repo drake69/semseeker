@@ -1,6 +1,9 @@
 enrichment_analysy_add_category <- function(source, data)
 {
 
+  if(nrow(data)==0)
+    return(data)
+
   ssEnv <- get_session_info()
   #TO DO: normalize naming of differente data sources
   if(source=="phenolyzer")
@@ -14,6 +17,11 @@ enrichment_analysy_add_category <- function(source, data)
     data[data$type=='BP',"SS_CATEGORY"] <- "GO-BP"
     data[data$type=='CC',"SS_CATEGORY"] <- "GO-CC"
     data[data$type=='MF',"SS_CATEGORY"] <- "GO-MF"
+  }
+  if(source=="ctdR")
+  {
+    data$source <- toupper(data$source)
+    data[,"SS_CATEGORY"] <- "CHEMICAL"
   }
 
   if(source=="pathfindR")
@@ -36,7 +44,6 @@ enrichment_analysy_add_category <- function(source, data)
     data[data$category=='KEGG',"SS_CATEGORY"] <- "KEGG-ORA"
   }
 
-  data$SS_RANK <- 0
   with_category <- data[!is.na(data$SS_CATEGORY),]
   categories <- na.omit(unique(with_category$SS_CATEGORY))
 
@@ -44,43 +51,50 @@ enrichment_analysy_add_category <- function(source, data)
 
 
   # Normalization functions
-  normalize_minimize <- function(x) (max(x) - x) / (max(x) - min(x))
-  normalize_maximize <- function(x) (x - min(x)) / (max(x) - min(x))
+  # normalize_minimize <- function(x) (max(x) - x) / (max(x) - min(x))
+  # normalize_maximize <- function(x) (x - min(x)) / (max(x) - min(x))
 
   # rank per SS_CATEGORY
   data <- data[is.na(data$SS_CATEGORY),]
   for (c in categories)
   {
-
+    if(!any(c %in% with_category$SS_CATEGORY))
+      next
+    to_rank <- with_category[with_category$SS_CATEGORY==c,]
+    if(nrow(to_rank)==0)
+      next
     # fdr
     column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_pvalue"]
-    if(max(with_category[,column_to_rank]) == min(with_category[,column_to_rank]))
-      with_category$SCORE_FDR <- 1
+    if(!any(column_to_rank %in% colnames(to_rank)))
+      browser()
+    # message(column_to_rank)
+    if(max(to_rank[,column_to_rank], na.rm=T) == min(to_rank[,column_to_rank], na.rm=T))
+      to_rank$SS_RANK_FDR <- 1
     else
-      with_category$SCORE_FDR <- normalize_minimize(with_category[,column_to_rank])
-
+    {
+      to_rank$SS_RANK_FDR <- normalize_minimize(to_rank[,column_to_rank])
+      to_rank$SS_RANK_FDR <- rank(-to_rank$SS_RANK_FDR, ties.method = "min")
+    }
     column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_enrichment"]
-    if(max(with_category[,column_to_rank]) == min(with_category[,column_to_rank]))
-      with_category$SCORE_ENRICHMENT <- 1
+    if(!any(column_to_rank %in% colnames(to_rank)))
+      browser()
+    # message(column_to_rank)
+    if(max(to_rank[,column_to_rank], na.rm=T) == min(to_rank[,column_to_rank], na.rm=T))
+      to_rank$SS_RANK_ENRICHMENT <- 1
     else
-      with_category$SCORE_ENRICHMENT <- normalize_maximize(with_category[,column_to_rank])
-
+    {
+      to_rank$SS_RANK_ENRICHMENT <- normalize_maximize(to_rank[,column_to_rank])
+      to_rank$SS_RANK_ENRICHMENT <- rank(-to_rank$SS_RANK_ENRICHMENT, ties.method = "min")
+    }
 
     # do a total score
-    with_category$SS_SCORE <- with_category$SCORE_FDR + with_category$SCORE_ENRICHMENT
-    # orde by SCORE descending
-    with_category <- with_category[order(with_category$SS_SCORE, decreasing = TRUE),]
+    to_rank$SS_RANK <- to_rank$SS_RANK_FDR + to_rank$SS_RANK_ENRICHMENT
 
-    # remove columns SCORE_FDR and SCORE_ENRICHMENT
-    with_category <- with_category[,!(names(with_category) %in% c("SCORE_FDR","SCORE_ENRICHMENT"))]
-
-    end <- sum(with_category$SS_CATEGORY==c, na.rm = TRUE)
-    to_rank <- with_category[with_category$SS_CATEGORY==c,]
-    to_rank$SS_RANK <- 1:end
+    to_rank$SS_RANK <- rank(-to_rank$SS_RANK, ties.method = "min")
     data <- plyr::rbind.fill(data,to_rank)
   }
 
-  data$SS_SCORE <- round(data$SS_SCORE,2)
+  data$SS_RANK <- round(data$SS_RANK,2)
 
   return(data)
 

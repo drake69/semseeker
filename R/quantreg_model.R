@@ -17,8 +17,10 @@ quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_
   res <- data.frame("tau" = tau)
 
   dep_var <- sig.formula_vars(sig.formula)
+  # independent_variable <- dep_var$dependent_variable
+  # dependent_variable <- dep_var$independent_variable
   dependent_variable <- dep_var$dependent_variable
-  inddependent_variable <- dep_var$independent_variable
+  independent_variable <- dep_var$independent_variable
 
   try({
     model <- lqmm::lqm(sig.formula, tau =tau, data = tempDataFrame, na.action = stats::na.omit, control = lqm_control)

@@ -3,11 +3,14 @@ name_cleaning <- function(name)
   name <- toupper(name)
   # replace < <= > >= and ==
   name <- gsub("!=","_diseq_",name)
-  name <- gsub("<","_lt_",name)
-  name <- gsub("<=","_lte_",name)
-  name <- gsub(">","_gt_",name)
   name <- gsub(">=","_gte_",name)
+  name <- gsub("=>","_gte_",name)
+  name <- gsub("<=","_lte_",name)
+  name <- gsub("=<","_lte_",name)
   name <- gsub("==","_eq_",name)
+
+  name <- gsub("<","_lt_",name)
+  name <- gsub(">","_gt_",name)
 
   name <- toupper(gsub("[.]", "_", name))
   name <- toupper(gsub(" ", "_", name))

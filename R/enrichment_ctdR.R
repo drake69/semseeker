@@ -1,6 +1,6 @@
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
-pathway_STRINGdb <- function(study,
+pathway_ctdR <- function(study,
   statistic_parameter="",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_details, significance = TRUE)
@@ -17,9 +17,9 @@ pathway_STRINGdb <- function(study,
   keys <- unique(ssEnv$keys_for_pathway)
 
   #check if optional package is installed
-  if(!requireNamespace("STRINGdb", quietly = TRUE))
+  if(!requireNamespace("ctdR", quietly = TRUE))
   {
-    log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y"),"STRINGdb package is not installed. Please install STRINGdb package to use this function.")
+    log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y"),"ctdR package is not installed. Please install ctdR package to use this function.")
     return()
   }
 
@@ -31,8 +31,6 @@ pathway_STRINGdb <- function(study,
   else
     progress_bar <- ""
 
-  string_db <- STRINGdb::STRINGdb$new(version="11.5", species=9606, # 9606 is the taxonomy ID for Homo sapiens
-    score_threshold=400, input_directory="")
 
   for(id in 1:nrow(inference_details))
   {
@@ -47,7 +45,7 @@ pathway_STRINGdb <- function(study,
         existing_keys <- unique(pathway_report[pathway_report$source==db,"key"])
 
       if(ssEnv$showprogress)
-        progress_bar(sprintf("Searching for pathway using STRINGdb for %s",keys[i,]$COMBINED))
+        progress_bar(sprintf("Searching for pathway using ctdR for %s",keys[i,]$COMBINED))
 
       key <- paste(keys[i,]$AREA,keys[i,]$SUBAREA,keys[i,]$MARKER,keys[i,]$FIGURE, sep="_")
 
@@ -56,7 +54,7 @@ pathway_STRINGdb <- function(study,
         suffix = "without_signal_"
 
       phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
-      path <- dir_check_and_create(ssEnv$result_folderPathway,c("STRINGdb",name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+      path <- dir_check_and_create(ssEnv$result_folderPathway,c("ctdR",name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
       pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
 
       # if(file.exists(pathway_report_path))
@@ -66,7 +64,7 @@ pathway_STRINGdb <- function(study,
         pp <- read.csv2(pathway_report_path,stringsAsFactors = FALSE)
         if(nrow(pp)==0)
           next
-        pp <- enrichment_analysy_add_category("STRINGdb",pp)
+        pp <- enrichment_analysy_add_category("ctdR",pp)
         write.csv2(pp,pathway_report_path,row.names = FALSE)
         next
       }
@@ -80,6 +78,11 @@ pathway_STRINGdb <- function(study,
         adjustment_method = adjustment_method,
         significance = TRUE)
 
+      results_inference$AREA_OF_TEST <- results_inference$ENTREZID
+
+      # remove rows wher AREA_OF_TEST is na
+      results_inference <- results_inference[!is.na(results_inference$AREA_OF_TEST),]
+
       if (nrow(results_inference)==0)
         next
 
@@ -92,6 +95,7 @@ pathway_STRINGdb <- function(study,
         gene_set <- results_inference[results_inference$FIGURE=="HYPER" | results_inference$FIGURE=="HYPO",]
       else
         gene_set <- results_inference[results_inference$FIGURE==keys[i,]$FIGURE,]
+
 
       # gene_set <- na.omit(gene_set)
       if (statistic_parameter=="")
@@ -131,35 +135,25 @@ pathway_STRINGdb <- function(study,
       if(nrow(gene_set)<5)
         next
 
-      log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Started STRINGdb analysis")
+      gene_set <- gene_set[, c("AREA_OF_TEST",pvalue_column)]
+      colnames(gene_set) <- c("entrez_ids", "pvalue")
+      result_pathway <- ctdR::enrichment_CTD(gene_set)
+      result_pathway <- as.data.frame(result_pathway)
 
-      colnames(gene_set) <- c("pvalue","logfc","gene")
-      # Map the gene list to STRING IDs
-      mapped_genes <- string_db$map(gene_set, "gene")
+      # remove leadingEdge
+      result_pathway$leadingEdge <- NULL
 
-      result_pathway <- string_db$get_enrichment(mapped_genes$STRING_id)
+      log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Started ctdR analysis")
+
+
       if(nrow(result_pathway)==0)
         next
 
-        # Assume total background number)
+      # Assume total background number)
       result_pathway$key <- key
+      result_pathway$source <- "ctdR"
 
-      # Assume total background number of genes (for Homo sapiens) is available
-      # For example, let's assume the total background number of genes is 20000
-      total_background_genes <- 20000
-
-      if(any(grepl("html",result_pathway[,1])))
-      {
-        log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " STRINGdb api server PROBLEM!")
-        next
-      }
-
-      # Calculate fold result_pathway
-      result_pathway$expected_count <- (length(mapped_genes$STRING_id) * result_pathway$number_of_genes_in_background) / total_background_genes
-      result_pathway$fold_enrichment <- result_pathway$number_of_genes / result_pathway$expected_count
-
-
-      log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Done STRINGdb analysis")
+      log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Done ctdR analysis")
 
 
       if(exists("result_pathway"))
@@ -171,6 +165,5 @@ pathway_STRINGdb <- function(study,
         }
       }
     }
-
   }
 }

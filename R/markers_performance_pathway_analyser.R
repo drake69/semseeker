@@ -1,12 +1,12 @@
 #' @export
 markers_performance_pathway_analyser <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
-  significance = TRUE,disease_hpo, disease_description,keywords,stop_keywords,alphas,top=50,pathway_alpha=0.05,areas_sql_condition, ...)
+  significance = TRUE,disease_hpo, disease_description,keywords,stop_keywords,alphas,top=50,pathway_alpha=0.05, ...)
 {
   #
   if(length(disease_hpo)>0)
     disease_original <- gsub("[:]","_",disease_hpo)
   else
-  disease_original <- ""
+    disease_original <- ""
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   keys <- unique(ssEnv$keys_for_pathway)
   inference_details <- as.data.frame(inference_details)
@@ -36,9 +36,9 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # id <- 2
         inference_detail <- inference_details[id,]
         if(key_enrichment_format[pt,"type"]=="Pathway")
-          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
         else
-          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
         family_test <- inference_detail$family_test
         transformation <- as.character(inference_detail$transformation)
         independent_variable <- inference_detail$independent_variable
@@ -116,7 +116,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
             # remove item with the stop kewywords where by_keyword is TRUE
             pathway_result[pathway_result$by_keyword,"by_keyword"] <- sapply(pathway_result[pathway_result$by_keyword,column_of_description], function(x) !any(grepl(paste(stop_keywords, collapse = "|"), x, ignore.case = TRUE)))
 
-            aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
+          aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
         }
 
         # browser()
@@ -155,7 +155,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           next
 
 
-        plot_path <- dir_check_and_create(ssEnv$result_folderChart,c("PATHWAYS",key_enrichment_format[pt,"label"],name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+        plot_path <- dir_check_and_create(ssEnv$result_folderChart,c("PATHWAYS",key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
         if (significance & key_enrichment_format[pt,"label"]!="phenolyzer")
           marker_performance_pathway_plot(aggregated_patwhay_result_total, key_enrichment_format[pt,],file_prfx,plot_path, disease, performance_category="MARKER",top)
 

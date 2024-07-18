@@ -57,7 +57,7 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
   #   }
   # }
 
-  if (plot & 1 != 1) {
+  if (plot) {
     if (!exists("expected_values") || !exists("predicted_values") || !exists("permutation_vector")) {
       stop("Required variables (expected_values, predicted_values, permutation_vector) are missing.")
     }

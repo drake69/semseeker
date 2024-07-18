@@ -58,6 +58,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   # foreach::foreach(z  =  1:nrow(inference_details), .export  =  variables_to_export) %dorng%
   for(z in 1:nrow(inference_details))
   {
+    results <- data.frame()
     start_time <- Sys.time()
     processed_items <- 0
     inference_detail <- inference_details[z,]
@@ -388,6 +389,12 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
 save_result <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
 
+
+  # there is a bug which mantain more family test in the same results file
+  # so we need to filter the results
+  # browser()
+  colnames(results) <- toupper(colnames(results))
+  results <- subset(results, FAMILY.TEST==as.character(family_test))
 
   # check if results is empty
   if(is.null(results))

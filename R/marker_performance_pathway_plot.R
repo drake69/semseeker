@@ -1,4 +1,4 @@
-marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease, performance_category="MARKER", top=50)
+marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease, performance_category="MARKER", top=50, column_sorting="SS_RANK")
 {
 
   ssEnv <- get_session_info()
@@ -85,8 +85,6 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
       library(ggplot2)
       library(ggstance)  # Assuming position_dodgev is from ggstance
 
-      # sort data by SS_RANK ascending
-      # data_to_plot <- data_to_plot[order(data_to_plot$SS_RANK),]
       # get for each Description the mean of log_fdr
       data_to_plot <- data_to_plot %>%
         group_by(Description) %>%
@@ -96,7 +94,7 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
       # Ensure the data_to_plot$Description is a factor and reorder it based on log_fdr
       # data_to_plot$Description <- reorder(data_to_plot$Description, data_to_plot$mean_log_fdr, decreasing = TRUE)
       # order data by mean_log_fdr descending
-      data_to_plot <- data_to_plot[order(data_to_plot$mean_log_fdr, decreasing = TRUE),]
+      data_to_plot <- data_to_plot[order(data_to_plot[,column_sorting], decreasing = FALSE),]
       data_to_plot[,performance_category] <- data_to_plot[,performance_category] %>% as.factor()
 
       unique_description <- unique(data_to_plot$Description)[1:top]

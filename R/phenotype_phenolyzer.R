@@ -1,7 +1,7 @@
 phenotype_phenolyzer <- function(study,
   disease,phenolyzer_folder_bin,minimum_score = 0.5, statistic_parameter = "",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_detail, significance = TRUE, areas_sql_condition)
+  inference_detail, significance = TRUE)
 {
 
   # start_fresh <- FALSE
@@ -46,7 +46,7 @@ phenotype_phenolyzer <- function(study,
       progress_bar(sprintf("Searching for disease using phenolyzer: %s",keys[i,]$COMBINED))
     key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
 
-    base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer",name_cleaning(areas_sql_condition)))
+    base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer",name_cleaning(inference_detail$areas_sql_condition)))
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "scores")
     annotated_gene_file <- file.path(tempFolder,"ex8.annotated_gene_scores")
     phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_",disease_label,"_gene_scores",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
@@ -55,14 +55,14 @@ phenotype_phenolyzer <- function(study,
     if(file.exists(phenotype_report_path))
       next
 
-    results_inference <- get_results_areas_inference(
+    results_inference <- association_results_get(
       inference_detail =  inference_detail,
       marker = keys[i,"MARKER"],
       adjust_per_area= adjust_per_area,
       adjust_globally = adjust_globally,
       pvalue_column=  pvalue_column,
       adjustment_method= adjustment_method,
-      areas_sql_condition = areas_sql_condition)
+      significance = TRUE)
 
     if (nrow(results_inference)==0)
       next

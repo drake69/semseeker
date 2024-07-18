@@ -1,7 +1,7 @@
 pathway_WebGestalt <- function(study,
   types=c("BP","MF"),  enrich_methods = c("ORA"),
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_detail,significance, areas_sql_condition)
+  inference_detail,significance)
 {
 
   #
@@ -10,7 +10,7 @@ pathway_WebGestalt <- function(study,
   ssEnv <- get_session_info()
   pvalue_column <- name_cleaning(pvalue_column)
   keys <- unique(ssEnv$keys_for_pathway)
-  path <- dir_check_and_create(ssEnv$result_folderPathway,c("WebGestalt",name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+  path <- dir_check_and_create(ssEnv$result_folderPathway,c("WebGestalt",name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
   tmp <- tempdir()
   tempFolder <- dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
 
@@ -57,14 +57,14 @@ pathway_WebGestalt <- function(study,
           progress_bar(sprintf("Searching for disease using WebGestalt: %s with %s and %s",keys[i,]$COMBINED,enrich_method,type))
         key <- paste(keys[i,]$FIGURE,keys[i,]$MARKER,keys[i,]$AREA,keys[i,]$SUBAREA, sep="_")
 
-        results_inference <- get_results_areas_inference(
+        results_inference <- association_results_get(
           inference_detail =  inference_detail,
           marker = keys[i,"MARKER"],
           adjust_per_area= adjust_per_area,
           adjust_globally = adjust_globally,
           pvalue_column=  pvalue_column,
           adjustment_method= adjustment_method,
-          areas_sql_condition = areas_sql_condition)
+          significance = TRUE)
 
         #
 

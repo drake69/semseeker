@@ -133,6 +133,7 @@ keys_create <- function(ssEnv, arguments)
   key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Pathway","label"="Phenolyzer_WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
   key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Phenotype","label"="phenolyzer","column_of_id"="Description","column_of_description"="Description","column_of_pvalue"="Score","column_of_enrichment"="Score"))
   key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="pathfindR","column_of_id"="ID","column_of_description"="Term_Description", "column_of_pvalue"="PVALUE_ADJ_ALL_FDR","column_of_enrichment"="Fold_Enrichment"))
+  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="ctdR","column_of_id"="ChemicalID","column_of_description"="ChemicalName", "column_of_pvalue"="padj","column_of_enrichment"="foldEnrichment"))
 
   ssEnv$key_enrichment_format <- key_enrichment_format
 

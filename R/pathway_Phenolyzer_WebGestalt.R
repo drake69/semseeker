@@ -1,7 +1,7 @@
 pathway_Phenolyzer_WebGestalt <- function(study,
   types=c("BP","MF"),  enrich_methods = c("ORA"),disease,
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_detail,significance, areas_sql_condition)
+  inference_detail,significance)
 {
 
   #
@@ -10,7 +10,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
   ssEnv <- get_session_info()
   pvalue_column <- name_cleaning(pvalue_column)
   keys <- unique(ssEnv$keys_for_pathway)
-  path <- dir_check_and_create(ssEnv$result_folderPathway,c("Phenolyzer_WebGestalt",name_cleaning(areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+  path <- dir_check_and_create(ssEnv$result_folderPathway,c("Phenolyzer_WebGestalt",name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
   tmp <- tempdir()
   tempFolder <- dir_check_and_create(tmp,c("/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]")))
 
@@ -59,7 +59,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
 
         #### START LOAD PHENOLYZER
         # load prioritized gene by phenolyzer
-        base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer",name_cleaning(areas_sql_condition)))
+        base_path <- dir_check_and_create(ssEnv$result_folderPhenotype,c("phenolyzer",name_cleaning(inference_detail$areas_sql_condition)))
         phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_", disease,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
         path_phenolyzer <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
         phenotype_report_path <- file_path_build(path_phenolyzer,phenotype_analysis_name,"csv")

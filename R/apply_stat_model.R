@@ -91,8 +91,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
           if(length(stats::na.omit(independent_variableData2ndLevel))==0 | length(stats::na.omit(independent_variableData1stLevel))==0)
           {
-            log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " I stop because one of the two groups is empty." )
-            stop()
+            log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " I skip this test because one of the two groups is empty." )
+            colnames(local_result) <- toupper(colnames(local_result))
+            local_result$PVALUE <- NA
           }
 
           local_result$CASE.LABEL <- if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA
@@ -123,7 +124,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         colnames(local_result) <- toupper(colnames(local_result))
 
         # local_result
-        result_temp <- plyr::rbind.fill(result_temp, local_result)
+        # result_temp <- plyr::rbind.fill(result_temp, local_result)
+        local_result
       }
     }
 

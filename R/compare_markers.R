@@ -13,8 +13,9 @@ compare_markers <- function(inference_detail){
     for (s in 1:nrow(studies))
     {
       # get the inference details for the study
-      temp_res <- get_results_areas_inference(inference_details = inference_detail, marker = MARKER, area= AREA,
-         adjust_per_area = adjust_per_area, adjust_globally = adjust_globally, pvalue_column= pvalue_column,adjustment_method = adjustment_method, areas_sql_condition = "")
+      temp_res <- association_results_get(inference_details = inference_detail, marker = MARKER, area= AREA,
+         adjust_per_area = adjust_per_area, adjust_globally = adjust_globally, pvalue_column= pvalue_column,
+        adjustment_method = adjustment_method,significance = TRUE)
       if(nrow(temp_res) != 0)
         temp_res$STUDY <- studies[s,"STUDY"]
       aggregated_markers_results <- plyr::rbind.fill(aggregated_markers_results, temp_res)

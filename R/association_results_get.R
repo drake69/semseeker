@@ -1,6 +1,6 @@
-get_results_areas_inference <- function (inference_detail, marker, adjust_per_area = F, adjust_globally = F,
+association_results_get <- function (inference_detail, marker, adjust_per_area = F, adjust_globally = F,
   pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE",
-  omit_na = TRUE, significance = NULL, areas_sql_condition="")
+  omit_na = TRUE, significance = NULL)
 {
 
 
@@ -70,10 +70,38 @@ get_results_areas_inference <- function (inference_detail, marker, adjust_per_ar
     else
       results_inference <- subset(results_inference, results_inference[,pvalue_column] >= as.numeric(ssEnv$alpha))
   }
+
+  # remove where pvalue_column is NA
+  results_inference <- results_inference[!is.na(results_inference[,pvalue_column]),]
+  # remove where pvalue_column is -Inf or +Inf
+  results_inference <- results_inference[results_inference[,pvalue_column] != -Inf,]
+  results_inference <- results_inference[results_inference[,pvalue_column] != Inf,]
+
   # if(omit_na)
   #   results_inference <- na.omit(results_inference)
 
-  results_inference <- filter_sql(areas_sql_condition, results_inference)
+  results_inference <- filter_sql(inference_detail$areas_sql_condition, results_inference)
+
+  if(nrow(results_inference) == 0)
+    return(data.frame())
+
+  entrez_ids <- rep(NA, length(results_inference$AREA_OF_TEST))
+  tryCatch({
+    entrez_ids <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, keys = results_inference$AREA_OF_TEST, column = "ENTREZID", keytype = "SYMBOL", multiVals = "first")
+  }, error = function(e) {
+
+  })
+
+
+  results_inference$ENTREZID <- entrez_ids
+  #
+  entrez_ids_not_na <- entrez_ids[!is.na(entrez_ids)]
+  if ((length(entrez_ids_not_na) != length(results_inference$AREA_OF_TEST)))
+  {
+    lost_gene <- unique(results_inference$AREA_OF_TEST[is.na(entrez_ids)])
+    # browser()
+  }
+
   log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," inference file loaded:", inferenceFile)
   return(results_inference)
 }
