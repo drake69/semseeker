@@ -1,8 +1,5 @@
-name_cleaning <- function(name, default_empty ="")
+name_cleaning <- function(name)
 {
-
-  if (name=="" & default_empty!="")
-    name = default_empty
 
   name <- toupper(name)
   # replace < <= > >= and ==

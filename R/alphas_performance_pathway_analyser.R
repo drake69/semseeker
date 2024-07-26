@@ -100,9 +100,6 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
             pathway_result$FIGURE <- keys[i,"FIGURE"]
             # pathway_result$key <- paste(pathway_result$MARKER,pathway_result$FIGURE,pathway_result$AREA,pathway_result$SUBAREA,sep="_")
 
-            if(key_enrichment_format[pt,"label"]=="pathfindR")
-              # adjust pvalue
-              pathway_result$PVALUE_ADJ_ALL_FDR <- p.adjust(pathway_result[,"highest_p"], method = "fdr")
 
             pathway_result$by_keyword <- FALSE
             if(length(keywords)>0)

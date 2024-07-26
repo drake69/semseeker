@@ -14,7 +14,7 @@ Imports: dplyr, doFuture, doRNG, FactoMineR, factoextra, foreach, FSA,
         lqmm, plyr, progressr, reshape, reshape2, R.utils, rlang,
         stats, stringr, utils, withr, zoo, VennDiagram, effsize, pwr,
         combinat, philentropy, parallelly, knitr, lmtest, usethis,
-        glmnet
+        glmnet, sqldf
 RoxygenNote: 7.3.2
 Suggests: openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR, wordcloud

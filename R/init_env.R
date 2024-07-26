@@ -19,6 +19,9 @@ init_env <- function(result_folder, maxResources = 90, ...)
     }
   )
 
+  # set digits to 22
+  withr::local_options(list(digits = 22))
+
   # suppress warnings messages of packages
   PKGs<- c("future","doRNG","doParallel","progressr","data.table","ggplot2","dplyr",
     "readr","readxl","stringr","tidyr","tibble","purrr","ggpubr","ggrepel","ggsci","foreach","VennDiagram")
@@ -31,7 +34,6 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments[["areas_selection"]] <- NULL
 
   # remove all empty items from arguments
-  #
   arguments <- lapply(arguments, function(x) gsub(" ", "", x))
   arguments <- lapply(arguments, function(x) x[x!=""])
   arguments <- arguments[sapply(arguments, function(x) length(x) > 0)]
@@ -64,7 +66,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv$seed <- 7658776
   set.seed(ssEnv$seed)
 
-  
+
   arguments <- set_env_variable(arguments,"verbosity",1)
   arguments <- set_env_variable(arguments,"q_b_param",data.frame("DELTAP_B"=4,"DELTARP_B"=4,"DELTAQ_Q"=4,"DELTARQ_Q"=4))
   arguments <- set_env_variable(arguments,"DELTAP_B",4)

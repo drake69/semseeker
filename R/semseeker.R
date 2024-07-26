@@ -34,8 +34,6 @@ semseeker <- function(sample_sheet,
   log_event("BANNER:", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will search MARKERS for project \n in ", ssEnv$result_folderData)
   write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet_original.csv"), row.names = FALSE)
 
-  # set digits to 22
-  withr::local_options(list(digits = 22))
   sliding_window_size <- 11
 
   if(is.data.frame(sample_sheet) & is.data.frame(signal_data))

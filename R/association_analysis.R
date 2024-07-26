@@ -373,6 +373,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
             # remove any column containing in the name samples_sql_condition
             results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
+            results <- subset(results, MARKER == key$MARKER)
             # results$samples_sql_condition <- inference_detail$samples_sql_condition
             save_result(results,fileNameResults, family_test, filter_p_value )
 
@@ -389,6 +390,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
 save_result <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
 
+
+  if(nrow(results)==0)
+    return()
 
   # there is a bug which mantain more family test in the same results file
   # so we need to filter the results
