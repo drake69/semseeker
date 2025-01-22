@@ -113,7 +113,7 @@ compute_mean_delta_permutation_gpu_single <- function(sig.formula,df, n_permutat
     # log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y"), " Execution OPENCL done !")
     # system.time(res_ok <- apply(burden_permutated, 1, function(x) mean(x[phenotype == 0]) - mean(x[phenotype == 1])))
     # all.equal(res, res_ok)
-    # 
+    #
     return(res)
 }
 
@@ -165,7 +165,7 @@ compute_mean_delta_permutation_gpu <- function(sig.formula,df, n_permutations, s
   # log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y"), " Execution OPENCL done !")
   # system.time(res_ok <- apply(burden_permutated, 1, function(x) mean(x[phenotype == 0]) - mean(x[phenotype == 1])))
   # all.equal(res, res_ok)
-  # 
+  #
   return(res)
 }
 
@@ -179,7 +179,7 @@ compute_mean_delta_permutation_gpu <- function(sig.formula,df, n_permutations, s
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-mean_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable)
+mean_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable,plot, samples_sql_condition=samples_sql_condition, area, subarea)
 {
   ssEnv <- get_session_info()
   n_permutations <- NA

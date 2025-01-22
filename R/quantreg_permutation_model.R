@@ -32,7 +32,7 @@ compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot)
+quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
 {
   #
   ssEnv <- get_session_info()

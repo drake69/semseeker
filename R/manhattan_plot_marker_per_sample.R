@@ -1,7 +1,25 @@
+#' Title manhattan_plot_marker_per_sample
+#'
+#' @param sample_name
+#' @param probes_range
+#' @param hyper_color
+#' @param hypo_color
+#' @param non_outlier_color
+#' @param limit_label_color
+#' @param result_folder
+#' @param maxResources
+#' @param parallel_strategy
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range = 1000:2000,
-  hyper_color = ssEnv$color_palette[1],   hypo_color = "orange",   non_outlier_color = "grey", limit_label_color = ssEnv$color_palette[1],
+  hyper_color = "blue",   hypo_color = "orange",   non_outlier_color = "grey", limit_label_color = ssEnv$color_palette[1],
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
+
 
   limit_line_color <- ssEnv$color_palette[2]
   limit_line_color_q <- "cyan"
@@ -21,10 +39,10 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
   for(k in 1:length(localKeys)){
     marker <- as.character(localKeys[k])
     pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
-    fname_both <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
-    fname_hypo <- file_path_build( pivot_subfolder ,c(marker, "HYPO", "PROBE","WHOLE"),"csv")
-    fname_hyper <- file_path_build( pivot_subfolder ,c(marker, "HYPER", "PROBE","WHOLE"),"csv")
-    
+    fname_both <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz = TRUE)
+    fname_hypo <- file_path_build( pivot_subfolder ,c(marker, "HYPO", "PROBE","WHOLE"),"csv", add_gz = TRUE)
+    fname_hyper <- file_path_build( pivot_subfolder ,c(marker, "HYPER", "PROBE","WHOLE"),"csv", add_gz = TRUE)
+
     if (!file.exists(fname_both) | !file.exists(fname_hypo) | !file.exists(fname_hyper))
       tempKeys <- tempKeys[-k]
   }
@@ -34,24 +52,40 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
 
   for(j in 1:length(tempKeys))
   {
-    
+
     marker <- as.character(tempKeys[j])
     pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
-    fname_both <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv")
+    fname_both <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz = TRUE)
     if(!file.exists(fname_both))
       next
-    marker_data_both <- utils::read.csv2(fname_both, sep  =  ";")
-    marker_data_both <- marker_data_both[-1,]
+
+    data_name <- read.csv2(fname_both, sep  =  ";", nrows = 1)
+    marker_data_both <- utils::read.csv2(fname_both, sep  =  ";", skip = 1)
+    # remove column X1
+    marker_data_both <- marker_data_both[, !grepl("X1", colnames(marker_data_both))]
+    # rename column SAMPLE_GROUP as SAMPLEID
+    colnames(marker_data_both)[colnames(marker_data_both)=="SAMPLE_GROUP"] <- "SAMPLEID"
+    colnames(marker_data_both) <- colnames(data_name)
+    # marker_data_both <- utils::read.csv2(fname_both, sep  =  ";")
+    # marker_data_both <- marker_data_both[-1,]
+
     # if sample_name is not in the columns, then skip
+    if(!(sample_name %in% colnames(marker_data_both)))
+    {
+      # find the sample with highest number of probes
+      sample_name <- colnames(marker_data_both)[which.max(colSums(marker_data_both[,2:ncol(marker_data_both)]>0))]
+    }
     if(!(sample_name %in% colnames(marker_data_both)))
       next
     sample_marker_both <- marker_data_both[,sample_name]
     sample_marker_both <- as.numeric(as.vector(t(sample_marker_both)))
     probes <- marker_data_both$SAMPLEID
 
-    fname_hypo <- file_path_build( pivot_subfolder ,c(marker, "HYPO", "PROBE","WHOLE"),"csv")
+    fname_hypo <- file_path_build( pivot_subfolder ,c(marker, "HYPO", "PROBE","WHOLE"),"csv", add_gz = TRUE)
     if(!file.exists(fname_hypo))
       next
+
+
     marker_data_hypo <- utils::read.csv2(fname_hypo, sep  =  ";")
     marker_data_hypo <- marker_data_hypo[-1,]
     # add to marker data hypo missed rows from both
@@ -62,7 +96,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     # add to marker missed column from both
     missed <- setdiff(colnames(marker_data_both),colnames(marker_data_hypo))
     missed <- data.frame(SAMPLEID = probes, matrix(0, nrow = length(probes), ncol = length(missed)))
-    marker_data_hypo <- cbind(marker_data_hypo,missed)
+    marker_data_hypo <- merge(marker_data_hypo,missed, by ="SAMPLEID")
 
     # give the same order as in both
     marker_data_hypo <- marker_data_hypo[match(marker_data_both$SAMPLEID,marker_data_hypo$SAMPLEID),]
@@ -71,7 +105,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     sample_marker_hypo <- as.numeric(as.vector(t(sample_marker_hypo)))
     sample_marker_hypo <- ifelse(sample_marker_hypo!=0,"Hypo","")
 
-    fname_hyper <- file_path_build( pivot_subfolder ,c(marker, "HYPER", "PROBE","WHOLE"),"csv")
+    fname_hyper <- file_path_build( pivot_subfolder ,c(marker, "HYPER", "PROBE","WHOLE"),"csv", add_gz = TRUE)
     if(!file.exists(fname_hyper))
       next
     marker_data_hyper <- utils::read.csv2(fname_hyper, sep  =  ";")
@@ -83,9 +117,10 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     marker_data_hyper <- rbind(marker_data_hyper,missed)
 
     # add to marker missed column from both
-    missed <- setdiff(colnames(marker_data_both),colnames(marker_data_hyper))
-    missed <- data.frame(SAMPLEID = probes, matrix(0, nrow = length(probes), ncol = length(missed)))
-    marker_data_hyper <- cbind(marker_data_hyper,missed)
+    missed_samples <- setdiff(colnames(marker_data_both),colnames(marker_data_hyper))
+    missed <- data.frame(SAMPLEID = probes, matrix(0, nrow = length(probes), ncol = length(missed_samples)))
+    colnames(missed) <- c("SAMPLEID",missed_samples)
+    marker_data_hyper <- merge(marker_data_hyper,missed, by ="SAMPLEID")
 
     # give the same order as in both
     marker_data_hyper <- marker_data_hyper[match(marker_data_both$SAMPLEID,marker_data_hyper$SAMPLEID),]
@@ -111,15 +146,18 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     # Assuming data_to_plot is your data frame and it's already filtered or adjusted
     # to exclude the factor level corresponding to x=0
 
+    # calculate ratio of axis as
+    ratio <- length(probes)/(max(data_to_plot$signal_to_plot) * 4)
+
     pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(probes)), y = signal_to_plot, color = outlier)) +
-      ggplot2::geom_point(alpha = 0.6) +
       ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(probes)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.5) +
+      ggplot2::geom_point(alpha = 0.6) +
       ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, non_outlier_color)) +
       ggplot2::labs(x = "Probe", y = marker, title ="") +
       ggplot2::theme_classic() +
       ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5)) +
-      ggplot2::scale_x_continuous(limits = c(1, NA)) # Adjust the limits to exclude 0
-
+      ggplot2::scale_x_continuous(limits = c(1, NA)) +
+      ggplot2::coord_fixed(ratio = ratio)
 
     # pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(probes)), y = signal_to_plot, color = outlier)) +
     #   ggplot2::geom_point(alpha = 0.6) +
@@ -131,7 +169,9 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     #   ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
 
     plot_filename <- file_path_build(chart_folder,c(sample_name,marker),ssEnv$plot_format)
-    ggplot2::ggsave(filename =plot_filename,plot = pp,units = "in", width = 6, height = 2, dpi=300)
+    ggplot2::ggsave(filename =plot_filename,plot = pp,
+      # units = "in", width = 6, height = 2,
+      dpi=as.numeric(ssEnv$plot_resolution))
   }
 
 }

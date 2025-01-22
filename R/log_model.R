@@ -1,4 +1,4 @@
-log_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, sample_sql_condition)
+log_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
 {
 
   ssEnv <- get_session_info()
@@ -54,7 +54,7 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
 
   if(plot)
   {
-    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(sample_sql_condition)))
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(samples_sql_condition)))
     filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
 
     # do a plot with train.data, test.data and predictions with 3 different colors 1 color for train.data, 1 color for test.data and 1 color for predictions
@@ -76,7 +76,7 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
       width = 1240,
       height = 1240,
       units = c("px"),
-      dpi = 144
+      dpi = ssEnv$plot_resolution
     )
 
     # data_to_save <- cbind(train.data, predicted = apply(train.data[,independent_variable],1, function(x) (start_a * exp(start_b * x))))

@@ -1,4 +1,4 @@
-armonyse_taxonomies <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
+taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
   significance = TRUE, disease_description,keywords,stop_keywords,alphas,disease_hpo, ...)
 {
   if(length(disease_hpo)>0)
@@ -35,9 +35,9 @@ armonyse_taxonomies <- function(inference_details, result_folder, pvalue_column=
         # id <- 2
         inference_detail <- inference_details[id,]
         if(key_enrichment_format[pt,"type"]=="Pathway")
-          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition), name_cleaning(inference_detail$association_results_sql_condition)))
         else
-          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition), name_cleaning(inference_detail$association_results_sql_condition)))
         family_test <- inference_detail$family_test
         transformation <- as.character(inference_detail$transformation)
         independent_variable <- inference_detail$independent_variable
@@ -132,9 +132,10 @@ armonyse_taxonomies <- function(inference_details, result_folder, pvalue_column=
           pathway_result$family_test <- family_test
           pathway_result$areas_sql_condition <- inference_detail$areas_sql_condition
           pathway_result$samples_sql_condition <- inference_detail$samples_sql_condition
+          pathway_result$association_results_sql_condition <- inference_detail$association_results_sql_condition
           pathway_result$combined_key <- paste(
             (pathway_result$alpha),
-            pathway_result$key,
+            (pathway_result$key),
             (pathway_result$family_test),
             (pathway_result$areas_sql_condition),
             (inference_detail$samples_sql_condition),

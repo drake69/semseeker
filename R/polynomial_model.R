@@ -1,4 +1,4 @@
-polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot, sample_sql_condition)
+polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
 {
 
   # browser()
@@ -78,8 +78,9 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
 
   res$pvalue <- 0
   significative <- TRUE
+  # browser()
   # for each degree extract the p-value
-  for (i in 1:(degree+1)) {
+  for (i in 1:(nrow(coefficients))) {
     # i <- 1
     p_value <- coefficients[i,4]
     row_name <- rownames(coefficients)[i]
@@ -101,8 +102,10 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   rownames(res) <- NULL
   if(plot)
   {
-    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(sample_sql_condition)))
-    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, covariates),ssEnv$plot_format)
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(samples_sql_condition)))
+    filename  =  file_path_build(chartFolder,
+      c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, covariates, area, subarea),
+      ssEnv$plot_format)
 
     # Predict the values for the plot
     train.data$predicted <- predict(polynomial_model_result, newdata = train.data)
@@ -149,10 +152,10 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
       filename,
       plot = ggp,
       scale = 1,
-      width = 1240,
-      height = 1240,
-      units = c("px"),
-      dpi = 144
+      width = 8,
+      height = 8,
+      units = c("in"),
+      dpi = ssEnv$plot_resolution
     )
 
     # data_to_save <- cbind(train.data, predicted = apply(train.data[,independent_variable],1, function(x) (poly(x, degree, raw = TRUE))))

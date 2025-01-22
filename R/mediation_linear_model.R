@@ -1,5 +1,5 @@
 # (family_test, tempDataFrame, sig.formula, transformation, plot)
-mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot) {
+mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea) {
 
   model_params <- unlist(strsplit(as.character(family_test),"_"))
   permutations_test <- as.numeric(model_params[2])
@@ -86,7 +86,7 @@ mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, trans
 
   # remove environment
   rm(env)
-  
+
 
   # Return the summary of the mediation analysis
   return(res)

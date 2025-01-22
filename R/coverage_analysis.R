@@ -4,7 +4,7 @@ coverage_analysis <- function(signal_data)
   # area <- c("CHR")
   # probes_prefix <- "PROBES_CHR_"
   ssEnv <- get_session_info()
-  
+
   keys <- ssEnv$keys_areas_subareas
   for ( k in 1:nrow(keys))
   {
@@ -71,7 +71,7 @@ coverage_analysis <- function(signal_data)
     return()
 
   chartFolder <- dir_check_and_create(ssEnv$result_folderChart,"COVERAGE")
-  filename = paste0( chartFolder,"/","EACH_AREA_COVERAGE_ANALYSIS.png",sep="")
+  filename  =  file_path_build(chartFolder,c("EACH_AREA_COVERAGE_ANALYSIS"),ssEnv$plot_format)
 
   temp_cov_result <- subset(cov_result,cov_result$SUBAREA !="WHOLE")
   if(nrow(temp_cov_result)>2)
@@ -85,7 +85,7 @@ coverage_analysis <- function(signal_data)
     ggp <- ggplot2::ggplot(temp_cov_result, ggplot2::aes(.data$GENOMIC_AREA, .data$COV_PERC)) +    # Create default ggplot2 heatmap
       ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
-      ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC)) +
+      ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC), size = 3) +
       ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
       ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
       ggplot2::labs(fill  = "Percentage\nover\neach\narea") +
@@ -94,11 +94,11 @@ coverage_analysis <- function(signal_data)
     ggplot2::ggsave(
       filename,
       plot = ggp,
-      scale = 1,
-      width = 1240,
-      height = 1240,
-      units = c("px"),
-      dpi = 144
+      # scale = 1,
+      # width = 1240,
+      # height = 1240,
+      # units = c("px"),
+      dpi = as.numeric(ssEnv$plot_resolution_ppi)
     )
   }
 
@@ -109,7 +109,7 @@ coverage_analysis <- function(signal_data)
     total_areas <- sum(number_areas$TOTAL_AREAS)
     temp_cov_result$GENOMIC_AREA <- paste(temp_cov_result$AREA, temp_cov_result$SUBAREA, sep=" ")
     temp_cov_result$AREA_PERC <- round(100* temp_cov_result$COUNT / total_areas,2)
-    filename = paste0( chartFolder,"/","WHOLE_GENOME_COVERAGE_ANALYSIS.png",sep="")
+    filename  =  file_path_build(chartFolder,c("WHOLE_GENOME_COVERAGE_ANALYSIS"),ssEnv$plot_format)
     # temp_cov_result$COV_PERC <- sprintf('%02d', str_pad(temp_cov_result$COV_PERC, 3, pad = "0"))
     temp_cov_result$COV_PERC <- sprintf('%03d', temp_cov_result$COV_PERC)
     temp_cov_result$AREA_PERC <-  round(temp_cov_result$AREA_PERC,2)
@@ -125,12 +125,12 @@ coverage_analysis <- function(signal_data)
     ggp <- ggplot2::ggplot(data = temp_cov_result, ggplot2::aes( x =.data$GENOMIC_AREA, y=.data$COV_PERC )) +    # Create default ggplot2 heatmap
       ggplot2::geom_tile(ggplot2::aes(fill = .data$AREA_PERC)) +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
-      ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC), size=3) +
+      ggplot2::geom_text(ggplot2::aes(label = .data$AREA_PERC), size = 3) +
       ggplot2::scale_fill_gradient(low = "white", high = "#1b98e0") +
       ggplot2::labs(x = "Genomic Area", y = " Percentage of covered Probes") +
       ggplot2::labs(fill  = "Percentage\nover\nwhole\ngenome", color="% Covered\narea\nover\nstudied") +
-      ggplot2::geom_point(data = h_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
-      ggplot2::geom_point(data = v_total, ggplot2::aes(color = .data$AREA_PERC), size = 10, shape = 19) +
+      ggplot2::geom_point(data = h_total, ggplot2::aes(color = .data$AREA_PERC), size = 8, shape = 19) +
+      ggplot2::geom_point(data = v_total, ggplot2::aes(color = .data$AREA_PERC), size = 8, shape = 19) +
       ggplot2::scale_color_gradient2(low = "white",high = "grey",midpoint = 0) +
       ggplot2::geom_text(data = h_total, size = 3, ggplot2::aes(label = .data$AREA_PERC)) +
       ggplot2::geom_text(data = v_total, size = 3, ggplot2::aes(label = .data$AREA_PERC))
@@ -138,11 +138,11 @@ coverage_analysis <- function(signal_data)
     ggplot2::ggsave(
       filename,
       plot = ggp,
-      scale = 1,
-      width = 1240,
-      height = 1240,
-      units = c("px"),
-      dpi = 144
+      # scale = 1,
+      # width = 1240,
+      # height = 1240,
+      # units = c("px"),
+      dpi = as.numeric(ssEnv$plot_resolution_ppi)
     )
 
   }
@@ -181,7 +181,7 @@ coverage_analysis <- function(signal_data)
   #   width = 1240,
   #   height = 1240,
   #   units = c("px"),
-  #   dpi = 144
+  #   dpi = ssEnv$plot_resolution
   # )
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Coverage analysis executed." )
 
@@ -196,7 +196,7 @@ coverage_analysis <- function(signal_data)
   #   if(nrow(tt) > 2 & ncol(tt) > 2)
   #   {
   #     filename = paste0( chartFolder,"/","COVERAGE_ANALYSIS.png",sep="")
-  #     grDevices::png(file= filename, width=1240, height = 1240, pointsize = 15, res = 300)
+  #     grDevices::png(file= filename, width=1240, height = 1240, pointsize = 15, res = ssEnv$plot_resolution)
   #     stats::heatmap(
   #       x =  as.matrix(tt),
   #       col = colors,

@@ -4,7 +4,7 @@
 #' @param tempDataFrame data frame to use for the model
 #' @param sig.formula formula to apply the model
 #'
-glm_model <- function(family_test, tempDataFrame, sig.formula, transformation, plot)
+glm_model <- function(family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
 {
   result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
   res <- data.frame("pvalue" = summary(result_glm)$coeff[-1, 4][1])
@@ -78,7 +78,7 @@ glm_model <- function(family_test, tempDataFrame, sig.formula, transformation, p
       width = 1240,
       height = 1240,
       units = c("px"),
-      dpi = 144
+      dpi = ssEnv$plot_resolution
     )
 
   }

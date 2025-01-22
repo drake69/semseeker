@@ -30,7 +30,7 @@ pathway_pathfindR_circlize <- function(
         suffix = "without_signal_"
 
       phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
-      path <- dir_check_and_create(ssEnv$result_folderPathway,c("pathfindR",name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+      path <- dir_check_and_create(ssEnv$result_folderPathway,c("pathfindR",name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition), name_cleaning(inference_detail$association_results_sql_condition)))
       pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
       message("Pathway report path: ", pathway_report_path)
       if(file.exists(pathway_report_path))
@@ -60,7 +60,7 @@ pathway_pathfindR_circlize <- function(
         }
         results <- unique(results)
         colnames(results) <- c("PATHWAY","GENE")
-        table(results$GENE)
+        # table(results$GENE)
 
 
         entrez_ids <- AnnotationDbi::mapIds(
@@ -147,8 +147,6 @@ pathway_pathfindR_circlize <- function(
 
         link_start_height <- 2
         link_length <- 2
-
-
 
         phenotype_analysis_name <- phenotype_analysis_name(inference_detail, keys[i,],prefix ="", suffix= suffix , pvalue_column, ssEnv$alpha, significance)
         path <- dir_check_and_create(ssEnv$result_folderChart,"pathfindR")

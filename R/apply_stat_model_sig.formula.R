@@ -1,6 +1,12 @@
 apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_variable, covariates)
 {
 
+  if(grepl("wilcoxon.paired",family_test) | grepl("t.test.paired",family_test))
+  {
+    covariates_model <- independent_variable
+    sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
+  }
+
   #
   if(family_test=="wilcoxon" | family_test=="t.test" | family_test =="jsd" | family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test")
   {

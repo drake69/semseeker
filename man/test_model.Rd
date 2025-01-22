@@ -11,7 +11,10 @@ test_model(
   burdenValue,
   independent_variable,
   transformation,
-  plot
+  plot,
+  samples_sql_condition = samples_sql_condition,
+  area,
+  subarea
 )
 }
 \arguments{

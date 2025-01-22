@@ -25,7 +25,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   arguments <- list(...)
 
   g_end <- ncol(tempDataFrame)
-  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis)
+  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis, key)
   tempDataFrame <- prepared_data$tempDataFrame
   independent_variable1stLevel <- prepared_data$independent_variableLevels[1]
   independent_variable2ndLevel <- prepared_data$independent_variableLevels[2]
@@ -43,9 +43,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "independent_variable1stLevel", "independent_variable2ndLevel",
     "key", "transformation","exact_pvalue","g_end",
     "data_preparation","apply_stat_model_sig.formula","quantreg_permutation_model",
-    "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
+    "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "test_model_paired", "Breusch_Pagan_pvalue",
     "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv","g_start",
-    "execute_model", "is.family_dicotomic", "log_event","mediate","mediation","get_session_info")
+    "execute_model", "is.family_dicotomic", "log_event","mediate","mediation","get_session_info", "samples_sql_condition")
 
   result_columns <- c("MARKER", "FIGURE", "AREA", "SUBAREA", "AREA_OF_TEST", "CI.LOWER", "CI.UPPER", "PVALUE", "STATISTIC_PARAMETER", "AIC_VALUE", "RESIDUALS", "SHAPIRO_PVALUE", "R_MODEL", "STD.ERROR", "N_PERMUTATIONS", "N_PERMUTATIONS_TEST")
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Starting foreach with: ", g_end - length(covariates), " items")
@@ -67,7 +67,8 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
         #
         sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-        model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5), samples_sql_condition)
+        # browser()
+        model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5), samples_sql_condition, as.character(key$AREA), as.character(key$SUBAREA))
 
         #
         local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
@@ -91,7 +92,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
           if(length(stats::na.omit(independent_variableData2ndLevel))==0 | length(stats::na.omit(independent_variableData1stLevel))==0)
           {
-            log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " I skip this test because one of the two groups is empty." )
+            log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I skip this test because one of the two groups is empty." )
             colnames(local_result) <- toupper(colnames(local_result))
             local_result$PVALUE <- NA
           }
@@ -144,8 +145,10 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     {
       if ("PVALUE" %in% colnames(result_temp))
       {
-        result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE_ADJ"]  <- (stats::p.adjust(result_temp[result_temp$AREA_OF_TEST=="TOTAL","PVALUE"]  ,method = "BH"))
-        result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE_ADJ"]  <- (stats::p.adjust(result_temp[result_temp$AREA_OF_TEST!="TOTAL","PVALUE"]  ,method = "BH"))
+        selector <- grepl("TOTAL",result_temp$AREA_OF_TEST)
+        result_temp[selector,"PVALUE_ADJ"]  <- (stats::p.adjust(result_temp[selector,"PVALUE"]  ,method = "BH"))
+        selector <- !grepl("TOTAL",result_temp$AREA_OF_TEST)
+        result_temp[selector,"PVALUE_ADJ"]  <- (stats::p.adjust(result_temp[selector,"PVALUE"]  ,method = "BH"))
       }
     }
     return(result_temp)

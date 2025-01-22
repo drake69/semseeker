@@ -1,4 +1,4 @@
-relu_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, sample_sql_condition)
+relu_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition)
 {
 
   #
@@ -97,7 +97,7 @@ relu_model <- function (family_test, tempDataFrame, sig.formula, transformation,
 
   if(plot & !any(is.na(predictions)))
   {
-    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(sample_sql_condition)))
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(samples_sql_condition)))
     filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
 
     ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
@@ -123,7 +123,7 @@ relu_model <- function (family_test, tempDataFrame, sig.formula, transformation,
       width = 1240,
       height = 1240,
       units = c("px"),
-      dpi = 144
+      dpi = ssEnv$plot_resolution
     )
 
 

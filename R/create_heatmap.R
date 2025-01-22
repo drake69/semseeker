@@ -65,7 +65,7 @@ create_heatmap <- function() {
             {
 
               # Prepare the filename
-              filename <- paste0(chartFolder, "/", paste0(sample_group_comb, collapse = "_Vs_"), "_", marker, "_", figure, ".png")
+              filename <- paste0(chartFolder, "/", paste0(sample_group_comb, collapse = "_Vs_"), "_", marker, "_", figure, ".",ssEnv$plot_format)
 
               # Convert the data to a long format for ggplot2
               heatmap_data <- reshape2::melt(annotatedData, id.vars = "SAMPLE_GROUP")
@@ -79,11 +79,11 @@ create_heatmap <- function() {
                 ggplot2::labs(title = mainTitle, x = "", y = "")
 
               # Save the plot
-              ggplot2::ggsave(filename = filename, plot = p, width = 2480/300, height = 2480/300, dpi = 300)
+              ggplot2::ggsave(filename = filename, plot = p, width = 2480/ssEnv$plot_resolution, height = 2480/ssEnv$plot_resolution, dpi = ssEnv$plot_resolution)
 
 
-              # filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".png",sep="")
-              # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 300)
+              # filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".",ssEnv$plot_format,sep="")
+              # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = ssEnv$plot_resolution)
               # stats::heatmap(as.matrix(annotatedData[,3:ncol(annotatedData)]),
               #   col = grDevices::cm.colors(256),
               #   scale = "column",

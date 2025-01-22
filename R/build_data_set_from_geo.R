@@ -7,14 +7,14 @@
 #'
 #' @return samplesheet, and sample's file saved and samplesheet csv
 #' @export
-build_data_set_from_geo <-  function(GEOgse, result_folder,maxResources, parallel_strategy ,start_fresh, downloadFiles = 0, ...) {
+build_data_set_from_geo <-  function(GEOgse, downloadFiles = 0,result_folder, ...) {
 
-  # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 
+  ssEnv <- init_env( result_folder= result_folder, ...)
   # check if GEOQuery package is installed
   if(!requireNamespace("GEOquery", quietly = TRUE))
   {
-    message("GEOquery package is not installed. Please install pathfindR package to use this function")
+    message("GEOquery package is not installed. Please install GEOquery package to use this function")
     return()
   }
 
@@ -35,6 +35,15 @@ build_data_set_from_geo <-  function(GEOgse, result_folder,maxResources, paralle
     samplesheet$Sample_Group <- ""
     samplesheet$Sentrix_ID <- ""
     samplesheet$Sentrix_Position <- ""
+
+    utils::write.table(
+      samplesheet,
+      paste(result_folder, "/", "final_samplesheet.csv", sep = ""),
+      row.names = FALSE,
+      sep="\t",
+      quote = FALSE
+    )
+
 
     dir_check_and_create(result_folder,"/")
     if(downloadFiles==0)

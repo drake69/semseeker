@@ -4,7 +4,16 @@
 \alias{mean_permutation}
 \title{Title}
 \usage{
-mean_permutation(family_test, sig.formula, tempDataFrame, independent_variable)
+mean_permutation(
+  family_test,
+  sig.formula,
+  tempDataFrame,
+  independent_variable,
+  plot,
+  samples_sql_condition = samples_sql_condition,
+  area,
+  subarea
+)
 }
 \arguments{
 \item{family_test}{family lqmm, mean}

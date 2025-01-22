@@ -1,4 +1,4 @@
-association_study_cross_studies_meta_analysis <- function(inference_details,statistic_parameter="BETA", pvalue_column="PVALUE_ADJ_ALL_BH",studies,
+association_cross_studies_meta_analysis <- function(inference_details,statistic_parameter="BETA", pvalue_column="PVALUE_ADJ_ALL_BH",studies,
   studies_base_folder, result_folder)
 {
 

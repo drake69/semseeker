@@ -36,7 +36,7 @@ compute_spearman_permutation <- function(sig.formula,df, shuffle = FALSE)
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-spearman_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable)
+spearman_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable,plot, samples_sql_condition=samples_sql_condition, area, subarea)
 {
   spearman_params <- unlist(strsplit(as.character(family_test),"_"))
   res <- data.frame()

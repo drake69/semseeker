@@ -1,7 +1,9 @@
 {
   "bioconductor.version": "3.19",
   "external.libraries": [],
-  "ignored.packages": [],
+  "ignored.packages": [
+    "igraph"
+  ],
   "package.dependency.fields": [
     "Imports",
     "Depends",

@@ -57,7 +57,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
     for (m in unique(aggregated_study_results$MARKER))
     {
       tt <- subset(aggregated_study_results, MARKER == m)
-      tt <- subset(aggregated_study_results, DEPTH == 3 )
+      tt <- subset(tt, DEPTH == 3 )
 
       tt$KEY <- paste0(tt$AREA,"_",tt$SUBAREA,"_",tt$MARKER,"_",tt$FIGURE,"_",tt$AREA_OF_TEST)
       SPLIT <- split(tt$KEY, tt$STUDY)
@@ -282,7 +282,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
           #   ggplot2::guides(fill = ggplot2::guide_legend(title = NULL, override.aes = list(color = NA)))
 
           # save the plot
-          ggplot2::ggsave(filename, venn_plot, width = 2048, height = 2048, dpi = 300, unit="px")
+          ggplot2::ggsave(filename, venn_plot, width = 2048, height = 2048, dpi = ssEnv$plot_resolution, unit="px")
 
           # Chart
           # Set up the Venn diagram parameters
@@ -303,7 +303,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
           #     individuals.in.intersections = TRUE,
           #     disable.logging = TRUE,
           #     filename = filename,
-          #     resolution = 300,
+          #     resolution = ssEnv$plot_resolution,
           #     units = "px",
           #     height = 1024,
           #     width = 1024

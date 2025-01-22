@@ -63,8 +63,8 @@ create_heatmap <- function() {
           if (!plyr::empty(tt))
             if(nrow(tt) > 2 & ncol(tt) > 2)
             {
-              filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".png",sep="")
-              grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 300)
+              filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".",ssEnv$plot_format,sep="")
+              grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = ssEnv$plot_resolution)
               stats::heatmap(as.matrix(annotatedData[,3:ncol(annotatedData)]),
                 col = grDevices::cm.colors(256),
                 scale = "column",

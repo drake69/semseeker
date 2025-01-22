@@ -21,7 +21,8 @@
 #'
 #' @importFrom doRNG %dorng%
 #' @export
-association_analysis <- function(inference_details,result_folder, maxResources = 90, parallel_strategy  = "multisession",start_fresh = FALSE, ...)
+association_analysis <- function(inference_details,result_folder, maxResources = 90,
+  parallel_strategy  = "multicore",start_fresh = FALSE, ...)
 {
 
   j <- 0
@@ -74,6 +75,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
     # filter samples using samples_sql_condition
     study_summary <- filter_sql(inference_detail$samples_sql_condition, study_summary)
+    # browser()
     results <- data.frame()
     if (validate_family_test(family_test))
     {
@@ -153,6 +155,11 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
           # remove samples with missed values
           sample_names <- sample_names[complete.cases(sample_names),]
+          if(nrow(sample_names)  ==  0)
+          {
+            log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " No samples with complete data for the analysis! Skipped.")
+            next
+          }
 
           ######################################################################################################
           # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
@@ -178,8 +185,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
             cols <- keys$COMBINED
-            fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,
-              prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
+            fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
             if (sum(cols %in% colnames(study_summary))!=0)
             {
               # temporaneamente filtriamo per le colonne esistenti
@@ -193,9 +199,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               else
                 study_summary_local <- study_summary
 
-
               #
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  > 3
+              old_results <- data.frame()
               # clean keys from already done association
               if(file_good)
               {
@@ -256,6 +262,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  >10
               dototal <- TRUE
+              old_results <- data.frame()
               # clean keys from already done association
               if(file_good)
               {
@@ -306,7 +313,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       {
                         # areas_selection_temp <- gsub(":","_",gsub("'","_",gsub("-","_",areas_selection_temp)))
                         # names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
-                        tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection_temp[,1], ]
+                        tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection_temp, ]
                       }
                     }
                     if(is.null(dim(tempDataFrame)))
@@ -358,10 +365,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   else
                     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " File not found:", fname,".")
                   association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
+                  results <- subset(results, MARKER == key$MARKER)
                 }
 
               if (exists("old_results"))
+              {
                 results <- plyr::rbind.fill(results, old_results)
+                rm(old_results)
+              }
             }
 
             if(exists("result_temp_foreach"))
@@ -373,9 +384,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
             # remove any column containing in the name samples_sql_condition
             results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
-            results <- subset(results, MARKER == key$MARKER)
             # results$samples_sql_condition <- inference_detail$samples_sql_condition
-            save_result(results,fileNameResults, family_test, filter_p_value )
+            association_analysis_save_results(results,fileNameResults, family_test, filter_p_value )
 
           }
         }
@@ -388,7 +398,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   close_env()
 }
 
-save_result <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
+association_analysis_save_results <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
 
 
   if(nrow(results)==0)
@@ -419,7 +429,7 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
   {
     for (p in 1:length(pvalue_columns))
     {
-      methods <- c("BY", "fdr","BH")
+      methods <- c("BY", "fdr","BH","bonferroni")
       for(method in 1:3)
       {
         col_p <- toupper(paste0(pvalue_columns[p], "_ADJ_ALL_", methods[method]))
@@ -441,7 +451,8 @@ save_result <- function(results=NULL,fileNameResults, family_test, filter_p_valu
 
   results$DEPTH <- 3
   results[results$SUBAREA=="SAMPLE","DEPTH"] <- 1
-  results[results$AREA_OF_TEST=="TOTAL","DEPTH"] <- 2
+  selector <- grepl("TOTAL",results$AREA_OF_TEST)
+  results[selector,"DEPTH"] <- 2
   # replace empty with NA
   results[results == ""] <- NA
   results[results == " "] <- NA

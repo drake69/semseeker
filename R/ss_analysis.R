@@ -49,7 +49,7 @@ ss_analysis <-
       localKeys_1 <- ssEnv$keys_areas_subareas_markers_figures
       keys <- localKeys_1[localKeys_1$MARKER == markers[a], ]
 
-      browser()
+
       # clean keys from already done analysis
       if (file.exists(fileNameResults))
       {

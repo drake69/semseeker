@@ -41,7 +41,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
     "independent_variable1stLevel", "independent_variable2ndLevel",
     "key", "transformation","quantreg_summary","iters", "boot_success", "tests_count",
     "data_preparation","apply_stat_model_sig.formula","quantreg_model",
-    "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "Breusch_Pagan_pvalue",
+    "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "test_model_paired", "Breusch_Pagan_pvalue",
     "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","iqrTimes","ssEnv")
   # message("Starting foreach withh: ", iters, " items")
 
@@ -62,6 +62,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       if(family_test=="wilcoxon" | family_test=="t.test" | family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
         model_result <- test_model(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
+
+      if(family_test=="wilcoxon.paired" | family_test=="t.test.paired")
+        model_result <- test_model_paired(family_test, tempDataFrame, sig.formula,burdenValue,independent_variable )
 
       # Determine the null device for the current platform
       null_device <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"

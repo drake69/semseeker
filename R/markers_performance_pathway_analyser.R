@@ -36,9 +36,9 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # id <- 2
         inference_detail <- inference_details[id,]
         if(key_enrichment_format[pt,"type"]=="Pathway")
-          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+          path <- dir_check_and_create(ssEnv$result_folderPathway,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition), name_cleaning(inference_detail$association_results_sql_condition)))
         else
-          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition)))
+          path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition), name_cleaning(inference_detail$association_results_sql_condition)))
         family_test <- inference_detail$family_test
         transformation <- as.character(inference_detail$transformation)
         independent_variable <- inference_detail$independent_variable
@@ -179,7 +179,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         if(length(categories)==1)
           next
         split <- split(aggregated_patwhay_result[,column_of_id], aggregated_patwhay_result$key)
-        filename <- paste(path, "/",file_prfx,"_venn_diagramm_",key_enrichment_format[pt,"label"],".png",sep = "")
+        filename <- paste(path, "/",file_prfx,"_venn_diagramm_",key_enrichment_format[pt,"label"],".",ssEnv$plot_format,sep = "")
 
 
         # aggregated_patwhay_result$key <- gsub("_", " ", aggregated_patwhay_result$key)

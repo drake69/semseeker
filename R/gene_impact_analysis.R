@@ -106,7 +106,7 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
           pathway_pathfindR(
             study =  study,
             path_db = path_dbs,
-            iterations = 10,
+            iterations = 20,
             statistic_parameter=statistic_parameter,
             adjust_per_area = adjust_per_area,
             adjust_globally = adjust_globally,

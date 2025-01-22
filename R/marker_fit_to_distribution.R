@@ -144,7 +144,7 @@ marker_fit_to_distribution <- function()
         # }
 
         # Save the plot to a file
-        # ggplot2::ggsave(filename, plot = p, width = 2480 / 300, height = 2480 / 300, dpi = 300)
+        # ggplot2::ggsave(filename, plot = p, width = 2480 / ssEnv$plot_resolution, height = 2480 / ssEnv$plot_resolution, dpi = ssEnv$plot_resolution)
 
         if(ssEnv$plot_format == "png")
           grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15)

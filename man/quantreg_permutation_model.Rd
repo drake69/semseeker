@@ -10,7 +10,10 @@ quantreg_permutation_model(
   tempDataFrame,
   independent_variable,
   transformation,
-  plot
+  plot,
+  samples_sql_condition = samples_sql_condition,
+  area,
+  subarea
 )
 }
 \arguments{

@@ -75,6 +75,8 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"DELTARQ_Q",4)
 
   arguments <- set_env_variable(arguments,"plot_format","png")
+  arguments <- set_env_variable(arguments,"plot_resolution","print")
+  arguments <- set_env_variable(arguments,"plot_resolution_ppi",600)
   arguments <- set_env_variable(arguments,"alpha",0.05)
   arguments <- set_env_variable(arguments,"sex_chromosome_remove",FALSE)
   arguments <- set_env_variable(arguments,"opencl",FALSE)

@@ -4,23 +4,15 @@
 \alias{build_data_set_from_geo}
 \title{build_data_set_from_geo}
 \usage{
-build_data_set_from_geo(
-  GEOgse,
-  result_folder,
-  maxResources,
-  parallel_strategy,
-  start_fresh,
-  downloadFiles = 0,
-  ...
-)
+build_data_set_from_geo(GEOgse, downloadFiles = 0, result_folder, ...)
 }
 \arguments{
 \item{GEOgse}{geo accession dataset identification}
 
-\item{result_folder}{where sample sheet and files will be saved}
-
 \item{downloadFiles}{0 means download all files from Gene Expression Ombibus (GEO),
 different than zero means how many download}
+
+\item{result_folder}{where sample sheet and files will be saved}
 }
 \value{
 samplesheet, and sample's file saved and samplesheet csv

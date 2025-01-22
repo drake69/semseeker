@@ -102,6 +102,8 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
     # browser()
   }
 
+  results_inference <- filter_sql(inference_details$association_results_sql_condition, results_inference)
+
   log_event("DEBUG: ",format(Sys.time(), "%a %b %d %X %Y")," inference file loaded:", inferenceFile)
   return(results_inference)
 }

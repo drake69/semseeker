@@ -13,7 +13,8 @@ data_preparation(
   g_end,
   dototal,
   covariates,
-  depth_analysis
+  depth_analysis,
+  key
 )
 }
 \arguments{

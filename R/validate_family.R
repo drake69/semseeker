@@ -23,6 +23,24 @@ validate_family_test <- function(family_test){
       return(TRUE)
   }
 
+  if(grepl("wilcoxon.paired",family_test))
+  {
+    mean_params <- unlist(strsplit(as.character(family_test),"@"))
+    if (length(mean_params) != 2)
+      log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "wilcoxon.paired family_test must have been with the following syntax wilcoxon.paired@pairing_variable")
+    else
+      return(TRUE)
+  }
+
+  if(grepl("t.test.paired",family_test))
+  {
+    mean_params <- unlist(strsplit(as.character(family_test),"@"))
+    if (length(mean_params) != 2)
+      log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "t.test.paired family_test must have been with the following syntax t.test.paired@pairing_variable")
+    else
+      return(TRUE)
+  }
+
   if (grepl("quantile-permutation",family_test))
   {
     quantile_params <- unlist(strsplit(as.character(family_test),"_"))

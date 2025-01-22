@@ -9,35 +9,36 @@
 #' @param covariates vector of covariates to be found in the sample sheet
 #' @param depth_analysis 1 only sample, 2 chr, 3 alle genomic areas
 #'
-data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis)
+data_preparation <- function(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis, key)
 {
 
+  # browser()
   ssEnv <- get_session_info()
 
   transformation <- as.character(transformation)
   independentVariableIsFactor <- FALSE
   independent_variableLevels <- NULL
   if (is.family_dicotomic(family_test))
+  {
+    test_factor <- as.factor(tempDataFrame[, independent_variable])
+    #
+    independent_variableLevels <- NA
+    independentVariableIsFactor <- FALSE
+    if(length(levels(test_factor))>1)
     {
-      test_factor <- as.factor(tempDataFrame[, independent_variable])
-      #
-      independent_variableLevels <- NA
-      independentVariableIsFactor <- FALSE
-      if(length(levels(test_factor))<4)
-      {
-        # sort alphabetically factors
-        # levels(test_factor) <- sort(levels(test_factor))
-        tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
-        tempDataFrame[, independent_variable] <- droplevels(tempDataFrame[, independent_variable])
-      }
-      if(is.factor(tempDataFrame[, independent_variable]))
-      {
-        independentVariableIsFactor <- TRUE
-        independentVariableData <- tempDataFrame[, independent_variable]
-        independent_variableLevels <- levels(tempDataFrame[, independent_variable])
-        # independent_variable1stLevel <- levels(tempDataFrame[, independent_variable])[1]
-        # independent_variable2ndLevel <- levels(tempDataFrame[, independent_variable])[2]
-      }
+      # sort alphabetically factors
+      # levels(test_factor) <- sort(levels(test_factor))
+      tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
+      tempDataFrame[, independent_variable] <- droplevels(tempDataFrame[, independent_variable])
+    }
+    if(is.factor(tempDataFrame[, independent_variable]))
+    {
+      independentVariableIsFactor <- TRUE
+      independentVariableData <- tempDataFrame[, independent_variable]
+      independent_variableLevels <- levels(tempDataFrame[, independent_variable])
+      # independent_variable1stLevel <- levels(tempDataFrame[, independent_variable])[1]
+      # independent_variable2ndLevel <- levels(tempDataFrame[, independent_variable])[2]
+    }
   }
 
   originalDataFrame <- tempDataFrame
@@ -48,27 +49,30 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   df_head <- tempDataFrame[,1:(g_start-1)]
 
   burden_values <- sapply(tempDataFrame[,g_start:g_end], as.numeric)
-
+  burden_values <- as.data.frame(burden_values)
 
   df_colnames <- colnames(tempDataFrame)
   if( !is.null(dim(burden_values))  & dototal) {
     sum_area <- apply(burden_values, 1, sum)
+    total_label <- paste("TOTAL_",key$MARKER,"_",key$FIGURE, sep="")
     if(depth_analysis==2)
     {
       #select just column of independent variables, remove columns burden value, preserve only total
-      df_colnames <- c(df_colnames[!(df_colnames %in% colnames(burden_values))],"TOTAL")
-      burden_values <- data.frame("TOTAL"=sum_area)
+      df_colnames <- c(df_colnames[!(df_colnames %in% colnames(burden_values))],total_label)
+      burden_values <- data.frame(total_label=sum_area)
     }
     else
     {
-      burden_values <- data.frame(burden_values,"TOTAL"=sum_area)
-      df_colnames <- c(df_colnames,"TOTAL")
+      burden_values <- data.frame(burden_values,total_label=sum_area)
+      df_colnames <- c(df_colnames,total_label)
     }
   }
 
   if(grepl("log",transformation))
+  {
+    # browser()
     burden_values <- burden_values + min(burden_values[burden_values>0])
-
+  }
   transformation <- as.character(transformation)
   if(is.null(transformation) | length(transformation)==0 | is.na(transformation))
     transformation <- "none"

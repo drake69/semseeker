@@ -6,7 +6,7 @@ metrics_ranking <- function (metric,data_frame, column_to_rank ="REBASED"){
   # R_SQUARED	R_SQUARED_ADJ
   the_higher_the_better_markers <-  toupper(semseeker::metrics_properties[semseeker::metrics_properties$Higher_the_Better==TRUE,"Metric"])
 
-  # replace -Inf with 1E-300
+  # replace -Inf with 1E-ssEnv$plot_resolution
   data_frame[data_frame == -Inf] <- 1E-300
   # replace Inf with 1E300
   data_frame[data_frame == Inf] <- 1E300

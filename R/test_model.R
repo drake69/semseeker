@@ -6,15 +6,15 @@
 #' @param burdenValue burden colon name
 #' @param independent_variable independent variable for regressor
 #'
-test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot )
+test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot , samples_sql_condition=samples_sql_condition, area, subarea)
 {
 
   ssEnv <- get_session_info()
-  res <- data.frame(pvalue=1)
+  res <- data.frame(pvalue=NA)
   if(family_test=="chisq.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -39,7 +39,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if(family_test=="bartlett.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -60,7 +60,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if (family_test=="fisher.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -80,7 +80,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if (family_test=="kruskal.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -88,11 +88,30 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     independent_variable <- dep_var[[3]] # sample_group
     dependent_variable <- round(as.numeric(tempDataFrame[,dependent_variable]),3)
     group <- as.factor(tempDataFrame[,independent_variable])
+    if(length(levels(group)) == 1)
+    {
+      res$pvalue <- NA
+      res$r_model <- "stats_kruskal.test"
+      res$kw_runk_sum <- 0
+      return(res)
+    }
     result_fisher <- suppressWarnings(stats::kruskal.test(x = dependent_variable, g = group))
     res$pvalue <- result_fisher$p.value
     res$r_model <- "stats_kruskal.test"
     res$kw_runk_sum <- result_fisher$statistic
-    kw_result <- stats::pairwise.wilcox.test(dependent_variable, group)
+    tryCatch({
+      power_result <- pwr::pwr.kruskal.test(k = length(unique(group)), n = length(dependent_variable), alpha = as.numeric(ssEnv$alpha), sig.level = as.numeric(ssEnv$alpha), power = )
+      res$power <- power_result$power
+    }, error = function(e) {
+      res$power <- 0
+    })
+
+    # pairwise wilcoxon test
+    tryCatch({
+      kw_result <- stats::pairwise.wilcox.test(dependent_variable, group)
+    }, error = function(e) {
+      return(res)
+    })
     kruska_wallis_summary <- kw_result$p.value
 
     kw_pvalue_max <- 0
@@ -107,7 +126,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
         col <- as.character(colnames(kruska_wallis_summary)[j])
         pval_name <- paste0("PVALUE_KW_",as.character(row),"_",as.character(col),sep="")
         significative <- significative & (p_value < as.numeric(ssEnv$alpha))
-        kw_pvalue_max <- max(kw_pvalue_max, p_value)
+        kw_pvalue_max <- max(kw_pvalue_max, p_value,nan.rm = TRUE)
         p_value <- data.frame(p_value)
         colnames(p_value) <- pval_name
         if (exists("res"))
@@ -152,7 +171,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if(family_test=="wilcoxon")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
 
     result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
     res$pvalue <- result_w$p.value
@@ -195,10 +214,11 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     res$power <- power_result$power
   }
 
+
   if(family_test=="t.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
 
     result_w  <-stats::t.test(formula= sig.formula, data = as.data.frame(tempDataFrame))
     res$pvalue <- result_w$p.value

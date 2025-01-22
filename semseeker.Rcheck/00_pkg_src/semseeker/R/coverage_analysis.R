@@ -94,7 +94,7 @@ coverage_analysis <- function(signal_data)
     width = 1240,
     height = 1240,
     units = c("px"),
-    dpi = 144
+    dpi = ssEnv$plot_resolution
   )
 
 
@@ -135,7 +135,7 @@ coverage_analysis <- function(signal_data)
     width = 1240,
     height = 1240,
     units = c("px"),
-    dpi = 144
+    dpi = ssEnv$plot_resolution
   )
 
   #show total count of probe_features per area
@@ -172,7 +172,7 @@ coverage_analysis <- function(signal_data)
   #   width = 1240,
   #   height = 1240,
   #   units = c("px"),
-  #   dpi = 144
+  #   dpi = ssEnv$plot_resolution
   # )
   message("INFO: ", Sys.time(), " Coverage analysis executed." )
 
@@ -187,7 +187,7 @@ coverage_analysis <- function(signal_data)
   #   if(nrow(tt) > 2 & ncol(tt) > 2)
   #   {
   #     filename = paste0( chartFolder,"/","COVERAGE_ANALYSIS.png",sep="")
-  #     grDevices::png(file= filename, width=1240, height = 1240, pointsize = 15, res = 300)
+  #     grDevices::png(file= filename, width=1240, height = 1240, pointsize = 15, res = ssEnv$plot_resolution)
   #     stats::heatmap(
   #       x =  as.matrix(tt),
   #       col = colors,
