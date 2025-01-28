@@ -100,9 +100,13 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
     names(signal_values) <- row.names(signal_data)
     signal_sample <- signal_single_sample( signal_values,local_sample_detail,probe_features)
 
+    if(plyr::empty(both_result_lesions))
+      sample_status_temp <- dplyr::bind_cols( hyper_result, hypo_result,
+        both_result_mutations, deltar_result, signal_sample)
+    else
+      sample_status_temp <- dplyr::bind_cols( hyper_result, hypo_result,
+        both_result_mutations,both_result_lesions, deltar_result, signal_sample)
 
-    sample_status_temp <- dplyr::bind_cols( hyper_result, hypo_result,
-      both_result_mutations,both_result_lesions, deltar_result, signal_sample)
     sample_status_temp$Sample_ID <- local_sample_detail$Sample_ID
     # count the real values available for the sample
     sample_status_temp$PROBES_COUNT <- length(stats::na.omit(signal_values))

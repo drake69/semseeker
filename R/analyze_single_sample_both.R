@@ -7,8 +7,9 @@ analyze_single_sample_both <- function( sample_detail, marker) {
   # nothing to do
   if ( !any(ssEnv$keys_markers_figures$COMBINED==paste(marker,"_","BOTH",sep="")) &
       !any(ssEnv$keys_markers_figures$COMBINED==paste(marker,"_","BOTHSUM",sep="")))
+  {
     return(result)
-
+  }
   start_time_single_sample <- Sys.time()
 
   data_to_save <- data.frame("CHR"="", "START"="", "END"="", "VALUE"="")
