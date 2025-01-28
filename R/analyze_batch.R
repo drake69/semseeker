@@ -97,6 +97,8 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
     }
     else
     {
+
+      log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "  Working on population ",sample_group, " with ", nrow(populationMatrixColumns), " probes.")
       resultPopulation <- analyze_population(
         signal_data = signal_data[, populationMatrixColumns],
         sample_sheet = populationSampleSheet,
