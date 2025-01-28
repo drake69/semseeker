@@ -76,36 +76,57 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
       signal_median_values <- rep(y_med,length(signal_values))
     }
 
+    result_list <- list()
     hyper_result <- analyze_single_sample( values = signal_values,
       thresholds = signal_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,
        probe_features = probe_features)
+    # add to result list if is not empty
+    if(!plyr::empty(hyper_result))
+      result_list <- c(result_list, list(hyper_result))
 
     hypo_result <- analyze_single_sample( values = signal_values,
       thresholds = signal_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail,
       probe_features = probe_features)
+    # add to result list if is not empty
+    if(!plyr::empty(hypo_result))
+      result_list <- c(result_list, list(hypo_result))
 
     both_result_mutations <- analyze_single_sample_both( sample_detail =  local_sample_detail, "MUTATIONS")
+    # add to result list if is not empty
+    if(!plyr::empty(both_result_mutations))
+      result_list <- c(result_list, list(both_result_mutations))
 
     both_result_lesions <- analyze_single_sample_both( sample_detail =  local_sample_detail, "LESIONS")
+    # add to result list if is not empty
+    if(!plyr::empty(both_result_lesions))
+      result_list <- c(result_list, list(both_result_lesions))
 
     delta_result <- delta_single_sample ( values = signal_values, high_thresholds = signal_superior_thresholds,
       low_thresholds = signal_inferior_thresholds, sample_detail = local_sample_detail,
       signal_medians = signal_median_values, probe_features = probe_features)
+    # add to result list if is not empty
+    if(!plyr::empty(delta_result))
+      result_list <- c(result_list, list(delta_result))
 
     deltar_result <- deltar_single_sample ( values = signal_values, high_thresholds = signal_superior_thresholds,
       low_thresholds = signal_inferior_thresholds, sample_detail = local_sample_detail,
       probe_features = probe_features)
+    # add to result list if is not empty
+    if(!plyr::empty(deltar_result))
+      result_list <- c(result_list, list(deltar_result))
 
     # summary signal
     names(signal_values) <- row.names(signal_data)
     signal_sample <- signal_single_sample( signal_values,local_sample_detail,probe_features)
+    # add to result list if is not empty
+    if(!plyr::empty(signal_sample))
+      result_list <- c(result_list, list(signal_sample))
 
-    if(plyr::empty(both_result_lesions))
-      sample_status_temp <- dplyr::bind_cols( hyper_result, hypo_result,
-        both_result_mutations, deltar_result, signal_sample)
+    # cycle list and bind columns
+    if(plyr::empty(result_list))
+      sample_status_temp <- data.frame()
     else
-      sample_status_temp <- dplyr::bind_cols( hyper_result, hypo_result,
-        both_result_mutations,both_result_lesions, deltar_result, signal_sample)
+      sample_status_temp <- do.call(plyr::rbind.fill, result_list)
 
     sample_status_temp$Sample_ID <- local_sample_detail$Sample_ID
     # count the real values available for the sample
