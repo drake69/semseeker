@@ -62,6 +62,7 @@ create_multiple_bed <- function(sample_sheet){
               utils::write.table(localtemp, temp_file, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE, append = TRUE)
             }
             rm(localtemp)
+            gc()
           }
         }
 
@@ -75,6 +76,7 @@ create_multiple_bed <- function(sample_sheet){
           utils::write.table(localtemp,gzfile(fileToWriteBed), sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
           file.remove(temp_file)
           log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Created multiple annotated file!", fileToWriteBed)
+          gc()
         }
       }
       if(ssEnv$showprogress)

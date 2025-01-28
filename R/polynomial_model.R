@@ -4,7 +4,7 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   # browser()
   ssEnv <- get_session_info()
 
-  # plynomial_degree_partition-partition_percentage
+  # polynomial_degree_partition-partition_percentage
   polynomial_params <- unlist(strsplit(as.character(family_test),"_"))
 
   degree <- as.numeric(polynomial_params[2])
@@ -82,13 +82,11 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   # for each degree extract the p-value
   for (i in 1:(nrow(coefficients))) {
     # i <- 1
+    # browser()
     p_value <- coefficients[i,4]
     row_name <- rownames(coefficients)[i]
     # browser()
-    if (row_name =="(Intercept)")
-      pval_name <- "PL_INTERCEPT_PVALUE"
-    else
-      pval_name <- paste0("PL_DEGREE_",as.character(i -1 ),"_PVALUE",sep="")
+    pval_name <- name_cleaning(paste0("pvalue_",row_name))
     p_value <- data.frame(p_value)
     significative <- significative & p_value < as.numeric(ssEnv$alpha)
     colnames(p_value) <- pval_name

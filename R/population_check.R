@@ -65,6 +65,7 @@ sample_group_check <- function(sample_sheet, signal_data)
   matchedPopulation <- sort(as.character(levels(sample_sheet$Sample_Group))) %in% sort(as.vector(ssEnv$keys_sample_groups[,1]))
   if (is.element(FALSE, matchedPopulation)) {
     result <- paste(result,  " The Sample_Group should contain only: Reference, Control, Case" )
+    result <- paste(result,  " The Sample_Group contains: ", paste(sort(as.character(levels(sample_sheet$Sample_Group))), collapse=", ") )
   }
 
   refence_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group=="Reference"]

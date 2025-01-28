@@ -24,43 +24,48 @@ signal_range_values <- function(populationMatrix) {
   export = c("progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv")
   r <- 1
 
-  
-  # if(ncol(signal_values) < 1000)
-  {
-    # # for(r in 1:1000)
-    # result <- foreach::foreach(r = 1:nrow(signal_values), .combine = "rbind", .export = export) %dorng%
-    #   {
-    #     signal_row <- signal_values[r,]
-    #     signal_row <- as.vector(t(signal_row))
-    #     temp <- stats::quantile(signal_row, c(0.25,0.5,0.75), na.rm=TRUE)
-    #     signalQ1Values <-  temp[1]
-    #     signalQ3Values <- temp[2]
-    #     signal_median_values <- temp[3]
-    #     signalValuesIQR <- stats::IQR(signal_row)
-    #
-    #     signal_inferior_thresholds <- max((signalQ1Values - (ssEnv$iqrTimes * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm=TRUE)
-    #     signal_superior_thresholds <- min((signalQ3Values + (ssEnv$iqrTimes * signalValuesIQR)), max(signal_row, na.rm = TRUE), na.rm=TRUE)
-    #
-    #     temp_result <- data.frame(
-    #       "signal_inferior_thresholds"= signal_inferior_thresholds,
-    #       "signal_superior_thresholds"= signal_superior_thresholds,
-    #       "signal_median_values"= signal_median_values,
-    #       "iqr" = signalValuesIQR,
-    #       "q1"= signalQ1Values,
-    #       "q3"= signalQ3Values)
-    #     row.names(temp_result) <- row.names(signal_row)
-    #     # temp_result$PROBE <- row.names(signal_row)
-    #     # colnames(temp_result) <- c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values")
-    #     if(ssEnv$showprogress)
-    #       progress_bar(sprintf("%s",names(signal_row)))
-    #     temp_result
-    #   }
 
-
-  }
+  # if(ncol(signal_values) > 1000)
+  # {
+  #   # for(r in 1:1000)
+  #   result <- foreach::foreach(r = 1:nrow(signal_values), .combine = "rbind", .export = export) %dorng%
+  #     {
+  #       signal_row <- signal_values[r,]
+  #       signal_row <- as.vector(t(signal_row))
+  #       temp <- stats::quantile(signal_row, c(0.25,0.5,0.75), na.rm=TRUE)
+  #       signalQ1Values <-  temp[1]
+  #       signalQ3Values <- temp[2]
+  #       signal_median_values <- temp[3]
+  #       signalValuesIQR <- stats::IQR(signal_row)
+  #
+  #       signal_inferior_thresholds <- max((signalQ1Values - (ssEnv$iqrTimes * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm=TRUE)
+  #       signal_superior_thresholds <- min((signalQ3Values + (ssEnv$iqrTimes * signalValuesIQR)), max(signal_row, na.rm = TRUE), na.rm=TRUE)
+  #
+  #       temp_result <- data.frame(
+  #         "signal_inferior_thresholds"= signal_inferior_thresholds,
+  #         "signal_superior_thresholds"= signal_superior_thresholds,
+  #         "signal_median_values"= signal_median_values,
+  #         "iqr" = signalValuesIQR,
+  #         "q1"= signalQ1Values,
+  #         "q3"= signalQ3Values)
+  #       row.names(temp_result) <- row.names(signal_row)
+  #       # temp_result$PROBE <- row.names(signal_row)
+  #       # colnames(temp_result) <- c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values")
+  #       if(ssEnv$showprogress)
+  #         progress_bar(sprintf("%s",names(signal_row)))
+  #       temp_result
+  #     }
+  #
+  #
+  # }
   # else
-  {
-    th <- future.apply::future_apply(signal_values, 1 ,  get_th <- function(signal_row)
+  # {
+  chunk_size <- 10000  # Define a chunk sizex
+  result <- data.frame()
+  for (i in seq(1, nrow(signal_values), by = chunk_size)) {
+
+    chunk_indices <- i:min(i + chunk_size - 1, nrow(signal_values))
+    th <- future.apply::future_apply(signal_values[chunk_indices, ], 1 ,  get_th <- function(signal_row)
     {
       signal_row <- as.vector(t(signal_row))
       temp <- stats::quantile(signal_row, c(0.25,0.5,0.75), na.rm = TRUE)
@@ -83,8 +88,9 @@ signal_range_values <- function(populationMatrix) {
       # temp_result$PROBE <- names(signal_row)
       temp_result
     })
-    result <- as.data.frame(t(th))
+    result <- rbind(result, as.data.frame(t(th)))
   }
+  # }
 
   colnames(result) <- c("signal_inferior_thresholds","signal_superior_thresholds", "signal_median_values","iqr","q1","q3")
   result$PROBE <- row.names(signal_values)

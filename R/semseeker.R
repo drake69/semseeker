@@ -32,7 +32,6 @@ semseeker <- function(sample_sheet,
 
   ssEnv <- get_session_info()
   log_event("BANNER:", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will search MARKERS for project \n in ", ssEnv$result_folderData)
-  write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet_original.csv"), row.names = FALSE)
 
   sliding_window_size <- 11
 
@@ -67,14 +66,18 @@ semseeker <- function(sample_sheet,
   {
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Working on batch:",batch_id)
     sample_sheet_local <- sample_sheet[[batch_id]]
+    sample_sheet_local$Sample_ID <- name_cleaning(sample_sheet_local$Sample_ID)
+    write.csv2(sample_sheet_local, file = file.path(ssEnv$result_folderData, paste(batch_id,"_sample_sheet_original.csv",sep="")), row.names = FALSE)
     signal_intrasample <- TRUE
     if (ssEnv$signal_intrasample)
       signal_data_local <- signal_data[[batch_id]]
     else
       signal_data_local <- stats::na.omit(signal_data[[batch_id]])
 
+    colnames(signal_data_local) <- name_cleaning(colnames(signal_data_local))
     signal_data_local <- substitute_infinite(signal_data_local)
     signal_data_local <- signal_data_local[rownames(signal_data_local) %in% probes_to_preserve,]
+    signal_data_local <- inpute_missing_values(signal_data_local)
     sample_sheet_local <- analyze_batch(signal_data_local, sample_sheet_local, batch_id)
     if(exists("sample_sheet_result"))
       sample_sheet_result <- plyr::rbind.fill(sample_sheet_result, sample_sheet_local)

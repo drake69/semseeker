@@ -74,6 +74,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"DELTAQ_Q",4)
   arguments <- set_env_variable(arguments,"DELTARQ_Q",4)
 
+  arguments <- set_env_variable(arguments,"inpute","none")
   arguments <- set_env_variable(arguments,"plot_format","png")
   arguments <- set_env_variable(arguments,"plot_resolution","print")
   arguments <- set_env_variable(arguments,"plot_resolution_ppi",600)
