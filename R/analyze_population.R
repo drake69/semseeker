@@ -132,7 +132,7 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
         if(j==1)
           sample_status_temp <- result_list[[j]]
         else
-          sample_status_temp <- cbind(sample_status_temp, result_list[[j]])
+          sample_status_temp <- dplyr::bind_cols(sample_status_temp, result_list[[j]])
       }
     }
 
