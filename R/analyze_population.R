@@ -123,10 +123,18 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
       result_list <- c(result_list, list(signal_sample))
 
     # cycle list and bind columns
-    if(plyr::empty(result_list))
+    if(length(result_list)==0)
       sample_status_temp <- data.frame()
     else
-      sample_status_temp <- do.call(plyr::rbind.fill, result_list)
+    {
+      for (j in 1:length(result_list))
+      {
+        if(j==1)
+          sample_status_temp <- result_list[[j]]
+        else
+          sample_status_temp <- cbind(sample_status_temp, result_list[[j]])
+      }
+    }
 
     sample_status_temp$Sample_ID <- local_sample_detail$Sample_ID
     # count the real values available for the sample
