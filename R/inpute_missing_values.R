@@ -1,16 +1,15 @@
 inpute_missing_values <- function(signal_data){
 
   ssEnv <- get_session_info()
+  # count number of na
+  n_na <- sum(is.na(signal_data))
 
-  log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputing missing values using ", ssEnv$inpute)
+  n_item = nrow(signal_data)*ncol(signal_data)/100
+  log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/n_item, 2), " % of the data.")
   if (ssEnv$inpute=="median")
   {
     # Assuming signal_data is a matrix or data frame
-    # signal_data <- signal_data %>%
-    #   dplyr::rowwise() %>%
-    #   dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), median(dplyr::c_across(dplyr::everything()), na.rm = TRUE), .))) %>%
-    #   dplyr::ungroup()
-    chunk_size <- 10000  # Define a chunk size
+    chunk_size <- 100000  # Define a chunk size
     for (i in seq(1, nrow(signal_data), by = chunk_size)) {
       # Define the chunk
       chunk_indices <- i:min(i + chunk_size - 1, nrow(signal_data))
@@ -23,10 +22,15 @@ inpute_missing_values <- function(signal_data){
   }
   else if (ssEnv$inpute=="mean")
   {
-    signal_data <- signal_data %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), mean(dplyr::c_across(dplyr::everything()), na.rm = TRUE), .))) %>%
-      dplyr::ungroup()
+    chunk_size <- 100000  # Define a chunk size
+    for (i in seq(1, nrow(signal_data), by = chunk_size)) {
+      # Define the chunk
+      chunk_indices <- i:min(i + chunk_size - 1, nrow(signal_data))
+      # Process the chunk
+      row_medians <- apply(signal_data[chunk_indices, ], 1, mean, na.rm = TRUE)
+      signal_data[chunk_indices, ][is.na(signal_data[chunk_indices, ])] <-
+        row_medians[row(signal_data[chunk_indices, ])[is.na(signal_data[chunk_indices, ])]]
+    }
   }
   else if (grepl("knn", ssEnv$inpute))
   {
@@ -51,6 +55,7 @@ inpute_missing_values <- function(signal_data){
   }
 
   gc()
-  log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputation completed.")
+  n_na <- sum(is.na(signal_data))
+  log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputation completed. Number of missing values: ", n_na)
   return(signal_data)
 }

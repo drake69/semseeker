@@ -135,6 +135,9 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
 
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)
+  # fill na with zeros
+  resultSampleSheet[is.na(resultSampleSheet)] <- 0
+
   samplesID <- sample_sheet$Sample_ID
   sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% colnames(resultSampleSheet))]
   sample_sheet$Sample_ID <- samplesID
