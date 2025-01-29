@@ -16,7 +16,6 @@ signal_range_values <- function(populationMatrix) {
   min_values <- apply(signal_values, 1, min, na.rm=TRUE)
   max_values <- apply(signal_values, 1, max, na.rm=TRUE)
   row.names(signal_values) <- rownames(populationMatrix)
-  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting signal thresholds calculation.")
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(signal_values))
 

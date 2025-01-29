@@ -1,6 +1,6 @@
 analyze_batch <- function(signal_data, sample_sheet, batch_id)
 {
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id)
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id, " of ", nrow(signal_data), " rows.")
 
   ssEnv <- get_session_info()
 
