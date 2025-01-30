@@ -26,6 +26,11 @@ test_that("signal_range_values", {
   ####################################################################################
   testthat::expect_true( nrow(signal_thresholds_local)==nprobes)
 
+  ####################################################################################
+  testthat::expect_true(all(signal_thresholds_local$signal_median_values<signal_thresholds_local$q3))
+
+  ####################################################################################
+  testthat::expect_true(all(signal_thresholds_local$signal_median_values>signal_thresholds_local$q1))
 
   semseeker:::close_env()
   unlink(tempFolder,recursive = TRUE)

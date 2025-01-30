@@ -73,8 +73,8 @@ signal_range_values <- function(populationMatrix) {
       signalQ3Values <- temp[3]
       signalValuesIQR <- stats::IQR(signal_row)
 
-      signal_inferior_thresholds <- max((signalQ1Values - (ssEnv$iqrTimes * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm = TRUE)
-      signal_superior_thresholds <- min((signalQ3Values + (ssEnv$iqrTimes * signalValuesIQR)), max(signal_row, na.rm = TRUE), na.rm = TRUE)
+      signal_inferior_thresholds <- max((signalQ1Values - (as.numeric(ssEnv$iqrTimes) * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm = TRUE)
+      signal_superior_thresholds <- min((signalQ3Values + (as.numeric(ssEnv$iqrTimes) * signalValuesIQR)), max(signal_row, na.rm = TRUE), na.rm = TRUE)
 
       temp_result <- c(
         "signal_inferior_thresholds"= signal_inferior_thresholds,

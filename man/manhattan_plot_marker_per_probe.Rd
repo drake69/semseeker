@@ -17,6 +17,7 @@ manhattan_plot_marker_per_probe(
   limit_line_color = "red",
   limit_line_color_median = "black",
   reference_samples_color = "cyan",
+  show_labels = TRUE,
   result_folder = result_folder,
   maxResources = maxResources,
   parallel_strategy = parallel_strategy,

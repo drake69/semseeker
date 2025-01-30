@@ -17,7 +17,7 @@
 manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sample=0, min_sample=0 , min_signal_probe=0, label_font_size=3,
   hyper_color = "blue", hypo_color = "orange",  non_outlier_color = "grey",  limit_label_color = "blue",
   limit_line_color = "red", limit_line_color_median = "black",
-  reference_samples_color = "cyan",
+  reference_samples_color = "cyan", show_labels = TRUE,
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
 
@@ -27,7 +27,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, tech = tech)
   chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_PROBE")
 
-  sample_sheet <- read.csv(file_path_build(ssEnv$result_folderData, "sample_sheet_original","csv"), sep=";", header = TRUE, stringsAsFactors = FALSE)
+  sample_sheet <- read.csv(file_path_build(ssEnv$result_folderData, "1_sample_sheet_original","csv"), sep=";", header = TRUE, stringsAsFactors = FALSE)
   references <- sample_sheet[sample_sheet$Sample_Group == "Reference", "Sample_ID"]
 
   annotate_bed()
@@ -39,6 +39,8 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   tempKeys <- localKeys
 
   high_signal_probes <- 0
+  low_signal_probes <- 100
+
   if(probe_name=="")
     for(k in 1:length(localKeys)){
       marker <- as.character(localKeys[k])
@@ -48,6 +50,19 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
         tempKeys <- tempKeys[-k]
       else
       {
+        # if(low_signal_probes==100)
+        # {
+        #   # get the row woth the max count of values
+        #   count_m <- read.csv(fname, sep=";", skip = 2, row.names = 1)
+        #   # count per each row the number of no zero values
+        #   count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
+        #   count_r <- count_r[count_r>10]
+        #   if(min(count_r)<low_signal_probes)
+        #   {
+        #     low_signal_probes <- min(count_r)
+        #     probe_name <- names(which.min(count_r))
+        #   }
+        # }
         if(high_signal_probes==0)
         {
           # get the row woth the max count of values
@@ -68,7 +83,7 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
   pivot_subfolder <- dir_check_and_create(result_folderPivot,"SIGNAL")
   # signal_data <- readRDS(file_path_build( ssEnv$result_folderData, "1_signal_data","rds"))
-  browser()
+
 
   fname <- file_path_build( pivot_subfolder ,c("SIGNAL", "MEAN", "PROBE","PROBE"),"csv", add_gz=TRUE)
   data_name <- read.csv2(fname, sep  =  ";", nrows = 1)
@@ -102,9 +117,10 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   y_sup <- probe_threshold$signal_superior_thresholds
   y_inf <- probe_threshold$signal_inferior_thresholds
 
+
   probe_signal <- as.numeric(probe_signal)
   outlier <-  as.vector(ifelse(probe_signal > y_sup, "Hyper", ifelse(probe_signal < y_inf, "Hypo" ,"Non-outlier")))
-  reference_col_id <- which(colnames(signal_data) %in% references)
+  reference_col_id <- which(colnames(signal_data[,-1]) %in% references)
   outlier[reference_col_id] <- "Reference"
   marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
 
@@ -181,26 +197,27 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   limit_line_color_q <- "red"
 
   pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(samples)), y = signal_to_plot, color = outlier)) +
-    ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.5) +
-    ggplot2::geom_hline(yintercept = y_med, linetype = "dashed", color = limit_line_color_median, size = 0.5) +
-    ggplot2::geom_hline(yintercept = y_sup, linetype = "dashed", color = limit_line_color, size = 0.5) +
-    ggplot2::geom_hline(yintercept = y_inf, linetype = "dashed", color = limit_line_color, size = 0.5) +
+    ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.1) +
+    ggplot2::geom_hline(yintercept = y_med, linetype = "dashed", color = limit_line_color_median, size = 0.1) +
+    ggplot2::geom_hline(yintercept = y_sup, linetype = "dashed", color = limit_line_color, size = 0.1) +
+    ggplot2::geom_hline(yintercept = y_inf, linetype = "dashed", color = limit_line_color, size = 0.1) +
     ggplot2::geom_point(alpha = 0.6) +
-    ggplot2::geom_hline(yintercept = q1, linetype = "dashed", color = limit_line_color_q) +
-    ggplot2::geom_hline(yintercept = q3, linetype = "dashed", color = limit_line_color_q) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = q1, label = "Q1"), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = q3, label = "Q3"), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_med, label = "Median"), color = limit_line_color_median, hjust = -0.2, vjust = -0.3) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_sup, label = "Upper Limit"), color = limit_label_color, hjust = -0.2, vjust = 1.5) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_inf, label = "Lower Limit"), color = limit_label_color, hjust = -0.2, vjust = -0.3) +
+    ggplot2::geom_hline(yintercept = q1, linetype = "dashed", color = limit_line_color_q, size = 0.1) +
+    ggplot2::geom_hline(yintercept = q3, linetype = "dashed", color = limit_line_color_q, size = 0.1) +
+    ggplot2::geom_text(ggplot2::aes(x = 0, y = q1, label = ifelse(show_labels, "Q1","")), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
+    ggplot2::geom_text(ggplot2::aes(x = 0, y = q3, label =  ifelse("Q3","")), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
+    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_med, label = ifelse("Median","")), color = limit_line_color_median, hjust = -0.2, vjust = -0.3) +
+    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_sup, label = ifelse("Upper Limit","")), color = limit_label_color, hjust = -0.2, vjust = 1.5) +
+    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_inf, label = ifelse("Lower Limit","")), color = limit_label_color, hjust = -0.2, vjust = -0.3) +
     ggplot2::geom_text(
-      ggplot2::aes( angle = 90, x = as.numeric(factor(samples)), y = delta_label_position, label = delta_label_value),
+      ggplot2::aes( angle = 90, x = as.numeric(factor(samples)), y = delta_label_position, label = ifelse(delta_label_value,"")),
       color = marker_segment_color,
       check_overlap = TRUE,
       size = label_font_size,
       hjust = +1,
       vjust = -0.45) +
     ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, "Non-outlier" = non_outlier_color,"Reference" = reference_samples_color)) +
+    ggplot2::scale_shape_manual(values = c("Hyper" = 24, "Hypo" = 24, "Non-outlier" = 19, "Reference" = 6)) +  # Change "Reference" to shape 4 (X mark)
     # ggplot2::labs(x = "Sample", y = "Signal", title = paste0("Signal outliers of all samples for probe ", probe_name)) +
     ggplot2::labs(x = "Sample", y = "Signal", title = "") +
     ggplot2::theme_classic() +

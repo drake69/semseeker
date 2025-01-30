@@ -7,6 +7,7 @@ nsamples <- 30
 # intersample_sd <- 1
 # perc_epimutation <- 0.05
 
+Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES')
 probe_features <- semseeker::PROBES
 probe_features <- probe_features[!is.na(probe_features$START),c("CHR","START","PROBE")]
 probe_features <- unique(probe_features)
