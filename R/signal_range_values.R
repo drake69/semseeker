@@ -33,8 +33,8 @@ signal_range_values <- function(populationMatrix) {
   #       signal_row <- as.vector(t(signal_row))
   #       temp <- stats::quantile(signal_row, c(0.25,0.5,0.75), na.rm=TRUE)
   #       signalQ1Values <-  temp[1]
-  #       signalQ3Values <- temp[2]
-  #       signal_median_values <- temp[3]
+  #       signalQ3Values <- temp[3]
+  #       signal_median_values <- temp[2]
   #       signalValuesIQR <- stats::IQR(signal_row)
   #
   #       signal_inferior_thresholds <- max((signalQ1Values - (ssEnv$iqrTimes * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm=TRUE)
@@ -69,8 +69,8 @@ signal_range_values <- function(populationMatrix) {
       signal_row <- as.vector(t(signal_row))
       temp <- stats::quantile(signal_row, c(0.25,0.5,0.75), na.rm = TRUE)
       signalQ1Values <-  temp[1]
-      signalQ3Values <- temp[2]
-      signal_median_values <- temp[3]
+      signal_median_values <- temp[2]
+      signalQ3Values <- temp[3]
       signalValuesIQR <- stats::IQR(signal_row)
 
       signal_inferior_thresholds <- max((signalQ1Values - (ssEnv$iqrTimes * signalValuesIQR)), min(signal_row, na.rm = TRUE), na.rm = TRUE)
@@ -91,6 +91,7 @@ signal_range_values <- function(populationMatrix) {
   }
   # }
 
+  # browser()
   colnames(result) <- c("signal_inferior_thresholds","signal_superior_thresholds", "signal_median_values","iqr","q1","q3")
   result$PROBE <- row.names(signal_values)
   if(nrow(result) != nrow(signal_values))

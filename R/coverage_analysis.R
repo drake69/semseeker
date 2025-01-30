@@ -181,7 +181,7 @@ coverage_analysis <- function(signal_data)
   #   width = 1240,
   #   height = 1240,
   #   units = c("px"),
-  #   dpi = ssEnv$plot_resolution
+  #   dpi = as.numeric(ssEnv$plot_resolution_ppi)
   # )
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Coverage analysis executed." )
 

@@ -79,7 +79,7 @@ create_heatmap <- function() {
                 ggplot2::labs(title = mainTitle, x = "", y = "")
 
               # Save the plot
-              ggplot2::ggsave(filename = filename, plot = p, width = 2480/ssEnv$plot_resolution, height = 2480/ssEnv$plot_resolution, dpi = ssEnv$plot_resolution)
+              ggplot2::ggsave(filename = filename, plot = p, width = 2480/ssEnv$plot_resolution, height = 2480/ssEnv$plot_resolution, dpi = as.numeric(ssEnv$plot_resolution_ppi))
 
 
               # filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".",ssEnv$plot_format,sep="")

@@ -51,8 +51,8 @@ box.plot <- function(dataFrameToPlot, independent_variable,dependent_variable, t
       } else if (family_test == "anova") {
         p <- p + ggpubr::stat_compare_means(method = "anova", label = "p.format", label.y = 0.5, size = 3)
       }
-      # ggplot2::ggsave(filename = filename, plot = p, width = 2480/ssEnv$plot_resolution, height = 2480/ssEnv$plot_resolution, dpi = ssEnv$plot_resolution)
-      ggplot2::ggsave(filename = filename, plot = p, dpi = ssEnv$plot_resolution)
+      # ggplot2::ggsave(filename = filename, plot = p, width = 2480/ssEnv$plot_resolution, height = 2480/ssEnv$plot_resolution, dpi = as.numeric(ssEnv$plot_resolution_ppi))
+      ggplot2::ggsave(filename = filename, plot = p, dpi = as.numeric(ssEnv$plot_resolution_ppi))
 
     }
 }

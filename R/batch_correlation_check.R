@@ -129,7 +129,7 @@ batch_correlation_check <- function() {
       width = 2480,
       height = 2480,
       units = c("px"),
-      dpi = ssEnv$plot_resolution
+      dpi = as.numeric(ssEnv$plot_resolution_ppi)
     )
     # calculate correlation
     pca_contrib <- pca_contrib[,-1]

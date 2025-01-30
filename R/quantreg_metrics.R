@@ -79,7 +79,7 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
         ggplot2::labs(title = "Observed vs. Predicted", x = "Observed", y = "Predicted") +
         ggplot2::theme_minimal()
 
-      ggplot2::ggsave(filename = filename, plot = observed_predicted_plot, device = ssEnv$plot_format, width = 8.27, height = 8.27, dpi = ssEnv$plot_resolution, bg = "transparent")
+      ggplot2::ggsave(filename = filename, plot = observed_predicted_plot, device = ssEnv$plot_format, width = 8.27, height = 8.27, dpi = as.numeric(ssEnv$plot_resolution_ppi), bg = "transparent")
     }
 
     # Check if the permutation_vector has data before plotting histogram
@@ -94,7 +94,7 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
         ggplot2::labs(title = "Histogram of Betas", x = "Regression Coefficient Value", y = "Frequency") +
         ggplot2::theme_minimal()
 
-      ggplot2::ggsave(filename = filename, plot = betas_histogram, device = ssEnv$plot_format, width = 8.27, height = 8.27, dpi = ssEnv$plot_resolution, bg = "transparent")
+      ggplot2::ggsave(filename = filename, plot = betas_histogram, device = ssEnv$plot_format, width = 8.27, height = 8.27, dpi = as.numeric(ssEnv$plot_resolution_ppi), bg = "transparent")
     }
   }
 

@@ -113,7 +113,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
         file_result_prefix <- paste(depth_analysis, as.character(independent_variable),sep = "_")
 
-        study_summary <- subset(study_summary, study_summary$Sample_Group !=  "Reference")
         #########################################################################################################
         #########################################################################################################
 

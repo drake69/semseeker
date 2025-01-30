@@ -282,7 +282,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
           #   ggplot2::guides(fill = ggplot2::guide_legend(title = NULL, override.aes = list(color = NA)))
 
           # save the plot
-          ggplot2::ggsave(filename, venn_plot, width = 2048, height = 2048, dpi = ssEnv$plot_resolution, unit="px")
+          ggplot2::ggsave(filename, venn_plot, width = 2048, height = 2048, dpi = as.numeric(ssEnv$plot_resolution_ppi), unit="px")
 
           # Chart
           # Set up the Venn diagram parameters

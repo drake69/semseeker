@@ -87,7 +87,6 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
   for (i in 1:length(ssEnv$keys_sample_groups[,1]))
   {
-    #
     sample_group <- ssEnv$keys_sample_groups[i,1]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == sample_group, ]
     populationMatrixColumns <- colnames(signal_data[, populationSampleSheet$Sample_ID])

@@ -153,7 +153,7 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
       width = 8,
       height = 8,
       units = c("in"),
-      dpi = ssEnv$plot_resolution
+      dpi = as.numeric(ssEnv$plot_resolution_ppi)
     )
 
     # data_to_save <- cbind(train.data, predicted = apply(train.data[,independent_variable],1, function(x) (poly(x, degree, raw = TRUE))))

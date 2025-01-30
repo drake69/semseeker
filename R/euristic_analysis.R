@@ -6,7 +6,7 @@ euristic_analysis_phenolizer <- function(result_folder, rule, cutoff)
   ssEnv <- init_env(result_folder)
 
   geneAnnotatedFile <- utils::read.csv2(file.path(ssEnv$result_folder_data , "GENE_ANNOTATED.csv"))
-  geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
+  # geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
 
   markers <- c("MUTATIONS","LESIONS")
   for ( m in 1:length(markers))

@@ -6,7 +6,6 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
     return()
 
   # save signal as rds and as pivot
-  sample_sheet <- subset(sample_sheet, sample_sheet$Sample_Group != "Reference")
   sample_info <- sample_sheet[,c("Sample_ID","Sample_Group")]
   colnames(sample_info) <- c("SAMPLEID","SAMPLE_GROUP")
   signal_data <- data.frame("SAMPLEID"=rownames(signal_data), signal_data[, sample_info$SAMPLEID])

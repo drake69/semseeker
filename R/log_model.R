@@ -76,7 +76,7 @@ log_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
       width = 1240,
       height = 1240,
       units = c("px"),
-      dpi = ssEnv$plot_resolution
+      dpi = as.numeric(ssEnv$plot_resolution_ppi)
     )
 
     # data_to_save <- cbind(train.data, predicted = apply(train.data[,independent_variable],1, function(x) (start_a * exp(start_b * x))))

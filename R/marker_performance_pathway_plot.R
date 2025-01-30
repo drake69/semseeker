@@ -212,7 +212,7 @@ marker_performance_pathway_plot <- function(data, rules,file_prfx,path, disease,
 
       fname <- name_cleaning(paste(file_prfx,"_lollipop_plot_",c,"_",f,"_",rules["label"],ifelse(disease=="","", paste("_", disease, sep="")), sep="_"))
       filename <- paste(path, "/",fname, ".",ssEnv$plot_format,sep = "")
-      ggplot2::ggsave(filename,  width = 16, height = 9, dpi = ssEnv$plot_resolution)
+      ggplot2::ggsave(filename,  width = 16, height = 9, dpi = as.numeric(ssEnv$plot_resolution_ppi))
     }
   }
 }

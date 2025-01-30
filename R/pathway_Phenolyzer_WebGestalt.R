@@ -173,7 +173,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
         #
         #
         # # Save the plot
-        # ggplot2::ggsave(plotFileName, gg, width = 4096, height = 2048, units = "px", dpi = ssEnv$plot_resolution)
+        # ggplot2::ggsave(plotFileName, gg, width = 4096, height = 2048, units = "px", dpi = as.numeric(ssEnv$plot_resolution_ppi))
 
         file.remove(geneFile)
         unlink(geneFile)
