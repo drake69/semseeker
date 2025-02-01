@@ -15,7 +15,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
     error = function(cond)  {
       log_event ("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Function's arguments must be passed explicitily !")
       log_event(cond)
-      stop()
+      stop("Function's arguments must be passed explicitily !")
     }
   )
 
@@ -148,24 +148,26 @@ init_env <- function(result_folder, maxResources = 90, ...)
   if(ssEnv$showprogress)
   {
     handler_settings <- progressr::handlers()
-    # if (!(exists("progress", mode = "function", inherits = TRUE)))
-    # {
-    #   progressr::handlers(global = TRUE)
-    #   progressr::handlers("progress")
-    # }
-    if (!(exists("cli", mode = "function", inherits = TRUE)))
+    list_names <- names(handler_settings)
+    # check "cli" is an item of the vector
+    if((any(list_names == "cli")))
     {
-      # check if handler is already registered
-      if(!("cli" %in% handler_settings$handler))
-      {
-        # check if handlers is on the stack
-        if(!("cli" %in% handler_settings$stack))
-        {
-          progressr::handlers(global = TRUE)
-          progressr::handlers("cli")
-        }
-      }
+      progressr::handlers(global = TRUE)
+      progressr::handlers("cli")
     }
+    # if (!(exists("cli", mode = "function", inherits = TRUE)))
+    # {
+    #   # check if handler is already registered
+    #   if(!("cli" %in% handler_settings$handler))
+    #   {
+    #     # check if handlers is on the stack
+    #     if(!("cli" %in% handler_settings$stack))
+    #     {
+    #       progressr::handlers(global = TRUE)
+    #       progressr::handlers("cli")
+    #     }
+    #   }
+    # }
   }
 
   arguments <- set_env_variable(arguments,"maxResources",maxResources)
@@ -177,11 +179,30 @@ init_env <- function(result_folder, maxResources = 90, ...)
     " due to ",  paste(unique(ssEnv$keys_markers_figures$FIGURE), collapse = " ", sep =" "),
     " of ",  paste( unique(ssEnv$keys_areas_subareas_markers_figures$AREA) , collapse = " ", sep =" "))
 
+  # remove empty arguments
+  v <- c()
+  if(length(arguments)!=0)
+  {
+    temp <- arguments
+    for (i in 1:length(temp))
+    {
+      if(is.null(temp[[i]]))
+        v <- c(v,i)
+      if(identical(temp[[i]],character(0)))
+        v <- c(v,i)
+    }
+    # remove items with index in v
+    if(length(v)!=0)
+      arguments <- temp[-v]
+    else
+      arguments <- temp
+  }
   # check length of arguments
   if(length(arguments)!=0)
   {
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
-    stop()
+    # throw error
+    stop("ERROR: This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
   }
 
 

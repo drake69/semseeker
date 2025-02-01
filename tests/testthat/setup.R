@@ -131,7 +131,7 @@ check_execution_context <- function() {
     # message("Called from testthat")
   } else {
     showprogress <<- TRUE
-    verbosity <<- 3
+    verbosity <<- 4
     # message("Called from source or directly")
   }
 }

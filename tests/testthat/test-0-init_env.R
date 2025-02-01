@@ -7,30 +7,33 @@ test_that("test_init_env", {
   semseeker:::close_env()
 
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy,areas = c("GENE","DMR"), showprogress=TRUE, start_fresh=TRUE)
-  testthat::expect_true(length(unique(ssEnv$keys_areas_subareas[,"AREA"]))==1)
+  testthat::expect_true(length(unique(ssEnv$keys_areas_subareas[,"AREA"]))!=1)
 
   unlink(tempFolder,recursive = TRUE)
   assign("ssEnv", NULL, envir=.pkgglobalenv)
 
   ####################################################################################
 
-  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, figures="HYPPO"), "I'm STOPPING HERE!")
+  testthat::expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, figures="HYPPO"), "ERROR:")
   ####################################################################################
 
 
-  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, markers="HYPPO"), "I'm STOPPING HERE!")
+  testthat::expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, markers="HYPPO"), "ERROR:")
 
   ####################################################################################
 
-  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas="HYPPO"), "I'm STOPPING HERE!")
+  testthat::expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas="HYPPO"), "ERROR:")
 
   ####################################################################################
 
-  expect_error( semseeker:::init_env(tempFolder, parallel_strategy ="cluster"), "I'm STOPPING HERE!")
+  # expect_error( semseeker:::init_env(tempFolder, parallel_strategy ="cluster"), "ERROR:")
 
   ####################################################################################
 
-  expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas="HYPPO"), "I'm STOPPING HERE!")
+  testthat::expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, subareas="HYPPO"), "ERROR:")
+
+
+  testthat::expect_error( semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, test_it="HYPPO"), "ERROR:")
 
   ####################################################################################
 

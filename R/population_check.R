@@ -13,7 +13,7 @@ sample_group_check <- function(sample_sheet, signal_data)
   # check Sample_Group==Case has different Sample_ID of  Sample_Group==Reference
 
   sample_sheet <- as.data.frame(sample_sheet)
-  sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% c("Probes_Count", ssEnv$keys$pasted))]
+  sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% name_cleaning(c("Probes_Count", ssEnv$keys$pasted)))]
 
   result <- NULL
 

@@ -1,20 +1,24 @@
 #' Title manhattan_plot_marker_per_probe
 #'
-#' @param probe_name
-#' @param max_sample
-#' @param min_sample
-#' @param min_signal_probe
-#' @param label_font_size
-#' @param hyper_color
-#' @param hypo_color
-#' @param non_outlier_color
-#' @param limit_label_color
-#' @param limit_line_color
-#' @param limit_line_color_median
-#' @param reference_samples_color
-#' @param result_folder
-#' @param maxResources
-manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sample=0, min_sample=0 , min_signal_probe=0, label_font_size=3,
+#' @param max_sample max number of samples to plot
+#' @param min_sample min number of samples to plot
+#' @param min_signal_probe min signal value of the probe to be plotted
+#' @param label_font_size size of the labels
+#' @param hyper_color color to assign to hypermethylated probes
+#' @param hypo_color color to assign to hypomethylated probes
+#' @param non_outlier_color color to assign to probes that are not outliers
+#' @param limit_label_color color to assign to the labels of the limit lines
+#' @param limit_line_color color to assign to the limit lines
+#' @param limit_line_color_median color to assign to the median limit line
+#' @param reference_samples_color color to assign to the reference samples
+#' @param result_folder foder where the results are stored
+#' @param probe_name_max  cg name of the probe to represent tyh probe with maximum burden
+#' @param probe_name_min cg name of the probe to represent tyh probe with miniumal burden
+#' @param show_labels show labels in the plot
+#' @param parallel_strategy strategy to use for parallelization
+#' @param ...
+#' @param maxResources percentage of max system's resource to use
+manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe_name_min = "cg11680158", max_sample=0, min_sample=0 , min_signal_probe=0, label_font_size=3,
   hyper_color = "blue", hypo_color = "orange",  non_outlier_color = "grey",  limit_label_color = "blue",
   limit_line_color = "red", limit_line_color_median = "black",
   reference_samples_color = "cyan", show_labels = TRUE,
@@ -38,10 +42,11 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
 
-  high_signal_probes <- 0
-  low_signal_probes <- 100
+  browser()
 
-  if(probe_name=="")
+  # find the probe with the highet signal values
+  high_signal_probes <- 0
+  if(probe_name_max=="")
     for(k in 1:length(localKeys)){
       marker <- as.character(localKeys[k])
       pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
@@ -50,19 +55,6 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
         tempKeys <- tempKeys[-k]
       else
       {
-        # if(low_signal_probes==100)
-        # {
-        #   # get the row woth the max count of values
-        #   count_m <- read.csv(fname, sep=";", skip = 2, row.names = 1)
-        #   # count per each row the number of no zero values
-        #   count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
-        #   count_r <- count_r[count_r>10]
-        #   if(min(count_r)<low_signal_probes)
-        #   {
-        #     low_signal_probes <- min(count_r)
-        #     probe_name <- names(which.min(count_r))
-        #   }
-        # }
         if(high_signal_probes==0)
         {
           # get the row woth the max count of values
@@ -72,18 +64,43 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
           if(max(count_r)>high_signal_probes)
           {
             high_signal_probes <- max(count_r)
-            probe_name <- names(which.max(count_r))
+            probe_name_max <- names(which.max(count_r))
           }
         }
       }
     }
 
-  probe_name <- toupper(probe_name)
+  # find the probe with the lowest signal values
+  low_signal_probes <- 0.1 * high_signal_probes
+  if(probe_name_min=="")
+    for(k in 1:length(localKeys)){
+      marker <- as.character(localKeys[k])
+      pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
+      fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz = TRUE)
+      if (!file.exists(fname))
+        tempKeys <- tempKeys[-k]
+      else
+      {
+        if(low_signal_probes==100)
+        {
+          # get the row woth the max count of values
+          count_m <- read.csv(fname, sep=";", skip = 2, row.names = 1)
+          # count per each row the number of no zero values
+          count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
+          count_r <- count_r[count_r>10]
+          if(min(count_r)<low_signal_probes)
+          {
+            low_signal_probes <- min(count_r)
+            probe_name_min <- names(which.min(count_r))
+          }
+        }
+      }
+    }
+
   # remove SIGNAL from tempKeys
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
   pivot_subfolder <- dir_check_and_create(result_folderPivot,"SIGNAL")
   # signal_data <- readRDS(file_path_build( ssEnv$result_folderData, "1_signal_data","rds"))
-
 
   fname <- file_path_build( pivot_subfolder ,c("SIGNAL", "MEAN", "PROBE","PROBE"),"csv", add_gz=TRUE)
   data_name <- read.csv2(fname, sep  =  ";", nrows = 1)
@@ -94,7 +111,6 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   colnames(signal_data)[colnames(signal_data)=="SAMPLE_GROUP"] <- "SAMPLEID"
   colnames(signal_data) <- colnames(data_name)
 
-
   threshold_data <- fst::read_fst(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))
 
   colnames(signal_data) <- gsub("-","_", colnames(signal_data))
@@ -104,128 +120,138 @@ manhattan_plot_marker_per_probe <- function(probe_name = "cg11680158", max_sampl
   samples <- samples[-1]
 
   signal_data$SAMPLEID <- toupper(signal_data$SAMPLEID)
-  probe_signal <- as.vector(t(signal_data[signal_data$SAMPLEID==probe_name,]))
-  probe_signal <- as.numeric(probe_signal[-1])
 
-  threshold_data$PROBE <- toupper(threshold_data$PROBE)
-  probe_threshold <- threshold_data[threshold_data$PROBE==probe_name,]
-
-  q1 <- probe_threshold$q1
-  q3 <- probe_threshold$q3
-  y_med <- probe_threshold$signal_median_values
-  iqr <- probe_threshold$iqr
-  y_sup <- probe_threshold$signal_superior_thresholds
-  y_inf <- probe_threshold$signal_inferior_thresholds
-
-
-  probe_signal <- as.numeric(probe_signal)
-  outlier <-  as.vector(ifelse(probe_signal > y_sup, "Hyper", ifelse(probe_signal < y_inf, "Hypo" ,"Non-outlier")))
-  reference_col_id <- which(colnames(signal_data[,-1]) %in% references)
-  outlier[reference_col_id] <- "Reference"
-  marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
-
-
-  ########################################################################################################################################################################
-  ############################ PLOT MARKERS FOR A GIVEN PROBE ################################################################################################
-  ########################################################################################################################################################################
-
-  for(j in 1:length(tempKeys))
+  for ( selection in c("min","max"))
   {
-    marker <- as.character(tempKeys[j])
-    pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
-    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz=TRUE)
-    message("Reading file ", fname)
-    if(!file.exists(fname))
-    {
-      log_event("WARNING:", format(Sys.time(), "%a %b %d %X %Y") ,"File does not exist", fname)
-      next
-    }
-    data_name <- read.csv2(fname, sep  =  ";", nrows = 1)
-    marker_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
+    if(selection=="min")
+      probe_name <- probe_name_min
+    else
+      probe_name <- probe_name_max
+
+    probe_name <- toupper(probe_name)
+
+    probe_signal <- as.vector(t(signal_data[signal_data$SAMPLEID==probe_name,]))
+    probe_signal <- as.numeric(probe_signal[-1])
+
+    threshold_data$PROBE <- toupper(threshold_data$PROBE)
+    probe_threshold <- threshold_data[threshold_data$PROBE==probe_name,]
+
+    q1 <- probe_threshold$q1
+    q3 <- probe_threshold$q3
+    y_med <- probe_threshold$signal_median_values
+    iqr <- probe_threshold$iqr
+    y_sup <- probe_threshold$signal_superior_thresholds
+    y_inf <- probe_threshold$signal_inferior_thresholds
 
 
-
-    colnames(marker_data) <- colnames(data_name)
-    if(any(!(colnames(signal_data) %in% colnames(marker_data))))
-    {
-      lost_columns <- colnames(signal_data)[!(colnames(signal_data) %in% colnames(marker_data))]
-    #  add column with zeros to marker data
-    for(l in 1:length(lost_columns))
-      marker_data[[lost_columns[l]]] <- 0
-    }
-    # marker_data <- marker_data[,colnames(marker_data) %in% colnames(signal_data)]
-    marker_data <- marker_data[,colnames(signal_data)]
-    marker_data$SAMPLEID <- toupper(marker_data$SAMPLEID)
-    probe_marker <- marker_data[marker_data$SAMPLEID==probe_name,-1]
-    probe_marker <- as.numeric(probe_marker)
-
-    outlier[probe_marker==0] <- "Non-outlier"
+    probe_signal <- as.numeric(probe_signal)
+    outlier <-  as.vector(ifelse(probe_signal > y_sup, "Hyper", ifelse(probe_signal < y_inf, "Hypo" ,"Non-outlier")))
+    reference_col_id <- which(colnames(signal_data[,-1]) %in% references)
     outlier[reference_col_id] <- "Reference"
+    marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
 
-    data_to_plot <- data.frame(samples = samples, signal_to_plot = as.numeric(probe_marker), outlier)
-    marker_bar_end <- 0
 
-    pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(samples)), y = signal_to_plot, color = outlier)) +
-      ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.5) +
-      ggplot2::geom_point(alpha = 0.6) +
-      ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, "Non-outlier" = non_outlier_color,"Reference" = reference_samples_color)) +
-      # ggplot2::labs(x = "Sample", y = marker, title = paste0(marker, " found among all samples for probe ", probe_name)) +
-      ggplot2::labs(x = "Sample", y = marker, title = "") +
-      ggplot2::theme_classic() +
-      ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
+    ########################################################################################################################################################################
+    ############################ PLOT MARKERS FOR A GIVEN PROBE ################################################################################################
+    ########################################################################################################################################################################
+
+    for(j in 1:length(tempKeys))
+    {
+      marker <- as.character(tempKeys[j])
+      pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
+      fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz=TRUE)
+      message("Reading file ", fname)
+      if(!file.exists(fname))
+      {
+        log_event("WARNING:", format(Sys.time(), "%a %b %d %X %Y") ,"File does not exist", fname)
+        next
+      }
+      data_name <- read.csv2(fname, sep  =  ";", nrows = 1)
+      marker_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
+
+      colnames(marker_data) <- colnames(data_name)
+      if(any(!(colnames(signal_data) %in% colnames(marker_data))))
+      {
+        lost_columns <- colnames(signal_data)[!(colnames(signal_data) %in% colnames(marker_data))]
+        #  add column with zeros to marker data
+        for(l in 1:length(lost_columns))
+          marker_data[[lost_columns[l]]] <- 0
+      }
+      # marker_data <- marker_data[,colnames(marker_data) %in% colnames(signal_data)]
+      marker_data <- marker_data[,colnames(signal_data)]
+      marker_data$SAMPLEID <- toupper(marker_data$SAMPLEID)
+      probe_marker <- marker_data[marker_data$SAMPLEID==probe_name,-1]
+      probe_marker <- as.numeric(probe_marker)
+
+      outlier[probe_marker==0] <- "Non-outlier"
+      outlier[reference_col_id] <- "Reference"
+
+      data_to_plot <- data.frame(samples = samples, signal_to_plot = as.numeric(probe_marker), outlier)
+      marker_bar_end <- 0
+
+      pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(samples)), y = signal_to_plot, color = outlier)) +
+        ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.5) +
+        ggplot2::geom_point(alpha = 0.6) +
+        ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, "Non-outlier" = non_outlier_color,"Reference" = reference_samples_color)) +
+        # ggplot2::labs(x = "Sample", y = marker, title = paste0(marker, " found among all samples for probe ", probe_name)) +
+        ggplot2::labs(x = "Sample", y = marker, title = "") +
+        ggplot2::theme_classic() +
+        ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
       # ggplot2::scale_x_continuous(limits = c(1, NA)) # Adjust the limits to exclude 0
 
-    plot_filename <- file_path_build(chart_folder,c(probe_name,marker),ssEnv$plot_format)
-    ggplot2::ggsave(filename =plot_filename,plot = pp,units = "in", width = 6, height = 2, dpi=as.numeric(ssEnv$plot_resolution_ppi))
-  }
+      plot_filename <- file_path_build(chart_folder,c(selection, probe_name,marker),ssEnv$plot_format)
+      ggplot2::ggsave(filename =plot_filename,plot = pp,units = "in", width = 6, height = 2, dpi=as.numeric(ssEnv$plot_resolution_ppi))
+    }
 
-  ########################################################################################################################################################################
-  ############################ PLOT OUTLIERS FOR A GIVEN PROBE ################################################################################################
-  ########################################################################################################################################################################
+    ########################################################################################################################################################################
+    ############################ PLOT OUTLIERS FOR A GIVEN PROBE ################################################################################################
+    ########################################################################################################################################################################
 
-  #
-  data_to_plot <- data.frame(samples = samples, signal_to_plot = as.numeric(probe_signal), outlier)
-  delta_label_value <-  ifelse(probe_signal > y_sup, paste("\u03B4 ",
-    format(probe_signal - y_sup, scientific=TRUE , digits=2),sep=""),
-    ifelse(probe_signal < y_inf,  paste("\u03B4:", format(y_inf - probe_signal,scientific=TRUE, digits=2),sep=""),""))
-  delta_label_value[as.numeric(probe_marker)==0] <- ""
+    #
+    data_to_plot <- data.frame(samples = samples, signal_to_plot = as.numeric(probe_signal), outlier)
+    delta_label_value <-  ifelse(probe_signal > y_sup, paste("\u03B4 ",
+      format(probe_signal - y_sup, scientific=TRUE , digits=2),sep=""),
+      ifelse(probe_signal < y_inf,  paste("\u03B4:", format(y_inf - probe_signal,scientific=TRUE, digits=2),sep=""),""))
+    delta_label_value[as.numeric(probe_marker)==0] <- ""
 
-  y_shift <- 0
-  delta_label_position <-  ifelse(probe_signal > y_sup, (probe_signal + y_shift), ifelse(probe_signal < y_inf, (probe_signal - y_shift) ,0))
-  marker_bar_end <-  ifelse(probe_signal > y_sup, y_sup, ifelse(probe_signal < y_inf, y_inf ,probe_signal))
-  # marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
-  limit_line_color_q <- "red"
+    y_shift <- 0
+    delta_label_position <-  ifelse(probe_signal > y_sup, (probe_signal + y_shift), ifelse(probe_signal < y_inf, (probe_signal - y_shift) ,0))
+    marker_bar_end <-  ifelse(probe_signal > y_sup, y_sup, ifelse(probe_signal < y_inf, y_inf ,probe_signal))
+    # marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
+    limit_line_color_q <- "red"
 
-  pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(samples)), y = signal_to_plot, color = outlier)) +
-    ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.1) +
-    ggplot2::geom_hline(yintercept = y_med, linetype = "dashed", color = limit_line_color_median, size = 0.1) +
-    ggplot2::geom_hline(yintercept = y_sup, linetype = "dashed", color = limit_line_color, size = 0.1) +
-    ggplot2::geom_hline(yintercept = y_inf, linetype = "dashed", color = limit_line_color, size = 0.1) +
-    ggplot2::geom_point(alpha = 0.6) +
-    ggplot2::geom_hline(yintercept = q1, linetype = "dashed", color = limit_line_color_q, size = 0.1) +
-    ggplot2::geom_hline(yintercept = q3, linetype = "dashed", color = limit_line_color_q, size = 0.1) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = q1, label = ifelse(show_labels, "Q1","")), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = q3, label =  ifelse("Q3","")), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_med, label = ifelse("Median","")), color = limit_line_color_median, hjust = -0.2, vjust = -0.3) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_sup, label = ifelse("Upper Limit","")), color = limit_label_color, hjust = -0.2, vjust = 1.5) +
-    ggplot2::geom_text(ggplot2::aes(x = 0, y = y_inf, label = ifelse("Lower Limit","")), color = limit_label_color, hjust = -0.2, vjust = -0.3) +
-    ggplot2::geom_text(
-      ggplot2::aes( angle = 90, x = as.numeric(factor(samples)), y = delta_label_position, label = ifelse(delta_label_value,"")),
-      color = marker_segment_color,
-      check_overlap = TRUE,
-      size = label_font_size,
-      hjust = +1,
-      vjust = -0.45) +
-    ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, "Non-outlier" = non_outlier_color,"Reference" = reference_samples_color)) +
-    ggplot2::scale_shape_manual(values = c("Hyper" = 24, "Hypo" = 24, "Non-outlier" = 19, "Reference" = 6)) +  # Change "Reference" to shape 4 (X mark)
-    # ggplot2::labs(x = "Sample", y = "Signal", title = paste0("Signal outliers of all samples for probe ", probe_name)) +
-    ggplot2::labs(x = "Sample", y = "Signal", title = "") +
-    ggplot2::theme_classic() +
-    ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
+    pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(samples)), y = signal_to_plot, color = outlier)) +
+      ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.1) +
+      ggplot2::geom_hline(yintercept = y_med, linetype = "dashed", color = limit_line_color_median, size = 0.1) +
+      ggplot2::geom_hline(yintercept = y_sup, linetype = "dashed", color = limit_line_color, size = 0.1) +
+      ggplot2::geom_hline(yintercept = y_inf, linetype = "dashed", color = limit_line_color, size = 0.1) +
+      ggplot2::geom_point(alpha = 0.6) +
+      ggplot2::geom_hline(yintercept = q1, linetype = "dashed", color = limit_line_color_q, size = 0.1) +
+      ggplot2::geom_hline(yintercept = q3, linetype = "dashed", color = limit_line_color_q, size = 0.1) +
+      ggplot2::geom_text(ggplot2::aes(x = 0, y = q1, label = ifelse(show_labels, "Q1","")), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
+      ggplot2::geom_text(ggplot2::aes(x = 0, y = q3, label =  ifelse("Q3","")), color = limit_line_color_q, hjust = -0.2, vjust = -0.3) +
+      ggplot2::geom_text(ggplot2::aes(x = 0, y = y_med, label = ifelse("Median","")), color = limit_line_color_median, hjust = -0.2, vjust = -0.3) +
+      ggplot2::geom_text(ggplot2::aes(x = 0, y = y_sup, label = ifelse("Upper Limit","")), color = limit_label_color, hjust = -0.2, vjust = 1.5) +
+      ggplot2::geom_text(ggplot2::aes(x = 0, y = y_inf, label = ifelse("Lower Limit","")), color = limit_label_color, hjust = -0.2, vjust = -0.3) +
+      ggplot2::geom_text(
+        ggplot2::aes( angle = 90, x = as.numeric(factor(samples)), y = delta_label_position, label = ifelse(delta_label_value,"")),
+        color = marker_segment_color,
+        check_overlap = TRUE,
+        size = label_font_size,
+        hjust = +1,
+        vjust = -0.45) +
+      ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, "Non-outlier" = non_outlier_color,"Reference" = reference_samples_color)) +
+      ggplot2::scale_shape_manual(values = c("Hyper" = 24, "Hypo" = 24, "Non-outlier" = 19, "Reference" = 6)) +  # Change "Reference" to shape 4 (X mark)
+      # ggplot2::labs(x = "Sample", y = "Signal", title = paste0("Signal outliers of all samples for probe ", probe_name)) +
+      ggplot2::labs(x = "Sample", y = "Signal", title = "") +
+      ggplot2::theme_classic() +
+      ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
     # ggplot2::scale_x_continuous(limits = c(1, NA)) # Adjust the limits to exclude 0
 
-  plot_filename <- file_path_build(chart_folder,c(probe_name,"SIGNAL_OUTLIER"),ssEnv$plot_format)
-  ggplot2::ggsave(filename = plot_filename,plot = pp,units = "in", width = 6, height = 4, dpi=as.numeric(ssEnv$plot_resolution_ppi))
+    plot_filename <- file_path_build(chart_folder,c(selection, probe_name,"SIGNAL_OUTLIER"),ssEnv$plot_format)
+    ggplot2::ggsave(filename = plot_filename,plot = pp,units = "in", width = 6, height = 4, dpi=as.numeric(ssEnv$plot_resolution_ppi))
+
+  }
 
 
 

@@ -14,7 +14,9 @@ parallel_session <- function()
         execute: export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES at shell or
          Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES') ! ")
       # Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES")
-      stop()
+      stop("Setting OBJC_DISABLE_INITIALIZE_FORK_SAFETY must be YES to work in multiprocess. \n
+        execute: export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES at shell or
+         Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES') !")
     }
   }
 

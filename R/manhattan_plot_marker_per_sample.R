@@ -1,14 +1,14 @@
 #' Title manhattan_plot_marker_per_sample
 #'
-#' @param sample_name
-#' @param probes_range
-#' @param hyper_color
-#' @param hypo_color
-#' @param non_outlier_color
-#' @param limit_label_color
-#' @param result_folder
-#' @param maxResources
-#' @param parallel_strategy
+#' @param sample_name name of the sample to be plotted
+#' @param probes_range range of probes to be plotted
+#' @param hyper_color color for hypermethylated probes
+#' @param hypo_color color for hypomethylated probes
+#' @param non_outlier_color color for non-outlier probes
+#' @param limit_label_color color for limit labels
+#' @param result_folder folder where the results are stored
+#' @param maxResources maximum number of resources to be used
+#' @param parallel_strategy strategy to be used for parallelization
 #' @param ...
 #'
 #' @return

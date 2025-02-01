@@ -71,7 +71,6 @@ semseeker <- function(sample_sheet,
     signal_intrasample <- TRUE
     signal_data_local <- signal_data[[batch_id]]
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id, " of ", nrow(signal_data_local), " rows and ", ncol(signal_data_local), " samples.")
-
     colnames(signal_data_local) <- name_cleaning(colnames(signal_data_local))
     signal_data_local <- signal_data_local[rownames(signal_data_local) %in% probes_to_preserve,]
     signal_data_local <- substitute_infinite(signal_data_local)

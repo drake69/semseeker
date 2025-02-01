@@ -18,6 +18,24 @@ manhattan_plot_marker_per_sample(
 )
 }
 \arguments{
+\item{sample_name}{name of the sample to be plotted}
+
+\item{probes_range}{range of probes to be plotted}
+
+\item{hyper_color}{color for hypermethylated probes}
+
+\item{hypo_color}{color for hypomethylated probes}
+
+\item{non_outlier_color}{color for non-outlier probes}
+
+\item{limit_label_color}{color for limit labels}
+
+\item{result_folder}{folder where the results are stored}
+
+\item{maxResources}{maximum number of resources to be used}
+
+\item{parallel_strategy}{strategy to be used for parallelization}
+
 \item{...}{}
 }
 \description{

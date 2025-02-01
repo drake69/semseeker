@@ -1,7 +1,6 @@
 polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
 {
 
-  # browser()
   ssEnv <- get_session_info()
 
   # polynomial_degree_partition-partition_percentage

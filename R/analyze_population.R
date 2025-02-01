@@ -16,7 +16,12 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   start_time <- Sys.time()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " AnalyzePopulation warmingUP ")
 
+  nrow_before <- nrow(signal_data)
   signal_data <- stats::na.omit(signal_data)
+  nrow_after <- nrow(signal_data)
+  if (nrow_before != nrow_after) {
+    log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), " Removed ", nrow_before - nrow_after, " rows with NA values")
+  }
 
   ### get signal_values ########################################################
   sample_sheet <- sample_sheet[order(sample_sheet[, "Sample_ID"], decreasing = FALSE), ]

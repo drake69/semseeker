@@ -65,7 +65,7 @@ lesions_get <- function(grouping_column, mutation_annotated_sorted)
   tt <- data.frame(mutationAnnotatedSortedLocal,lesionpValue)
 
   ## correction by Bonferroni
-  lesionWeighted <- (tt$lesionpValue ) < ( ssEnv$bonferroni_threshold/( length(tt$PROBES_COUNT) * log10(tt$BASEPAIR_COUNT) ))
+  lesionWeighted <- (tt$lesionpValue ) < ( as.numeric(ssEnv$bonferroni_threshold)/( length(tt$PROBES_COUNT) * log10(tt$BASEPAIR_COUNT) ))
   table(lesionWeighted)
   rm(tt)
 

@@ -42,12 +42,14 @@ keys_create <- function(ssEnv, arguments)
   ssEnv$keys_markers_figures_default <- keys_markers_figures_default
 
   figures <- arguments[["figures"]]
-  arguments[["figures"]] <- NULL
+  missed_figures <- figures[!figures %in% keys_markers_figures_default$FIGURE]
+  arguments[["figures"]] <- missed_figures
   if (!is.null(figures))
     keys_markers_figures_default <- keys_markers_figures_default[keys_markers_figures_default$FIGURE %in% figures,]
 
   markers <- arguments[["markers"]]
-  arguments[["markers"]] <- NULL
+  missed_markers <- markers[!markers %in% keys_markers_figures_default$MARKER]
+  arguments[["markers"]] <- missed_markers
   if (!is.null(markers))
     keys_markers_figures_default <- keys_markers_figures_default[keys_markers_figures_default$MARKER %in% markers,]
 
@@ -65,12 +67,14 @@ keys_create <- function(ssEnv, arguments)
   keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default)
 
   areas <- arguments[["areas"]]
-  arguments[["areas"]] <- NULL
+  missed_areas <- areas[!areas %in% keys_areas_subareas_default$AREA]
+  arguments[["areas"]] <- missed_areas
   if (!is.null(areas))
     keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$AREA %in% areas,]
 
   subareas <- arguments[["subareas"]]
-  arguments[["subareas"]] <- NULL
+  missed_subareas <- subareas[!subareas %in% keys_areas_subareas_default$SUBAREA]
+  arguments[["subareas"]] <- missed_subareas
   if (!is.null(subareas))
     keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$SUBAREA %in% subareas,]
 
