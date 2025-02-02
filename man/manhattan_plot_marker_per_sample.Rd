@@ -36,7 +36,7 @@ manhattan_plot_marker_per_sample(
 
 \item{parallel_strategy}{strategy to be used for parallelization}
 
-\item{...}{}
+\item{...}{other parameters}
 }
 \value{
 save plot in the result_folder/Chart/MARKER_PER_SAMPLE
