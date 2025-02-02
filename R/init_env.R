@@ -148,26 +148,26 @@ init_env <- function(result_folder, maxResources = 90, ...)
   if(ssEnv$showprogress)
   {
     handler_settings <- progressr::handlers()
-    list_names <- names(handler_settings)
+    # list_names <- names(handler_settings)
     # check "cli" is an item of the vector
-    if((any(list_names == "cli")))
-    {
-      progressr::handlers(global = TRUE)
-      progressr::handlers("cli")
-    }
-    # if (!(exists("cli", mode = "function", inherits = TRUE)))
+    # if((any(list_names == "cli")))
     # {
-    #   # check if handler is already registered
-    #   if(!("cli" %in% handler_settings$handler))
-    #   {
-    #     # check if handlers is on the stack
-    #     if(!("cli" %in% handler_settings$stack))
-    #     {
-    #       progressr::handlers(global = TRUE)
-    #       progressr::handlers("cli")
-    #     }
-    #   }
+    #   progressr::handlers(global = TRUE)
+    #   progressr::handlers("cli")
     # }
+    if (!(exists("cli", mode = "function", inherits = TRUE)))
+    {
+      # check if handler is already registered
+      if(!("cli" %in% handler_settings$handler))
+      {
+        # check if handlers is on the stack
+        if(!("cli" %in% handler_settings$stack))
+        {
+          progressr::handlers(global = TRUE)
+          progressr::handlers("cli")
+        }
+      }
+    }
   }
 
   arguments <- set_env_variable(arguments,"maxResources",maxResources)
