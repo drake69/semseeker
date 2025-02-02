@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stochastic Epigenetic Mutations SEM Seeker • semseeker</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -19,7 +19,7 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -47,7 +47,7 @@
 <li>
   <a href="https://github.com/drake69/semseeker/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -58,7 +58,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -74,57 +74,57 @@
 </h2>
 <p>To install semseeker, you can use devtools; upcoming releases will be accessible via CRAN.</p>
 <p>Install the latest release:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"devtools"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"drake69/semseeker"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"drake69/semseeker"</span>)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quick-example">Quick Example<a class="anchor" aria-label="anchor" href="#quick-example"></a>
 </h2>
 <p>This basic example demonstrates the process of creating a methylation matrix for beta values that can be utilized in calculations using ChAMP:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ChAMP)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>idat_folder <span class="ot">&lt;-</span> <span class="st">"~/source_idat/"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>result_folder <span class="ot">=</span> <span class="st">"~/result/"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>myLoadN <span class="ot">&lt;-</span> <span class="fu">champ.load</span>(<span class="at">directory =</span> idat_folder,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">method =</span> <span class="st">"minfi"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">methValue=</span><span class="st">"B"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">autoimpute=</span><span class="cn">TRUE</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filterDetP=</span><span class="cn">TRUE</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">ProbeCutoff=</span><span class="dv">0</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">SampleCutoff=</span><span class="fl">0.1</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">detPcut=</span><span class="fl">0.01</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filterBeads=</span><span class="cn">TRUE</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                      <span class="at">beadCutoff=</span><span class="fl">0.05</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filterNoCG=</span><span class="cn">TRUE</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filterSNPs=</span><span class="cn">TRUE</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">population=</span><span class="cn">NULL</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filterMultiHit=</span><span class="cn">TRUE</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                      <span class="at">filterXY=</span><span class="cn">TRUE</span>,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                      <span class="at">force=</span><span class="cn">FALSE</span>,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                      <span class="at">arraytype=</span><span class="st">"450K"</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># normalize with ChAMP</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>myNormN<span class="ot">&lt;-</span><span class="fu">champ.norm</span>(<span class="at">beta=</span>myLoadN<span class="sc">$</span>beta,</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                    <span class="at">rgSet=</span>myLoadN<span class="sc">$</span>rgSet,</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                    <span class="at">mset=</span>myLoadN<span class="sc">$</span>mset,</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>                    <span class="at">resultsDir=</span> result_folder,</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method=</span><span class="st">"SWAN"</span>,</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                    <span class="at">plotBMIQ=</span><span class="cn">FALSE</span>,</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                    <span class="at">arraytype=</span><span class="st">"450K"</span>,</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cores=</span> <span class="fu">detectCores</span>(<span class="at">all.tests =</span> <span class="cn">FALSE</span>, <span class="at">logical =</span> <span class="cn">TRUE</span>) <span class="sc">-</span> <span class="dv">1</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                    )</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(myNormN,<span class="st">"~/normalizedData.rds"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(ChAMP)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>idat_folder <span class="ot">&lt;-</span> <span class="st">"~/source_idat/"</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>result_folder <span class="ot">=</span> <span class="st">"~/result/"</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>myLoadN <span class="ot">&lt;-</span> <span class="fu">champ.load</span>(<span class="at">directory =</span> idat_folder,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                      <span class="at">method =</span> <span class="st">"minfi"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                      <span class="at">methValue=</span><span class="st">"B"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>                      <span class="at">autoimpute=</span><span class="cn">TRUE</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>                      <span class="at">filterDetP=</span><span class="cn">TRUE</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>                      <span class="at">ProbeCutoff=</span><span class="dv">0</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                      <span class="at">SampleCutoff=</span><span class="fl">0.1</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>                      <span class="at">detPcut=</span><span class="fl">0.01</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>                      <span class="at">filterBeads=</span><span class="cn">TRUE</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>                      <span class="at">beadCutoff=</span><span class="fl">0.05</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>                      <span class="at">filterNoCG=</span><span class="cn">TRUE</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>                      <span class="at">filterSNPs=</span><span class="cn">TRUE</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>                      <span class="at">population=</span><span class="cn">NULL</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>                      <span class="at">filterMultiHit=</span><span class="cn">TRUE</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>                      <span class="at">filterXY=</span><span class="cn">TRUE</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>                      <span class="at">force=</span><span class="cn">FALSE</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>                      <span class="at">arraytype=</span><span class="st">"450K"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co"># normalize with ChAMP</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>myNormN<span class="ot">&lt;-</span><span class="fu">champ.norm</span>(<span class="at">beta=</span>myLoadN<span class="sc">$</span>beta,</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>                    <span class="at">rgSet=</span>myLoadN<span class="sc">$</span>rgSet,</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>                    <span class="at">mset=</span>myLoadN<span class="sc">$</span>mset,</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>                    <span class="at">resultsDir=</span> result_folder,</span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>                    <span class="at">method=</span><span class="st">"SWAN"</span>,</span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>                    <span class="at">plotBMIQ=</span><span class="cn">FALSE</span>,</span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>                    <span class="at">arraytype=</span><span class="st">"450K"</span>,</span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>                    <span class="at">cores=</span> <span class="fu">detectCores</span>(<span class="at">all.tests =</span> <span class="cn">FALSE</span>, <span class="at">logical =</span> <span class="cn">TRUE</span>) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>                    )</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="fu">saveRDS</span>(myNormN,<span class="st">"~/normalizedData.rds"</span>)</span></code></pre></div>
 <p>Here’s how you can obtain the analyzed data:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semseeker)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>normalizedData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"~/normalizedData.rds"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>sample_sheet <span class="ot">&lt;-</span> <span class="fu">read.csv2</span>(<span class="st">"~/sample_sheet.csv"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">semseeker</span> (<span class="at">sample_sheet =</span> sample_sheet, </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">methylation_data =</span> normalizedData,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">result_folder =</span> <span class="st">"~/semseeker_result/"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(semseeker)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>normalizedData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"~/normalizedData.rds"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>sample_sheet <span class="ot">&lt;-</span> <span class="fu">read.csv2</span>(<span class="st">"~/sample_sheet.csv"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">semseeker</span> (<span class="at">sample_sheet =</span> sample_sheet, </span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>        <span class="at">methylation_data =</span> normalizedData,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>        <span class="at">result_folder =</span> <span class="st">"~/semseeker_result/"</span>)</span></code></pre></div>
 </div>
 </div>
 <div class="section level1">
@@ -197,16 +197,16 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>
