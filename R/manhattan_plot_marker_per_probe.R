@@ -42,8 +42,6 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
 
-  browser()
-
   # find the probe with the highet signal values
   high_signal_probes <- 0
   if(probe_name_max=="")
@@ -55,17 +53,14 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
         tempKeys <- tempKeys[-k]
       else
       {
-        if(high_signal_probes==0)
+        # get the row woth the max count of values
+        count_m <- utils::read.csv2(fname, sep=";", skip = 2, row.names = 1)
+        # count per each row the number of no zero values
+        count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
+        if(max(count_r)>high_signal_probes)
         {
-          # get the row woth the max count of values
-          count_m <- utils::read.csv2(fname, sep=";", skip = 2, row.names = 1)
-          # count per each row the number of no zero values
-          count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
-          if(max(count_r)>high_signal_probes)
-          {
-            high_signal_probes <- max(count_r)
-            probe_name_max <- names(which.max(count_r))
-          }
+          high_signal_probes <- max(count_r)
+          probe_name_max <- names(which.max(count_r))
         }
       }
     }
@@ -81,18 +76,15 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
         tempKeys <- tempKeys[-k]
       else
       {
-        if(low_signal_probes==100)
+        # get the row woth the max count of values
+        count_m <- utils::read.csv2(fname, sep=";", skip = 2, row.names = 1)
+        # count per each row the number of no zero values
+        count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
+        count_r <- count_r[count_r>10]
+        if(min(count_r)<low_signal_probes)
         {
-          # get the row woth the max count of values
-          count_m <- utils::read.csv2(fname, sep=";", skip = 2, row.names = 1)
-          # count per each row the number of no zero values
-          count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
-          count_r <- count_r[count_r>10]
-          if(min(count_r)<low_signal_probes)
-          {
-            low_signal_probes <- min(count_r)
-            probe_name_min <- names(which.min(count_r))
-          }
+          low_signal_probes <- min(count_r)
+          probe_name_min <- names(which.min(count_r))
         }
       }
     }
