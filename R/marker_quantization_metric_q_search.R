@@ -25,7 +25,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   # message(filename)
   result_temp <- data.frame()
   if(file.exists(filename))
-    result_temp <- utils::read.csv(file = filename, sep=",",dec=".")
+    result_temp <- utils::read.csv2(file = filename, sep=",",dec=".")
 
   qq <- nrow(result_temp)==0
   if(!qq)
@@ -133,7 +133,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   colnames(result_temp) <- toupper(colnames(result_temp))
   dataFolder <- dir_check_and_create(dest_folder,c("Data","Distributions"))
   filename  <-  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
-  utils::write.csv(result_temp, file = filename, row.names = FALSE)
+  utils::write.csv2(result_temp, file = filename, row.names = FALSE)
 
   markers <- unique(result_temp$MARKER)
   filename  <-  file_path_build(dest_folder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_PIVOT"),"csv")
@@ -180,7 +180,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
     group_by(MARKER, Q) %>%
     dplyr::summarise(SCORE = sum(SCORE, na.rm = TRUE))
 
-  write.csv(result, file = filename, row.names = FALSE)
+  utils::write.csv2(result, file = filename, row.names = FALSE)
   aggregate_pivot <- reshape2::dcast(aggregate_pivot, MARKER ~ Q, value.var = "SCORE", fun.aggregate = sum)
   aggregate_pivot <- t(aggregate_pivot)
   aggregate_pivot <- as.data.frame(aggregate_pivot)
@@ -188,15 +188,15 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   aggregate_pivot <- aggregate_pivot[-1,]
   aggregate_pivot$Q <- rownames(aggregate_pivot)
   filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE","PIVOT"),"csv")
-  write.csv(aggregate_pivot, file = filename, row.names = FALSE)
+  utils::write.csv2(aggregate_pivot, file = filename, row.names = FALSE)
 
 
   # calculate best marker
 
   filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
-  result_temp <- utils::read.csv(file = filename, sep=",",dec=".")
+  result_temp <- utils::read.csv2(file = filename, sep=",",dec=".")
   filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
-  results_q <- read.csv2(file =filename, sep=",",dec=".")
+  results_q <- utils::read.csv2(file =filename, sep=",",dec=".")
   results_q_max <- unique(results_q[,c("SCORE","MARKER")] %>%
       dplyr::group_by(MARKER) %>%
       dplyr::filter(SCORE == max(SCORE)))
@@ -234,7 +234,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   filename  =  file_path_build(dataFolder,c(study,"BEST_MARKER", "ANALYSIS","SCORE"),"csv")
   # sort by score desc
   scores <- scores[order(-scores$SCORE),]
-  write.csv2(scores, file = filename, row.names = FALSE)
+  utils::write.csv2(scores, file = filename, row.names = FALSE)
 
   close_env()
 }
@@ -244,7 +244,7 @@ load_deltax <- function(original_marker){
 
   #
   ssEnv <- get_session_info()
-  sample_sheet <- read.csv(file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), header = TRUE, sep=";")
+  sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), header = TRUE, sep=";")
   Sample_Group=as.data.frame(unique(sample_sheet$Sample_Group))
   colnames(Sample_Group) <- "SAMPLE_GROUP"
 

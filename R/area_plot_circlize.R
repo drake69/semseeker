@@ -1,4 +1,4 @@
-area_plot_circlize <- function(areas, circle_plot_path, maxResources = 90, parallel_strategy  = "multicore", ...)
+area_plot_circlize <- function(areas, circle_plot_path,result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
   ssEnv <- init_env(result_folder = result_folder, maxResources = maxResources, parallel_strategy = parallel_strategy, start_fresh = FALSE, ...)
 
@@ -45,7 +45,7 @@ area_plot_circlize <- function(areas, circle_plot_path, maxResources = 90, paral
   circlize::circos.genomicIdeogram(cytoband)
 
   # Add genomic links with unique colors
-  my_col <- rainbow(nrow(results))
+  my_col <- grDevicesrainbow(nrow(results))
   circlize::circos.genomicLink(results[, 1:3], results[, 6:8], col = my_col)
 
   # Clear the circos plot after drawing

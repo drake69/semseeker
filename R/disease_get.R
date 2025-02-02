@@ -8,7 +8,7 @@ disease_get <- function(disease, vocabulary="HPO")
     return(data.frame("DISEASE"="")[-1,])
   }
   # read file and skip first 4 rows
-  diseases_original <- read.csv2("~/Downloads/phenotype.hpoa", header = TRUE, stringsAsFactors = FALSE, sep ="\t", skip = 4)
+  diseases_original <- utils::read.csv2("~/Downloads/phenotype.hpoa", header = TRUE, stringsAsFactors = FALSE, sep ="\t", skip = 4)
   #
   message(disease)
   # subset diseases based on disease name contained in the disease column

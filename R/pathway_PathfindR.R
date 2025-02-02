@@ -67,7 +67,7 @@ pathway_pathfindR <- function(study,
         if(file.exists(pathway_report_path))
         {
           next
-          # pathway_report <- read.csv2(pathway_report_path)
+          # pathway_report <- utils::read.csv2(pathway_report_path)
           # existing_db <-   unique(pathway_report$source)
         }
 
@@ -163,9 +163,9 @@ pathway_pathfindR <- function(study,
       {
         if(nrow(result_pathway)!=0)
         {
-          output_temp$FDR <- p.adjust(output_temp$highest_p, method = "fdr")
+          output_temp$FDR <-stats::p.adjust(output_temp$highest_p, method = "fdr")
           result_pathway$PHENOTYPE <- grepl(study,result_pathway$Term_Description, ignore.case = T)
-          write.csv2(result_pathway, pathway_report_path)
+          utils::write.csv2(result_pathway, pathway_report_path)
           rm(result_pathway)
         }
       }

@@ -79,14 +79,14 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
               next
             }
 
-            pathway_result <- read.csv2(file_name)
+            pathway_result <- utils::read.csv2(file_name)
 
             if(nrow(pathway_result)==0)
               next
 
             # add fake FDR
             if(key_enrichment_format[pt,"label"]=="pathfindR")
-              pathway_result$PVALUE_ADJ_ALL_FDR <- p.adjust(pathway_result[,"highest_p"], method = "fdr")
+              pathway_result$PVALUE_ADJ_ALL_FDR <-stats::p.adjust(pathway_result[,"highest_p"], method = "fdr")
 
             cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
             # check column names contain the required columns
@@ -117,7 +117,7 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
             next
 
           # TO DO: manage comparison of pathways by FIGURE
-          aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, FIGURE =="HYPER_HYPO")
+          aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, aggregated_patwhay_result_total$FIGURE =="HYPER_HYPO")
 
           # browser()
           # keep only first top taxonomies

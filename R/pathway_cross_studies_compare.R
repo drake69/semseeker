@@ -75,7 +75,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
               "_pathways.csv",
               sep = ""
             )
-          write.csv2(overlaps, filename)
+          utils::write.csv2(overlaps, filename)
           pathway_shared <- pathway_inference_comb[pathway_inference_comb$key == keys[i] & pathway_inference_comb$ID %in% overlaps, ]
           filename <-
             paste(
@@ -84,7 +84,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
               "_pathways_shared.csv",
               sep = ""
             )
-          write.csv2(pathway_shared, filename)
+          utils::write.csv2(pathway_shared, filename)
         }
       }
     }

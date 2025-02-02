@@ -17,6 +17,6 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
   pivot_subfolder <- dir_check_and_create(ssEnv$result_folderData,c("Pivots","SIGNAL"))
   fileName <- file_path_build(pivot_subfolder,c("SIGNAL","MEAN","PROBE","PROBE"),"csv", add_gz = TRUE)
   utils::write.table(signal_data, gzfile(fileName), row.names = T, col.names = T, sep=";")
-  # saveRDS(signal_data,file_path_build(ssEnv$result_folderData, c(batch_id,"_signal_data"),"rds"))
+  saveRDS(signal_data,file_path_build(ssEnv$result_folderData, c(batch_id,"_signal_data"),"rds"))
 
 }

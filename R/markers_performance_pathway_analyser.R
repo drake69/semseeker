@@ -85,10 +85,10 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           if(key_enrichment_format[pt,"label"]=="phenolyzer")
           {
             # read the pathway_result
-            pathway_result <- read.csv2(file_name, dec=".")
+            pathway_result <- utils::read.csv2(file_name, dec=".")
           }
           else
-            pathway_result <- read.csv2(file_name)
+            pathway_result <- utils::read.csv2(file_name)
 
           cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
           # check column names contain the required columns
@@ -167,7 +167,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
         aggregated_patwhay_result <- aggregated_patwhay_result_total
         # save it
-        write.csv2(aggregated_patwhay_result, file_path_build(baseFolder =  path, detailsFilename =  paste(file_prfx,"_aggregated_patwhay_result", sep="_"), extension = "csv"))
+        utils::write.csv2(aggregated_patwhay_result, file_path_build(baseFolder =  path, detailsFilename =  paste(file_prfx,"_aggregated_patwhay_result", sep="_"), extension = "csv"))
 
         fdr <- aggregate(aggregated_patwhay_result[, column_of_pvalue], by = list(aggregated_patwhay_result[,column_of_id]), FUN = mean)
         colnames(fdr) <- c( column_of_id, column_of_pvalue)
@@ -222,7 +222,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
         pivot_path <- dir_check_and_create(path, "marker_perfomance")
         filename <- paste(pivot_path, "/",file_prfx,"_pivot_",key_enrichment_format[pt,"label"],ifelse(disease=="","", paste("_", disease, sep="")), ".csv",sep = "")
-        write.csv2(key_gene_set_pivot, filename)
+        utils::write.csv2(key_gene_set_pivot, filename)
 
         # aggregate enrichment
         colnames(aggregated_patwhay_result_total)[which(colnames(aggregated_patwhay_result_total)==column_of_id)] <- "column_of_id_label"
@@ -375,7 +375,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           filename <- paste(ssEnv$result_folderPathway, "/",file_prfx,"_pivot_summary_",key_enrichment_format[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
         else
           filename <- paste(ssEnv$result_folderPhenotype, "/",file_prfx,"_pivot_summary_",key_enrichment_format[pt,"label"], ifelse(disease=="","", paste("_", disease, sep="")) ,".csv",sep = "")
-        write.csv2(key_gene_set_pivot_summary, filename)
+        utils::write.csv2(key_gene_set_pivot_summary, filename)
 
 
 
@@ -406,7 +406,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
             diff_df <- plyr::rbind.fill(diff_df, tt2)
           }
           diff_df <- merge(diff_df, tt[,c(column_of_id, column_of_description)], by=column_of_id)
-          write.csv2(diff_df, filename)
+          utils::write.csv2(diff_df, filename)
         }
       }
 

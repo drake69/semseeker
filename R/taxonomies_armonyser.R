@@ -83,10 +83,10 @@ taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column
           if(key_enrichment_format[pt,"label"]=="phenolyzer")
           {
             # read the pathway_result
-            pathway_result <- read.csv2(file_name, dec=".")
+            pathway_result <- utils::read.csv2(file_name, dec=".")
           }
           else
-            pathway_result <- read.csv2(file_name)
+            pathway_result <- utils::read.csv2(file_name)
 
           pathway_result <- enrichment_analysy_add_category(data =  pathway_result, source =  key_enrichment_format[pt,"label"])
           cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
@@ -105,7 +105,7 @@ taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column
           if(key_enrichment_format[pt,"label"]=="pathfindR")
           {
             # adjust pvalue
-            pathway_result$PVALUE_ADJ_ALL_FDR <- p.adjust(pathway_result[,"highest_p"], method = "fdr")
+            pathway_result$PVALUE_ADJ_ALL_FDR <-stats::p.adjust(pathway_result[,"highest_p"], method = "fdr")
 
           }
           pathway_result$by_keyword <- FALSE

@@ -83,7 +83,7 @@ colnames(signal_superior_thresholds) <- "HIGH"
 
 row.names(signal_superior_thresholds) <- probe_features$PROBE
 row.names(signal_inferior_thresholds) <- probe_features$PROBE
-signal_medians <- apply(signal_data, 1, median)
+signal_medians <- apply(signal_data, 1, stats::median)
 
 signal_thresholds <- data.frame("signal_median_values"=signal_medians,
   "signal_inferior_thresholds"=signal_inferior_thresholds,

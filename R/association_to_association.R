@@ -32,8 +32,8 @@ association_to_association <- function(inference_details_origin, inference_detai
 
 
     inference_filename_origin <- inference_file_name(inference_detail = inference_details_origin, folder = ssEnv$result_folderInference, marker = marker, file_extension = "csv")
-    data_origin <- read.csv2(inference_filename_origin)
-    data <- read.csv2(inference_filename)
+    data_origin <- utils::read.csv2(inference_filename_origin)
+    data <- utils::read.csv2(inference_filename)
 
     # remove from data origin where figure, area, subare and are_of_test are not in data
     data_origin$KEY <- paste(data_origin$FIGURE, data_origin$AREA, data_origin$SUBAREA, data_origin$AREA_OF_TEST, sep = "_")

@@ -173,7 +173,7 @@ phenotype_phenolyzer <- function(study,
     phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste("_", disease_label,"_report",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "summary")
     phenotype_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
-    write.csv2(annotated_genes, phenotype_report_path)
+    utils::write.csv2(annotated_genes, phenotype_report_path)
 
 
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "scores")
@@ -202,7 +202,7 @@ phenotype_phenolyzer <- function(study,
     {
 
       diseases_file <- diseases_files[w]
-      disease_temp <- read.csv2(diseases_file, sep = "\t", header = FALSE)
+      disease_temp <- utils::read.csv2(diseases_file, sep = "\t", header = FALSE)
       colnames(disease_temp) <- c("Description","Score")
       disease_temp$key <- key
       disease_temp$HPO <- disease
@@ -210,7 +210,7 @@ phenotype_phenolyzer <- function(study,
 
       projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix= disease_label  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
       filenameResult = file_path_build(base_path,projectName,"csv")
-      write.csv2(disease_temp, filenameResult)
+      utils::write.csv2(disease_temp, filenameResult)
     }
 
     # phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste(disease,"_gene_cloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha)
@@ -227,7 +227,7 @@ phenotype_phenolyzer <- function(study,
   # phenotype_report_path <- file_path_build(base_path,analysis_name,"csv")
   # if(file.exists(phenotype_report_path))
   # {
-  #   disease_temp <- read.csv2(phenotype_report_path)
+  #   disease_temp <- utils::read.csv2(phenotype_report_path)
   #   diseases_summary <- plyr::rbind.fill(diseases_summary, disease_temp)
   # }
   # diseases_summary <- unique(diseases_summary)

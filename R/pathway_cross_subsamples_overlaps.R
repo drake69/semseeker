@@ -63,7 +63,7 @@ pathway_cross_subsamples_overlaps <- function(inference_details,pathways_sql_sel
             pathway_report_path <- file_path_build(path,phenotype_analysis_name,"csv")
             if(file.exists(pathway_report_path))
             {
-              temp_res <- read.csv2(pathway_report_path)
+              temp_res <- utils::read.csv2(pathway_report_path)
               if(nrow(temp_res) != 0)
                 temp_res <- filter_sql(pathways_sql_selection,temp_res)
 
@@ -193,7 +193,7 @@ pathway_cross_subsamples_overlaps <- function(inference_details,pathways_sql_sel
             overlaps <- data.frame(overlaps)
             colnames(overlaps) <- column_of_id
             overlaps <- merge(overlaps, pathway_results, by = column_of_id)
-            write.csv2(overlaps, filename)
+            utils::write.csv2(overlaps, filename)
           }
 
           # create a pivot table
@@ -210,7 +210,7 @@ pathway_cross_subsamples_overlaps <- function(inference_details,pathways_sql_sel
               )
             colnames(pivot_table)[1] <- column_of_id
             pivot_table <- merge(unique(pathway_results[,c(column_of_description,column_of_id)]),pivot_table, by = column_of_id, all.y = TRUE)
-            write.csv2(pivot_table, filename)
+            utils::write.csv2(pivot_table, filename)
           }
 
           log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y"),"  job completed !")

@@ -45,7 +45,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
             next
           }
           # read the file
-          file <- read.csv2(file_name)
+          file <- utils::read.csv2(file_name)
           file <- file[file$DEPTH == depths,]
           # file$FAMILY.TEST <- paste(family_test, inference_detail$independent_variable, sep="_")
           metrics_name_collect(file)

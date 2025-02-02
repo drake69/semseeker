@@ -177,7 +177,7 @@ bayes_analysis <-
             {
               results <- results_temp
             }
-            write.csv2(x = results, file = fileNameResults, row.names = FALSE)
+            utils::write.csv2(x = results, file = fileNameResults, row.names = FALSE)
           }
         }
       # sort descending by P_to_be_Case_cond_to_be_Epimutated and P_to_be_Case_cond_to_be_Epimutated
@@ -189,7 +189,7 @@ bayes_analysis <-
       results <- results[, colSums(is.na(results)) != nrow(results)]
       results$P_to_be_Case_cond_to_be_Epimutated <- as.numeric(results$P_to_be_Case_cond_to_be_Epimutated)
       results$P_to_be_Control_cond_to_be_Epimutated <- as.numeric(results$P_to_be_Control_cond_to_be_Epimutated)
-      write.csv2(x = results, file = fileNameResults, row.names = FALSE)
+      utils::write.csv2(x = results, file = fileNameResults, row.names = FALSE)
 
       max_P_to_be_Case_cond_to_be_Epimutated <- max(results$P_to_be_Case_cond_to_be_Epimutated)
       max_P_to_be_Case_cond_to_be_Epimutated <- max(results$P_to_be_Case_cond_to_be_Epimutated)

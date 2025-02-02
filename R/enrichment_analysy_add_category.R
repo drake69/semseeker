@@ -32,7 +32,7 @@ enrichment_analysy_add_category <- function(source, data)
     data[data$source=='GO-MF',"SS_CATEGORY"] <- "GO-MF"
     data[data$source=='KEGG',"SS_CATEGORY"] <- "KEGG-NTA"
     data[data$source=='REACTOME',"SS_CATEGORY"] <- "REACTOME-NTA"
-    data$PVALUE_ADJ_ALL_FDR <- p.adjust(data[,"highest_p"], method = "fdr")
+    data$PVALUE_ADJ_ALL_FDR <-stats::p.adjust(data[,"highest_p"], method = "fdr")
   }
 
   if(any(source %in% c("STRINGdb","Phenolyzer_STRINGdb")))

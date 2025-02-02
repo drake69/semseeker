@@ -35,7 +35,7 @@ pathway_pathfindR_circlize <- function(
       message("Pathway report path: ", pathway_report_path)
       if(file.exists(pathway_report_path))
       {
-        pathways <- read.csv2(pathway_report_path, header = TRUE)
+        pathways <- utils::read.csv2(pathway_report_path, header = TRUE)
         if(length(pathways_selection)>0)
           pathways <- subset(pathways, ID %in% pathways_selection)
         results <- data.frame()
@@ -135,7 +135,7 @@ pathway_pathfindR_circlize <- function(
         # circos.genomicIdeogram(cytoband)
         #
         # # genomic links
-        # my_col <- rainbow(nrow(results))
+        # my_col <- grDevicesrainbow(nrow(results))
         # circos.genomicLink(results[, 1:3], results[, 6:8], col = my_col)
 
 
@@ -182,7 +182,7 @@ pathway_pathfindR_circlize <- function(
         circlize::circos.genomicIdeogram(cytoband)
 
         # Add genomic links with unique colors
-        my_col <- rainbow(nrow(results))
+        my_col <- grDevicesrainbow(nrow(results))
         circlize::circos.genomicLink(results[, 1:3], results[, 6:8], col = my_col)
 
         # Clear the circos plot after drawing

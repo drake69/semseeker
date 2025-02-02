@@ -51,7 +51,7 @@ markers_performance_association_q_search <- function(inference_details, result_f
         }
 
         # read the file
-        file <- read.csv2(file_name)
+        file <- utils::read.csv2(file_name)
 
 
         # filter the metrics
@@ -166,7 +166,7 @@ markers_performance_association_q_search <- function(inference_details, result_f
             if(nrow(final_temp) == 0)
               next
 
-            
+
             final_temp <- metrics_ranking(metric = metric ,final_temp,column_to_rank =metric)
             scores_temp <- aggregate(final_temp[,"SCORE"], by = list(final_temp[,"Q"]), FUN = aggr_fun)
             scores_temp[,"FIGURE"] <- fig
@@ -191,7 +191,7 @@ markers_performance_association_q_search <- function(inference_details, result_f
           # #
           # save scores
           path  <- dir_check_and_create(dest_folder,"MARKERS_PERFORMANCE")
-          write.csv(scores, file = name_composer(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
+          utils::write.csv2(scores, file = name_composer(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
 
           scores$SCORE <- round(scores$SCORE,2)
 
@@ -207,7 +207,7 @@ markers_performance_association_q_search <- function(inference_details, result_f
           # sort by SCORE descending
           scores_agg_fig <- scores_agg_fig[order(scores_agg_fig$TOTAL, decreasing = TRUE),]
           # save scores
-          # write.csv(scores_agg_fig, file = name_composer(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv"), row.names = FALSE)
+          # utils::write.csv2(scores_agg_fig, file = name_composer(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv"), row.names = FALSE)
         }
 
 
@@ -235,7 +235,7 @@ markers_performance_association_q_search <- function(inference_details, result_f
           # sort by SCORE descending
           scores_agg_fig <- scores_agg_fig[order(scores_agg_fig$TOTAL, decreasing = TRUE),]
           # save scores
-          write.csv(scores_agg_fig, file = name_composer(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv"), row.names = FALSE)
+          utils::write.csv2(scores_agg_fig, file = name_composer(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv"), row.names = FALSE)
         }
         log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), "Areas, subareas done!" )
 

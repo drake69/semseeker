@@ -67,7 +67,7 @@ semseeker <- function(sample_sheet,
     # browser()
     sample_sheet_local <- sample_sheet[[batch_id]]
     sample_sheet_local$Sample_ID <- name_cleaning(sample_sheet_local$Sample_ID)
-    write.csv2(sample_sheet_local, file = file.path(ssEnv$result_folderData, paste(batch_id,"_sample_sheet_original.csv",sep="")), row.names = FALSE)
+    utils::write.csv2(sample_sheet_local, file = file.path(ssEnv$result_folderData, paste(batch_id,"_sample_sheet_original.csv",sep="")), row.names = FALSE)
     signal_intrasample <- TRUE
     signal_data_local <- signal_data[[batch_id]]
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id, " of ", nrow(signal_data_local), " rows and ", ncol(signal_data_local), " samples.")

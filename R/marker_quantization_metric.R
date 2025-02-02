@@ -75,7 +75,7 @@ marker_quantization_metric <- function()
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
         next
       }
-      original <- as.matrix(read.csv(fname, header = TRUE, row.names = 1, skip = 1, sep=";"))
+      original <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";"))
 
 
       pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
@@ -85,7 +85,7 @@ marker_quantization_metric <- function()
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
         next
       }
-      quantized <- as.matrix(read.csv(fname, header = TRUE, row.names = 1, skip = 1, sep=";"))
+      quantized <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";"))
 
       mdl_perf <- model_performance(original, quantized,c(),c())
       res_temp <- cbind(res_temp, mdl_perf)
@@ -134,7 +134,7 @@ marker_quantization_metric <- function()
   colnames(result_temp) <- toupper(colnames(result_temp))
   dataFolder <- dir_check_and_create(ssEnv$result_folderData,c("Distributions"))
   filename  =  file_path_build(dataFolder,c("DISTRIBUTION", "ANALYSIS"),"csv")
-  utils::write.csv(result_temp, file = filename, row.names = FALSE)
+  utils::write.csv2(result_temp, file = filename, row.names = FALSE)
 
 
   cols_to_cycke <- toupper(c("JSD", "Structural_Similarity_Index", "variation_of_information","MAPE","R-SQUARED"))
@@ -175,7 +175,7 @@ marker_quantization_metric <- function()
   scores_agg_fig <- scores_agg_fig[order(scores_agg_fig$TOTAL, decreasing = TRUE),]
   # save scores
   filename  =  file_path_build(dataFolder,c("DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
-  write.csv(scores_agg_fig, file = filename, row.names = FALSE)
+  utils::write.csv2(scores_agg_fig, file = filename, row.names = FALSE)
 
 }
 

@@ -61,11 +61,11 @@ pathway_ctdR <- function(study,
       #   next
       if(file.exists(pathway_report_path))
       {
-        pp <- read.csv2(pathway_report_path,stringsAsFactors = FALSE)
+        pp <- utils::read.csv2(pathway_report_path,stringsAsFactors = FALSE)
         if(nrow(pp)==0)
           next
         pp <- enrichment_analysy_add_category("ctdR",pp)
-        write.csv2(pp,pathway_report_path,row.names = FALSE)
+        utils::write.csv2(pp,pathway_report_path,row.names = FALSE)
         next
       }
 
@@ -101,7 +101,7 @@ pathway_ctdR <- function(study,
       if (statistic_parameter=="")
       {
         gene_set <- gene_set[,c("AREA_OF_TEST",pvalue_column)]
-        gene_set <- aggregate(gene_set[,pvalue_column], by = list(gene_set$AREA_OF_TEST), mean)
+        gene_set <- aggregate(gene_set[,pvalue_column], by = list(gene_set$AREA_OF_TEST), stats::mean)
         colnames(gene_set) <- c("AREA_OF_TEST",pvalue_column)
         gene_set$statistic_parameter <- NA
         gene_set <- gene_set[,c(pvalue_column,"statistic_parameter","AREA_OF_TEST")]

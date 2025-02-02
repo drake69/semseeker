@@ -61,11 +61,11 @@ pathway_Phenolyzer_STRINGdb <- function(study,
 
       if(file.exists(pathway_report_path))
       {
-        pp <- read.csv2(pathway_report_path,stringsAsFactors = FALSE)
+        pp <- utils::read.csv2(pathway_report_path,stringsAsFactors = FALSE)
         if(nrow(pp)==0)
           next
         pp <- enrichment_analysy_add_category("STRINGdb",pp)
-        write.csv2(pp,pathway_report_path,row.names = FALSE)
+        utils::write.csv2(pp,pathway_report_path,row.names = FALSE)
         next
       }
       #### START LOAD PHENOLYZER
@@ -80,7 +80,7 @@ pathway_Phenolyzer_STRINGdb <- function(study,
         log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Phenotype report not found: ", phenotype_report_path)
         next
       }
-      gene_set <- read.csv2(phenotype_report_path,stringsAsFactors = FALSE)
+      gene_set <- utils::read.csv2(phenotype_report_path,stringsAsFactors = FALSE)
       if(nrow(gene_set)==0)
         next
       log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Number of genes in the gene set: ",nrow(gene_set), " key: ", keys[i,])
@@ -129,7 +129,7 @@ pathway_Phenolyzer_STRINGdb <- function(study,
       {
         if(nrow(result_pathway)!=0)
         {
-          write.csv2(result_pathway, pathway_report_path)
+          utils::write.csv2(result_pathway, pathway_report_path)
           rm(result_pathway)
         }
       }

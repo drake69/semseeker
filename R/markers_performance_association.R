@@ -3,7 +3,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
   aggr_fun ="mean",significance = TRUE,sql_conditions=c(),alphas, ...)
 {
 
-  # 
+  #
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   unlink(path <- dir_check_and_create(ssEnv$result_folderChart, "MARKERS_PERFORMANCE"), recursive = TRUE)
   unlink( path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKERS_PERFORMANCE"), recursive = TRUE)
@@ -13,7 +13,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
   markers <- unique(ssEnv$keys_areas_subareas_markers_figures$MARKER)
   # #
 
-  # 
+  #
   model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
   selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
   inference_details <- as.data.frame(inference_details)
@@ -49,7 +49,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
           next
         }
         # read the file
-        file <- read.csv2(file_name)
+        file <- utils::read.csv2(file_name)
 
 
         # filter the metrics
@@ -82,7 +82,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
       # mantain only existng markers
       markers <- unique(final$MARKER)
 
-      # 
+      #
       # count the number of rows for each marker, figure
       count <- aggregate(!(final$MARKER==""), by=list(final$MARKER, final$FIGURE), FUN=sum)
       # assign to each row the count of rows matching by marker and figure
@@ -279,7 +279,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
           # #
           # save scores
           path  <- dir_check_and_create(ssEnv$result_folderInference,"MARKERS_PERFORMANCE")
-          write.csv(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
+          utils::write.csv2(scores, file = paste0(path,"/",prfx,"_scores_", aggr_fun,".csv"), row.names = FALSE)
 
 
           # aggregate scores by MARKER and sum RANK
@@ -296,7 +296,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
           # save scores
           fname <- paste0(path,"/",prfx,"_scores_aggregated_",aggr_fun, ".csv")
           save_latex_table(scores_agg_fig, fname, "Scores post association-analysis per each marker.")
-          write.csv(scores_agg_fig, file = fname, row.names = FALSE)
+          utils::write.csv2(scores_agg_fig, file = fname, row.names = FALSE)
         }
 
         log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), "Areas, subareas done!" )

@@ -42,11 +42,11 @@ pathway_Phenolyzer_WebGestalt <- function(study,
         #   next
         if(file.exists(filenameResult))
         {
-          pp <- read.csv2(filenameResult,stringsAsFactors = FALSE)
+          pp <- utils::read.csv2(filenameResult,stringsAsFactors = FALSE)
           if(nrow(pp)==0)
             next
           pp <- enrichment_analysy_add_category("WebGestalt",pp)
-          write.csv2(pp,filenameResult,row.names = FALSE)
+          utils::write.csv2(pp,filenameResult,row.names = FALSE)
           next
         }
 
@@ -69,7 +69,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
           log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Phenotype report not found: ", phenotype_report_path)
           next
         }
-        gene_set <- read.csv2(phenotype_report_path,stringsAsFactors = FALSE)
+        gene_set <- utils::read.csv2(phenotype_report_path,stringsAsFactors = FALSE)
         if(nrow(gene_set)==0)
           next
         log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Number of genes in the gene set: ",nrow(gene_set), " key: ", keys[i,])
@@ -191,7 +191,7 @@ pathway_Phenolyzer_WebGestalt <- function(study,
     {
       projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
       filenameResult = file_path_build(path,projectName,"csv")
-      write.csv2(enrichResultFinal, filenameResult)
+      utils::write.csv2(enrichResultFinal, filenameResult)
       rm(enrichResultFinal)
     }
   }

@@ -21,7 +21,7 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
   }
 
 
-  results_inference <- read.csv2(inferenceFile, sep=";", dec=",", row.names = NULL, header = TRUE, stringsAsFactors = FALSE)
+  results_inference <- utils::read.csv2(inferenceFile, sep=";", dec=",", row.names = NULL, header = TRUE, stringsAsFactors = FALSE)
   colnames(results_inference) <- name_cleaning(colnames(results_inference))
   pvalue_column <- name_cleaning(pvalue_column)
 
@@ -40,7 +40,7 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
   results_inference[results_inference$AREA==area,"AREA_OF_TEST"] <- gsub(results_inference[results_inference$AREA==area,"AREA_OF_TEST"] , pattern="_", replacement="-")
 
   if(adjust_globally)
-    results_inference[,pvalue_column] <- p.adjust(results_inference[, pvalue_column], method = adjustment_method)
+    results_inference[,pvalue_column] <-stats::p.adjust(results_inference[, pvalue_column], method = adjustment_method)
 
   adjustment_text = "no_adjustment"
   if(adjust_per_area)
@@ -55,7 +55,7 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
     {
       area <- areas[a]
       results_inference_area <- results_inference[results_inference$AREA==area,]
-      results_inference_area[,pvalue_column] <- p.adjust(results_inference_area[, pvalue_column], method = adjustment_method)
+      results_inference_area[,pvalue_column] <-stats::p.adjust(results_inference_area[, pvalue_column], method = adjustment_method)
       results_inference[results_inference$AREA==area,] <- results_inference_area
     }
 

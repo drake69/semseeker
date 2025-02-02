@@ -103,7 +103,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
       inference_detail$samples_sql_condition <- ""
       filename <- inference_file_name(inference_detail, marker, dest_folder ,prefix="" )
 
-      write.csv2(tt, filename, row.names = F)
+      utils::write.csv2(tt, filename, row.names = F)
     }
 
 
@@ -355,7 +355,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
           {
             filename <- inference_file_name(inference_detail, paste(keys[i, ]$AREA, keys[i, ]$SUBAREA, keys[i, ]$MARKER, keys[i, ]$FIGURE , sep="_"),dest_folder,file_extension = "csv",suffix = "OVERLAPS", prefix = ifelse(signif,"SIGNIFICANT","NOT_SIGNIFICANT"))
             overlaps <- data.frame("AREA_OF_TEST" = overlaps)
-            write.csv2(overlaps, filename, append = TRUE)
+            utils::write.csv2(overlaps, filename, append = TRUE)
           }
         }
       }

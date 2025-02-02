@@ -25,7 +25,7 @@ test_that("create_excel_pivot", {
   drq <- deltarq_get(mySampleSheet)
   dq <- deltap_get(mySampleSheet)
   drq <- deltarp_get(mySampleSheet)
-  # semseeker:::annotate_bed()
+  semseeker:::annotate_bed()
 
   ####################################################################################
 

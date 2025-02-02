@@ -99,7 +99,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
 
       if(file.exists(filename))
       {
-        old_results <- read.csv2(filename, header = TRUE, stringsAsFactors = FALSE)
+        old_results <- utils::read.csv2(filename, header = TRUE, stringsAsFactors = FALSE)
         # remove statistic_parameter column
         old_results <- old_results[,!colnames(old_results) %in% c(statistic_parameter)]
         if(!pvalue_column %in% colnames(old_results))
@@ -107,7 +107,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
         # remove KEY COLUMN
         tt$KEY <- NULL
       }
-      write.csv2(tt, filename, row.names = F)
+      utils::write.csv2(tt, filename, row.names = F)
     }
 
   aggregated_study_results <- data.frame()
@@ -182,7 +182,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
     #   write.csv2(aggregated_study_results_table_marker, filename, row.names = F)
     # }
     filename <- inference_file_name(inference_detail, paste0(markers, collapse = "_") ,ssEnv$result_folderInference,file_extension = "csv",suffix = "AGGREGATED", prefix = ifelse(signif,"SIGNIFICANT","NOT_SIGNIFICANT"))
-    write.csv2(aggregated_study_results_table, filename, row.names = F)
+    utils::write.csv2(aggregated_study_results_table, filename, row.names = F)
     log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y"),"  aggregated files saved!")
     # for( j in 2:length(studies_to_comb))
     {
@@ -316,7 +316,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
           {
             filename <- inference_file_name(inference_detail, paste(keys[i, ]$AREA, keys[i, ]$SUBAREA, keys[i, ]$MARKER, keys[i, ]$FIGURE , sep="_"),ssEnv$result_folderInference,file_extension = "csv",suffix = "OVERLAPS", prefix = ifelse(signif,"SIGNIFICANT","NOT_SIGNIFICANT"))
             overlaps <- data.frame("AREA_OF_TEST" = overlaps)
-            write.csv2(overlaps, filename, append = TRUE)
+            utils::write.csv2(overlaps, filename, append = TRUE)
           }
         }
       }

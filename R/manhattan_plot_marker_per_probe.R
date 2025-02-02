@@ -31,7 +31,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, tech = tech)
   chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_PROBE")
 
-  sample_sheet <- read.csv(file_path_build(ssEnv$result_folderData, "1_sample_sheet_original","csv"), sep=";", header = TRUE, stringsAsFactors = FALSE)
+  sample_sheet <- utils::read.csv2(file_path_build(ssEnv$result_folderData, "1_sample_sheet_original","csv"), sep=";", header = TRUE, stringsAsFactors = FALSE)
   references <- sample_sheet[sample_sheet$Sample_Group == "Reference", "Sample_ID"]
 
   annotate_bed()
@@ -58,7 +58,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
         if(high_signal_probes==0)
         {
           # get the row woth the max count of values
-          count_m <- read.csv(fname, sep=";", skip = 2, row.names = 1)
+          count_m <- utils::read.csv2(fname, sep=";", skip = 2, row.names = 1)
           # count per each row the number of no zero values
           count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
           if(max(count_r)>high_signal_probes)
@@ -84,7 +84,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
         if(low_signal_probes==100)
         {
           # get the row woth the max count of values
-          count_m <- read.csv(fname, sep=";", skip = 2, row.names = 1)
+          count_m <- utils::read.csv2(fname, sep=";", skip = 2, row.names = 1)
           # count per each row the number of no zero values
           count_r <- apply(count_m, 1, function(x) length(x[x!=0]))
           count_r <- count_r[count_r>10]
@@ -103,7 +103,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   # signal_data <- readRDS(file_path_build( ssEnv$result_folderData, "1_signal_data","rds"))
 
   fname <- file_path_build( pivot_subfolder ,c("SIGNAL", "MEAN", "PROBE","PROBE"),"csv", add_gz=TRUE)
-  data_name <- read.csv2(fname, sep  =  ";", nrows = 1)
+  data_name <- utils::read.csv2(fname, sep  =  ";", nrows = 1)
   signal_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
   # remove column X1
   signal_data <- signal_data[, !grepl("X1", colnames(signal_data))]
@@ -166,7 +166,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
         log_event("WARNING:", format(Sys.time(), "%a %b %d %X %Y") ,"File does not exist", fname)
         next
       }
-      data_name <- read.csv2(fname, sep  =  ";", nrows = 1)
+      data_name <- utils::read.csv2(fname, sep  =  ";", nrows = 1)
       marker_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
 
       colnames(marker_data) <- colnames(data_name)

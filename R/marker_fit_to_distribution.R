@@ -195,7 +195,7 @@ marker_fit_to_distribution <- function()
   dataFolder <- dir_check_and_create(ssEnv$result_folderData,c("Distributions"))
   # close_env()
   filename  =  file_path_build(dataFolder,c("SUMMARY", "HISTOGRAM"),"csv")
-  utils::write.csv(result_temp, file = filename, row.names = FALSE)
+  utils::write.csv2(result_temp, file = filename, row.names = FALSE)
 }
 
 # Funzione per aggiungere curve di distribuzione teoriche

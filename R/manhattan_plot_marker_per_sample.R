@@ -9,12 +9,11 @@
 #' @param result_folder folder where the results are stored
 #' @param maxResources maximum number of resources to be used
 #' @param parallel_strategy strategy to be used for parallelization
-#' @param ...
+#' @param ... other parameters
 #'
-#' @return
+#' @return save plot in the result_folder/Chart/MARKER_PER_SAMPLE
 #' @export
 #'
-#' @examples
 manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range = 1000:2000,
   hyper_color = "blue",   hypo_color = "orange",   non_outlier_color = "grey", limit_label_color = ssEnv$color_palette[1],
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
@@ -59,7 +58,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
     if(!file.exists(fname_both))
       next
 
-    data_name <- read.csv2(fname_both, sep  =  ";", nrows = 1)
+    data_name <- utils::read.csv2(fname_both, sep  =  ";", nrows = 1)
     marker_data_both <- utils::read.csv2(fname_both, sep  =  ";", skip = 1)
     # remove column X1
     marker_data_both <- marker_data_both[, !grepl("X1", colnames(marker_data_both))]

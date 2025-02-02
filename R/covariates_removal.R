@@ -1,4 +1,4 @@
-# sample_sheet <- read.csv2("~/Desktop/What_s_going_On/papers_writing/Dioxin/orange/analysis/epimutation/Data/sample_sheet_result.csv")
+# sample_sheet <- utils::read.csv2("~/Desktop/What_s_going_On/papers_writing/Dioxin/orange/analysis/epimutation/Data/sample_sheet_result.csv")
 # mvalue = readRDS(file = "~/Desktop/What_s_going_On/papers_writing/Dioxin/orange/analysis/champ_junone/normalizedData.rds")
 # mvalue <- as.data.frame(mvalue)
 # sample_sheet <- sample_sheet[,c("Sample_ID","Sample_Group","age.ch1","bmi.ch1","smoking.lvl")]
@@ -11,7 +11,7 @@ covariates_removal <- function(signal_values, covariates, sample_sheet, result_f
 {
   init_env( result_folder= result_folder, maxResources= maxResources, ...)
   ssEnv <- get_session_info()
-  write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet.csv"))
+  utils::write.csv2(sample_sheet, file = file.path(ssEnv$result_folderData, "sample_sheet.csv"))
   # sample_sheet <- subset(sample_sheet, Sample_Group != "Reference")
   signal_values <- signal_values[,sample_sheet$Sample_ID]
   get_th <- function(signal_row)

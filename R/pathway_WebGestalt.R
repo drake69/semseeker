@@ -42,11 +42,11 @@ pathway_WebGestalt <- function(study,
 
         if(file.exists(filenameResult))
         {
-          pp <- read.csv2(filenameResult,stringsAsFactors = FALSE)
+          pp <- utils::read.csv2(filenameResult,stringsAsFactors = FALSE)
           if(nrow(pp)==0)
             next
           pp <- enrichment_analysy_add_category("WebGestalt",pp)
-          write.csv2(pp,filenameResult,row.names = FALSE)
+          utils::write.csv2(pp,filenameResult,row.names = FALSE)
           next
         }
 
@@ -218,7 +218,7 @@ pathway_WebGestalt <- function(study,
     {
       projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
       filenameResult = file_path_build(path,projectName,"csv")
-      write.csv2(enrichResultFinal, filenameResult)
+      utils::write.csv2(enrichResultFinal, filenameResult)
       rm(enrichResultFinal)
     }
   }

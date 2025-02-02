@@ -73,7 +73,7 @@ create_heatmap <- function() {
               # Create the ggplot heatmap
               p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = variable, y = SAMPLE_GROUP, fill = value)) +
                 ggplot2::geom_tile() +
-                ggplot2::scale_fill_gradientn(colours = cm.colors(256)) +
+                ggplot2::scale_fill_gradientn(colours = grDevices::cm.colors(256)) +
                 ggplot2::theme_minimal(base_size = 15) +
                 ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1), plot.margin = unit(c(2.5, 2.5, 2.5, 2.5), "cm")) +
                 ggplot2::labs(title = mainTitle, x = "", y = "")

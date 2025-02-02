@@ -64,11 +64,11 @@ pathway_STRINGdb <- function(study,
       #   next
       if(file.exists(pathway_report_path))
       {
-        pp <- read.csv2(pathway_report_path,stringsAsFactors = FALSE)
+        pp <- utils::read.csv2(pathway_report_path,stringsAsFactors = FALSE)
         if(nrow(pp)==0)
           next
         pp <- enrichment_analysy_add_category("STRINGdb",pp)
-        write.csv2(pp,pathway_report_path,row.names = FALSE)
+        utils::write.csv2(pp,pathway_report_path,row.names = FALSE)
         next
       }
 
@@ -167,7 +167,7 @@ pathway_STRINGdb <- function(study,
       {
         if(nrow(result_pathway)!=0)
         {
-          write.csv2(result_pathway, pathway_report_path)
+          utils::write.csv2(result_pathway, pathway_report_path)
           rm(result_pathway)
         }
       }

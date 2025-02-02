@@ -4,7 +4,7 @@ metrics_name_collect <- function(data_frame)
   # metrics_temp <- toupper(colnames(data_frame))
   # # read from package cache
   # if(file.exists("~/Desktop/metrics.csv"))
-  #   metrics <- read.csv2("~/Desktop/metrics.csv")
+  #   metrics <- utils::read.csv2("~/Desktop/metrics.csv")
   # # metrics <- semseeker::metrics
   # #remove from temp existing metrics and all with PVALUE inside
   # metrics_temp <- metrics_temp[!(metrics_temp %in% semseeker::metrics_properties$Metric)]
@@ -18,7 +18,7 @@ metrics_name_collect <- function(data_frame)
   #   metrics <- rbind(metrics, metrics_temp)
   #   # sort by name
   #   metrics <- metrics[order(semseeker::metrics_properties$Metric),]
-  #   # write.csv(metrics, file = "metrics.csv", row.names = FALSE)
+  #   # utils::write.csv2(metrics, file = "metrics.csv", row.names = FALSE)
   #   # usethis::use_data(metrics, overwrite = TRUE,compress = "bzip2")
   #   write.csv2(metrics, file = "~/Desktop/metrics.csv")
   #   # save to semseeker::metrics

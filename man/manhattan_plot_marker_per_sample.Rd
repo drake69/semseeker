@@ -38,6 +38,9 @@ manhattan_plot_marker_per_sample(
 
 \item{...}{}
 }
+\value{
+save plot in the result_folder/Chart/MARKER_PER_SAMPLE
+}
 \description{
 Title manhattan_plot_marker_per_sample
 }
