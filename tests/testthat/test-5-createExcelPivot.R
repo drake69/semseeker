@@ -23,6 +23,8 @@ test_that("create_excel_pivot", {
   semseeker:::create_multiple_bed(mySampleSheet)
   dq <- deltaq_get(mySampleSheet)
   drq <- deltarq_get(mySampleSheet)
+  dq <- deltap_get(mySampleSheet)
+  drq <- deltarp_get(mySampleSheet)
   # semseeker:::annotate_bed()
 
   ####################################################################################

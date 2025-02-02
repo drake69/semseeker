@@ -51,7 +51,7 @@ deltarp_get <- function(resultPopulation){
 
 
   deltarp$VALUE <- as.numeric(deltarp$VALUE)
-  num_bins <- as.numeric(ssEnv$DELTARP_B) + 1
+  num_bins <- as.numeric(ssEnv$DELTARP_B)
   deltarp$DELTARP <- cut(deltarp$VALUE, breaks=num_bins, labels=FALSE)
   deltarp$DELTARP <- as.numeric(deltarp$DELTARP)
 

@@ -59,6 +59,8 @@ manhattan_plot_marker_per_probe(
 \item{maxResources}{percentage of max system's resource to use}
 
 \item{parallel_strategy}{strategy to use for parallelization}
+
+\item{...}{other parameter}
 }
 \description{
 Title manhattan_plot_marker_per_probe

@@ -31,6 +31,8 @@ test_that("deltaX_get", {
 
   result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
 
+  mutations_bed <- data.frame()
+  marker_multiple_bed <- data.frame()
   count_multiple_bed <- 0
   for (sample_group in sample_groups)
   {
@@ -45,19 +47,15 @@ test_that("deltaX_get", {
         fileToRead <- semseeker:::file_path_build(tempresult_folder, c("MULTIPLE", marker ,figure ), "fst")
         if (file.exists(fileToRead))
         {
-          mutations_bed <-semseeker:::read_multiple_bed (figure = figure, marker = "MUTATIONS", sample_group = sample_group)
-          marker_multiple_bed <-semseeker:::read_multiple_bed(figure = figure, marker = marker, sample_group = sample_group)
-          testthat::expect_true(nrow(marker_multiple_bed)==nrow(mutations_bed))
+          mutations_bed <- plyr::rbind.fill(mutations_bed, semseeker:::read_multiple_bed (figure = figure, marker = "MUTATIONS", sample_group = sample_group))
+          marker_multiple_bed <- plyr::rbind.fill(marker_multiple_bed, semseeker:::read_multiple_bed(figure = figure, marker = marker, sample_group = sample_group))
           # message(nrow(mutations_bed)==nrow(marker_multiple_bed))
           count_multiple_bed <- count_multiple_bed + 1
         }
-        else
-        {
-          # is normal the random dataset loose hyper or hypo mutations at all
-          # message("File not found: ", fileToRead)
-          # testthat::expect_true(1==0)
-        }
       }
+      testthat::expect_true(nrow(marker_multiple_bed)==nrow(mutations_bed))
+      testthat::expect_true(max(marker_multiple_bed[,4])==as.numeric(ssEnv$DELTAP_B))
+      testthat::expect_true(min(marker_multiple_bed[,4])==1)
     }
   }
 
