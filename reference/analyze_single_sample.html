@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">semseeker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.18</span>
       </span>
     </div>
 
@@ -41,7 +41,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>analyze_single_sample</h1>
-    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/main/R/analyze_single_sample.R" class="external-link"><code>R/analyze_single_sample.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/develop/R/analyze_single_sample.R" class="external-link"><code>R/analyze_single_sample.R</code></a></small>
     <div class="hidden name"><code>analyze_single_sample.Rd</code></div>
     </div>
 
@@ -52,11 +52,9 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">analyze_single_sample</span><span class="op">(</span></span>
 <span>  <span class="va">values</span>,</span>
-<span>  <span class="va">sliding_window_size</span>,</span>
 <span>  <span class="va">thresholds</span>,</span>
 <span>  <span class="va">figure</span>,</span>
 <span>  <span class="va">sample_detail</span>,</span>
-<span>  bonferroni_threshold <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  <span class="va">probe_features</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -69,10 +67,6 @@
 <dd><p>values of methylation</p></dd>
 
 
-<dt id="arg-sliding-window-size">sliding_window_size<a class="anchor" aria-label="anchor" href="#arg-sliding-window-size"></a></dt>
-<dd><p>size of window sliding to calculate hypergeometric</p></dd>
-
-
 <dt id="arg-thresholds">thresholds<a class="anchor" aria-label="anchor" href="#arg-thresholds"></a></dt>
 <dd><p>threshold to use for comparison</p></dd>
 
@@ -83,10 +77,6 @@
 
 <dt id="arg-sample-detail">sample_detail<a class="anchor" aria-label="anchor" href="#arg-sample-detail"></a></dt>
 <dd><p>details of the sample to analyze</p></dd>
-
-
-<dt id="arg-bonferroni-threshold">bonferroni_threshold<a class="anchor" aria-label="anchor" href="#arg-bonferroni-threshold"></a></dt>
-<dd><p>bonferroni threshold to validate pValue</p></dd>
 
 
 <dt id="arg-probe-features">probe_features<a class="anchor" aria-label="anchor" href="#arg-probe-features"></a></dt>

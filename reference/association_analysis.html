@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">semseeker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.18</span>
       </span>
     </div>
 
@@ -41,7 +41,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Association analysis of SEMseeker's results</h1>
-    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/main/R/association_analysis.R" class="external-link"><code>R/association_analysis.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/develop/R/association_analysis.R" class="external-link"><code>R/association_analysis.R</code></a></small>
     <div class="hidden name"><code>association_analysis.Rd</code></div>
     </div>
 
@@ -54,7 +54,8 @@
 <span>  <span class="va">inference_details</span>,</span>
 <span>  <span class="va">result_folder</span>,</span>
 <span>  maxResources <span class="op">=</span> <span class="fl">90</span>,</span>
-<span>  parallel_strategy <span class="op">=</span> <span class="st">"multisession"</span>,</span>
+<span>  parallel_strategy <span class="op">=</span> <span class="st">"multicore"</span>,</span>
+<span>  start_fresh <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -72,7 +73,7 @@ tipi di correlazioni: pearson, kendall, spearman
 MUTATIONS_* ~ tcdd_mother + exam_age
 transformation to be applied to dependent variable
 (mutations and lesions): scale, log, log2, log10, exp, none, quantile_quantiles(as number) eg quantile_3
-depth analysis:
+DEPTH analysis:
 1: sample level
 2: type level (gene, DMR, cpgisland) (includes 1)
 3: genomic area: gene, body, gene tss1550, gene whole, gene tss200,  (includes 1 and 2)

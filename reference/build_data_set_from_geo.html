@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">semseeker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.18</span>
       </span>
     </div>
 
@@ -41,7 +41,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>build_data_set_from_geo</h1>
-    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/main/R/build_data_set_from_geo.R" class="external-link"><code>R/build_data_set_from_geo.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/develop/R/build_data_set_from_geo.R" class="external-link"><code>R/build_data_set_from_geo.R</code></a></small>
     <div class="hidden name"><code>build_data_set_from_geo.Rd</code></div>
     </div>
 
@@ -50,7 +50,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">build_data_set_from_geo</span><span class="op">(</span><span class="va">GEOgse</span>, <span class="va">workingFolder</span>, downloadFiles <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">build_data_set_from_geo</span><span class="op">(</span><span class="va">GEOgse</span>, downloadFiles <span class="op">=</span> <span class="fl">0</span>, <span class="va">result_folder</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -61,13 +61,13 @@
 <dd><p>geo accession dataset identification</p></dd>
 
 
-<dt id="arg-workingfolder">workingFolder<a class="anchor" aria-label="anchor" href="#arg-workingfolder"></a></dt>
-<dd><p>where sample sheet and files will be saved</p></dd>
-
-
 <dt id="arg-downloadfiles">downloadFiles<a class="anchor" aria-label="anchor" href="#arg-downloadfiles"></a></dt>
 <dd><p>0 means download all files from Gene Expression Ombibus (GEO),
 different than zero means how many download</p></dd>
+
+
+<dt id="arg-result-folder">result_folder<a class="anchor" aria-label="anchor" href="#arg-result-folder"></a></dt>
+<dd><p>where sample sheet and files will be saved</p></dd>
 
 </dl></div>
     <div id="value">

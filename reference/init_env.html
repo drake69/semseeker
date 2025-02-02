@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">semseeker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.18</span>
       </span>
     </div>
 
@@ -41,7 +41,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>init ssEnvonment</h1>
-    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/main/R/init_env.R" class="external-link"><code>R/init_env.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/develop/R/init_env.R" class="external-link"><code>R/init_env.R</code></a></small>
     <div class="hidden name"><code>init_env.Rd</code></div>
     </div>
 
@@ -50,12 +50,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">init_env</span><span class="op">(</span></span>
-<span>  <span class="va">result_folder</span>,</span>
-<span>  maxResources <span class="op">=</span> <span class="fl">90</span>,</span>
-<span>  parallel_strategy <span class="op">=</span> <span class="st">"multicore"</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">init_env</span><span class="op">(</span><span class="va">result_folder</span>, maxResources <span class="op">=</span> <span class="fl">90</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -70,12 +65,12 @@
 <dd><p>percentage of how many available cores will be used default 90 percent, rounded to the lowest integer</p></dd>
 
 
-<dt id="arg-parallel-strategy">parallel_strategy<a class="anchor" aria-label="anchor" href="#arg-parallel-strategy"></a></dt>
-<dd><p>which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster</p></dd>
-
-
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>other options to filter elaborations</p></dd>
+
+
+<dt id="arg-parallel-strategy">parallel_strategy<a class="anchor" aria-label="anchor" href="#arg-parallel-strategy"></a></dt>
+<dd><p>which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster</p></dd>
 
 </dl></div>
     <div id="value">

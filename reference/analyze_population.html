@@ -18,7 +18,7 @@ report of pivot"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">semseeker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.18</span>
       </span>
     </div>
 
@@ -42,7 +42,7 @@ report of pivot"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Calculate stochastic epi mutations from a methylation dataset as outcome report of pivot</h1>
-    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/main/R/analyze_population.R" class="external-link"><code>R/analyze_population.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/drake69/semseeker/blob/develop/R/analyze_population.R" class="external-link"><code>R/analyze_population.R</code></a></small>
     <div class="hidden name"><code>analyze_population.Rd</code></div>
     </div>
 
@@ -53,11 +53,9 @@ report of pivot</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">analyze_population</span><span class="op">(</span></span>
-<span>  <span class="va">methylation_data</span>,</span>
-<span>  <span class="va">sliding_window_size</span>,</span>
+<span>  <span class="va">signal_data</span>,</span>
 <span>  <span class="va">sample_sheet</span>,</span>
-<span>  <span class="va">beta_thresholds</span>,</span>
-<span>  bonferroni_threshold <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  <span class="va">signal_thresholds</span>,</span>
 <span>  <span class="va">probe_features</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -66,13 +64,8 @@ report of pivot</p>
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-methylation-data">methylation_data<a class="anchor" aria-label="anchor" href="#arg-methylation-data"></a></dt>
+<dl><dt id="arg-signal-data">signal_data<a class="anchor" aria-label="anchor" href="#arg-signal-data"></a></dt>
 <dd><p>whole matrix of data to analyze.</p></dd>
-
-
-<dt id="arg-sliding-window-size">sliding_window_size<a class="anchor" aria-label="anchor" href="#arg-sliding-window-size"></a></dt>
-<dd><p>size of the sliding widows to compute epilesions
-default 11 probe_features.</p></dd>
 
 
 <dt id="arg-sample-sheet">sample_sheet<a class="anchor" aria-label="anchor" href="#arg-sample-sheet"></a></dt>
@@ -80,13 +73,8 @@ default 11 probe_features.</p></dd>
 selector followed by selection value,</p></dd>
 
 
-<dt id="arg-beta-thresholds">beta_thresholds<a class="anchor" aria-label="anchor" href="#arg-beta-thresholds"></a></dt>
-<dd><p>thresholds defined to calculate epimutations
-lesions definition</p></dd>
-
-
-<dt id="arg-bonferroni-threshold">bonferroni_threshold<a class="anchor" aria-label="anchor" href="#arg-bonferroni-threshold"></a></dt>
-<dd><p>threshold to define which pValue accept for</p></dd>
+<dt id="arg-signal-thresholds">signal_thresholds<a class="anchor" aria-label="anchor" href="#arg-signal-thresholds"></a></dt>
+<dd><p>thresholds defined to calculate epimutations</p></dd>
 
 
 <dt id="arg-probe-features">probe_features<a class="anchor" aria-label="anchor" href="#arg-probe-features"></a></dt>
