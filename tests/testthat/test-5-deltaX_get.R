@@ -34,6 +34,7 @@ test_that("deltaX_get", {
   mutations_bed <- data.frame()
   marker_multiple_bed <- data.frame()
   count_multiple_bed <- 0
+  total_sum <- data.frame()
   for (sample_group in sample_groups)
   {
     # sample_group <- "Case"
@@ -53,12 +54,15 @@ test_that("deltaX_get", {
           count_multiple_bed <- count_multiple_bed + 1
         }
       }
+      total_sum <- plyr::rbind.fill(total_sum, data.frame("MARKER"=marker,"SUM"=sum(marker_multiple_bed[,4])))
       testthat::expect_true(nrow(marker_multiple_bed)==nrow(mutations_bed))
       testthat::expect_true(max(marker_multiple_bed[,4])==as.numeric(ssEnv$DELTAP_B))
       testthat::expect_true(min(marker_multiple_bed[,4])==1)
     }
   }
 
+  # verify the markers produce a total burden different from each other
+  testthat::expect_true(nrow(total_sum)==nrow(unique(total_sum$SUM)))
   testthat::expect_true(count_multiple_bed>0)
 
   semseeker:::close_env()

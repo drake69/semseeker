@@ -27,7 +27,7 @@ inpute_missing_values <- function(signal_data){
       # Define the chunk
       chunk_indices <- i:min(i + chunk_size - 1, nrow(signal_data))
       # Process the chunk
-      row_medians <- apply(signal_data[chunk_indices, ], 1, stats::mean, na.rm = TRUE)
+      row_medians <- apply(signal_data[chunk_indices, ], 1, mean, na.rm = TRUE)
       signal_data[chunk_indices, ][is.na(signal_data[chunk_indices, ])] <-
         row_medians[row(signal_data[chunk_indices, ])[is.na(signal_data[chunk_indices, ])]]
     }

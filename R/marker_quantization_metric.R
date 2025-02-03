@@ -113,6 +113,30 @@ marker_quantization_metric <- function()
       jsd <- suppressMessages(suppressWarnings(philentropy::JSD(rbind(probability_distribution1_adjusted, probability_distribution2_adjusted))))
       res_temp$JSD <- jsd
 
+      quantized <- quantized_both$VALUE
+      original_range <- range(original_both$V4)
+      original_to_plot <- (original * (quantized_range[2] - quantized_range[1]) / (original_range[2] - original_range[1])) + (quantized_range[1] - original_range[1])
+
+      # Define number of intervals
+      num_intervals_original <- quantized_range[2]  # Change this to desiblue number of intervals
+
+      chart_folder <- dir_check_and_create(result_folderCharts, "MARKERS_DISTRIBUTION")
+      filename <- file_path_build( chart_folder ,c(original_range[2],original_marker, key$FIGURE, key$AREA,key$SUBAREA),"png")
+      grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
+      plot(density(original_to_plot), col = "skyblue", main = paste0(original_marker, "Vs. ", key$MARKER ,"Density Plot"))
+      lines(density(quantized), col = "blue")
+      dev.off()
+
+      # plot two istograms with log10 y axis scale
+      filename <- file_path_build( chart_folder ,c(original_range[2],original_marker, key$FIGURE, key$AREA,key$SUBAREA),"png")
+      grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
+      par(mfrow=c(2,1))
+      hist(original, col = "skyblue", xlab = "Frequency", main = paste0( original_marker," Histogram"))
+      hist(quantized, col = "blue", xlab = "Frequency", main = paste0(key$MARKER, " Histogram"))
+      par(mfrow=c(1,1))
+      dev.off()
+
+
       if(ssEnv$showprogress)
         progress_bar(sprintf("Doing comparison within study."))
 

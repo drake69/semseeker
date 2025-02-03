@@ -113,7 +113,7 @@ semseeker <- function(sample_sheet,
   #   batch_correlation_check(ssEnv)
 
   # marker_quantization_metric()
-  # marker_fit_to_distribution()
+  # marker_fit_to_theoretical_distribution()
 
   close_env()
 }

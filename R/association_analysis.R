@@ -475,14 +475,14 @@ association_analysis_log <- function(inference_detail, start_time, end_time, pro
   inference_detail$processed_items <- processed_items
   if(!file.exists(association_file))
   {
-    write.table(inference_detail, file  =  association_file, sep  =  ",", row.names  =  FALSE, col.names  =  TRUE)
+    utils::write.csv2(inference_detail, file  =  association_file, row.names  =  FALSE, col.names  =  TRUE)
   } else
   {
     # convert all columns of inference detail as character
     tryCatch({
-      association_file_data <- read.table(association_file, header  =  TRUE, sep  =  ",", stringsAsFactors  =  FALSE)
+      association_file_data <- utils::read.csv2(association_file, header  =  TRUE, stringsAsFactors  =  FALSE)
       association_file_data <- plyr::rbind.fill(inference_detail, association_file_data)
-      write.table(association_file_data, file  =  association_file, sep  =  ",", row.names  =  FALSE, col.names  =  TRUE)
+      utils::write.csv2(association_file_data, file  =  association_file, row.names  =  FALSE, col.names  =  TRUE)
     }, error = function(e) {
       # print("ERROR: I'm stopping here, data to associate are not correct, file a bug!")
     })

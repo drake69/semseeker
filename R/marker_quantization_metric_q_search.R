@@ -25,7 +25,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   # message(filename)
   result_temp <- data.frame()
   if(file.exists(filename))
-    result_temp <- utils::read.csv2(file = filename, sep=",",dec=".")
+    result_temp <- utils::read.csv2(file = filename)
 
   qq <- nrow(result_temp)==0
   if(!qq)
@@ -194,9 +194,9 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   # calculate best marker
 
   filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
-  result_temp <- utils::read.csv2(file = filename, sep=",",dec=".")
+  result_temp <- utils::read.csv2(file = filename)
   filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
-  results_q <- utils::read.csv2(file =filename, sep=",",dec=".")
+  results_q <- utils::read.csv2(file =filename)
   results_q_max <- unique(results_q[,c("SCORE","MARKER")] %>%
       dplyr::group_by(MARKER) %>%
       dplyr::filter(SCORE == max(SCORE)))

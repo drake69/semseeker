@@ -25,7 +25,7 @@ association_analysis_summary <- function(inference_details,destination_folder=""
       dplyr::summarise(dplyr::across(available_metrics, list(
         max= ~max(., na.rm=TRUE),
         min= ~min(., na.rm=TRUE),
-        mean = ~stats::mean(., na.rm = TRUE),
+        mean = ~mean(., na.rm = TRUE),
         sd = ~sd(., na.rm = TRUE),
         count_below_0.05 = ~sum(. < 0.05, na.rm = TRUE))))
   } else {

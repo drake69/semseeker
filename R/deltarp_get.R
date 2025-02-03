@@ -15,7 +15,7 @@ deltarp_get <- function(resultPopulation){
 
   # must use keys_markers_figures_default because the selected marker could exclude deltas which is basic for deltarp
   localKeys <- reshape::expand.grid.df(as.data.frame(ssEnv$keys_markers_figures_default),Sample_Group)
-  localKeys <- subset(localKeys, localKeys$MARKER=="DELTAS")
+  localKeys <- subset(localKeys, localKeys$MARKER=="DELTAR")
   localKeys <- subset(localKeys, localKeys$FIGURE!="BOTHSUM")
   localKeys <- subset(localKeys, localKeys$FIGURE!="BOTH")
   localKeys$EXT <- "fst"

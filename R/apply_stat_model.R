@@ -99,11 +99,11 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
           local_result$CASE.LABEL <- if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA
           local_result$COUNT_CASE <- length(independent_variableData1stLevel)
-          local_result$MEAN_CASE <- (stats::mean(independent_variableData1stLevel))
+          local_result$MEAN_CASE <- (mean(independent_variableData1stLevel))
           local_result$SD_CASE <- (stats::sd(independent_variableData1stLevel))
           local_result$CONTROL.LABEL <- as.character(independent_variable2ndLevel)
           local_result$COUNT_CONTROL <- length(stats::na.omit(independent_variableData2ndLevel))
-          local_result$MEAN_CONTROL <- (stats::mean(independent_variableData2ndLevel))
+          local_result$MEAN_CONTROL <- (mean(independent_variableData2ndLevel))
           local_result$SD_CONTROL <- (stats::sd(independent_variableData2ndLevel))
         }
 

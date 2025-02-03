@@ -101,7 +101,7 @@ pathway_ctdR <- function(study,
       if (statistic_parameter=="")
       {
         gene_set <- gene_set[,c("AREA_OF_TEST",pvalue_column)]
-        gene_set <- aggregate(gene_set[,pvalue_column], by = list(gene_set$AREA_OF_TEST), stats::mean)
+        gene_set <- aggregate(gene_set[,pvalue_column], by = list(gene_set$AREA_OF_TEST), mean)
         colnames(gene_set) <- c("AREA_OF_TEST",pvalue_column)
         gene_set$statistic_parameter <- NA
         gene_set <- gene_set[,c(pvalue_column,"statistic_parameter","AREA_OF_TEST")]
