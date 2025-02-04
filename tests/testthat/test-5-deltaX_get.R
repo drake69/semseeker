@@ -62,7 +62,7 @@ test_that("deltaX_get", {
   }
 
   # verify the markers produce a total burden different from each other
-  testthat::expect_true(nrow(total_sum)==nrow(unique(total_sum$SUM)))
+  testthat::expect_true(nrow(total_sum)==length(unique(total_sum$SUM)))
   testthat::expect_true(count_multiple_bed>0)
 
   semseeker:::close_env()

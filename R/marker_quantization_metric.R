@@ -30,8 +30,8 @@ marker_quantization_metric <- function()
   keys <- keys[complete.cases(keys),]
   nkeys <- nrow(keys)
 
-  annotate_bed()
-  create_excel_pivot()
+  # annotate_bed()
+  # create_excel_pivot()
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nkeys)
@@ -75,7 +75,7 @@ marker_quantization_metric <- function()
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
         next
       }
-      original <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";"))
+      original <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";", dec="."))
 
 
       pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
@@ -85,60 +85,77 @@ marker_quantization_metric <- function()
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
         next
       }
-      quantized <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";"))
+      quantized <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";", dec="."))
 
-      mdl_perf <- model_performance(original, quantized,c(),c())
-      res_temp <- cbind(res_temp, mdl_perf)
+      tryCatch(
+        {
+          mdl_perf <- model_performance(original, quantized,c(),c())
+          res_temp <- cbind(res_temp, mdl_perf)
 
-      # SSIM con pracma
-      ssim_value <- ssim(original, quantized)
-      res_temp$Structural_Similarity_Index <- ssim_value
+          # SSIM con pracma
+          ssim_value <- ssim(original, quantized)
+          res_temp$Structural_Similarity_Index <- ssim_value
 
-      vi_value <- variation_of_information(original, quantized)
-      res_temp$variation_of_information <- vi_value
+          vi_value <- variation_of_information(original, quantized)
+          res_temp$variation_of_information <- vi_value
 
-      # calculate JSD
-      # Combine the unique elements from both samples to create a common event space
-      common_events <- unique(c(original, quantized))
+          # calculate JSD
+          # Combine the unique elements from both samples to create a common event space
+          common_events <- unique(c(original, quantized))
 
-      # Create adjusted frequency tables for both samples
-      frequency_table1_adjusted <- tabulate(match(original, common_events), nbins = length(common_events))
-      frequency_table2_adjusted <- tabulate(match(quantized, common_events), nbins = length(common_events))
+          # Create adjusted frequency tables for both samples
+          frequency_table1_adjusted <- tabulate(match(original, common_events), nbins = length(common_events))
+          frequency_table2_adjusted <- tabulate(match(quantized, common_events), nbins = length(common_events))
 
-      # Convert adjusted frequencies to probabilities
-      probability_distribution1_adjusted <- frequency_table1_adjusted / sum(frequency_table1_adjusted)
-      probability_distribution2_adjusted <- frequency_table2_adjusted / sum(frequency_table2_adjusted)
+          # Convert adjusted frequencies to probabilities
+          probability_distribution1_adjusted <- frequency_table1_adjusted / sum(frequency_table1_adjusted)
+          probability_distribution2_adjusted <- frequency_table2_adjusted / sum(frequency_table2_adjusted)
 
-      # Calculate the Jensen-Shannon distance
-      jsd <- suppressMessages(suppressWarnings(philentropy::JSD(rbind(probability_distribution1_adjusted, probability_distribution2_adjusted))))
-      res_temp$JSD <- jsd
+          # Calculate the Jensen-Shannon distance
+          jsd <- suppressMessages(suppressWarnings(philentropy::JSD(rbind(probability_distribution1_adjusted, probability_distribution2_adjusted))))
+          res_temp$JSD <- jsd
+        },
+        error = function(e)
+        {
+          log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y"), "Error in calculate_metrics: ", e)
+        }
+      )
 
-      quantized <- quantized_both$VALUE
-      original_range <- range(original_both$V4)
+
+      # remove zeros from original and quantized
+      quantized <- quantized[,4]
+      original <- original[,4]
+      original <- original[original != 0]
+      quantized <- quantized[quantized != 0]
+      if (key$MARKER=="MUTATIONS")
+        quantized <- c(quantized,0,2)
+      original_range <- range(original)
+      quantized_range <- range(quantized)
       original_to_plot <- (original * (quantized_range[2] - quantized_range[1]) / (original_range[2] - original_range[1])) + (quantized_range[1] - original_range[1])
-
+      quantized_to_plot <- (quantized * (original_range[2] - original_range[1]) / (quantized_range[2] - quantized_range[1])) + (original_range[1] - quantized_range[1])
       # Define number of intervals
       num_intervals_original <- quantized_range[2]  # Change this to desiblue number of intervals
 
-      chart_folder <- dir_check_and_create(result_folderCharts, "MARKERS_DISTRIBUTION")
-      filename <- file_path_build( chart_folder ,c(original_range[2],original_marker, key$FIGURE, key$AREA,key$SUBAREA),"png")
+      chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKERS_DISTRIBUTION")
+      filename <- file_path_build( chart_folder ,c(quantized_range[2],original_marker,key$MARKER, key$FIGURE, key$AREA,key$SUBAREA, "dens"),"png")
       grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
-      plot(density(original_to_plot), col = "skyblue", main = paste0(original_marker, "Vs. ", key$MARKER ,"Density Plot"))
-      lines(density(quantized), col = "blue")
+      plot(density(original), col = "skyblue", main = paste0(original_marker, " Vs. ", key$MARKER ," Density Plot"))
+      lines(density(quantized_to_plot), col = "blue")
+      legend("bottom", legend = c(original_marker, key$MARKER),  col = c("skyblue", "blue"), lty = 1, cex = 0.8, bty = "n")
       dev.off()
 
       # plot two istograms with log10 y axis scale
-      filename <- file_path_build( chart_folder ,c(original_range[2],original_marker, key$FIGURE, key$AREA,key$SUBAREA),"png")
+      filename <- file_path_build( chart_folder ,c(quantized_range[2],original_marker,key$MARKER, key$FIGURE, key$AREA,key$SUBAREA, "hist"),"png")
       grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
       par(mfrow=c(2,1))
       hist(original, col = "skyblue", xlab = "Frequency", main = paste0( original_marker," Histogram"))
-      hist(quantized, col = "blue", xlab = "Frequency", main = paste0(key$MARKER, " Histogram"))
+      hist(quantized_to_plot, col = "blue", xlab = "Frequency", main = paste0(key$MARKER, " Histogram"))
       par(mfrow=c(1,1))
       dev.off()
 
 
       if(ssEnv$showprogress)
-        progress_bar(sprintf("Doing comparison within study."))
+        progress_bar(sprintf("I'm doing metrics calculation for the quantization process."))
 
       res_temp
       # result_temp <- plyr::rbind.fill(result_temp, res_temp)

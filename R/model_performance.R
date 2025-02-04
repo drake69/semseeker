@@ -1,7 +1,6 @@
 model_performance <- function(fitted_values, expected_values, prediction_values, prediction_expected_values)
 {
 
-  
   model_residuals <- expected_values - fitted_values
 
   # calculate the mean squared error
