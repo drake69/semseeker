@@ -1,8 +1,8 @@
 #' @importFrom doRNG %dorng%
-violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, marker,metaarea, subgroup, independent_variable, transformation)
+violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, marker,area, subarea, independent_variable, transformation)
 {
   inference_inference_file <- ""
-  group <- ""
+  area <- ""
   s <- ""
 
   ssEnv <- get_session_info()
@@ -10,9 +10,9 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
 
   # violin plot only significative areas
 
-  areas <- utils::read.csv2(file.path(ssEnv$result_folderData, "/Pivots/", figure,"/", paste(figure,"_",marker,"_",metaarea,"_",subgroup, ".csv", sep="")))
+  areas <- utils::read.csv2(file.path(ssEnv$result_folderData, "/Pivots/", figure,"/", paste(figure,"_",marker,"_",area,"_",subarea, ".csv", sep="")))
   results_inference <- utils::read.csv2(file.path(ssEnv$result_folderInference,inference_file_name))
-  results_inference <- subset(results_inference, "MARKER"==marker & "FIGURE"==figure & "AREA" == group & "SUBAREA" == subgroup
+  results_inference <- subset(results_inference, "MARKER"==marker & "FIGURE"==figure & "AREA" == area & "SUBAREA" == subarea
     & "INDIPENDENT.VARIABLE"==independent_variable)
 
   #pivot hase SAMPLEID over the genomic area of interest
@@ -23,7 +23,7 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
 
   areas <- areas[-1,]
 
-  sample_sheet <- utils::read.csv2( file.path(ssEnv$result_folderData,"/sample_sheet_result.csv"), sep=";", dec=",")
+  sample_sheet <- utils::read.csv2( file.path(ssEnv$result_folderData,"/sample_sheet_result.csv"), sep=";", dec=".")
   metaareas_f <- foreach::foreach(s = 2: ncol(areas), .combine = rbind) %dorng%
   # for( s in 2: ncol(areas) )
   {

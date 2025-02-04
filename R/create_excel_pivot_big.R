@@ -12,10 +12,10 @@
 #'     # k <- 1
 #'     marker <- as.character(ssEnv$keys_markers_figures_areas[k,"MARKER"])
 #'     figure <- as.character(ssEnv$keys_markers_figures_areas[k,"FIGURE"])
-#'     group <- as.character(ssEnv$keys_markers_figures_areas[k,"AREA"])
-#'     subgroup <- as.character(ssEnv$keys_markers_figures_areas[k,"SUBAREA"])
+#'     area <- as.character(ssEnv$keys_markers_figures_areas[k,"AREA"])
+#'     subarea <- as.character(ssEnv$keys_markers_figures_areas[k,"SUBAREA"])
 #'
-#'     pivot_file_name <- paste(marker,"_",figure,"_",  group,"_",subgroup, sep="")
+#'     pivot_file_name <- paste(marker,"_",figure,"_",  area,"_",subarea, sep="")
 #'     pivot_subfolder <- dir_check_and_create(reportFolder, marker)
 #'     fileName <- paste0(pivot_subfolder,"/",pivot_file_name,".csv" , sep="")
 #'     if(file.exists(fileName))
@@ -36,8 +36,8 @@
 #'       colnames(tempDataFrame) <- c("AREA",sample_names)
 #'       tempDataFrame$MARKER <- marker
 #'       tempDataFrame$FIGURE <- figure
-#'       tempDataFrame$AREA <- group
-#'       # tempDataFrame$SUBAREA <- subgroup
+#'       tempDataFrame$AREA <- area
+#'       # tempDataFrame$SUBAREA <- subarea
 #'       # if(exists("pivot"))
 #'       #   pivot <- rbind(pivot, tempDataFrame)
 #'       # else
