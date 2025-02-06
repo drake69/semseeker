@@ -7,8 +7,8 @@
 manhattan_plot_per_area(
   marker,
   figure,
-  group,
-  subgroup,
+  area,
+  subarea,
   family,
   adjust_method,
   phenotype,
@@ -20,9 +20,9 @@ manhattan_plot_per_area(
 
 \item{figure}{HYPO, HYPER}
 
-\item{group}{genomic area (eg. GENE, ISLAND, DMR)}
+\item{area}{genomic area (eg. GENE, ISLAND, DMR)}
 
-\item{subgroup}{sub genomic area (TSS1550), depending on the genomic area}
+\item{subarea}{sub genomic area (TSS1550), depending on the genomic area}
 
 \item{family}{fullname of the family used for the association analysis}
 

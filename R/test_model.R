@@ -232,6 +232,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
 
   if( family_test=="pearson" | family_test=="kendall" | family_test=="spearman")
   {
+    tempDataFrame <- tempDataFrame[complete.cases(tempDataFrame),]
     result_cor <- stats::cor.test(as.numeric(tempDataFrame[,burdenValue]), as.numeric(tempDataFrame[,independent_variable]), method = as.character(family_test))
     res$pvalue <- result_cor$p.value
     res$r_model <- "stats_cor.test"
@@ -239,6 +240,17 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     res$rho <- statistic_parameter
     power_result <- pwr::pwr.r.test(n = nrow(tempDataFrame) , r = statistic_parameter , sig.level = as.numeric(ssEnv$alpha) , power = NULL)
     res$power <- power_result$power
+
+    if (plot)
+    {
+      chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("CORRELATION",name_cleaning(as.character(samples_sql_condition))))
+      # plot a scatter plot of the burden value vs the independent variable and a linear regression line
+      filename  =  file_path_build(chartFolder,toupper(c(family_test,as.character(transformation), independent_variable,"Vs", burdenValue,area, subarea)),ssEnv$plot_format)
+      grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
+      plot(tempDataFrame[,burdenValue], tempDataFrame[,independent_variable], xlab = burdenValue, ylab = independent_variable, main = paste("Correlation between", burdenValue, "and", independent_variable), pch = 19)
+      abline(lm(tempDataFrame[,independent_variable] ~ tempDataFrame[,burdenValue]), col = "blue")
+      dev.off()
+    }
   }
 
   return (res)

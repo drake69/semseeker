@@ -30,6 +30,8 @@ markers_performance_association <- function(inference_details, result_folder, pv
       depth_analysis <- inference_detail$depth_analysis
       family_test <- inference_detail$family_test
       transformation <- as.character(inference_detail$transformation)
+      if(transformation == "")
+        transformation <- "none"
       filtered_metrics <- metrics_filter(model_metrics, as.character(transformation))
       covariates <- paste0(inference_detail$covariates, collapse = "_")
       independent_variable <- inference_detail$independent_variable

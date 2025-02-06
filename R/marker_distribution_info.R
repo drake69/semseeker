@@ -8,7 +8,7 @@ marker_distribution_info <- function(result_folder, maxResources = 90, parallel_
   # annotate_bed()
   # create_excel_pivot()
 
-  marker_quantization_metric()
+  marker_quantization_metric(result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
   marker_fit_to_theoretical_distribution()
 
   close_env()

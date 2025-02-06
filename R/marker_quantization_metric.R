@@ -1,12 +1,11 @@
 #' @export
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
-marker_quantization_metric <- function()
+marker_quantization_metric <- function(result_folder, maxResources = 90, parallel_strategy  = "multisession", ...)
 {
   # result_folder, maxResources = 90, parallel_strategy  = "multisession", ...
-  # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
-  ssEnv <- get_session_info()
-
+  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
+  # ssEnv <- get_session_info()
 
   keys <- ssEnv$keys_areas_subareas_markers_figures
   keys <- keys[keys$AREA == "PROBE",]
@@ -51,6 +50,7 @@ marker_quantization_metric <- function()
       # k <- 1
       key <- keys [k,]
       log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y"), "Processing key: ", key$MARKER," ", key$FIGURE," ", key$AREA," ", key$SUBAREA)
+
 
       res_temp <- data.frame("MARKER" = key$MARKER, "FIGURE" = key$FIGURE, "AREA" = key$AREA, "SUBAREA" = key$SUBAREA)
 
@@ -120,39 +120,6 @@ marker_quantization_metric <- function()
           log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y"), "Error in calculate_metrics: ", e)
         }
       )
-
-
-      # remove zeros from original and quantized
-      quantized <- quantized[,4]
-      original <- original[,4]
-      original <- original[original != 0]
-      quantized <- quantized[quantized != 0]
-      if (key$MARKER=="MUTATIONS")
-        quantized <- c(quantized,0,2)
-      original_range <- range(original)
-      quantized_range <- range(quantized)
-      original_to_plot <- (original * (quantized_range[2] - quantized_range[1]) / (original_range[2] - original_range[1])) + (quantized_range[1] - original_range[1])
-      quantized_to_plot <- (quantized * (original_range[2] - original_range[1]) / (quantized_range[2] - quantized_range[1])) + (original_range[1] - quantized_range[1])
-      # Define number of intervals
-      num_intervals_original <- quantized_range[2]  # Change this to desiblue number of intervals
-
-      chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKERS_DISTRIBUTION")
-      filename <- file_path_build( chart_folder ,c(quantized_range[2],original_marker,key$MARKER, key$FIGURE, key$AREA,key$SUBAREA, "dens"),"png")
-      grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
-      plot(density(original), col = "skyblue", main = paste0(original_marker, " Vs. ", key$MARKER ," Density Plot"))
-      lines(density(quantized_to_plot), col = "blue")
-      legend("bottom", legend = c(original_marker, key$MARKER),  col = c("skyblue", "blue"), lty = 1, cex = 0.8, bty = "n")
-      dev.off()
-
-      # plot two istograms with log10 y axis scale
-      filename <- file_path_build( chart_folder ,c(quantized_range[2],original_marker,key$MARKER, key$FIGURE, key$AREA,key$SUBAREA, "hist"),"png")
-      grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
-      par(mfrow=c(2,1))
-      hist(original, col = "skyblue", xlab = "Frequency", main = paste0( original_marker," Histogram"))
-      hist(quantized_to_plot, col = "blue", xlab = "Frequency", main = paste0(key$MARKER, " Histogram"))
-      par(mfrow=c(1,1))
-      dev.off()
-
 
       if(ssEnv$showprogress)
         progress_bar(sprintf("I'm doing metrics calculation for the quantization process."))

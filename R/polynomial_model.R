@@ -6,6 +6,11 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   # polynomial_degree_partition-partition_percentage
   polynomial_params <- unlist(strsplit(as.character(family_test),"_"))
 
+  if(length(polynomial_params)!=3)
+  {
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " The polynomial model must have 3 parameters: polynomial followed by degree and partition percentage eg: polynomial_2_1 " )
+  }
+
   degree <- as.numeric(polynomial_params[2])
   res <- data.frame("PL_DEGREE"= degree)
   partition_percentage <- as.numeric(polynomial_params[3])
@@ -30,6 +35,9 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
       dependent_variable <- dep_var$independent_variable
       independent_variable <- dep_var$dependent_variable
     }
+
+  if (nrow(tempDataFrame) == 0)
+    return(res)
 
   # Split the data into training and test set
   training.samples <- tempDataFrame[, dependent_variable] %>% caret::createDataPartition(p = partition_percentage, list = FALSE)

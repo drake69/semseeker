@@ -129,9 +129,9 @@ exp_model <- function (family_test, tempDataFrame, sig.formula, transformation, 
       filename,
       plot = ggp,
       scale = 1,
-      width = 1240,
-      height = 1240,
-      units = c("px"),
+      width = 9,
+      height = 9,
+      units = c("in"),
       dpi = as.numeric(ssEnv$plot_resolution_ppi)
     )
 
