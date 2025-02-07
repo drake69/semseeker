@@ -91,8 +91,23 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
     steps:
-      # - name: Checkout repository
-      #   uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Set up R
+        id: setup-r
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install common dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck, any::pkgdown, any::covr, any::rmarkdown
+          needs: check, website, coverage
 
       - name: Build package
         run: |
@@ -113,7 +128,7 @@ jobs:
       #   uses: actions/checkout@v4
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
