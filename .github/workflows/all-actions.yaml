@@ -31,7 +31,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck, any::pkgdown, any::covr, any::rmarkdown
-          needs: check, website, coverage
+          needs: release-create, website, coverage
 
   # R-CMD-check:
   #   runs-on: ${{ matrix.config.os }}
@@ -91,24 +91,6 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Pandoc
-        uses: r-lib/actions/setup-pandoc@v2
-
-      - name: Set up R
-        id: setup-r
-        uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-
-      - name: Install common dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::rcmdcheck, any::pkgdown, any::covr, any::rmarkdown
-          needs: check, website, coverage
-
       - name: Build package
         run: |
           R CMD build .
