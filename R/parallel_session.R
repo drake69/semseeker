@@ -48,7 +48,7 @@ parallel_session <- function()
   # is changed in onload see zzz.R
   # options(parallelly.fork.enable= FALSE)
   # options(future.globals.resolve = TRUE)
-  #allow export of object of 32gb with future
+  # allow export of object of 32gb with future
   options(future.globals.maxSize= 32 * 1024^3)
 
 

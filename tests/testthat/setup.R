@@ -1,7 +1,13 @@
+# num_rows <- 3e^6
+# num_cols <- 5200
+# populationMatrix <- as.data.frame(matrix(runif(num_rows * num_cols), nrow = num_rows, ncol = num_cols))
+# library(future)
+# options(future.globals.maxSize = 10 * 1024^3)
+
 loadNamespace("future")
 loadNamespace("stats")
 nprobes <- 6e3
-nsamples <- 30
+nsamples <- 3e5
 
 # intersample_mean <- 5
 # intersample_sd <- 1
