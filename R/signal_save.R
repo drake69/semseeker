@@ -2,6 +2,7 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
 {
   ssEnv <- get_session_info()
 
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Saving signal data,")
   # if(ncol(signal_data) >100)
   #   return()
 
@@ -18,5 +19,6 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
   fileName <- file_path_build(pivot_subfolder,c("SIGNAL","MEAN","PROBE","PROBE"),"csv", add_gz = TRUE)
   utils::write.table(signal_data, gzfile(fileName), row.names = T, col.names = T, sep=";")
   saveRDS(signal_data,file_path_build(ssEnv$result_folderData, c(batch_id,"_signal_data"),"rds"))
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Saved signal data,")
 
 }
