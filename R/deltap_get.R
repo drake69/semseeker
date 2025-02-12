@@ -113,8 +113,10 @@ deltap_get <- function(resultPopulation){
     tempDataFrame <- reshape2::dcast(data = deltap_summary, formula = SAMPLEID  ~ LABEL, value.var = "VALUE", fun.aggregate = sum, drop = TRUE)
     # remove from result columns existing in tempDataFrame
     resultPopulation <- resultPopulation[,!(colnames(resultPopulation) %in% colnames(tempDataFrame))]
-    resultPopulation <- merge(resultPopulation, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID")
+    resultPopulation <- merge(resultPopulation, tempDataFrame, by.x="Sample_ID", by.y="SAMPLEID", all.x=TRUE)
   }
+
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Created DELTAP multiple annotated file!", fileToWrite)
   return(resultPopulation)
 
 }

@@ -80,7 +80,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   otherSamples <- sample_sheet[sample_sheet$Sample_Group != "Reference",]
   referenceSamples <- referenceSamples[!(referenceSamples$Sample_ID %in% otherSamples$Sample_ID), ]
   sample_sheet <- rbind(otherSamples, referenceSamples)
-
+  resultSampleSheet <- data.frame()
   i <- 0
   variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "analyze_population",
     "populationControlRangeBetaValues", "PROBES", "create_multiple_bed","probe_features")
@@ -97,6 +97,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
     else
     {
 
+
       log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "  Working on population ",sample_group, " with ", nrow(signal_data), " probes.")
       resultPopulation <- analyze_population(
         signal_data = signal_data[, populationMatrixColumns],
@@ -109,23 +110,14 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
       resultPopulation$Sample_Group <- sample_group
       create_multiple_bed(resultPopulation)
 
-      # resultPopulation
-      # resultPopulation
-      # # if(nrow(resultPopulation) != nrow(populationSampleSheet) )
-      # #   #
-
-      if(!exists("resultSampleSheet"))
-        resultSampleSheet <- resultPopulation
-      else
-        resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
-
-      # rm(populationSampleSheet)
-
-      # resultPopulation
+      resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
     }
   }
 
-  # resultSampleSheet <- as.data.frame(resultSampleSheet)
+
+  resultSampleSheet[is.na(resultSampleSheet)] <- 0
+  colResult <- colnames(resultSampleSheet)
+
   resultSampleSheet <- deltaq_get(resultSampleSheet)
   resultSampleSheet <- deltarq_get(resultSampleSheet)
 
@@ -142,7 +134,9 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   sample_sheet$Sample_ID <- samplesID
   sample_sheet$Batch_ID <- batch_id
 
+
   sample_sheet <- merge(sample_sheet, resultSampleSheet, by.x="Sample_ID", by.y="Sample_ID", all.x=TRUE)
+  sample_sheet[is.na(sample_sheet$Sample_Group),colResult] <- 0
   rm(signal_data)
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "  Batch completed:", batch_id)

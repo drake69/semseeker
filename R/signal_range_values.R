@@ -28,7 +28,7 @@ signal_range_values <- function(populationMatrix) {
 
   row.names(populationMatrix) <- rownames(populationMatrix)
   if(ssEnv$showprogress)
-    progress_bar <- progressr::progressor(along = 1:nrow(populationMatrix))
+    progress_bar <- progressr::progressor(along = 1:(nrow(populationMatrix)/10000))
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting signal thresholds calculation.")
   export = c("progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","populationMatrix","ssEnv")

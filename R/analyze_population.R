@@ -154,6 +154,7 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   }
 
   gc()
+  summary_population[is.na(summary_population)] <- 0
   # progress_bar$terminate()
   summary_population <- as.matrix.data.frame(summary_population)
   summary_population <- as.data.frame(summary_population)
