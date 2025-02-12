@@ -66,7 +66,6 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   if(!ssEnv$signal_intrasample)
   {
     populationControlRangeBetaValues <- as.data.frame(signal_range_values(referencePopulationMatrix))
-
     # utils::write.table(x = gzfile(populationControlRangeBetaValues), file = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds","csv"), add_gz = TRUE), sep=";")
     fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"fst"), compress = 100)
   }
