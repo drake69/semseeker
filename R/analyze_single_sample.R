@@ -13,7 +13,7 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
   ssEnv <- get_session_info()
   result <- data.frame()
   result <- result[-1]
- log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:", ssEnv$result_folderData)
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:", ssEnv$result_folderData)
 
   mutation_annotated_sorted <- mutations_get(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
   mutation_annotated_sorted_to_save <- subset(mutation_annotated_sorted, mutation_annotated_sorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
@@ -43,6 +43,3 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
 
   return(result)
 }
-
-
-
