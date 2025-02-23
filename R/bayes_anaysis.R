@@ -38,8 +38,7 @@ bayes_analysis <-
     localKeys <- ssEnv$keys_markers_figures
     sample_groups <- c("Reference", "Control", "Case")
 
-    create_excel_pivot()
-    result_folderPivot <- dir_check_and_create(ssEnv$result_folderData, "Pivots")
+    
 
     study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
     if (independent_variable=="Sample_Group")
@@ -71,25 +70,29 @@ bayes_analysis <-
       }
 
       nkeys <- nrow(keys)
-      variables_to_export_nested <- c("variables_to_export","keys","result_folderPivot","sample_names","ssEnv","file_path_build")
+      variables_to_export_nested <- c("variables_to_export","keys","sample_names","ssEnv","file_path_build")
       if (nrow(keys) > 0)
         for (k in 1:nkeys)
         {
           # k <- 3
           key <- keys [k, ]
-          pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
-          fname <- file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv")
-          if (file.exists(fname))
+          pivot_filename <- pivot_file_name(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
+          if (file.exists(pivot_filename))
           {
             log_event("INFO: ",
               format(Sys.time(), "%a %b %d %X %Y"),
               " Starting to read pivot:",
-              fname,
+              pivot_filename,
               ".")
-            if(!file.exists(fname))
+            if(!file.exists(pivot_filename))
               next
-            tempDataFrame <- utils::read.csv2(fname, sep  =  ";")
-            row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+            pivot <- readr::read_delim(pivot_file_name,
+              col_types = readr::cols(
+                .default = readr::col_double(),
+                AREA = readr::col_character(),
+              ),
+              show_col_types=FALSE, progress=FALSE)
+            row.names(tempDataFrame) <- tempDataFrame$AREA
             if (length(areas_selection) > 0)
               tempDataFrame <-tempDataFrame[tempDataFrame[, 1] %in% areas_selection,]
 
@@ -105,7 +108,7 @@ bayes_analysis <-
               "INFO: ",
               format(Sys.time(), "%a %b %d %X %Y"),
               " Read pivot:",
-              fname,
+              pivot_filename,
               " with ",
               ncol(tempDataFrame),
               " rows."

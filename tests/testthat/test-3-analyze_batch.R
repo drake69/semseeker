@@ -5,7 +5,8 @@ test_that("analize_batch", {
   ssEnv <- semseeker:::init_env(tempFolder,
     parallel_strategy = parallel_strategy,
     bonferroni_threshold =  bonferroni_threshold,
-    iqrTimes =  iqrTimes
+    iqrTimes =  iqrTimes,
+    inpute="median"
   )
 
   ####################################################################################

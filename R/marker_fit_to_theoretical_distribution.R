@@ -11,10 +11,6 @@ marker_fit_to_theoretical_distribution <- function()
 
   keys <- ssEnv$keys_areas_subareas_markers_figures
   keys <- keys[keys$AREA == "PROBE",]
-  result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
-
-  # result_folderPivot <- "~/Documents/Dati_Lavoro/osteoporosis/results/GSE99624/Data/Pivots/"
-  # key <- data.frame("MARKER" = "SIGNAL", "FIGURE"="MEAN", "AREA"="PROBE","SUBAREA"="WHOLE")
 
   remove_zeros <- c(TRUE,FALSE)
   to_export <- c("keys")

@@ -21,12 +21,16 @@ dump_sample_as_bed_file <- function(data_to_dump, fileName) {
   # bed coordinate must start from zero!
   data_to_dump$START <- as.numeric(data_to_dump$START)
   data_to_dump$END <- as.numeric(data_to_dump$END)
+
+  data_to_dump <- data_to_dump[!is.na(data_to_dump$START),]
+
   if (!plyr::empty(data_to_dump)) {
 
     log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " trying to save: ", fileName)
 
     # save file bed per sample
-    utils::write.table(data_to_dump, file = gzfile(fileName), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+    # utils::write.table(data_to_dump, file = gzfile(fileName), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+    readr::write_tsv(data_to_dump, fileName, col_names = FALSE, na = "NA", progress = FALSE)
 
     # save file bed per sample temporary to reuse for aggregated bed file
     # filePath <- paste(fileName,"",".temp")

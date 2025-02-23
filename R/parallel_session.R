@@ -43,6 +43,8 @@ parallel_session <- function()
   ssEnv$parallel$parallel_strategy <- parallel_strategy
   ssEnv$parallel$nCore <- nCore
 
+  options(readr.num_threads = nCore)  # Set to the desired number of threads
+
   options(doFuture.foreach.export = ".export-and-automatic-with-warning")
   # doFuture
   # is changed in onload see zzz.R

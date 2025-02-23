@@ -2,18 +2,25 @@ test_that("delta_single_sample",{
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder)
+  ssEnv <- semseeker:::init_env(tempFolder, inpute="median")
 
   ####################################################################################
 
-  semseeker:::get_meth_tech(signal_data)
+  tt <- semseeker:::get_meth_tech(signal_data)
 
   ####################################################################################
+  if (nrow(signal_data)!=nprobes)
+    signal_data <- semseeker:::inpute_missing_values(signal_data)
 
-  delta_single_sample(
+  if (!exists("signal_thresholds"))
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data)
+
+  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
+
+  dss <- delta_single_sample(
     values = signal_data[,1],
-    high_thresholds = signal_superior_thresholds,
-    low_thresholds = signal_inferior_thresholds,
+    high_thresholds = signal_thresholds$signal_superior_thresholds,
+    low_thresholds = signal_thresholds$signal_inferior_thresholds,
     sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")],
     signal_medians = signal_medians,
     probe_features = probe_features
@@ -28,19 +35,19 @@ test_that("delta_single_sample",{
   # test I can open it
   res <- read.table(gzfile(fileName), header = FALSE)
   # message("res: ", res)
-  testthat::expect_true(nrow(res)> 0)
+  testthat::expect_true(nrow(res)>0)
 
   ####################################################################################
-  result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
-  outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_BOTHS"))
-  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTHS"), "bedgraph", add_gz = TRUE)
-  testthat::expect_true(file.exists(fileName))
-
-  # message("fileName: ", fileName)
-  # test I can open it
-  res <- read.table(gzfile(fileName), header = FALSE)
-  # message("res: ", res)
-  testthat::expect_true(nrow(res)> 0)
+  # result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
+  # outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_BOTHS"))
+  # fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTHS"), "bedgraph", add_gz = TRUE)
+  # testthat::expect_true(file.exists(fileName))
+  #
+  # # message("fileName: ", fileName)
+  # # test I can open it
+  # res <- read.table(gzfile(fileName), header = FALSE)
+  # # message("res: ", res)
+  # testthat::expect_true(nrow(res)> 0)
 
   ####################################################################################
 

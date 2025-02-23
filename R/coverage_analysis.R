@@ -45,7 +45,7 @@ coverage_analysis <- function(signal_data)
     coverage <- coverage[ !is.na(coverage[,area_subarea]),]
     coverage <- coverage[ coverage[,area_subarea]!="",]
 
-    coverage$PERC <- plyr::round_any(100 * coverage$COUNT_COVERED / coverage$COUNT_TOTAL, 5)
+    coverage$PERC <- plyr::round_any(100 * as.numeric(coverage$COUNT_COVERED) / coverage$COUNT_TOTAL, 5)
     cov_stat <- stats::aggregate(coverage$PERC, list(coverage$PERC), FUN=length)
     colnames(cov_stat) <- c("COV_PERC","COUNT")
 

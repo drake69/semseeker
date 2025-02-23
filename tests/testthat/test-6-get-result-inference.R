@@ -7,7 +7,7 @@ test_that("get_result_inference", {
 
 
   semseeker:::semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, figures="BOTH",
-    markers=c("DELTAQ"), areas=c("PROBE","CHR","GENE"), start_fresh = TRUE)
+    markers=c("DELTAQ"), areas=c("PROBE","CHR","GENE"), start_fresh = TRUE, inpute="median")
 
   ####################################################################################
 

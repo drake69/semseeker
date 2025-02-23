@@ -2,7 +2,7 @@ test_that("create_heatmap", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, inpute="median")
 
   ####################################################################################
 
@@ -10,11 +10,17 @@ test_that("create_heatmap", {
 
   ####################################################################################
 
+  if (!exists("signal_thresholds"))
+  {
+    signal_data <- semseeker:::inpute_missing_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data)
+  }
+  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 
   batch_id <- 1
   sp <- semseeker:::analyze_batch(signal_data =  signal_data,
     sample_sheet =  mySampleSheet,
-    
+
     bonferroni_threshold =  bonferroni_threshold,
     iqrTimes =  iqrTimes,
     batch_id = batch_id

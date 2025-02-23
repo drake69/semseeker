@@ -11,7 +11,7 @@ keys_create <- function(ssEnv, arguments)
 
 
   keys_markers_default_discrete$Q <- c(1,NA,ssEnv$DELTAQ_Q,ssEnv$DELTARQ_Q,ssEnv$DELTAP_B,ssEnv$DELTARP_B)
-
+  keys_markers_default_discrete$SOURCE <- c("DELTAS","DELTAS","DELTAS","DELTAR","DELTAS","DELTAR")
   keys_markers_default_discrete$SUFFIX <-  rep("",6)
   # keys_markers_default$SUFFIX <-  c("","","","", ssEnv$epiquantile ,"",ssEnv$epiquantile)
   keys_markers_default_discrete$EXT <-  c("bed","bed","bed","bed","bed","bed")
@@ -38,6 +38,10 @@ keys_create <- function(ssEnv, arguments)
   keys_markers_figures_default <- plyr::rbind.fill(keys_markers_figures_default_discrete,
     keys_markers_figures_default_continuos,
     keys_markers_figures_default_continuos_mono_figure)
+  keys_markers_figures_default$DISCRETE <- keys_markers_figures_default$EXT=="bed"
+
+  # remove BOTH and BOTHSUM
+  keys_markers_figures_default <- keys_markers_figures_default[!(keys_markers_figures_default$FIGURE=="BOTH" | keys_markers_figures_default$FIGURE=="BOTHSUM"),]
 
   ssEnv$keys_markers_figures_default <- keys_markers_figures_default
 
@@ -60,9 +64,10 @@ keys_create <- function(ssEnv, arguments)
 
   keys_gene_subareas_default <- data.frame("AREA"="GENE", "SUBAREA"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
   keys_island_subareas_default <- data.frame("AREA"="ISLAND","SUBAREA"=c("N_SHORE","S_SHORE","N_SHELF","S_SHELF", "WHOLE"))
-  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c("WHOLE","DMR"))
-  keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("WHOLE","CYTOBAND"))
-  keys_probe_subareas_default <- data.frame("AREA"="PROBE","SUBAREA"=c("WHOLE"))
+  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c("","DMR"))
+  keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("","CYTOBAND"))
+  keys_probe_subareas_default <- data.frame("AREA"="PROBE","SUBAREA"=c(""))
+  keys_probe_subareas_default <- data.frame("AREA"="POSITION","SUBAREA"=c(""))
 
   keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default)
 
@@ -94,7 +99,7 @@ keys_create <- function(ssEnv, arguments)
   {
     # paste0(x[x!=""], collapse = "_")
     # remove spaces
-    gsub(" ","",paste0(x[x!=""], collapse = "_"))
+    name_cleaning(gsub(" ","",paste0(x[x!=""], collapse = "_")))
   }
 
   ssEnv$keys_areas_subareas_markers_figures$COMBINED <- apply(ssEnv$keys_areas_subareas_markers_figures[,c("MARKER","FIGURE","AREA","SUBAREA")], 1, combine_not_empty )
@@ -124,7 +129,8 @@ keys_create <- function(ssEnv, arguments)
   keys <- keys[!duplicated(keys),]
   # remove only HYPER or only HYPO
   keys <- keys[!(keys$FIGURE=="HYPER" | keys$FIGURE=="HYPO"),]
-  keys$COMBINED <- paste(keys$AREA,keys$SUBAREA,keys$MARKER,keys$FIGURE, sep="_")
+  if(nrow(keys)!=0)
+    keys$COMBINED <- paste0(keys$AREA,keys$SUBAREA,keys$MARKER,keys$FIGURE, sep="_")
   # remove BOTH and BOTHSUM
   keys <- keys[!(keys$FIGURE=="BOTH" | keys$FIGURE=="BOTHSUM"),]
   ssEnv$keys_for_pathway <- keys

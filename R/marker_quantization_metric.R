@@ -16,10 +16,6 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
     return()
   }
 
-  result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
-
-  # result_folderPivot <- "~/Documents/Dati_Lavoro/osteoporosis/results/GSE99624/quantized/Pivots/"
-  # key <- data.frame("MARKER" = "MUTATIONS", "FIGURE"="BOTH", "AREA"="PROBE","SUBAREA"="WHOLE")
 
   keys <- keys[keys$MARKER != "DELTAS",]
   keys <- keys[keys$MARKER != "DELTAR",]
@@ -29,8 +25,8 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
   keys <- keys[complete.cases(keys),]
   nkeys <- nrow(keys)
 
-  # annotate_bed()
-  # create_excel_pivot()
+  #
+  #
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nkeys)

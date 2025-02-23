@@ -10,6 +10,13 @@ signal_range_values <- function(populationMatrix) {
 
   ssEnv <- get_session_info()
 
+  if (sum(is.na(populationMatrix)) > 0)
+  {
+    msg <- paste0("ERROR:", format(Sys.time(), "%a %b %d %X %Y"), " There are missing values in the population matrix, apply the parameter inpute or remove the missing values.")
+    log_event(msg)
+    stop(msg)
+  }
+
   # populationMatrix <- signal_data
   # populationMatrixDim <- dim(populationMatrix)
   populatioinMatrix <- as.data.frame(populationMatrix)
@@ -72,7 +79,7 @@ signal_range_values <- function(populationMatrix) {
 
 
   {
-    chunk_size <- 10000  # Define a chunk sizex
+    chunk_size <- 50000  # Define a chunk sizex
     result <- data.frame()
     for (i in seq(1, nrow(populationMatrix), by = chunk_size)) {
 

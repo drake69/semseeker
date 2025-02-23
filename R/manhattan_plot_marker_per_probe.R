@@ -34,11 +34,6 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   sample_sheet <- utils::read.csv2(file_path_build(ssEnv$result_folderData, "1_sample_sheet_original","csv"), sep=";", header = TRUE, stringsAsFactors = FALSE)
   references <- sample_sheet[sample_sheet$Sample_Group == "Reference", "Sample_ID"]
 
-  annotate_bed()
-  create_excel_pivot()
-  result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
-
-
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
 

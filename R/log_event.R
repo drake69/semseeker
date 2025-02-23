@@ -14,7 +14,7 @@ log_event <- function(...)
   log_file <- file.path(ssEnv$session_folder,file_name)
 
   log_event_to_print <- log_event_to_save
-  if (grepl("BANNER", log_event_to_save))
+  if (grepl("^BANNER", log_event_to_save))
   {
     log_event_to_print_dash <- "##############################################################################"
     log_event_to_print <- paste0( log_event_to_print_dash, "\n", gsub("BANNER: ", "", log_event_to_print))
@@ -34,19 +34,19 @@ log_event <- function(...)
     verbosity <- as.numeric(ssEnv$verbosity)
 
   # if verbosity is 1, only print ERROR messages
-  if (verbosity == 1 && grepl("ERROR", log_event_to_save) || grepl("BANNER", log_event_to_save))
+  if (verbosity == 1 && grepl("^ERROR", log_event_to_save) || grepl("^BANNER", log_event_to_save) && !testthat::is_testing())
     message(log_event_to_print)
 
   # if verbosity is 2, print ERROR and WARNING messages
-  if (verbosity == 2 && (grepl("ERROR", log_event_to_save) || grepl("WARNING", log_event_to_save)|| grepl("BANNER", log_event_to_save)))
+  if (verbosity == 2 && (grepl("^ERROR", log_event_to_save) || grepl("^WARNING", log_event_to_save)|| grepl("^BANNER", log_event_to_save)) && !testthat::is_testing())
     message(log_event_to_print)
 
   # if verbosity is 3, print ERROR, WARNING and INFO messages
-  if (verbosity == 3 && (grepl("ERROR", log_event_to_save) || grepl("WARNING", log_event_to_save) || grepl("INFO", log_event_to_save) || grepl("BANNER", log_event_to_save)))
+  if (verbosity == 3 && (grepl("^ERROR", log_event_to_save) || grepl("^WARNING", log_event_to_save) || grepl("^INFO", log_event_to_save) || grepl("^BANNER", log_event_to_save)) && !testthat::is_testing())
     message(log_event_to_print)
 
   # if verbosity is 4, print ERROR, WARNING, INFO and DEBUG messages
-  if (verbosity == 4)
+  if (verbosity == 4 && !testthat::is_testing())
     message(log_event_to_print)
 
   cat(log_event_to_save, "\n", file = log_file, append = TRUE)

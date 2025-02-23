@@ -30,9 +30,6 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
   #   figures=c("BOTH","HYPER","HYPO"), areas="PROBE", markers = "DELTAQ")
   chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_SAMPLE")
 
-  create_excel_pivot()
-  result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
-
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
   for(k in 1:length(localKeys)){

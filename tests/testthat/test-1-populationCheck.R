@@ -3,7 +3,7 @@ test_that(" semseeker:::sample_group_check", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  semseeker:::init_env(tempFolder)
+  semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, iqrTimes = iqrTimes, inpute="median")
 
   ####################################################################################
 

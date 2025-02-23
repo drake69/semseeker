@@ -3,6 +3,7 @@ inpute_missing_values <- function(signal_data){
   ssEnv <- get_session_info()
   # count number of na
   n_na <- sum(is.na(signal_data))
+  nrow_ex_ante <- nrow(signal_data)
 
   n_item = nrow(signal_data)*ncol(signal_data)/100
   log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/n_item, 2), " % of the data.")
@@ -13,11 +14,10 @@ inpute_missing_values <- function(signal_data){
     for (i in seq(1, nrow(signal_data), by = chunk_size)) {
       # Define the chunk
       chunk_indices <- i:min(i + chunk_size - 1, nrow(signal_data))
-
       # Process the chunk
       row_medians <- apply(signal_data[chunk_indices, ], 1, stats::median, na.rm = TRUE)
-      signal_data[chunk_indices, ][is.na(signal_data[chunk_indices, ])] <-
-        row_medians[row(signal_data[chunk_indices, ])[is.na(signal_data[chunk_indices, ])]]
+      row_id <- row(signal_data[chunk_indices, ])[is.na(signal_data[chunk_indices, ])]
+      signal_data[chunk_indices, ][is.na(signal_data[chunk_indices, ])] <- row_medians[row_id]
     }
   }
   else if (ssEnv$inpute=="mean")
@@ -55,6 +55,14 @@ inpute_missing_values <- function(signal_data){
   }
 
   gc()
+
+  # drop rows with all NA
+  signal_data <- signal_data[!apply(signal_data, 1, function(x) all(is.na(x))), ]
+  nrows_ex_post <- nrow(signal_data)
+  if (nrows_ex_post < nrow_ex_ante)
+  {
+    log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Dropping rows with all missing values. Number of rows dropped: ", nrow_ex_ante - nrows_ex_post)
+  }
   n_na <- sum(is.na(signal_data))
   log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputation completed. Number of missing values: ", n_na)
   return(signal_data)

@@ -16,8 +16,6 @@ marker_quantization_chart <- function(result_folder, maxResources = 90, parallel
     return()
   }
 
-  result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
-
   keys <- keys[keys$MARKER != "DELTAS",]
   keys <- keys[keys$MARKER != "DELTAR",]
   keys <- keys[keys$MARKER != "LESIONS",]
@@ -26,8 +24,8 @@ marker_quantization_chart <- function(result_folder, maxResources = 90, parallel
   keys <- keys[complete.cases(keys),]
   nkeys <- nrow(keys)
 
-  # annotate_bed()
-  # create_excel_pivot()
+  #
+  #
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nkeys)

@@ -29,16 +29,23 @@ init_env <- function(result_folder, maxResources = 90, ...)
   tt <- lapply(PKGs, suppressPackageStartupMessages)
 
 
-
   arguments <- list(...)
-  arguments[["areas_selection"]] <- NULL
+  # check if optional arguments are passed
+  if(length(arguments) == 0)
+  {
+    arguments <- list()
+  }
+  else
+  {
+    # remove all empty items from arguments
+    arguments <- lapply(arguments, function(x) gsub(" ", "", x))
+    arguments <- lapply(arguments, function(x) x[x!=""])
+    arguments <- arguments[sapply(arguments, function(x) length(x) > 0)]
+    arguments <- arguments[sapply(arguments, function(x) !is.null(x))]
+    # arguments <- arguments[sapply(arguments, function(x) !is.na(x))]
+  }
 
-  # remove all empty items from arguments
-  arguments <- lapply(arguments, function(x) gsub(" ", "", x))
-  arguments <- lapply(arguments, function(x) x[x!=""])
-  arguments <- arguments[sapply(arguments, function(x) length(x) > 0)]
-  arguments <- arguments[sapply(arguments, function(x) !is.null(x))]
-  # arguments <- arguments[sapply(arguments, function(x) !is.na(x))]
+  arguments[["areas_selection"]] <- NULL
 
 
   start_fresh <- TRUE
@@ -148,25 +155,16 @@ init_env <- function(result_folder, maxResources = 90, ...)
   if(ssEnv$showprogress)
   {
     handler_settings <- progressr::handlers()
-    # list_names <- names(handler_settings)
-    # check "cli" is an item of the vector
-    # if((any(list_names == "cli")))
-    # {
-    #   progressr::handlers(global = TRUE)
-    #   progressr::handlers("cli")
-    # }
     if (!(exists("cli", mode = "function", inherits = TRUE)))
     {
       # check if handler is already registered
-      if(!("cli" %in% handler_settings$handler))
-      {
-        # check if handlers is on the stack
-        if(!("cli" %in% handler_settings$stack))
+      if (!testthat::is_testing())
+        # if (length(handler_settings$handler) == 0)
+        if(!("cli" %in% handler_settings$handler))
         {
           progressr::handlers(global = TRUE)
           progressr::handlers("cli")
         }
-      }
     }
   }
 

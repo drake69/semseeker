@@ -48,8 +48,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   sample_groups <- c("Reference","Control","Case")
 
 
-  annotate_bed()
-  create_excel_pivot()
+  
+  
 
   inference_details <- unique(inference_details)
   # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
@@ -108,8 +108,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         # transform independent variable as factor
         if(family_test  ==  "binomial" || family_test  ==  "wilcoxon" || family_test  ==  "t.test")
           study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
-
-        result_folderPivot <- dir_check_and_create(ssEnv$result_folderData,"Pivots")
 
         file_result_prefix <- paste(depth_analysis, as.character(independent_variable),sep = "_")
 
@@ -275,7 +273,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               }
 
               nkeys <- nrow(keys)
-              variables_to_export_nested <- c("variables_to_export", "keys", "result_folderPivot", "sample_names", "independent_variable", "covariates",
+              variables_to_export_nested <- c("variables_to_export", "keys", "sample_names", "independent_variable", "covariates",
                 "family_test", "transformation", "ssEnv", "depth_analysis","file_path_build", "apply_stat_model")
               if(nrow(keys)>0)
                 # result_temp_foreach <- foreach::foreach(k  =  1:nkeys, .combine  =  rbind, .export  =  variables_to_export_nested) %dorng%
@@ -284,17 +282,18 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   if(exists("tempDataFrame"))
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
-                  pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
-                  fname <- file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv", add_gz=TRUE)
-                  if (file.exists(fname))
+                  pivot_filename <- pivot_file_name(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
+                  if (file.exists(pivot_filename))
                   {
                     areas_selection_temp <- areas_selection
-                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", fname,".")
-                    tempDataFrame <- utils::read.table(gzfile(fname), sep  =  ";", header  =  T, skip = 1)
-                    header <- utils::read.table(gzfile(fname), sep  =  ";", header  =  T, nrows = 1)
-                    colnames(tempDataFrame) <- colnames(header)
-                    rm(header)
-                    tempDataFrame <- plyr::rename(tempDataFrame, c("SAMPLEID"  =  "Sample_ID"))
+                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", pivot_filename,".")
+                    pivot <- readr::read_delim(pivot_file_name,
+                      col_types = readr::cols(
+                        .default = readr::col_double(),
+                        AREA = readr::col_character(),
+                      ),
+                      show_col_types=FALSE, progress=FALSE)
+                    tempDataFrame <- plyr::rename(tempDataFrame, c("AREA"  =  "Sample_ID"))
                     if(length(areas_selection_temp)>0)
                     {
                       #
@@ -331,7 +330,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
                     colnames(tempDataFrameBatch) <- header_areas
                     tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
-                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", fname, " with ", ncol(tempDataFrameBatch), " rows.")
+                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch), " rows.")
                     if(nrow(tempDataFrameBatch)>1)
                     {
                       tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
@@ -362,7 +361,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     }
                   }
                   else
-                    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " File not found:", fname,".")
+                    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " File not found:", pivot_filename,".")
                   association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
                   results <- subset(results, MARKER == key$MARKER)
                 }

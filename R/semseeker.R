@@ -98,8 +98,8 @@ semseeker <- function(sample_sheet,
   # ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
   # update_session_info(ssEnv)
 
-  # annotate_bed()
-  # create_excel_pivot()
+  # 
+  # 
 
  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "Starting inference Analysis.")
   # inferenceAnalysis(ssEnv$result_folderData = ssEnv$result_folderData, ssEnv$session_folder= ssEnv$session_folder, inferenceDetails)

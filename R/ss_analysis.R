@@ -27,8 +27,8 @@ ss_analysis <-
     localKeys <- ssEnv$keys_markers_figures
     sample_groups <- c("Reference", "Control", "Case")
 
-    annotate_bed()
-    create_excel_pivot()
+    
+    
 
     study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
     study_summary <- filter_sql(samples_sql_selection, study_summary)
@@ -70,8 +70,7 @@ ss_analysis <-
         {
           # k <- 3
           key <- keys [k, ]
-          pivot_subfolder <- dir_check_and_create(ssEnv$result_folderData,c("Pivots",key$MARKER))
-          fname <- file_path_build(pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA),"csv", add_gz = T)
+          pivot_filename <- pivot_file_name(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
           if (file.exists(fname))
           {
             log_event("INFO: ",
@@ -79,9 +78,13 @@ ss_analysis <-
               " Starting to read pivot:",
               fname,
               ".")
-            tempDataFrame <- utils::read.csv2(fname, sep  =  ";")
-            # tempDataFrame <- tempDataFrame[1:100,]
-            row.names(tempDataFrame) <- tempDataFrame$SAMPLEID
+            pivot <- readr::read_delim(pivot_file_name,
+              col_types = readr::cols(
+                .default = readr::col_double(),
+                AREA = readr::col_character(),
+              ),
+              show_col_types=FALSE, progress=FALSE)
+            row.names(tempDataFrame) <- tempDataFrame$AREA
             if (length(areas_selection) > 0)
               tempDataFrame <-tempDataFrame[tempDataFrame[, 1] %in% areas_selection,]
 

@@ -1,7 +1,7 @@
 Package: semseeker
 Type: Package
 Title: Stochastic Epigenetic Mutations SEM Seeker
-Version: 0.10.18
+Version: 0.11.0
 Author: see github contributors ;-)
 Maintainer: Luigi Corsaro <lcorsaro69@gmail.com>
 Description: Stochastic epimutation and enriched region upstream and downstream tool for EWAS.
@@ -14,7 +14,7 @@ Imports: dplyr, doFuture, doRNG, FactoMineR, factoextra, foreach, FSA,
         lqmm, plyr, progressr, reshape, reshape2, R.utils, rlang,
         stats, stringr, utils, withr, zoo, VennDiagram, effsize, pwr,
         combinat, philentropy, parallelly, knitr, lmtest, usethis,
-        glmnet, sqldf
+        glmnet, sqldf, wordcloud
 RoxygenNote: 7.3.2
 Suggests: openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR, wordcloud

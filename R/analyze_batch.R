@@ -95,8 +95,6 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
     }
     else
     {
-
-
       log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "  Working on population ",sample_group, " with ", nrow(signal_data), " probes.")
       resultPopulation <- analyze_population(
         signal_data = signal_data[, populationMatrixColumns],
@@ -108,6 +106,8 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- sample_group
       create_multiple_bed(resultPopulation)
+
+      create_position_pivots(resultPopulation,ssEnv$keys_markers_figures_default)
 
       resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
     }
