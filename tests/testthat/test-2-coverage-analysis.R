@@ -4,7 +4,7 @@ test_that("coverage-analysis", {
   tempFolders <- tempFolders[-1]
   semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy)
 
-  semseeker:::get_meth_tech(signal_data)
+  tt <- semseeker:::get_meth_tech(signal_data)
   res_cov <- semseeker:::coverage_analysis(signal_data)
   testthat::expect_true(nrow(res_cov)!=0)
 

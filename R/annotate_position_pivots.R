@@ -2,15 +2,11 @@
 #'
 #' @return nothing
 #' @importFrom doRNG %dorng%
-
 annotate_position_pivots <- function ()
 {
-
-  browser()
   start_time <- Sys.time()
   ssEnv <- get_session_info()
   # area and subarea are defined using the filename
-  i <- 0
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
 
   # remove POSITION area
@@ -34,18 +30,19 @@ annotate_position_pivots <- function ()
   if(nrow(localKeys)==0)
     return()
 
-  # for(i in 1:nrow(localKeys))
-  foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export, .combine = plyr::rbind.fill) %dorng%
+  # doesn't work with parallel, tests throws error
+  for(i in 1:nrow(localKeys))
+  # foreach::foreach(i=1:nrow(localKeys), .export = variables_to_export) %dorng%
     {
+      gc()
       marker <- as.character(localKeys[i,"MARKER"])
       figure <- as.character(localKeys[i,"FIGURE"])
       subarea <- as.character(localKeys[i,"SUBAREA"])
       area <- as.character(localKeys[i,"AREA"])
       # TO DO: remove subarea whole from probe features
       area_subarea <- paste(area,"_", ifelse (subarea=="","WHOLE",subarea) , sep="")
-      source_pivot_filename <- pivot_file_name(marker, figure, "POSITION","")
-      dest_pivot_filename <- pivot_file_name(marker, figure, area,subarea)
-
+      source_pivot_filename <- pivot_file_name_parquet(marker, figure, "POSITION","")
+      dest_pivot_filename <- pivot_file_name_parquet(marker, figure, area,subarea)
       # i <- 1
       if (!file.exists(dest_pivot_filename))
       {
@@ -55,16 +52,9 @@ annotate_position_pivots <- function ()
           probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
 
           # annotate file
-          pivot <- readr::read_delim(source_pivot_filename,
-            col_types = readr::cols(
-              .default = readr::col_double(),
-              CHR = readr::col_character(),
-              START = readr::col_integer(),
-              END = readr::col_integer()
-            ),
-            show_col_types=FALSE, progress=FALSE)
-          if(!is.null(pivot))
+          if(file.exists(source_pivot_filename))
           {
+            pivot <- polars::pl$read_parquet(source_pivot_filename)$to_data_frame()
             if(any(grepl("END", colnames(probe_features)))) #dplyr::inner_join
               pivot <- merge(probe_features,pivot, by = c("CHR", "START","END"), all.y = TRUE)
             else
@@ -91,15 +81,17 @@ annotate_position_pivots <- function ()
                 pivot <- pivot %>% dplyr::group_by(AREA) %>% dplyr::summarise_all(list(sum = sum))
               else
                 pivot <- pivot %>% dplyr::group_by(AREA) %>% dplyr::summarise_all(list(mean = mean))
-              readr::write_delim(pivot, dest_pivot_filename, col_names = T, progress = FALSE)
+              pivot <- polars::as_polars_df(pivot)
+              pivot$write_parquet(dest_pivot_filename)
               rm(pivot)
               #
             }
           }
-          if(ssEnv$showprogress)
-            progress_bar(sprintf("Annotating position pivots."))
         }
       }
+
+      if(ssEnv$showprogress)
+        progress_bar(sprintf("Annotating position pivots."))
     }
 
 

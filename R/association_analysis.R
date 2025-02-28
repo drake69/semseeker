@@ -48,8 +48,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   sample_groups <- c("Reference","Control","Case")
 
 
-  
-  
+
+
 
   inference_details <- unique(inference_details)
   # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
@@ -282,18 +282,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   if(exists("tempDataFrame"))
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
-                  pivot_filename <- pivot_file_name(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
+                  pivot_filename <- pivot_file_name_parquet(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
                   if (file.exists(pivot_filename))
                   {
                     areas_selection_temp <- areas_selection
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", pivot_filename,".")
-                    pivot <- readr::read_delim(pivot_file_name,
-                      col_types = readr::cols(
-                        .default = readr::col_double(),
-                        AREA = readr::col_character(),
-                      ),
-                      show_col_types=FALSE, progress=FALSE)
-                    tempDataFrame <- plyr::rename(tempDataFrame, c("AREA"  =  "Sample_ID"))
+                    tempDataFrame <- arrow::read_parquet(pivot_filename)
+                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", pivot_filename, " with ", nrow(tempDataFrame), " rows.")
+                    tempDataFrame[is.na(tempDataFrame)] <- 0
                     if(length(areas_selection_temp)>0)
                     {
                       #
@@ -318,52 +314,52 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       next
                     if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
                       next
-                    # max_row_count <- ceiling(10^6/ncol(tempDataFrame))
-                    # batch_count <- ceiling(nrow(tempDataFrame)/max_row_count)
-                    # for(h in 0:batch_count)
-                    # {
-                    # tempDataFrameBatch <- tempDataFrame[ (1+h*max_row_count):min((h+1)*max_row_count,nrow(tempDataFrame)), ]
-                    tempDataFrameBatch <- tempDataFrame
-                    header_areas <- tempDataFrameBatch[,1]
-                    tempDataFrameBatch <- tempDataFrameBatch[,-1]
-                    tempDataFrameBatch <- t(tempDataFrameBatch)
-                    tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                    colnames(tempDataFrameBatch) <- header_areas
-                    tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
-                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch), " rows.")
-                    if(nrow(tempDataFrameBatch)>1)
-                    {
-                      tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
-                      tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                      tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
-                      tempDataFrameBatch <- tempDataFrameBatch[,-1]
-                      cols <- (gsub(" ", "_", colnames(tempDataFrameBatch)))
-                      cols <- (gsub("-", "_", cols))
-                      cols <- (gsub(":", "_", cols))
-                      cols <- (gsub("/", "_", cols))
-                      cols <- (gsub("'", "_", cols))
-                      tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                      if(length(colnames(tempDataFrameBatch)) !=  length(cols))
-                        stop("ERROR: I'm stopping here data to associate are not correct, file a bug!")
-                      colnames(tempDataFrameBatch) <- cols
-                      g_start <- 2 + length(covariates)
-                      processed_items <- processed_items + ncol(tempDataFrameBatch) - g_start
-                      if(any(is.na(tempDataFrameBatch)))
-                      {
-                        log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
-                        # next
-                      }
-                      result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
-                        key  =  key, transformation =  transformation, dototal  =  dototal,
-                        session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
 
-                      results <- plyr::rbind.fill(results, result_temp_local_batch)
+                    chunk_size <- 10000  # Define a chunk size
+                    for (i in seq(1, nrow(tempDataFrame), by = chunk_size)) {
+                      {
+                        chunk_indices <- i:min(i + chunk_size - 1, nrow(tempDataFrame))
+                        tempDataFrameBatch <- as.data.frame(tempDataFrame)[chunk_indices,]
+                        rownames(tempDataFrameBatch) <- tempDataFrameBatch[,1]
+                        tempDataFrameBatch <- tempDataFrameBatch[,-1]
+                        tempDataFrameBatch <- t(tempDataFrameBatch)
+                        tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                        tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
+                        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Transposed pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch) -1 , " columns.")
+                        if(nrow(tempDataFrameBatch)>1)
+                        {
+                          tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
+                          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Merged pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch), " columns.")
+                          tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                          tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
+                          tempDataFrameBatch <- tempDataFrameBatch[,-1]
+                          cols <- (colnames(tempDataFrameBatch))
+                          tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                          if(length(colnames(tempDataFrameBatch)) !=  length(cols))
+                            stop("ERROR: I'm stopping here data to associate are not correct, file a bug!")
+                          colnames(tempDataFrameBatch) <- cols
+                          # two are the sample_id and the sample_group
+                          g_start <- 2 + length(covariates)
+                          processed_items <- processed_items + ncol(tempDataFrameBatch) - g_start
+                          if(any(is.na(tempDataFrameBatch)))
+                          {
+                            log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
+                            # next
+                          }
+                          result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
+                            key  =  key, transformation =  transformation, dototal  =  dototal,
+                            session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
+
+                          results <- plyr::rbind.fill(results, result_temp_local_batch)
+                        }
+                      }
                     }
                   }
                   else
                     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " File not found:", pivot_filename,".")
                   association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
-                  results <- subset(results, MARKER == key$MARKER)
+                  if(nrow(results)!=0)
+                    results <- subset(results, MARKER == key$MARKER)
                 }
 
               if (exists("old_results"))

@@ -1,16 +1,16 @@
-test_that("lesions_get",{
+test_that("lesions_get", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
   Sample_ID <- mySampleSheet[1,"Sample_ID"]
 
   semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90,
-    figures = "BOTH", markers = "DELTAS", areas = "GENE", bonferroni_threshold=5, inpute="median")
+    figures = "HYPER", markers = "DELTAS", areas = "GENE", bonferroni_threshold=5, inpute="median")
 
   if (!exists("signal_thresholds"))
   {
     signal_data <- semseeker:::inpute_missing_values(signal_data)
-    signal_thresholds <<- semseeker:::signal_range_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
   }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 

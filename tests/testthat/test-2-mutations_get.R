@@ -9,7 +9,7 @@ test_that(" semseeker:::mutations_get",{
   if (!exists("signal_thresholds"))
   {
     signal_data <- semseeker:::inpute_missing_values(signal_data)
-    signal_thresholds <<- semseeker:::signal_range_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
   }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 
@@ -22,10 +22,6 @@ test_that(" semseeker:::mutations_get",{
                )
 
   expect_false(length(mutations)==0)
-
-  ####################################################################################
-  # expect the count of mutations is not less than 80% of total added mutations
-  # expect_true(sum(mutations$MUTATIONS==1)> 0 )
 
   ####################################################################################
   semseeker:::close_env()

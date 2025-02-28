@@ -6,14 +6,18 @@ test_that("signal_range_values", {
 
   # test range calculation with missed values
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, iqrTimes = iqrTimes)
-  testthat::expect_error( semseeker:::signal_range_values(signal_data), "^ERROR:")
+  testthat::expect_error( semseeker:::signal_range_values(signal_data, batch_id), "^ERROR:")
 
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, iqrTimes = iqrTimes, inpute = "median")
   signal_data <- semseeker:::inpute_missing_values(signal_data)
 
   ####################################################################################
-  signal_thresholds <<- semseeker:::signal_range_values(signal_data)
+  signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
   testthat::expect_true(sum(colnames(signal_thresholds) %in% c("signal_inferior_thresholds","signal_superior_thresholds","signal_median_values","iqr","q1","q3"))==6)
+
+  ####################################################################################
+  # check thresholds file exists
+  testthat::expect_true(file.exists(file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"parquet")))
 
   ####################################################################################
   # test no probe are lost

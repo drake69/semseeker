@@ -3,14 +3,23 @@ inpute_missing_values <- function(signal_data){
   ssEnv <- get_session_info()
   # count number of na
   n_na <- sum(is.na(signal_data))
+
+  if (n_na==0)
+    return (signal_data)
+
   nrow_ex_ante <- nrow(signal_data)
+
+  chunk_size <- 10000  # Define a chunk size
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:length(seq(1, nrow(signal_data), by = chunk_size)))
+  else
+    progress_bar <- ""
 
   n_item = nrow(signal_data)*ncol(signal_data)/100
   log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/n_item, 2), " % of the data.")
   if (ssEnv$inpute=="median")
   {
     # Assuming signal_data is a matrix or data frame
-    chunk_size <- 100000  # Define a chunk size
     for (i in seq(1, nrow(signal_data), by = chunk_size)) {
       # Define the chunk
       chunk_indices <- i:min(i + chunk_size - 1, nrow(signal_data))
@@ -18,11 +27,14 @@ inpute_missing_values <- function(signal_data){
       row_medians <- apply(signal_data[chunk_indices, ], 1, stats::median, na.rm = TRUE)
       row_id <- row(signal_data[chunk_indices, ])[is.na(signal_data[chunk_indices, ])]
       signal_data[chunk_indices, ][is.na(signal_data[chunk_indices, ])] <- row_medians[row_id]
+      gc()
+      if(ssEnv$showprogress)
+        progress_bar(sprintf("Inputed: %s positions", stringr::str_pad(max(chunk_indices), 10, pad = " ")))
+
     }
   }
   else if (ssEnv$inpute=="mean")
   {
-    chunk_size <- 100000  # Define a chunk size
     for (i in seq(1, nrow(signal_data), by = chunk_size)) {
       # Define the chunk
       chunk_indices <- i:min(i + chunk_size - 1, nrow(signal_data))

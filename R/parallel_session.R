@@ -51,7 +51,7 @@ parallel_session <- function()
   # options(parallelly.fork.enable= FALSE)
   # options(future.globals.resolve = TRUE)
   # allow export of object of 32gb with future
-  options(future.globals.maxSize= 32 * 1024^3)
+  options(future.globals.maxSize= 64 * 1024^3)
 
 
   # check if future is registered

@@ -3,7 +3,7 @@ test_that("log-event", {
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
   ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90,
-    figures = "BOTH", markers = "DELTAS", areas = "GENE")
+    figures = "HYPER", markers = "DELTAS", areas = "GENE")
 
   file_name <- paste(as.character(Sys.info()["nodename"]),"_session_output.log", sep="")
 
@@ -32,7 +32,7 @@ test_that("log-event", {
   testthat::expect_true(nrow(session_log) == nrow(session_log_closed) - 2)
 
   # check after closing session log is preserved when not starting fresh
-  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures = "BOTH", markers = "DELTAS", areas = "GENE", start_fresh = FALSE)
+  ssEnv <- semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures = "HYPER", markers = "DELTAS", areas = "GENE", start_fresh = FALSE)
   session_log <- read.table(file.path(ssEnv$session_folder, file_name), sep = "\t", header = TRUE, quote = "")
   testthat::expect_true(nrow(session_log) > nrow(session_log_closed))
 

@@ -4,13 +4,10 @@ probe_features_get <- function(area_subarea)
 
   if(is.null(ssEnv$tech) | ssEnv$tech=="")
   {
-    
+
     # try to get from signal_data saved
-    signal_data <- readRDS(file.path(ssEnv$result_folderData, "1_signal_data.rds"))
-    rownames(signal_data) <- signal_data[,1]
-    signal_data <- signal_data[-1,1:2]
-    signal_data[,1] <- as.numeric(signal_data[,1])
-    signal_data[,2] <- as.numeric(signal_data[,2])
+    pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","")
+    signal_data <- polars::read_parquet(pivot_file_name)
     ssEnv <- get_meth_tech(signal_data)
     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Probes get should be called once defined which tech is used.")
     if(is.null(ssEnv$tech) | ssEnv$tech=="")
@@ -19,6 +16,11 @@ probe_features_get <- function(area_subarea)
       stop()
     }
   }
+
+
+  if(!grepl("_",area_subarea))
+    area_subarea <- paste(area_subarea,"_","WHOLE",sep="")
+
   probe_features <- semseeker::pp_tot
   probe_features <- probe_features[ probe_features[,ssEnv$tech], ]
   probe_features$END <- probe_features$START

@@ -10,21 +10,29 @@ test_that("analize_batch", {
   )
 
   ####################################################################################
-
-  semseeker:::get_meth_tech(signal_data)
-
+  tt <- semseeker:::get_meth_tech(signal_data)
   ####################################################################################
 
   batch_id <- 2
-  sp <- semseeker:::analyze_batch(signal_data =  signal_data,
+  if (!exists("signal_thresholds"))
+  {
+    signal_data <- semseeker:::inpute_missing_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
+  }
+  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
+
+  # ss <- mySampleSheet[mySampleSheet$Sample_Group!="Reference",]
+
+  sp <- semseeker:::analyze_batch(
+    signal_data =  signal_data,
     sample_sheet =  mySampleSheet,
     batch_id = batch_id
   )
 
-
-  sp$Sample_Group <- mySampleSheet$Sample_Group
-  testthat::expect_true(nrow(sp)==nrow(mySampleSheet))
-  testthat::expect_true(sum(na.omit(sp[,"MUTATIONS_BOTH"])>0)>0)
+  # sp$Sample_Group <- mySampleSheet[mySampleSheet$Sample_Group!="Reference","Sample_Group"]
+  testthat::expect_true(all(mySampleSheet$Sample_ID %in% sp$Sample_ID))
+  # testthat::expect_true(nrow(sp)==nrow(mySampleSheet))
+  testthat::expect_true(sum(na.omit(sp[,"MUTATIONS_HYPER"])>0)>0)
 
   ####################################################################################
   semseeker:::close_env()

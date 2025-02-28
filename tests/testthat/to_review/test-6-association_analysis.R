@@ -5,7 +5,9 @@ test_that("association_analysis", {
 
   ####################################################################################
 
-  semseeker:::semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,parallel_strategy=parallel_strategy, areas=c("PROBE","CHR","GENE"), start_fresh = TRUE, showprogress=showprogress, verbosity=verbosity)
+  semseeker:::semseeker(sample_sheet =  mySampleSheet,signal_data =  signal_data,result_folder = tempFolder,
+    parallel_strategy=parallel_strategy, areas=c("PROBE","CHR","GENE"), start_fresh = TRUE,
+    showprogress=showprogress, verbosity=verbosity)
 
   ####################################################################################
 
@@ -16,8 +18,10 @@ test_that("association_analysis", {
     "transformation"="",
     "depth_analysis"=3,
     "filter_p_value" = FALSE)
-  semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",markers=markers, areas="GENE", subareas=c("WHOLE"))
-  res <- get_results_inference(inference_details =  inference_details, marker =  markers[1], pvalue = 1)
+  semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder,
+    parallel_strategy=parallel_strategy,figures="HYPER",markers=markers, areas="GENE", subareas=c("WHOLE"))
+
+  res <- semseeker:::get_results_inference(inference_details =  inference_details, marker =  markers[1], pvalue = 1)
   testthat::expect_true(nrow(res)>0)
 
   ####################################################################################
@@ -30,7 +34,7 @@ test_that("association_analysis", {
     "depth_analysis"=3,
     "filter_p_value" = FALSE)
 
-  semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",markers=markers, areas="GENE", subareas=c("WHOLE"))
+  semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",markers=markers, areas="GENE", subareas=c("WHOLE"))
   res <- get_results_inference(inference_details =  inference_details, marker =  markers[1], pvalue = 1)
   testthat::expect_true(nrow(res)>0)
 
@@ -44,7 +48,7 @@ test_that("association_analysis", {
   #                                  "depth_analysis"=3,
   #                                  "filter_p_value" = FALSE)
   #
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",markers=markers, areas="GENE", subareas="WHOLE", areas_selection="1:10")
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",markers=markers, areas="GENE", subareas="WHOLE", areas_selection="1:10")
   # res <- get_results_inference(inference_details =  inference_details, marker =  markers[1], pvalue = 1)
   # testthat::expect_true(nrow(res)>0)
   #
@@ -57,7 +61,7 @@ test_that("association_analysis", {
   #                                  "transformation"="scale",
   #                                  "depth_analysis"=3,
   #                                  "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH",  markers=markers,areas_selection="11:20")
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER",  markers=markers,areas_selection="11:20")
   #
   # localFileRes <- get_results_inference(inference_details =  inference_details, marker =  markers[1], pvalue = 1, area="PROBE")
   # testthat::expect_true(nrow(localFileRes)>0)
@@ -70,7 +74,7 @@ test_that("association_analysis", {
   # ####################################################################################
   #
   # # inference_details,result_folder, maxResources, parallel_strategy
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH",
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER",
   #   markers=markers)
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
@@ -90,7 +94,7 @@ test_that("association_analysis", {
   #                                  "depth_analysis"=3,
   #                                  "filter_p_value" = FALSE)
   # # inference_details,result_folder, maxResources, parallel_strategy
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", markers=markers,
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", markers=markers,
   #   areas="PROBE")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
@@ -111,7 +115,7 @@ test_that("association_analysis", {
   # #
   # # # inference_details,result_folder, maxResources, parallel_strategy
   # # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,
-  # #   figures="BOTH", markers=markers)
+  # #   figures="HYPER", markers=markers)
   # #
   # # fileToRead <- semseeker:::file_path_build(inferenceFolder, "3_Phenotest_scale_quantreg-permutation_0.5_Covariates1_Covariates2", extension = "csv")
   # # localFileRes <- read.table(fileToRead, sep=";")
@@ -125,7 +129,7 @@ test_that("association_analysis", {
   #                                  "transformation"="scale",
   #                                  "depth_analysis"=3,
   #                                  "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", markers=markers)
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", markers=markers)
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
   # testthat::expect_true(nrow(localFileRes)>0)
@@ -141,7 +145,7 @@ test_that("association_analysis", {
   #   "transformation"="scale",
   #   "depth_analysis"=3,
   #   "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", markers=markers)
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", markers=markers)
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
   # testthat::expect_true(nrow(localFileRes)>0)
@@ -158,7 +162,7 @@ test_that("association_analysis", {
   #                                  "transformation"="scale",
   #                                  "depth_analysis"=3,
   #                                  "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", markers=markers, areas="CHR")
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", markers=markers, areas="CHR")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
   # testthat::expect_true(nrow(localFileRes)>0)
@@ -174,7 +178,7 @@ test_that("association_analysis", {
   #                                  "transformation"="log",
   #                                  "depth_analysis"=1,
   #                                  "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="BOTH", markers=markers, areas="PROBE", areas_selection="1:10")
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy, figures="HYPER", markers=markers, areas="PROBE", areas_selection="1:10")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
   # testthat::expect_true(nrow(localFileRes)>0)
@@ -328,7 +332,7 @@ test_that("association_analysis", {
   #   "transformation"="",
   #   "depth_analysis"=3,
   #   "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",
   #   markers=markers, areas="GENE")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
@@ -345,7 +349,7 @@ test_that("association_analysis", {
   #   "transformation"="",
   #   "depth_analysis"=3,
   #   "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",
   #   markers=markers, areas="GENE")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
@@ -362,7 +366,7 @@ test_that("association_analysis", {
   #     "transformation"="scale",
   #     "depth_analysis"=2,
   #     "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",
   #   markers=markers, areas="GENE")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
@@ -379,7 +383,7 @@ test_that("association_analysis", {
   #     "transformation"="scale",
   #     "depth_analysis"=2,
   #     "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",
   #   markers=markers, areas="GENE")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
@@ -396,7 +400,7 @@ test_that("association_analysis", {
   #     "transformation"="scale",
   #     "depth_analysis"=2,
   #     "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",
   #   markers=markers, areas="GENE")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])
@@ -413,7 +417,7 @@ test_that("association_analysis", {
   #     "transformation"="scale",
   #     "depth_analysis"=2,
   #     "filter_p_value" = FALSE)
-  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="BOTH",
+  # semseeker:::association_analysis(inference_details = inference_details, result_folder = tempFolder, parallel_strategy=parallel_strategy,figures="HYPER",
   #   markers=markers, areas="GENE")
   #
   # localFileRes <- get_results_inference(inference_details = inference_details,markers[1])

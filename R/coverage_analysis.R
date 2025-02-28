@@ -5,6 +5,7 @@ coverage_analysis <- function(signal_data)
   # probes_prefix <- "PROBES_CHR_"
   ssEnv <- get_session_info()
 
+
   keys <- ssEnv$keys_areas_subareas
   for ( k in 1:nrow(keys))
   {
@@ -12,6 +13,13 @@ coverage_analysis <- function(signal_data)
     subarea <- as.character(keys[k,"SUBAREA"])
     area <-  as.character(keys[k,"AREA"])
     area_subarea <- as.character(keys[k,"COMBINED"])
+
+    if(area=="POSITION")
+      next
+
+    if(!grepl("_",area_subarea))
+      area_subarea <- paste(area_subarea,"_","WHOLE",sep="")
+
     # log_event(area,"\n")
     if(exists("covered_count"))
       rm(covered_count)
@@ -91,14 +99,17 @@ coverage_analysis <- function(signal_data)
       ggplot2::labs(fill  = "Percentage\nover\neach\narea") +
       ggplot2::scale_y_continuous(breaks = seq(0,100, by=5))
 
-    ggplot2::ggsave(
-      filename,
-      plot = ggp,
-      # scale = 1,
-      # width = 1240,
-      # height = 1240,
-      # units = c("px"),
-      dpi = as.numeric(ssEnv$plot_resolution_ppi)
+    invisible
+    (
+      ggplot2::ggsave(
+        filename,
+        plot = ggp,
+        # scale = 1,
+        # width = 1240,
+        # height = 1240,
+        # units = c("px"),
+        dpi = as.numeric(ssEnv$plot_resolution_ppi)
+      )
     )
   }
 
@@ -135,14 +146,16 @@ coverage_analysis <- function(signal_data)
       ggplot2::geom_text(data = h_total, size = 3, ggplot2::aes(label = .data$AREA_PERC)) +
       ggplot2::geom_text(data = v_total, size = 3, ggplot2::aes(label = .data$AREA_PERC))
 
-    ggplot2::ggsave(
-      filename,
-      plot = ggp,
-      # scale = 1,
-      # width = 1240,
-      # height = 1240,
-      # units = c("px"),
-      dpi = as.numeric(ssEnv$plot_resolution_ppi)
+    invisible(
+      ggplot2::ggsave(
+        filename,
+        plot = ggp,
+        # scale = 1,
+        # width = 1240,
+        # height = 1240,
+        # units = c("px"),
+        dpi = as.numeric(ssEnv$plot_resolution_ppi)
+      )
     )
 
   }

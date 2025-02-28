@@ -2,7 +2,7 @@ test_that("get-meth_tech", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures = "BOTH", markers = "DELTAS", areas = "GENE")
+  semseeker:::init_env(result_folder =  tempFolder, parallel_strategy = parallel_strategy, maxResources = 90, figures = "HYPER", markers = "DELTAS", areas = "GENE")
 
   probe_features <- semseeker::pp_tot
 

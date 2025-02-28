@@ -3,8 +3,6 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id, " of ", nrow(signal_data), " rows.")
 
   ssEnv <- get_session_info()
-
-  # #
   signal_data <- as.data.frame(signal_data)
   get_meth_tech(signal_data)
   coverage_analysis(signal_data = signal_data)
@@ -65,9 +63,8 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
 
   if(!ssEnv$signal_intrasample)
   {
-    populationControlRangeBetaValues <- as.data.frame(signal_range_values(referencePopulationMatrix))
-    # utils::write.table(x = gzfile(populationControlRangeBetaValues), file = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds","csv"), add_gz = TRUE), sep=";")
-    fst::write.fst(x = populationControlRangeBetaValues, path = file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"fst"), compress = 100)
+    populationControlRangeBetaValues <- as.data.frame(signal_range_values(referencePopulationMatrix,batch_id))
+    gc()
   }
   else
   {
@@ -82,7 +79,7 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   resultSampleSheet <- data.frame()
   i <- 0
   variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "analyze_population",
-    "populationControlRangeBetaValues", "PROBES", "create_multiple_bed","probe_features")
+    "populationControlRangeBetaValues", "PROBES","probe_features")
   # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
   for (i in 1:length(ssEnv$keys_sample_groups[,1]))
   {
@@ -102,26 +99,22 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
         signal_thresholds = populationControlRangeBetaValues,
         probe_features = probe_features
       )
-
+      gc()
       resultPopulation <- as.data.frame(resultPopulation)
       resultPopulation$Sample_Group <- sample_group
-      create_multiple_bed(resultPopulation)
 
-      create_position_pivots(resultPopulation,ssEnv$keys_markers_figures_default)
 
       resultSampleSheet <- plyr::rbind.fill(resultSampleSheet, resultPopulation)
     }
   }
 
 
+  create_position_pivots(resultSampleSheet,ssEnv$keys_markers_figures)
+
   resultSampleSheet[is.na(resultSampleSheet)] <- 0
   colResult <- colnames(resultSampleSheet)
 
-  resultSampleSheet <- deltaq_get(resultSampleSheet)
-  resultSampleSheet <- deltarq_get(resultSampleSheet)
-
-  resultSampleSheet <- deltap_get(resultSampleSheet)
-  resultSampleSheet <- deltarp_get(resultSampleSheet)
+  resultSampleSheet <- deltaX_get(resultSampleSheet)
 
   sample_sheet <- as.data.frame(sample_sheet)
   resultSampleSheet <- as.data.frame(resultSampleSheet)

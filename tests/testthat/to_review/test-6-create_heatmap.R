@@ -13,7 +13,7 @@ test_that("create_heatmap", {
   if (!exists("signal_thresholds"))
   {
     signal_data <- semseeker:::inpute_missing_values(signal_data)
-    signal_thresholds <<- semseeker:::signal_range_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
   }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 
@@ -33,10 +33,10 @@ test_that("create_heatmap", {
   semseeker:::create_excel_pivot()
   semseeker:::create_heatmap()
 
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/CHR/Control_Vs_Case_CHR_MUTATIONS_BOTH.png")))
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE_AREA/Control_Vs_Case_GENE_AREA_MUTATIONS_BOTH.png")))
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE_AREA/Control_Vs_Case_GENE_AREA_DELTAS_BOTH.png")))
-  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE/Control_Vs_Case_GENE_DELTAS_BOTH.png")))
+  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/CHR/Control_Vs_Case_CHR_MUTATIONS_HYPER.png")))
+  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE_AREA/Control_Vs_Case_GENE_AREA_MUTATIONS_HYPER.png")))
+  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE_AREA/Control_Vs_Case_GENE_AREA_DELTAS_HYPER.png")))
+  testthat::expect_true(file.exists(file.path(ssEnv$result_folderChart,"/GENE/Control_Vs_Case_GENE_DELTAS_HYPER.png")))
 
   # unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()

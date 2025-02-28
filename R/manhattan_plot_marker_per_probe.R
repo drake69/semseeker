@@ -25,9 +25,12 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
 
-
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE,
-    figures="BOTH", areas="PROBE", ...)
+    figures=c("HYPER","HYPO"), areas="PROBE", ...)
+
+  study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+  annotate_position_pivots()
+
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, tech = tech)
   chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "MARKER_PER_PROBE")
 
@@ -56,14 +59,33 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     marker <- as.character(localKeys[k])
     if (any(subset(probes_stat, MARKER == marker)[,"VALUE"] ==""))
     {
-      pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
-      fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz = TRUE)
-      if (!file.exists(fname))
+      pivot_file_name_hyper <- pivot_file_name(marker,"HYPER","PROBE","")
+      pivot_file_name_hypo <- pivot_file_name(marker,"HYPO","PROBE","")
+      if (!file.exists(pivot_file_name_hyper) & !file.exists(pivot_file_name_hypo))
         tempKeys <- tempKeys[-k]
       else
       {
-        # get the row woth the max count of values
-        count_m <- utils::read.csv2(fname, sep=";", skip = 2, row.names = 1, dec=".")
+        browser()
+        pivot_hyper <- data.frame()
+        if(file.exists(pivot_file_name_hyper))
+          pivot_hyper <- readr::read_delim(pivot_file_name_hyper,
+            col_types = vroom::cols(
+              .default = vroom::col_double(),
+              PROBE = vroom::col_character()
+            ),
+            show_col_types=FALSE, progress=FALSE)
+        pivot_hypo <- data.frame()
+        if(file.exists(pivot_file_name_hypo))
+          pivot_hypo <- readr::read_delim(pivot_file_name_hypo,
+            col_types = vroom::cols(
+              .default = vroom::col_double(),
+              PROBE = vroom::col_character()
+            ),
+            show_col_types=FALSE, progress=FALSE)
+        # get the row with the max count of values
+        count_m <- plyr::rbind.fill(pivot_hyper, pivot_hypo)
+        count_m[is.na(count_m)] <- 0
+
         probes_stat[probes_stat$MARKER == marker  & probes_stat$METRIC== "COUNT","VALUE"] <- nrow(count_m) * ncol(count_m)
         # count per each row the number of no zero values
         markers_sum <- apply(count_m, 1, sum)
@@ -112,17 +134,20 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
   pivot_subfolder <- dir_check_and_create(result_folderPivot,"SIGNAL")
   # signal_data <- readRDS(file_path_build( ssEnv$result_folderData, "1_signal_data","rds"))
+  fname <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","")
+  # fname <- file_path_build( pivot_subfolder ,c("SIGNAL", "MEAN", "PROBE",""),"csv", add_gz=TRUE)
+  browser()
+  # data_name <- utils::read.csv2(fname, sep  =  ";", nrows = 1)
+  # signal_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
+  # # remove column X1
+  # signal_data <- signal_data[, !grepl("X1", colnames(signal_data))]
+  # # rename column SAMPLE_GROUP as SAMPLEID
+  # colnames(signal_data)[colnames(signal_data)=="SAMPLE_GROUP"] <- "SAMPLEID"
+  # colnames(signal_data) <- colnames(data_name)
+  signal_data <- polars::read_parquet(fname)
 
-  fname <- file_path_build( pivot_subfolder ,c("SIGNAL", "MEAN", "PROBE","PROBE"),"csv", add_gz=TRUE)
-  data_name <- utils::read.csv2(fname, sep  =  ";", nrows = 1)
-  signal_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
-  # remove column X1
-  signal_data <- signal_data[, !grepl("X1", colnames(signal_data))]
-  # rename column SAMPLE_GROUP as SAMPLEID
-  colnames(signal_data)[colnames(signal_data)=="SAMPLE_GROUP"] <- "SAMPLEID"
-  colnames(signal_data) <- colnames(data_name)
-
-  threshold_data <- fst::read_fst(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))
+  # threshold_data <- fst::read_fst(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))
+  threshold_data <- polars::read_parquet(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","parquet"))
 
   colnames(signal_data) <- gsub("-","_", colnames(signal_data))
   if(max_sample!=0)
@@ -270,9 +295,6 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
 
     }
   }
-
-
-
 }
 
 

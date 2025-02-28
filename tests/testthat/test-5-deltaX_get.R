@@ -1,16 +1,53 @@
-test_that("semeeker", {
+test_that("deltaX_get", {
 
   tempFolder <- tempFolders[1]
-  unlink(tempFolder,recursive = TRUE)
+  unlink(tempFolder, recursive = TRUE)
+  # message(tempFolder)
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, showprogress=showprogress, verbosity=verbosity)
+  ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy,
+    bonferroni_threshold = bonferroni_threshold,
+    inpute="median", start_fresh=TRUE)
 
   ####################################################################################
 
-  semseeker:::semseeker( sample_sheet =  mySampleSheet ,signal_data =  signal_data,
-    result_folder = tempFolder, parallel_strategy = parallel_strategy)
+  tt <- semseeker:::get_meth_tech(signal_data)
 
-  keys <- subset(ssEnv$keys_areas_subareas_markers_figures)
+  ####################################################################################
+  sliding_window_size <- 11
+  bonferroni_threshold <- 0.05
+
+  if (!exists("signal_thresholds"))
+  {
+    signal_data <- semseeker:::inpute_missing_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
+  }
+  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
+
+  keys <- ssEnv$keys_markers_figures_default
+  sp <- semseeker:::analyze_population(signal_data=signal_data,
+    signal_thresholds = signal_thresholds,
+    sample_sheet = mySampleSheet[mySampleSheet$Sample_Group == "Case",],
+    probe_features = probe_features
+  )
+  semseeker:::create_position_pivots(mySampleSheet[mySampleSheet$Sample_Group == "Case",],keys)
+
+  sp <- semseeker:::analyze_population(signal_data=signal_data,
+    signal_thresholds = signal_thresholds,
+    sample_sheet = mySampleSheet[mySampleSheet$Sample_Group == "Control",],
+    probe_features = probe_features
+  )
+
+  semseeker:::create_position_pivots(mySampleSheet[mySampleSheet$Sample_Group == "Control",],keys)
+
+  mySampleSheet <- semseeker:::deltaX_get(mySampleSheet[mySampleSheet$Sample_Group != "Reference",])
+
+  # verify all DELTAX (except DELTAS and DELTAR ) are coherent with MUTATIONS
+  keys <- subset(ssEnv$keys_areas_subareas_markers_figures, AREA == "POSITION")
+  keys <- subset(keys, MARKER != "DELTAS")
+  keys <- subset(keys, MARKER != "DELTAR")
+  keys <- subset(keys, MARKER != "LESIONS")
+  keys <- subset(keys, MARKER != "SIGNAL")
+
 
   for (k in 1:nrow(keys))
   {
@@ -40,10 +77,15 @@ test_that("semeeker", {
     testthat::expect_true(nrow(pivot)<nprobes)
     testthat::expect_true(nrow(pivot)>0)
 
+    # sort samplesheet by Sample_ID
+    mySampleSheet <- mySampleSheet[order(mySampleSheet$Sample_ID),]
+    # sort colnames by Sample_ID
     pivot <- pivot[,order(colnames(pivot))]
     mutations_pivot <- mutations_pivot[,order(colnames(mutations_pivot))]
 
     testthat::expect_true(all(colnames(pivot) %in% (mySampleSheet$Sample_ID)))
+    # wit few positions some sample mutation could be missing
+    # testthat::expect_true(all(colnames(pivot) == unique(mySampleSheet$Sample_ID)))
     testthat::expect_true(all(colnames(pivot) == colnames(mutations_pivot)))
 
     testthat::expect_true(ncol(pivot)==ncol(mutations_pivot))
@@ -77,8 +119,7 @@ test_that("semeeker", {
 
   }
 
-  ####################################################################################
-  unlink(tempFolder,recursive = TRUE)
   semseeker:::close_env()
+  unlink(tempFolder, recursive = TRUE)
 })
 

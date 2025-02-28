@@ -5,7 +5,7 @@
 #' @return methylation matrix as normalized distribution
 #' @importFrom doRNG %dorng%
 
-signal_range_values <- function(populationMatrix) {
+signal_range_values <- function(populationMatrix, batch_id) {
 
 
   ssEnv <- get_session_info()
@@ -34,8 +34,6 @@ signal_range_values <- function(populationMatrix) {
   # signal_inferior_thresholds[signal_inferior_thresholds<min_values] <- min_values
 
   row.names(populationMatrix) <- rownames(populationMatrix)
-  if(ssEnv$showprogress)
-    progress_bar <- progressr::progressor(along = 1:(nrow(populationMatrix)/10000))
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting signal thresholds calculation.")
   export = c("progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","populationMatrix","ssEnv")
@@ -79,8 +77,10 @@ signal_range_values <- function(populationMatrix) {
 
 
   {
-    chunk_size <- 50000  # Define a chunk sizex
+    chunk_size <- 10000  # Define a chunk size
     result <- data.frame()
+    if(ssEnv$showprogress)
+      progress_bar <- progressr::progressor(along = seq(1, nrow(populationMatrix), by = chunk_size))
     for (i in seq(1, nrow(populationMatrix), by = chunk_size)) {
 
       chunk_indices <- i:min(i + chunk_size - 1, nrow(populationMatrix))
@@ -109,9 +109,10 @@ signal_range_values <- function(populationMatrix) {
       }, future.chunk.size = 1000)
       #
       result <- rbind(result, as.data.frame(t(th)))
+      gc()
       rm(th)
       if(ssEnv$showprogress)
-        progress_bar(sprintf("Done %s rows.",i))
+        progress_bar(sprintf("Done %s positions",i))
     }
   }
 
@@ -120,6 +121,8 @@ signal_range_values <- function(populationMatrix) {
   result$PROBE <- row.names(populationMatrix)
   if(nrow(result) != nrow(populationMatrix))
     stop("I'M STOPPING HERE, No thresholds defined for the population.")
+
+  polars::as_polars_df(result)$write_parquet(file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"parquet"))
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Thresholds defined for: ", nrow(result), " probe_features.")
   gc()
   return(result)

@@ -3,10 +3,9 @@
 # populationMatrix <- as.data.frame(matrix(runif(num_rows * num_cols), nrow = num_rows, ncol = num_cols))
 # library(future)
 # options(future.globals.maxSize = 10 * 1024^3)
+Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES')
 
 rm(list = ls())
-# devtools::document()
-
 loadNamespace("future")
 loadNamespace("stats")
 if ( 1==2)
@@ -130,9 +129,12 @@ parallel_strategy <<- "multicore"
 markers <<- c("MUTATIONS","DELTAQ","DELTARQ","DELTAP","DELTARP","LESIONS")
 
 signal_data <- readRDS("~/Documents/Dati_Lavoro/beckwith-wiedemann/raw/GSE95486/beta.rds")
+signal_data <- as.data.frame(signal_data)
+signal_data <- signal_data[1:1000,]
+# count rows with all missing values
+nrow_missed <- sum(apply(signal_data, 1, function(x) all(is.na(x))))
 probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")
-nrow_missed <<- 3
 nprobes <<- nrow(signal_data) - nrow_missed
 nsamples <<- ncol(signal_data)
 mySampleSheet <- read.csv2("~/Documents/Dati_Lavoro/beckwith-wiedemann/raw/GSE95486/final_samplesheet.csv")
@@ -146,7 +148,7 @@ signal_data_batch <<- list(signal_data, signal_data, signal_data)
 # TODO
 # recover session stored
 #
-tmp <- tempdir()
+tmp <- normalizePath(tempdir())
 tempFolders <<- paste(tmp,"/semseeker/",stringi::stri_rand_strings(50, 7, pattern = "[A-Za-z0-9]"),sep="")
 
 

@@ -24,16 +24,14 @@
 #' @importFrom doRNG %dorng%
 #'
 semseeker <- function(sample_sheet,
-                      signal_data,
-                      result_folder,
-                      ... ) {
+  signal_data,
+  result_folder,
+  ... ) {
 
   init_env( result_folder= result_folder, ...)
 
   ssEnv <- get_session_info()
   log_event("BANNER:", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will search MARKERS for project \n in ", ssEnv$result_folderData)
-
-  sliding_window_size <- 11
 
   if(is.data.frame(sample_sheet) & is.data.frame(signal_data))
   {
@@ -84,36 +82,11 @@ semseeker <- function(sample_sheet,
     utils::write.csv2(sample_sheet, file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), row.names = F)
   }
 
+  annotate_position_pivots()
+
   sample_sheet <- sample_sheet_result
   utils::write.csv2(sample_sheet, file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), row.names = F)
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Saving Sample Sheet with Results! ")
-
-  if(length(sample_sheet$Sample_Group=="Reference")>0)
-    sample_groups <- c("Reference","Control","Case")
-  else
-    sample_groups <- c("Control","Case")
-
-  # seems to change the ssEnv reducing the items TODO
-  # ssEnv <- get_session_info()
-  # ssEnv$keys_sample_groups <- data.frame("SAMPLE_GROUP"=sample_groups)
-  # update_session_info(ssEnv)
-
-  # 
-  # 
-
- log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "Starting inference Analysis.")
-  # inferenceAnalysis(ssEnv$result_folderData = ssEnv$result_folderData, ssEnv$session_folder= ssEnv$session_folder, inferenceDetails)
-  # future::autoStopCluster(computationCluster)
-  # doFuture::stopImplicitCluster()
-
-  # geneontology_analysis_webgestalt(ssEnv$result_folderData = ssEnv$result_folderData, fileName = fileName)
-  # euristic_analysis_webgestalt(ssEnv$result_folderData = ssEnv$result_folderData)
-
-  # if(length(signal_data)>1)
-  #   batch_correlation_check(ssEnv)
-
-  # marker_quantization_metric()
-  # marker_fit_to_theoretical_distribution()
+  log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), " Saving Sample Sheet with Results! ")
 
   close_env()
 }

@@ -33,5 +33,12 @@ dir_check_and_create <- function  (baseFolder, subFolders)
         dir.create(subF, recursive = FALSE)
     }
   }
-  return(file.path(as.character(subF)))
+
+
+  res <- file.path(as.character(subF))
+
+  # transform to absolute path
+  res <- file.path(normalizePath(res))
+
+  return(res)
 }

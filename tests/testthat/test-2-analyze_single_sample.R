@@ -12,7 +12,7 @@ test_that("analyze_single_sample",{
   if (!exists("signal_thresholds"))
   {
     signal_data <- semseeker:::inpute_missing_values(signal_data)
-    signal_thresholds <<- semseeker:::signal_range_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
   }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 

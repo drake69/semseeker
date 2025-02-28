@@ -7,11 +7,13 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
 {
 
   to_export <- ""
-  # result_temp <- foreach::foreach(k = 1:nkeys, .combine =  plyr::rbind.fill) %dorng%
-  # if(1!=1)
   result_folder <- paste0(base_folder,"/", study, folder_key, qs[1], sep="")
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy,
-    start_fresh = FALSE, areas=c("PROBE"), subareas=c("WHOLE"), ...)
+    start_fresh = FALSE, areas=c("POSITION"), subareas=c(""), markers=c("DELTAS","DELTAR"), figures=c("HYPO","HYPER"), ...)
+
+  study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+  create_position_pivots(study_summary,ssEnv$keys_areas_subareas_markers_figures)
+
   nkeys <- 2*2*length(qs) + 1
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:(nkeys))
@@ -35,6 +37,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   {
     res_temp <- data.frame("ORIGINAL_MARKER"="DELTAS")
     original <- load_deltax("DELTAS")
+    log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y"), "Processing key: MUTATIONS")
     res_temp$MARKER <- "MUTATIONS"
     quantized <- rep(1, length(original))
     mdl_perf <- model_performance(original, quantized,c(),c())
@@ -240,45 +243,33 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
 }
 
 
-load_deltax <- function(original_marker){
+load_deltax <- function(source_marker){
 
-  #
   ssEnv <- get_session_info()
-  sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), header = TRUE, sep=";")
-  Sample_Group=as.data.frame(unique(sample_sheet$Sample_Group))
-  colnames(Sample_Group) <- "SAMPLE_GROUP"
+  area_position <- "POSITION"
+  subarea_position <- ""
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " loading: ", source_marker)
 
-  # must use keys_markers_figures_default because the selected marker could exclude deltas which is basic for deltax
-  localKeys <- reshape::expand.grid.df(as.data.frame(ssEnv$keys_markers_figures_default),Sample_Group)
-  localKeys <- subset(localKeys, localKeys$MARKER==original_marker)
-  localKeys <- subset(localKeys, localKeys$FIGURE!="BOTHSUM")
-  localKeys <- subset(localKeys, localKeys$FIGURE!="BOTH")
-  localKeys$EXT <- "fst"
+  pivot_file_nameparquet <- pivot_file_name_parquet(source_marker,"HYPER",area_position,subarea_position)
+  pivot_hyper <- polars::pl$scan_parquet(pivot_file_nameparquet)
+  positions_hyper <- pivot_hyper$select(pivot_hyper$columns[1:3])$collect()$to_data_frame()
+  pivot_hyper <- pivot_hyper$drop(pivot_hyper$columns[1:3])
+  vector_shaped_hyper <- as.vector(as.matrix(pivot_hyper$collect()$to_data_frame()))
+  rm(pivot_hyper)
+  vector_shaped_hyper[vector_shaped_hyper==0] <- NA
 
-  progress_bar <- ""
-  if(ssEnv$showprogress)
-    progress_bar <- progressr::progressor(along = 1:nrow(localKeys))
+  pivot_file_nameparquet <- pivot_file_name_parquet(source_marker,"HYPO",area_position,subarea_position)
+  pivot_hypo <- polars::pl$scan_parquet(pivot_file_nameparquet)
+  positions_hypo <- pivot_hypo$select(pivot_hypo$columns[1:3])$collect()$to_data_frame()
+  pivot_hypo <- pivot_hypo$drop(pivot_hypo$columns[1:3])
+  vector_shaped_hypo <- as.vector(as.matrix(pivot_hypo$collect()$to_data_frame()))
+  rm(pivot_hypo)
+  vector_shaped_hypo[vector_shaped_hypo==0] <- NA
 
-  for(i in 1:nrow(localKeys))
-  {
-    key <- localKeys[i,]
-    tempresult_folderData <- dir_check_and_create(ssEnv$result_folderData,c(as.character(key$SAMPLE_GROUP) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))
-    fileToRead <- file_path_build(tempresult_folderData, c("MULTIPLE", as.character(key$MARKER), as.character(key$FIGURE)), as.character(key$EXT))
-    if(file.exists(fileToRead))
-    {
-      deltax_temp <- fst::read.fst(fileToRead, as.data.table = T)
-      colnames(deltax_temp) <- c("CHR","START","END","VALUE","SAMPLEID")
-      deltax_temp$FIGURE <- key$FIGURE
-      deltax_temp$SAMPLE_GROUP <- key$SAMPLE_GROUP
-      if(exists("deltax"))
-        deltax <- rbind(deltax, deltax_temp)
-      else
-        deltax <- deltax_temp
-    }
-    if(ssEnv$showprogress)
-      progress_bar(sprintf("Collecting bed files."))
-  }
-  return(deltax[,"VALUE"])
+  vector_shaped <- c(vector_shaped_hyper,vector_shaped_hypo)
+  vector_shaped <- vector_shaped[!is.na(vector_shaped)]
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " loaded ", source_marker)
+  return(vector_shaped)
 }
 
 jsd_calc <- function(original, quantized){

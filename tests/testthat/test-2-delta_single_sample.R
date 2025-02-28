@@ -8,13 +8,11 @@ test_that("delta_single_sample",{
 
   tt <- semseeker:::get_meth_tech(signal_data)
 
-  ####################################################################################
-  if (nrow(signal_data)!=nprobes)
-    signal_data <- semseeker:::inpute_missing_values(signal_data)
-
   if (!exists("signal_thresholds"))
-    signal_thresholds <<- semseeker:::signal_range_values(signal_data)
-
+  {
+    signal_data <- semseeker:::inpute_missing_values(signal_data)
+    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
+  }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 
   dss <- delta_single_sample(
@@ -27,8 +25,8 @@ test_that("delta_single_sample",{
   )
 
   result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
-  outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_BOTH"))
-  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTH"), "bedgraph", add_gz = TRUE)
+  outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_HYPER"))
+  fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","HYPER"), "bedgraph", add_gz = TRUE)
   testthat::expect_true(file.exists(fileName))
 
   # message("fileName: ", fileName)
@@ -39,8 +37,8 @@ test_that("delta_single_sample",{
 
   ####################################################################################
   # result_folderData  <-  semseeker:::dir_check_and_create(tempFolder, "Data")
-  # outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_BOTHS"))
-  # fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","BOTHS"), "bedgraph", add_gz = TRUE)
+  # outputFolder <- semseeker:::dir_check_and_create(result_folderData,c("Control","DELTAS_HYPERS"))
+  # fileName <- semseeker:::file_path_build(outputFolder,c(mySampleSheet[1,c("Sample_ID")],"DELTAS","HYPERS"), "bedgraph", add_gz = TRUE)
   # testthat::expect_true(file.exists(fileName))
   #
   # # message("fileName: ", fileName)

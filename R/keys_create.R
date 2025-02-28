@@ -11,7 +11,7 @@ keys_create <- function(ssEnv, arguments)
 
 
   keys_markers_default_discrete$Q <- c(1,NA,ssEnv$DELTAQ_Q,ssEnv$DELTARQ_Q,ssEnv$DELTAP_B,ssEnv$DELTARP_B)
-  keys_markers_default_discrete$SOURCE <- c("DELTAS","DELTAS","DELTAS","DELTAR","DELTAS","DELTAR")
+  keys_markers_default_discrete$SOURCE <- c("DELTAS","MUTATIONS","DELTAS","DELTAR","DELTAS","DELTAR")
   keys_markers_default_discrete$SUFFIX <-  rep("",6)
   # keys_markers_default$SUFFIX <-  c("","","","", ssEnv$epiquantile ,"",ssEnv$epiquantile)
   keys_markers_default_discrete$EXT <-  c("bed","bed","bed","bed","bed","bed")
@@ -46,14 +46,14 @@ keys_create <- function(ssEnv, arguments)
   ssEnv$keys_markers_figures_default <- keys_markers_figures_default
 
   figures <- arguments[["figures"]]
-  missed_figures <- figures[!figures %in% keys_markers_figures_default$FIGURE]
-  arguments[["figures"]] <- missed_figures
+  unknown_figures <- figures[!figures %in% keys_markers_figures_default$FIGURE]
+  arguments[["figures"]] <- unknown_figures
   if (!is.null(figures))
     keys_markers_figures_default <- keys_markers_figures_default[keys_markers_figures_default$FIGURE %in% figures,]
 
   markers <- arguments[["markers"]]
-  missed_markers <- markers[!markers %in% keys_markers_figures_default$MARKER]
-  arguments[["markers"]] <- missed_markers
+  unknown_markers <- markers[!markers %in% keys_markers_figures_default$MARKER]
+  arguments[["markers"]] <- unknown_markers
   if (!is.null(markers))
     keys_markers_figures_default <- keys_markers_figures_default[keys_markers_figures_default$MARKER %in% markers,]
 
@@ -64,22 +64,23 @@ keys_create <- function(ssEnv, arguments)
 
   keys_gene_subareas_default <- data.frame("AREA"="GENE", "SUBAREA"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
   keys_island_subareas_default <- data.frame("AREA"="ISLAND","SUBAREA"=c("N_SHORE","S_SHORE","N_SHELF","S_SHELF", "WHOLE"))
-  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c("","DMR"))
+  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c(""))
   keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("","CYTOBAND"))
   keys_probe_subareas_default <- data.frame("AREA"="PROBE","SUBAREA"=c(""))
-  keys_probe_subareas_default <- data.frame("AREA"="POSITION","SUBAREA"=c(""))
+  keys_position_subareas_default <- data.frame("AREA"="POSITION","SUBAREA"=c(""))
 
-  keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default)
+  keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default, keys_position_subareas_default)
 
   areas <- arguments[["areas"]]
-  missed_areas <- areas[!areas %in% keys_areas_subareas_default$AREA]
-  arguments[["areas"]] <- missed_areas
+  unknown_areas <- areas[!areas %in% keys_areas_subareas_default$AREA]
+  arguments[["areas"]] <- unknown_areas
   if (!is.null(areas))
     keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$AREA %in% areas,]
 
   subareas <- arguments[["subareas"]]
-  missed_subareas <- subareas[!subareas %in% keys_areas_subareas_default$SUBAREA]
-  arguments[["subareas"]] <- missed_subareas
+  unknown_subareas <- subareas[!subareas %in% keys_areas_subareas_default$SUBAREA]
+  # could exist WHOLE associated to AREAS where exists empty SUBAREAS
+  arguments[["subareas"]] <- unknown_subareas[!(unknown_subareas %in% c("WHOLE"))]
   if (!is.null(subareas))
     keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$SUBAREA %in% subareas,]
 
