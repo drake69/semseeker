@@ -38,6 +38,7 @@ test_that("annotations", {
 
   semseeker:::annotate_position_pivots()
 
+  # reload keys some subareas may have been removed because not presente as positions
   keys <- subset(ssEnv$keys_areas_subareas_markers_figures, AREA != "POSITION")
 
   for (k in 1:nrow(keys))
@@ -52,6 +53,12 @@ test_that("annotations", {
     mutations_pivot_file_name_parquet <- semseeker:::pivot_file_name_parquet("MUTATIONS",figure,area,subarea)
     if(file.exists(mutations_pivot_file_name_parquet))
       mutations_pivot <- polars::pl$read_parquet(mutations_pivot_file_name_parquet)$to_data_frame()
+    else
+      next
+
+    mutations_position_pivot_file_name_parquet <- semseeker:::pivot_file_name_parquet("MUTATIONS",figure,"POSITION","")
+    if(file.exists(mutations_position_pivot_file_name_parquet))
+      mutations_position_pivot <- polars::pl$read_parquet(mutations_position_pivot_file_name_parquet)$to_data_frame()
     else
       next
 
@@ -70,6 +77,10 @@ test_that("annotations", {
 
     pivot <- pivot[,order(colnames(pivot))]
     mutations_pivot <- mutations_pivot[,order(colnames(mutations_pivot))]
+    mutations_position_pivot <- mutations_position_pivot[,order(colnames(mutations_position_pivot))]
+
+    testthat::expect_true(all(colnames(pivot) == colnames(mutations_position_pivot)))
+    testthat::expect_true(all(colnames(mutations_position_pivot) == colnames(mutations_pivot)))
 
     testthat::expect_true(all(colnames(pivot) %in% (mySampleSheet$Sample_ID)))
     testthat::expect_true(all(colnames(pivot) == colnames(mutations_pivot)))

@@ -1,11 +1,10 @@
-coverage_analysis <- function(signal_data)
+coverage_analysis <- function(observed_probes)
 {
   # probe_features <- PROBES_CHR_CHR
   # area <- c("CHR")
   # probes_prefix <- "PROBES_CHR_"
   ssEnv <- get_session_info()
-
-
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Started Coverage analysis.")
   keys <- ssEnv$keys_areas_subareas
   for ( k in 1:nrow(keys))
   {
@@ -31,7 +30,7 @@ coverage_analysis <- function(signal_data)
     total_count <- stats::aggregate(probe_features$PROBE, list(probe_features[, area_subarea]), FUN=length)
     colnames(total_count) <- c(as.character(area_subarea),"COUNT_TOTAL")
 
-    probe_filtered <- probe_features[ probe_features$PROBE %in% rownames(signal_data),]
+    probe_filtered <- probe_features[ probe_features$PROBE %in% observed_probes,]
     # if no probe is covered
     if (nrow(probe_filtered)>0)
     {
@@ -228,6 +227,7 @@ coverage_analysis <- function(signal_data)
   # tot_result <- subset(tot_result, SUBAREA!="CHR" & SUBAREA != "WHOLE")
   # # tot_result <- aggregate(tot_result$SUBAREA, list(tot_result$COUNT_TOTAL), FUN=length)
   # tot_result <- reshape2::dcast(data = tot_result, AREA + SUBAREA ~ COUNT_TOTAL, value.var = "COUNT_TOTAL", length)
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed Coverage analysis.")
 
   return(cov_result)
 }

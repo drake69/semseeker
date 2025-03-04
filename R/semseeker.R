@@ -65,21 +65,23 @@ semseeker <- function(sample_sheet,
     # browser()
     sample_sheet_local <- sample_sheet[[batch_id]]
     sample_sheet_local$Sample_ID <- name_cleaning(sample_sheet_local$Sample_ID)
-    utils::write.csv2(sample_sheet_local, file = file.path(ssEnv$result_folderData, paste(batch_id,"_sample_sheet_original.csv",sep="")), row.names = FALSE)
+    utils::write.csv2(sample_sheet_local, file = file_path_build(ssEnv$result_folderData, paste0(batch_id,"_sample_sheet_original")),"csv",FALSE)
     signal_intrasample <- TRUE
     signal_data_local <- signal_data[[batch_id]]
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id, " of ", nrow(signal_data_local), " rows and ", ncol(signal_data_local), " samples.")
     colnames(signal_data_local) <- name_cleaning(colnames(signal_data_local))
     signal_data_local <- signal_data_local[rownames(signal_data_local) %in% probes_to_preserve,]
     signal_data_local <- substitute_infinite(signal_data_local)
+    gc()
     signal_data_local <- inpute_missing_values(signal_data_local)
+    gc()
     signal_data_local <- stats::na.omit(signal_data_local)
     sample_sheet_local <- analyze_batch(signal_data_local, sample_sheet_local, batch_id)
     if(exists("sample_sheet_result"))
       sample_sheet_result <- plyr::rbind.fill(sample_sheet_result, sample_sheet_local)
     else
       sample_sheet_result <- sample_sheet_local
-    utils::write.csv2(sample_sheet, file.path(ssEnv$result_folderData , "sample_sheet_result.csv"), row.names = F)
+    utils::write.csv2(sample_sheet, file_path_build(ssEnv$result_folderData , "sample_sheet_result","csv",FALSE))
   }
 
   annotate_position_pivots()

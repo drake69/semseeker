@@ -148,6 +148,7 @@ keys_create <- function(ssEnv, arguments)
 
   ssEnv$key_enrichment_format <- key_enrichment_format
 
+  ssEnv$key_missed_areas_subareas <- ssEnv$keys_areas_subareas[0,]
 
   update_session_info(ssEnv)
 

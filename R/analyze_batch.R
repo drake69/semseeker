@@ -5,12 +5,16 @@ analyze_batch <- function(signal_data, sample_sheet, batch_id)
   ssEnv <- get_session_info()
   signal_data <- as.data.frame(signal_data)
   get_meth_tech(signal_data)
-  coverage_analysis(signal_data = signal_data)
+  # coverage_analysis(rownames(signal_data))
 
-  methDataTemp <- data.frame( "PROBE"= rownames(signal_data), signal_data)
-  methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
-  signal_data <- methDataTemp[, -c(1)]
-  rm(methDataTemp)
+  # sort signal data by row names
+  # signal_data <- signal_data[order(rownames(signal_data)), ]
+  #
+  #
+  # methDataTemp <- data.frame( "PROBE"= rownames(signal_data), signal_data)
+  # methDataTemp <- methDataTemp[with(methDataTemp, order(methDataTemp$PROBE)), ]
+  # signal_data <- methDataTemp[, -c(1)]
+  # rm(methDataTemp)
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will work on:", nrow(signal_data), " PROBES.")
 

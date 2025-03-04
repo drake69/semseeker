@@ -113,7 +113,9 @@ save_figure <- function(colname_pivot,dim_pivot,vector_figure,positions,sample_s
 
   vector_figure <- vector_figure$to_data_frame()
   marker_sum <- data.frame(colSums(vector_figure[,4:ncol(vector_figure)],na.rm = T))
-  colnames(marker_sum) <- paste0(marker,"_",figure)
+  combined <- paste0(marker,"_",figure)
+  sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% combined)]
+  colnames(marker_sum) <- combined
   marker_sum$Sample_ID <- row.names(marker_sum)
   sample_sheet <- merge(sample_sheet,marker_sum,by="Sample_ID",all.x=TRUE)
 

@@ -28,6 +28,8 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE,
     figures=c("HYPER","HYPO"), areas="PROBE", ...)
 
+  log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will generate images for significative probes \n")
+
   study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
   annotate_position_pivots()
 
@@ -55,112 +57,97 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     probes_stat$VALUE <- ""
     colnames(probes_stat) <- c("MARKER", "METRIC","POSITION","VALUE")
   }
-  for(k in 1:length(localKeys)){
-    marker <- as.character(localKeys[k])
-    if (any(subset(probes_stat, MARKER == marker)[,"VALUE"] ==""))
-    {
-      pivot_file_name_hyper <- pivot_file_name(marker,"HYPER","PROBE","")
-      pivot_file_name_hypo <- pivot_file_name(marker,"HYPO","PROBE","")
-      if (!file.exists(pivot_file_name_hyper) & !file.exists(pivot_file_name_hypo))
-        tempKeys <- tempKeys[-k]
-      else
+
+  localKeys <- localKeys[(localKeys %in% unique(probes_stat[ probes_stat$VALUE=="","MARKER"]))]
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:(length(localKeys)))
+  else
+    progress_bar <- ""
+
+  if (length(localKeys) != 0)
+    for(k in 1:length(localKeys)){
+      marker <- as.character(localKeys[k])
       {
-        browser()
-        pivot_hyper <- data.frame()
-        if(file.exists(pivot_file_name_hyper))
-          pivot_hyper <- readr::read_delim(pivot_file_name_hyper,
-            col_types = vroom::cols(
-              .default = vroom::col_double(),
-              PROBE = vroom::col_character()
-            ),
-            show_col_types=FALSE, progress=FALSE)
-        pivot_hypo <- data.frame()
-        if(file.exists(pivot_file_name_hypo))
-          pivot_hypo <- readr::read_delim(pivot_file_name_hypo,
-            col_types = vroom::cols(
-              .default = vroom::col_double(),
-              PROBE = vroom::col_character()
-            ),
-            show_col_types=FALSE, progress=FALSE)
-        # get the row with the max count of values
-        count_m <- plyr::rbind.fill(pivot_hyper, pivot_hypo)
-        count_m[is.na(count_m)] <- 0
+        count_m <- get_pivot_both(marker)
+        if (nrow(count_m)==0)
+          tempKeys <- tempKeys[-k]
+        else
+        {
 
-        probes_stat[probes_stat$MARKER == marker  & probes_stat$METRIC== "COUNT","VALUE"] <- nrow(count_m) * ncol(count_m)
-        # count per each row the number of no zero values
-        markers_sum <- apply(count_m, 1, sum)
-        #Q1
-        markers_sum_q1 <- quantile(markers_sum, 0.25)
-        probes_name_q1 <- names(which(markers_sum <= markers_sum_q1))
-        if (length(probes_name_q1) > 1)
-          probes_name_q1 <- probes_name_q1[1]
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q1","POSITION"] <- probes_name_q1
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q1","VALUE"] <- markers_sum_q1
-        #Q3
-        markers_sum_q3 <- quantile(markers_sum, 0.75)
-        probes_name_q3 <- names(which(markers_sum >= markers_sum_q3))
-        if (length(probes_name_q3) > 1)
-          probes_name_q3 <- probes_name_q3[1]
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q3","POSITION"] <- probes_name_q3
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q3","VALUE"] <- markers_sum_q3
-        #MAX
-        markers_sum_max <- max(markers_sum)
-        probe_name_max <- names(which.max(markers_sum))
-        if (length(probe_name_max) > 1)
-          probe_name_max <- probe_name_max[1]
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MAX","POSITION"] <- probe_name_max
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MAX","VALUE"] <- markers_sum_max
-        #MIN
-        markers_sum_min <- min(markers_sum)
-        probe_name_min <- names(which.min(markers_sum))
-        if (length(probe_name_min) > 1)
-          probe_name_min <- probe_name_min[1]
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MIN","POSITION"] <- probe_name_min
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MIN","VALUE"] <- markers_sum_min
-        #MEDIAN
-        markers_median <- apply(count_m, 1, median)
-        markers_median_max <- max(markers_median)
-        probe_name_median <- names(which(markers_median==markers_median_max))
-        if (length(probe_name_median) > 1)
-          probe_name_median <- probe_name_median[1]
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","POSITION"] <- probe_name_median
-        probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","VALUE"] <- markers_median_max
-        utils::write.csv2(probes_stat, probes_stat_fname, row.names = FALSE)
+          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Collecting probe stat for marker: ", marker, " \n")
+          areas_name <- count_m$AREA
+          count_m <- count_m[, -1]
+
+          probes_stat[probes_stat$MARKER == marker  & probes_stat$METRIC== "COUNT","VALUE"] <- nrow(count_m) * ncol(count_m)
+          # count per each row the number of no zero values
+          markers_sum <- apply(count_m, 1, sum)
+          #Q1
+          markers_sum_q1 <- quantile(markers_sum, 0.25)
+          probes_name_q1 <- areas_name[which(markers_sum <= markers_sum_q1)]
+          if (length(probes_name_q1) > 1)
+            probes_name_q1 <- probes_name_q1[1]
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q1","POSITION"] <- probes_name_q1
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q1","VALUE"] <- markers_sum_q1
+          #Q3
+          markers_sum_q3 <- quantile(markers_sum, 0.75)
+          probes_name_q3 <- areas_name[which(markers_sum >= markers_sum_q3)]
+          if (length(probes_name_q3) > 1)
+            probes_name_q3 <- probes_name_q3[1]
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q3","POSITION"] <- probes_name_q3
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q3","VALUE"] <- markers_sum_q3
+          #MAX
+          markers_sum_max <- max(markers_sum)
+          probe_name_max <- areas_name[which.max(markers_sum)]
+          if (length(probe_name_max) > 1)
+            probe_name_max <- probe_name_max[1]
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MAX","POSITION"] <- probe_name_max
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MAX","VALUE"] <- markers_sum_max
+          #MIN
+          markers_sum_min <- min(markers_sum)
+          probe_name_min <- areas_name[which.min(markers_sum)]
+          if (length(probe_name_min) > 1)
+            probe_name_min <- probe_name_min[1]
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MIN","POSITION"] <- probe_name_min
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MIN","VALUE"] <- markers_sum_min
+          #MEDIAN
+          markers_median <- apply(count_m, 1, median)
+          markers_median_max <- max(markers_median)
+          probe_name_median <- areas_name[which(markers_median==markers_median_max)]
+          if (length(probe_name_median) > 1)
+            probe_name_median <- probe_name_median[1]
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","POSITION"] <- probe_name_median
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","VALUE"] <- markers_median_max
+        }
       }
+      if(ssEnv$showprogress)
+        progress_bar(sprintf("Collecting stats for marker %s", marker))
     }
-  }
 
+  utils::write.csv2(probes_stat, probes_stat_fname, row.names = FALSE)
   # remove SIGNAL from tempKeys
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
-  pivot_subfolder <- dir_check_and_create(result_folderPivot,"SIGNAL")
-  # signal_data <- readRDS(file_path_build( ssEnv$result_folderData, "1_signal_data","rds"))
   fname <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","")
-  # fname <- file_path_build( pivot_subfolder ,c("SIGNAL", "MEAN", "PROBE",""),"csv", add_gz=TRUE)
-  browser()
-  # data_name <- utils::read.csv2(fname, sep  =  ";", nrows = 1)
-  # signal_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
-  # # remove column X1
-  # signal_data <- signal_data[, !grepl("X1", colnames(signal_data))]
-  # # rename column SAMPLE_GROUP as SAMPLEID
-  # colnames(signal_data)[colnames(signal_data)=="SAMPLE_GROUP"] <- "SAMPLEID"
-  # colnames(signal_data) <- colnames(data_name)
-  signal_data <- polars::read_parquet(fname)
+  signal_data <- polars::pl$read_parquet(fname)$to_data_frame()
 
   # threshold_data <- fst::read_fst(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))
-  threshold_data <- polars::read_parquet(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","parquet"))
+  threshold_data <- polars::pl$read_parquet(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","parquet"))$to_data_frame()
 
   colnames(signal_data) <- gsub("-","_", colnames(signal_data))
   if(max_sample!=0)
     signal_data <- signal_data[,min_sample:max_sample]
-  samples <- as.vector(colnames(signal_data))
-  samples <- samples[-1]
+  samples <- as.vector(colnames(signal_data[,!grepl("AREA", colnames(signal_data))]))
 
-  signal_data$SAMPLEID <- toupper(signal_data$SAMPLEID)
+  signal_data$AREA <- toupper(signal_data$AREA)
   probes_stat <- utils::read.csv2(probes_stat_fname, header = TRUE, stringsAsFactors = FALSE)
 
   ########################################################################################################################################################################
   ############################ PLOT MARKERS FOR A GIVEN PROBE ################################################################################################
   ########################################################################################################################################################################
+
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:(length(tempKeys)*5))
+  else
+    progress_bar <- ""
 
   for(j in 1:length(tempKeys))
   {
@@ -173,19 +160,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     if (length(files) > 0)
       next
 
-
-    pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
-    fname <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz=TRUE)
-    message("Reading file ", fname)
-    if(!file.exists(fname))
-    {
-      log_event("WARNING:", format(Sys.time(), "%a %b %d %X %Y") ,"File does not exist", fname)
-      next
-    }
-    data_name <- utils::read.csv2(fname, sep  =  ";", nrows = 1)
-    marker_data <- utils::read.csv2(fname, sep  =  ";", skip = 1)
-
-    colnames(marker_data) <- colnames(data_name)
+    marker_data <- get_pivot_both(marker)
     if(any(!(colnames(signal_data) %in% colnames(marker_data))))
     {
       lost_columns <- colnames(signal_data)[!(colnames(signal_data) %in% colnames(marker_data))]
@@ -195,16 +170,20 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     }
     # marker_data <- marker_data[,colnames(marker_data) %in% colnames(signal_data)]
     marker_data <- marker_data[,colnames(signal_data)]
-    marker_data$SAMPLEID <- toupper(marker_data$SAMPLEID)
+    marker_data$AREA <- toupper(marker_data$AREA)
+
     for ( selection in c("min","max","median","q1","q3"))
     {
+
+
+      log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), "Generating plot for ", marker, " and ", selection, " probe")
       probe_name <- probes_stat[probes_stat$METRIC==toupper(selection) & max(probes_stat[probes_stat$METRIC==toupper(selection),"VALUE"])==probes_stat[probes_stat$METRIC==toupper(selection),"VALUE"],"POSITION"]
       if(length(probe_name)>1)
         probe_name <- probe_name[1]
       probe_name <- toupper(probe_name)
 
-      probe_signal <- as.vector(t(signal_data[signal_data$SAMPLEID==probe_name,]))
-      probe_signal <- as.numeric(probe_signal[-1])
+      probe_signal <- as.vector(t(signal_data[signal_data$AREA==probe_name,!grepl("AREA", colnames(signal_data))]))
+      probe_signal[is.na(probe_signal)] <- 0
 
       threshold_data$PROBE <- toupper(threshold_data$PROBE)
       probe_threshold <- threshold_data[threshold_data$PROBE==probe_name,]
@@ -222,8 +201,9 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
       reference_col_id <- which(colnames(signal_data[,-1]) %in% references)
       outlier[reference_col_id] <- "Reference"
       marker_segment_color <-  ifelse(probe_signal > y_sup, hyper_color, ifelse(probe_signal < y_inf, hypo_color ,"white"))
-      probe_marker <- marker_data[marker_data$SAMPLEID==probe_name,-1]
 
+      probe_marker <- marker_data[marker_data$AREA==probe_name,!grepl("AREA", colnames(marker_data))]
+      probe_marker[is.na(probe_marker)] <- 0
       probe_marker <- as.numeric(probe_marker)
 
       outlier[probe_marker==0] <- "Non-outlier"
@@ -293,8 +273,34 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
       plot_filename <- file_path_build(chart_folder,c(selection, probe_name,"SIGNAL_OUTLIER"),ssEnv$plot_format)
       ggplot2::ggsave(filename = plot_filename,plot = pp,units = "in", width = 6, height = 4, dpi=as.numeric(ssEnv$plot_resolution_ppi))
 
+      if(ssEnv$showprogress)
+        progress_bar(sprintf("Plotting images for probe %s", probe_name))
+
     }
   }
+
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Generation of plot completed!")
+
 }
 
 
+get_pivot_both <- function(marker)
+{
+  pivot_file_name_hyper <- pivot_file_name_parquet(marker,"HYPER","PROBE","")
+  pivot_file_name_hypo <- pivot_file_name_parquet(marker,"HYPO","PROBE","")
+  pivot_hyper <- data.frame()
+  if(file.exists(pivot_file_name_hyper))
+    pivot_hyper <- polars::pl$read_parquet(pivot_file_name_hyper)$to_data_frame()
+  pivot_hypo <- data.frame()
+  if(file.exists(pivot_file_name_hypo))
+    pivot_hypo <- polars::pl$read_parquet(pivot_file_name_hypo)$to_data_frame()
+  # get the row with the max count of values
+  count_m <- plyr::rbind.fill(pivot_hyper, pivot_hypo)
+  count_m[is.na(count_m)] <- 0
+  # summarize per AREA doing sum
+  count_m <- count_m %>%
+    dplyr::group_by(AREA) %>%
+    dplyr::summarise(across(everything(), mean, .names = "{.col}"))
+
+  return(count_m)
+}

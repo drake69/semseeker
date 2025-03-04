@@ -27,7 +27,6 @@ inpute_missing_values <- function(signal_data){
       row_medians <- apply(signal_data[chunk_indices, ], 1, stats::median, na.rm = TRUE)
       row_id <- row(signal_data[chunk_indices, ])[is.na(signal_data[chunk_indices, ])]
       signal_data[chunk_indices, ][is.na(signal_data[chunk_indices, ])] <- row_medians[row_id]
-      gc()
       if(ssEnv$showprogress)
         progress_bar(sprintf("Inputed: %s positions", stringr::str_pad(max(chunk_indices), 10, pad = " ")))
 

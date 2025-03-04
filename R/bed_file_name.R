@@ -1,6 +1,11 @@
 bed_file_name <- function(sample_id,sample_group,marker,figure)
 {
   ssEnv <- get_session_info()
+  if (is.na(sample_group) || sample_group=="")
+  {
+    browser()
+    stop("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " bed_file_name: sample_group is empty")
+  }
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_group),paste0(marker,"_",figure)))
   bed_ext <- unique(ssEnv$keys_markers_figures[ ssEnv$keys_markers_figures$MARKER==marker & ssEnv$keys_markers_figures$FIGURE==figure, "EXT"])

@@ -9,7 +9,7 @@ signal_range_values <- function(populationMatrix, batch_id) {
 
 
   ssEnv <- get_session_info()
-
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting signal thresholds calculation.")
   if (sum(is.na(populationMatrix)) > 0)
   {
     msg <- paste0("ERROR:", format(Sys.time(), "%a %b %d %X %Y"), " There are missing values in the population matrix, apply the parameter inpute or remove the missing values.")
@@ -77,7 +77,7 @@ signal_range_values <- function(populationMatrix, batch_id) {
 
 
   {
-    chunk_size <- 10000  # Define a chunk size
+    chunk_size <- 5000  # Define a chunk size
     result <- data.frame()
     if(ssEnv$showprogress)
       progress_bar <- progressr::progressor(along = seq(1, nrow(populationMatrix), by = chunk_size))
@@ -109,11 +109,11 @@ signal_range_values <- function(populationMatrix, batch_id) {
       }, future.chunk.size = 1000)
       #
       result <- rbind(result, as.data.frame(t(th)))
-      gc()
       rm(th)
       if(ssEnv$showprogress)
         progress_bar(sprintf("Done %s positions",i))
     }
+    gc()
   }
 
   #

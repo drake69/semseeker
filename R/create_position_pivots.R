@@ -11,6 +11,7 @@ create_position_pivots <- function(population, keys)
   ssEnv <- get_session_info()
   # sort keys by MARKER
   keys <- keys[order(keys$MARKER),]
+  population_result <- data.frame()
   for (k in 1:nrow(keys))
   {
     key <- keys[k,]
@@ -18,6 +19,8 @@ create_position_pivots <- function(population, keys)
     figure <- as.character(key$FIGURE)
     area <- as.character("POSITION")
     subarea <- as.character("")
+    if(is.na(marker) || is.na(figure) || is.na(area) || is.na(subarea))
+      next
     pivot_filename <- pivot_file_name_parquet(marker, figure, area, subarea)
     # look if pivot exists
     # if(ssEnv$showprogress)
@@ -35,9 +38,14 @@ create_position_pivots <- function(population, keys)
     else
       progress_bar_pop <- ""
 
+    # remove rows with empty Sample_Group
+    temp_pop <- temp_pop[!is.na(temp_pop$Sample_Group),]
+    if(nrow(temp_pop) == 0)
+      next
     for ( s in 1:nrow(temp_pop))
     {
 
+      gc()
       if(ssEnv$showprogress)
         progress_bar_pop(sprintf("Creating pivot of %s %s %s %s", marker, figure, area, subarea))
 
@@ -101,7 +109,6 @@ create_position_pivots <- function(population, keys)
       )
       pivot <- pivot$drop(c("CHR_right", "START_right","END_right"))
       # message(pivot$columns)
-      gc()
       if ( s %% 100 == 0 )
       {
         # browser()
@@ -118,8 +125,19 @@ create_position_pivots <- function(population, keys)
     pivot <- pivot$collect()
     pivot <- pivot$sort(c("CHR", "START"), descending = c(FALSE, FALSE))
     pivot$write_parquet(pivot_filename)
+    # remove CHR START END columns
+    pivot <- pivot$drop(c("CHR", "START", "END"))
+    # sum per columns
+    if(key$DISCRETE)
+      pivot <- pivot$sum()$with_columns(polars::pl$col("*"))$transpose()
+    else
+      pivot <- pivot$mean()$with_columns(polars::pl$col("*"))$transpose()
+    pivot <- pivot$rename(list(column_0 = key$COMBINED))
+    population_result <- plyr::rbind.fill(population_result, pivot$to_data_frame())
     rm(pivot)
   }
+  population_result <- population[, !(colnames(population) %in% colnames(population_result))]
+  return(population_result)
 }
 
 

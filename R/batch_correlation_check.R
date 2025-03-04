@@ -3,7 +3,7 @@ batch_correlation_check <- function() {
   ssEnv <- get_session_info()
   y <- g <- 1
   i <- 1
-  sample_sheet <- utils::read.csv2(file.path(ssEnv$result_folderData,"sample_sheet_result.csv"))
+  sample_sheet <- utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
   localKeys <- expand.grid("FIGURE"=ssEnv$keys_figures_default[,1],"MARKER"= ssEnv$keys_markers[,1])
 
   batch_analysis_folder <- dir_check_and_create(ssEnv$result_folderData,"Batch_Analysis")

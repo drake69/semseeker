@@ -27,8 +27,8 @@ ss_analysis <-
     localKeys <- ssEnv$keys_markers_figures
     sample_groups <- c("Reference", "Control", "Case")
 
-    
-    
+
+
 
     study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
     study_summary <- filter_sql(samples_sql_selection, study_summary)
@@ -70,7 +70,7 @@ ss_analysis <-
         {
           # k <- 3
           key <- keys [k, ]
-          pivot_filename <- pivot_file_name(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
+          pivot_filename <- pivot_file_namep(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
           if (file.exists(fname))
           {
             log_event("INFO: ",

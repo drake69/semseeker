@@ -47,9 +47,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   localKeys <- ssEnv$keys_markers_figures
   sample_groups <- c("Reference","Control","Case")
 
-
-
-
+  study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+  deltaX_get(study_summary)
+  annotate_position_pivots()
 
   inference_details <- unique(inference_details)
   # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
@@ -72,7 +72,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     covariates <- covariates[lengths(covariates)  !=  0]
     covariates <- covariates[covariates  !=  ""]
     family_test <- inference_detail$family_test
-    study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
     # filter samples using samples_sql_condition
     study_summary <- filter_sql(inference_detail$samples_sql_condition, study_summary)
     # browser()
