@@ -1,7 +1,7 @@
 signal_save <- function(signal_data, sample_sheet, batch_id )
 {
-  ssEnv <- get_session_info()
-
+  ssEnv <- get_session_info("~/Documents/Dati_Lavoro/cancer_stage/results/ewas_data_hub/")
+  # update_session_info(ssEnv)
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Saving signal data.")
 
   signal_data <- signal_data[,unique(sample_sheet$Sample_ID)]
@@ -14,13 +14,20 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
   pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","")
   polars::as_polars_df(signal_data)$write_parquet(pivot_file_name)
 
-  pp <- probe_features_get("PROBE")
-  signal_data <- merge(pp,signal_data, by.x="PROBE",by.y="AREA")
+  rm(signal_data)
 
-  # remove PROBE column
-  signal_data <- signal_data[, which(colnames(signal_data) != "PROBE")]
+  signal_data <- polars::pl$scan_parquet(pivot_file_name)
+  pp <- polars::as_polars_df(probe_features_get("PROBE"))$lazy()
+  # rename AREA as PROBE
+  signal_data <- signal_data$with_columns(polars::pl$col("AREA")$alias("PROBE"))
+  signal_data <- pp$join(
+    signal_data,
+    on = c("PROBE"),
+    how = "inner"
+  )
+  signal_data <- signal_data$drop(c("PROBE","PROBE_WHOLE","AREA"))
   pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION","")
-  polars::as_polars_df(signal_data)$write_parquet(pivot_file_name)
+  signal_data$collect()$write_parquet(pivot_file_name)
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Saved signal data.")
 

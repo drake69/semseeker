@@ -77,7 +77,7 @@ signal_range_values <- function(populationMatrix, batch_id) {
 
 
   {
-    chunk_size <- 5000  # Define a chunk size
+    chunk_size <- 10000  # Define a chunk size
     result <- data.frame()
     if(ssEnv$showprogress)
       progress_bar <- progressr::progressor(along = seq(1, nrow(populationMatrix), by = chunk_size))

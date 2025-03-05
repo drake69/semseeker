@@ -1,0 +1,50 @@
+study_summary_total <- function()
+{
+  ssEnv <- get_session_info()
+  study_summary <- study_summary_get()
+
+  # ssEnv <- get_session_info()
+  keys <- ssEnv$keys_areas_subareas_markers_figures
+  keys <- subset(keys, AREA=="POSITION")
+  if(nrow(keys)==0)
+    return()
+  for ( k in 1:nrow(keys))
+  {
+    # k <- 1
+    key <- keys[k,]
+    marker <- key$MARKER
+    figure <- key$FIGURE
+    area <- key$AREA
+    subarea <- key$SUBAREA
+    pivot_file_nameparquet <- pivot_file_name_parquet(marker,figure,area,subarea)
+    if (!file.exists(pivot_file_nameparquet))
+      next
+
+    pivot <- polars::pl$scan_parquet(pivot_file_nameparquet)
+    # remove CHR START END columns
+    pivot <- pivot$drop(c("CHR", "START", "END"))
+    # sum per columns
+    if(key$DISCRETE)
+      pivot <- pivot$sum()$with_columns(polars::pl$col("*"))
+    else
+      pivot <- pivot$mean()$with_columns(polars::pl$col("*"))
+
+    pivot <- as.data.frame(t(pivot$collect()$to_data_frame()))
+    combined_key <- paste0(marker,"_",figure)
+    colnames(pivot) <- combined_key
+    pivot$Sample_ID <- row.names(pivot)
+
+    if(!exists("temp_result"))
+      temp_result <- pivot
+    else
+    {
+      temp_result <- temp_result[, !(colnames(temp_result) == combined_key)]
+      temp_result <- merge(temp_result, pivot, by="Sample_ID", all=TRUE)
+    }
+  }
+  temp_result[is.na(temp_result)] <- 0
+  study_summary <- merge(study_summary, temp_result, by="Sample_ID", all.x=TRUE)
+  study_summary$PROBE_COUNT <- ssEnv$probes_count
+  summary_file <- file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv")
+  utils::write.csv2(study_summary,summary_file, row.names = FALSE)
+}

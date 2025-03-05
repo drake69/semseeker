@@ -46,10 +46,10 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
     progress_bar <- progressr::progressor(along = 1:nrow(sample_sheet))
 
   variables_to_export <- c("sample_sheet", "signal_data", "analyze_single_sample", "ssEnv",
-                            "signal_superior_thresholds","deltar_single_sample","signal_inferior_thresholds","iqr","signal_median_values",
-                           "bt","bonferroni_threshold", "probe_features", "analyze_single_sample_both", "delta_single_sample", "progress_bar",
-                           "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_single_sample",
-                           "get_session_info")
+    "signal_superior_thresholds","deltar_single_sample","signal_inferior_thresholds","iqr","signal_median_values",
+    "bt","bonferroni_threshold", "probe_features", "analyze_single_sample_both", "delta_single_sample", "progress_bar",
+    "progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_single_sample",
+    "get_session_info")
   i <- 1
 
   if (!ssEnv$signal_intrasample)
@@ -61,7 +61,7 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   }
 
   # for(i in 1:nrow(sample_sheet)) {
-  summary_population <-  foreach::foreach(i =1:nrow(sample_sheet), .combine= plyr::rbind.fill , .export = variables_to_export) %dorng% {
+  foreach::foreach(i =1:nrow(sample_sheet), .export = variables_to_export) %dorng% {
     local_sample_detail <- sample_sheet[i,]
 
     ssEnv <- get_session_info()
@@ -81,84 +81,36 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
       signal_median_values <- rep(y_med,length(signal_values))
     }
 
-    result_list <- list()
-    hyper_result <- analyze_single_sample( values = signal_values,
+    analyze_single_sample( values = signal_values,
       thresholds = signal_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,
-       probe_features = probe_features)
-    # add to result list if is not empty
-    if(!plyr::empty(hyper_result))
-      result_list <- c(result_list, list(hyper_result))
+      probe_features = probe_features)
 
-    hypo_result <- analyze_single_sample( values = signal_values,
+    analyze_single_sample( values = signal_values,
       thresholds = signal_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail,
       probe_features = probe_features)
-    # add to result list if is not empty
-    if(!plyr::empty(hypo_result))
-      result_list <- c(result_list, list(hypo_result))
 
-    both_result_mutations <- analyze_single_sample_both( sample_detail =  local_sample_detail, "MUTATIONS")
-    # add to result list if is not empty
-    if(!plyr::empty(both_result_mutations))
-      result_list <- c(result_list, list(both_result_mutations))
+    analyze_single_sample_both( sample_detail =  local_sample_detail, "MUTATIONS")
 
-    both_result_lesions <- analyze_single_sample_both( sample_detail =  local_sample_detail, "LESIONS")
-    # add to result list if is not empty
-    if(!plyr::empty(both_result_lesions))
-      result_list <- c(result_list, list(both_result_lesions))
+    analyze_single_sample_both( sample_detail =  local_sample_detail, "LESIONS")
 
-    delta_result <- delta_single_sample ( values = signal_values, high_thresholds = signal_superior_thresholds,
+    delta_single_sample( values = signal_values, high_thresholds = signal_superior_thresholds,
       low_thresholds = signal_inferior_thresholds, sample_detail = local_sample_detail,
       signal_medians = signal_median_values, probe_features = probe_features)
-    # add to result list if is not empty
-    if(!plyr::empty(delta_result))
-      result_list <- c(result_list, list(delta_result))
 
-    deltar_result <- deltar_single_sample ( values = signal_values, high_thresholds = signal_superior_thresholds,
+    deltar_single_sample ( values = signal_values, high_thresholds = signal_superior_thresholds,
       low_thresholds = signal_inferior_thresholds, sample_detail = local_sample_detail,
       probe_features = probe_features)
-    # add to result list if is not empty
-    if(!plyr::empty(deltar_result))
-      result_list <- c(result_list, list(deltar_result))
 
     # summary signal
     names(signal_values) <- row.names(signal_data)
     signal_sample <- signal_single_sample( signal_values,local_sample_detail,probe_features)
-    # add to result list if is not empty
-    if(!plyr::empty(signal_sample))
-      result_list <- c(result_list, list(signal_sample))
-
-    # cycle list and bind columns
-    if(length(result_list)==0)
-      sample_status_temp <- data.frame()
-    else
-    {
-      for (j in 1:length(result_list))
-      {
-        if(j==1)
-          sample_status_temp <- result_list[[j]]
-        else
-          sample_status_temp <- dplyr::bind_cols(sample_status_temp, result_list[[j]])
-      }
-    }
-
-    sample_status_temp$Sample_ID <- local_sample_detail$Sample_ID
-    # count the real values available for the sample
-    sample_status_temp$PROBES_COUNT <- length(stats::na.omit(signal_values))
 
     if(ssEnv$showprogress)
       progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
-
-    sample_status_temp[is.na(sample_status_temp)] <- 0
-    sample_status_temp
   }
 
   gc()
-  summary_population[is.na(summary_population)] <- 0
-  # progress_bar$terminate()
-  summary_population <- as.matrix.data.frame(summary_population)
-  summary_population <- as.data.frame(summary_population)
-  rownames(summary_population) <- summary_population$Sample_ID
-  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Row count result:", nrow(summary_population))
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Row count result:", nrow(sample_sheet))
   rm(signal_data)
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population analysis ")
@@ -166,7 +118,6 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
   time_taken <- difftime(end_time,start_time, units = "mins")
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population with summary - Time taken: ", time_taken, " minutes.")
 
-  return(summary_population)
 }
 
 

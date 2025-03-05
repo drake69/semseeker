@@ -9,9 +9,13 @@ create_position_pivots <- function(population, keys)
 
   # create pivot for basic markers and figure
   ssEnv <- get_session_info()
+  selection <-c("MUTATIONS","DELTAR","DELTAS")
   # sort keys by MARKER
   keys <- keys[order(keys$MARKER),]
+  keys <- subset(keys, MARKER %in% selection)
   population_result <- data.frame()
+  if(nrow(keys)==0)
+    return()
   for (k in 1:nrow(keys))
   {
     key <- keys[k,]
@@ -113,31 +117,17 @@ create_position_pivots <- function(population, keys)
       {
         # browser()
         pivot <- pivot$collect()
-        # pivot$write_parquet(pivot_filename)
+        pivot$write_parquet(pivot_filename)
         pivot <- pivot$lazy()
-        # save pivot
-        # pivot$(pivot_filename
       }
     }
 
     if (!exists("pivot"))
       next
     pivot <- pivot$collect()
-    pivot <- pivot$sort(c("CHR", "START"), descending = c(FALSE, FALSE))
     pivot$write_parquet(pivot_filename)
-    # remove CHR START END columns
-    pivot <- pivot$drop(c("CHR", "START", "END"))
-    # sum per columns
-    if(key$DISCRETE)
-      pivot <- pivot$sum()$with_columns(polars::pl$col("*"))$transpose()
-    else
-      pivot <- pivot$mean()$with_columns(polars::pl$col("*"))$transpose()
-    pivot <- pivot$rename(list(column_0 = key$COMBINED))
-    population_result <- plyr::rbind.fill(population_result, pivot$to_data_frame())
     rm(pivot)
   }
-  population_result <- population[, !(colnames(population) %in% colnames(population_result))]
-  return(population_result)
 }
 
 

@@ -34,7 +34,7 @@ deltaX_get <- function(sample_sheet)
   keys <- subset(keys,!is.na(Q))
   keys <- subset(keys,(Q!=1))
   if(nrow(keys)==0)
-    return(sample_sheet)
+    return()
 
   # sample_sheet_res <-  foreach::foreach(k =1:nrow(keys), .combine= cbind , .export = variables_to_export) %dorng%
   for ( k in 1:nrow(keys))
@@ -78,25 +78,13 @@ deltaX_get <- function(sample_sheet)
     else if(endsWith(marker,"Q"))
       vector_both <- as.numeric(dplyr::ntile(x=vector_shaped , n= as.numeric(key$Q)))
 
-    sample_sheet_temp <- save_figure(colname_pivot_hyper, dim_pivot_hyper,vector_both[(1:length_hyper)],positions_hyper,sample_sheet_temp,area_position,subarea_position,marker,"HYPER")
-    sample_sheet_temp <- save_figure(colname_pivot_hypo, dim_pivot_hypo,vector_both[((length_hyper + 1):(length_hyper + length_hypo))], positions_hypo,sample_sheet_temp,area_position,subarea_position,marker,"HYPO")
-
-    # if ( nrow(sample_sheet_res)==0)
-    #   sample_sheet_res <- sample_sheet_temp
-    # else
-    #   sample_sheet_res <- merge(sample_sheet_res,sample_sheet_temp,by="Sample_ID")
+    save_figure(colname_pivot_hyper, dim_pivot_hyper,vector_both[(1:length_hyper)],positions_hyper,sample_sheet_temp,area_position,subarea_position,marker,"HYPER")
+    save_figure(colname_pivot_hypo, dim_pivot_hypo,vector_both[((length_hyper + 1):(length_hyper + length_hypo))], positions_hypo,sample_sheet_temp,area_position,subarea_position,marker,"HYPO")
 
     if(ssEnv$showprogress)
       progress_bar(sprintf("Got: %s", stringr::str_pad(marker, 10, pad = " ")))
 
-    # remove Sample_ID column
-    sample_sheet_temp <- sample_sheet_temp[,-which(colnames(sample_sheet_temp)=="Sample_ID")]
-    sample_sheet_temp <- sample_sheet_temp[,-which(colnames(sample_sheet_temp)=="Sample_Group")]
-    sample_sheet_temp
   }
-  if ( nrow(sample_sheet_res)==nrow(sample_sheet))
-    sample_sheet <- cbind(sample_sheet,sample_sheet_res)
-  return(sample_sheet)
 }
 
 
@@ -112,12 +100,6 @@ save_figure <- function(colname_pivot,dim_pivot,vector_figure,positions,sample_s
   vector_figure$write_parquet(pivot_file_nameparquet)
 
   vector_figure <- vector_figure$to_data_frame()
-  marker_sum <- data.frame(colSums(vector_figure[,4:ncol(vector_figure)],na.rm = T))
-  combined <- paste0(marker,"_",figure)
-  sample_sheet <- sample_sheet[, !(colnames(sample_sheet) %in% combined)]
-  colnames(marker_sum) <- combined
-  marker_sum$Sample_ID <- row.names(marker_sum)
-  sample_sheet <- merge(sample_sheet,marker_sum,by="Sample_ID",all.x=TRUE)
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 4:ncol(vector_figure))
@@ -138,7 +120,4 @@ save_figure <- function(colname_pivot,dim_pivot,vector_figure,positions,sample_s
     if(ssEnv$showprogress)
       progress_bar(sprintf("Annotating bed file %s of %s, %s.",sample_id,marker, figure))
   }
-  # replace NA with 0
-  sample_sheet[is.na(sample_sheet)] <- 0
-  return(sample_sheet)
 }

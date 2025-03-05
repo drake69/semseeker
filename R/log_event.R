@@ -17,15 +17,15 @@ log_event <- function(...)
   if (grepl("^BANNER", log_event_to_save))
   {
     log_event_to_print_dash <- "##############################################################################"
-    log_event_to_print <- paste0( log_event_to_print_dash, "\n", gsub("BANNER: ", "", log_event_to_print))
-    log_event_to_print <- paste0( log_event_to_print , "\n",log_event_to_print_dash)
+    log_event_to_print <- paste0( log_event_to_print_dash, "\n",
+      gsub("BANNER: ", "", log_event_to_print), "\n",
+      log_event_to_print_dash, '\n')
   }
 
   if (grepl("ERROR:", log_event_to_save))
   {
     log_event_to_print_dash <- "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    log_event_to_print <- paste0( log_event_to_print_dash, "\n", gsub("BANNER: ", "", log_event_to_print))
-    log_event_to_print <- paste0( log_event_to_print , "\n",log_event_to_print_dash)
+    log_event_to_print <- paste0( log_event_to_print_dash, "\n",  log_event_to_print  , "\n",log_event_to_print_dash)
   }
 
   if(is.null(ssEnv$verbosity))

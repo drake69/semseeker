@@ -53,7 +53,6 @@ analyze_single_sample_both <- function( sample_detail, marker) {
       data_to_dump = data_to_save_both,
       fileName = fileName
     )
-    result <- data.frame_add.column(result, paste(marker,"_","BOTH",sep=""),sum(data_to_save_both$VALUE))
   }
 
   if (any(ssEnv$keys_markers_figures$COMBINED==paste(marker,"_","BOTHSUM",sep="")))
@@ -65,13 +64,10 @@ analyze_single_sample_both <- function( sample_detail, marker) {
       data_to_dump = data_to_save,
       fileName = fileName
     )
-    result <- data.frame_add.column(result, paste(marker,"_","BOTHSUM",sep=""),sum(as.numeric(data_to_save$VALUE)))
-
   }
 
   end_time_single_sample <- Sys.time()
   time_taken <- difftime(end_time_single_sample,start_time_single_sample, units = "mins")
   log_event("DEBUG: Completed figure BOTH for sample in ", as.numeric(time_taken), " minutes.")
 
-  return(result)
 }

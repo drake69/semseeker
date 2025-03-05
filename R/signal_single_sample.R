@@ -21,8 +21,8 @@ signal_single_sample <- function(values,sample_detail,probe_features)
     fileName = file_path_build(baseFolder =  folder_to_save, detailsFilename =  c(sample_detail$Sample_ID,"SIGNAL","MEAN"), extension = "bedgraph", add_gz=TRUE)
   )
 
-  result <- data.frame("BETA_MEAN"="")
-  result["BETA_MEAN"] <- mean(signal_values_annotated$VALUE)
+  result <- data.frame("SIGNAL_MEAN"="")
+  result["SIGNAL_MEAN"] <- mean(signal_values_annotated$VALUE)
 
 
   return(result)

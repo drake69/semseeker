@@ -68,7 +68,6 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
 
     folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_BOTH"))
     dump_sample_as_bed_file(data_to_dump = deltarAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTH"),"bedgraph", add_gz=TRUE))
-    result <- data.frame_add.column(result, "DELTAR_BOTH",mean(deltarAnnotated_bothSorted$DELTA, na.rm = TRUE))
   }
 
   if (any(ssEnv$keys_markers_figures$COMBINED=="DELTAR_BOTHSUM"))
@@ -82,7 +81,6 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
 
     folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAR_BOTHSUM"))
     dump_sample_as_bed_file(data_to_dump = deltarAnnotated_both_sumSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAR","BOTHSUM"),"bedgraph", add_gz=TRUE))
-    result <- data.frame_add.column(result, "DELTAR_BOTHSUM",mean(deltarAnnotated_both_sumSorted$DELTA, na.rm = TRUE))
   }
 
   ### get deltar from medians #########################################################
@@ -98,12 +96,6 @@ deltar_single_sample <- function ( values, high_thresholds, low_thresholds, samp
       log_event(min(deltarAnnotated_hyperSorted$DELTA))
       stop("ERROR: I'm stopping here the deltar have negative values!")
     }
-  result <- data.frame_add.column(result, "DELTAR_HYPO",mean(deltarAnnotated_hypoSorted$DELTA, na.rm = TRUE))
-  result <- data.frame_add.column(result, "DELTAR_HYPER",mean(deltarAnnotated_hyperSorted$DELTA, na.rm = TRUE))
-  # fill NA with 0
-  result[is.na(result)] <- 0
-
-  return(result)
 }
 
 

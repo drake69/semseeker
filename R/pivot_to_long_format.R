@@ -17,7 +17,7 @@ pivot_to_long_format <- function (marker, figure, area,subarea, phenotype_column
   area_pivot <- get_pivot(marker, figure, area, subarea)
 
   area_pivot <- subset(area_pivot, area_pivot$SAMPLEID=="SAMPLE_GROUP" | area_pivot$SAMPLEID %in% areas_selection)
-  study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+  study_summary <-   study_summary_get()
   area_pivot <- area_pivot[-1,]
   for( s in 2: ncol(area_pivot))
   {

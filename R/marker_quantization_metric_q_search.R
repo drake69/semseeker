@@ -11,7 +11,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy,
     start_fresh = FALSE, areas=c("POSITION"), subareas=c(""), markers=c("DELTAS","DELTAR"), figures=c("HYPO","HYPER"), ...)
 
-  study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+  study_summary <-   study_summary_get()
   create_position_pivots(study_summary,ssEnv$keys_areas_subareas_markers_figures)
 
   nkeys <- 2*2*length(qs) + 1

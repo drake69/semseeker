@@ -23,7 +23,7 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
 
   areas <- areas[-1,]
 
-  sample_sheet <- utils::read.csv2( file.path(ssEnv$result_folderData,"/sample_sheet_result.csv"), sep=";", dec=".")
+  sample_sheet <- study_summary_get()
   metaareas_f <- foreach::foreach(s = 2: ncol(areas), .combine = rbind) %dorng%
   # for( s in 2: ncol(areas) )
   {

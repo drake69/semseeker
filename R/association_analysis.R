@@ -47,7 +47,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   localKeys <- ssEnv$keys_markers_figures
   sample_groups <- c("Reference","Control","Case")
 
-  study_summary <-   utils::read.csv2(file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv"))
+  study_summary <-   study_summary_get()
   deltaX_get(study_summary)
   annotate_position_pivots()
 

@@ -49,7 +49,6 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
 
     folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTH"))
     dump_sample_as_bed_file(data_to_dump = deltasAnnotated_bothSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTH"),"bedgraph", add_gz=TRUE))
-    result <- data.frame_add.column(result, "DELTAS_BOTH",mean(deltasAnnotated_bothSorted$DELTA, na.rm = TRUE))
   }
   ### get deltas BOTHSUM #########################################################
 
@@ -63,7 +62,6 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
 
     folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_detail$Sample_Group),"DELTAS_BOTHSUM"))
     dump_sample_as_bed_file(data_to_dump = deltasAnnotated_both_sumSorted, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","BOTHSUM"),"bedgraph", add_gz=TRUE))
-    result <- data.frame_add.column(result, "DELTAS_BOTHSUM",mean(deltasAnnotated_both_sumSorted$DELTA, na.rm = TRUE))
   }
 
   ### get deltas from medians #########################################################
@@ -79,13 +77,6 @@ delta_single_sample <- function ( values, high_thresholds, low_thresholds, sampl
       log_event(min(deltasAnnotated_hyperSorted$DELTA))
       stop("ERROR: I'm stopping here the deltas have negative values!")
     }
-
-  result <- data.frame_add.column(result, "DELTAS_HYPO",mean(deltasAnnotated_hypoSorted$DELTA, na.rm = TRUE))
-  result <- data.frame_add.column(result, "DELTAS_HYPER",mean(deltasAnnotated_hyperSorted$DELTA, na.rm = TRUE))
-  # fill NA with 0
-  result[is.na(result)] <- 0
-
-  return(result)
 }
 
 

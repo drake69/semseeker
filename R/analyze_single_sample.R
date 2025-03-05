@@ -38,8 +38,4 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"LESIONS",figure),"bed", add_gz=TRUE)
   )
 
-  result <- data.frame_add.column(result, paste("LESIONS_", figure, sep=""), if (!is.null(lesionWeighted)) dim(lesionWeighted)[1] else 0)
-
-
-  return(result)
 }

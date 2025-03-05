@@ -57,7 +57,7 @@ inpute_missing_values <- function(signal_data){
   }
   else if (ssEnv$inpute=="none")
   {
-    signal_data <- signal_data
+    signal_data <- signal_data[complete.cases(signal_data),]
   }
   else
   {
