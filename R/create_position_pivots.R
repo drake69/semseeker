@@ -3,6 +3,7 @@
 #' @param population population data frame to use for creating pivot
 #' @param keys markers and figure to create pivot of
 #'
+#' @importFrom doRNG %dorng%
 create_position_pivots <- function(population, keys)
 {
   ssEnv <- get_session_info()
@@ -16,7 +17,12 @@ create_position_pivots <- function(population, keys)
   population_result <- data.frame()
   if(nrow(keys)==0)
     return()
-  for (k in 1:nrow(keys))
+
+  variables_to_export <- c("pivot", "pivot_filename", "temp_pop", "samples", "progress_bar_pop", "progress_bar_key", "progress_bar_pop",
+    "sample", "sample_id", "sample_group", "pivot_filename", "marker", "figure", "area", "subarea", "s", "progress_bar_pop")
+
+  foreach::foreach(k=1:nrow(keys), .export = variables_to_export) %dorng%
+  # for (k in 1:nrow(keys))
   {
     key <- keys[k,]
     marker <- as.character(key$MARKER)
@@ -124,6 +130,8 @@ create_position_pivots <- function(population, keys)
 
     if (!exists("pivot"))
       next
+
+    pivot <- pivot$sort(c("CHR", "START"), descending = c(FALSE, FALSE))
     pivot <- pivot$collect()
     pivot$write_parquet(pivot_filename)
     rm(pivot)
