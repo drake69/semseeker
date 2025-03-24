@@ -1,5 +1,6 @@
 study_summary_total <- function()
 {
+
   ssEnv <- get_session_info()
   study_summary <- study_summary_get()
 
@@ -43,8 +44,11 @@ study_summary_total <- function()
     }
   }
   temp_result[is.na(temp_result)] <- 0
+  # remove from summary all column excet Sample_ID from temp_result
+  col_temp <- colnames(temp_result)[!(colnames(temp_result) == "Sample_ID")]
+  study_summary <- study_summary[, !(colnames(study_summary) %in% col_temp)]
   study_summary <- merge(study_summary, temp_result, by="Sample_ID", all.x=TRUE)
-  study_summary$PROBE_COUNT <- ssEnv$probes_count
+  study_summary$PROBES_COUNT <- ssEnv$probes_count
   summary_file <- file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv")
   utils::write.csv2(study_summary,summary_file, row.names = FALSE)
 }

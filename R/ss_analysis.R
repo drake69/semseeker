@@ -67,7 +67,7 @@ ss_analysis <-
         {
           # k <- 3
           key <- keys [k, ]
-          pivot_filename <- pivot_file_namep(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
+          fname <- pivot_file_name_parquet(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
           if (file.exists(fname))
           {
             log_event("INFO: ",
@@ -75,12 +75,13 @@ ss_analysis <-
               " Starting to read pivot:",
               fname,
               ".")
-            pivot <- readr::read_delim(pivot_file_name,
-              col_types = readr::cols(
-                .default = readr::col_double(),
-                AREA = readr::col_character(),
-              ),
-              show_col_types=FALSE, progress=FALSE)
+            # pivot <- readr::read_delim(pivot_file_name,
+            #   col_types = readr::cols(
+            #     .default = readr::col_double(),
+            #     AREA = readr::col_character(),
+            #   ),
+            #   show_col_types=FALSE, progress=FALSE)
+            tempDataFrame <- polars::pl$read_parquet(fname)$to_data_frame()
             row.names(tempDataFrame) <- tempDataFrame$AREA
             if (length(areas_selection) > 0)
               tempDataFrame <-tempDataFrame[tempDataFrame[, 1] %in% areas_selection,]

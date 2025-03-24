@@ -52,20 +52,32 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
     "get_session_info")
   i <- 1
 
-  if (!ssEnv$signal_intrasample)
-  {
-    signal_superior_thresholds <- signal_thresholds$signal_superior_thresholds
-    signal_inferior_thresholds <- signal_thresholds$signal_inferior_thresholds
-    iqr <- signal_thresholds$iqr
-    signal_median_values <- signal_thresholds$signal_median_values
+  for(i in 1:nrow(sample_sheet)) {
+    # foreach::foreach(i =1:nrow(sample_sheet), .export = variables_to_export) %dorng% {
+    local_sample_detail <- sample_sheet[i,]
+    ssEnv <- get_session_info()
+    signal_values <- signal_data[,local_sample_detail$Sample_ID]
+    bed_file_name <- bed_file_name(local_sample_detail$Sample_ID,local_sample_detail$Sample_Group, "SIGNAL","MEAN")
+    if(!file.exists(bed_file_name))
+      signal_single_sample( signal_values,local_sample_detail,probe_features)
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("Saving signal of sample: %s",local_sample_detail$Sample_ID))
   }
+  gc()
 
+  progress_bar <- NULL
+  if(ssEnv$showprogress)
+    progress_bar <- progressr::progressor(along = 1:nrow(sample_sheet))
+
+  rm(signal_data)
   # for(i in 1:nrow(sample_sheet)) {
   foreach::foreach(i =1:nrow(sample_sheet), .export = variables_to_export) %dorng% {
-    local_sample_detail <- sample_sheet[i,]
 
-    ssEnv <- get_session_info()
-    signal_values <- signal_data[, local_sample_detail$Sample_ID]
+    local_sample_detail <- sample_sheet[i,]
+    bed_file_name <- bed_file_name(local_sample_detail$Sample_ID,local_sample_detail$Sample_Group, "SIGNAL","MEAN")
+    signal_values <- utils::read.delim(bed_file_name, header = FALSE, sep = "\t")
+    colnames(signal_values) <- c("CHR", "START", "END", "VALUE")
+
     if (ssEnv$signal_intrasample )
     {
       q <- stats::quantile(signal_values)
@@ -81,37 +93,30 @@ analyze_population <- function(signal_data, sample_sheet,signal_thresholds, prob
       signal_median_values <- rep(y_med,length(signal_values))
     }
 
-    analyze_single_sample( values = signal_values,
-      thresholds = signal_superior_thresholds, figure="HYPER", sample_detail = local_sample_detail,
-      probe_features = probe_features)
+    bed_file_name <- bed_file_name(local_sample_detail$Sample_ID,local_sample_detail$Sample_Group, "MUTATIONS","HYPER")
+    if(!file.exists(bed_file_name))
+      analyze_single_sample( values = signal_values,thresholds = signal_thresholds, figure="HYPER", sample_detail = local_sample_detail)
 
-    analyze_single_sample( values = signal_values,
-      thresholds = signal_inferior_thresholds, figure="HYPO", sample_detail = local_sample_detail,
-      probe_features = probe_features)
+    bed_file_name <- bed_file_name(local_sample_detail$Sample_ID,local_sample_detail$Sample_Group, "MUTATIONS","HYPO")
+    if(!file.exists(bed_file_name))
+      analyze_single_sample( values = signal_values,thresholds = signal_thresholds, figure="HYPO", sample_detail = local_sample_detail)
 
-    analyze_single_sample_both( sample_detail =  local_sample_detail, "MUTATIONS")
+    bed_file_name <- bed_file_name(local_sample_detail$Sample_ID,local_sample_detail$Sample_Group, "DELTAS","HYPO")
+    if(!file.exists(bed_file_name))
+      delta_single_sample( values = signal_values,thresholds = signal_thresholds , sample_detail = local_sample_detail)
 
-    analyze_single_sample_both( sample_detail =  local_sample_detail, "LESIONS")
-
-    delta_single_sample( values = signal_values, high_thresholds = signal_superior_thresholds,
-      low_thresholds = signal_inferior_thresholds, sample_detail = local_sample_detail,
-      signal_medians = signal_median_values, probe_features = probe_features)
-
-    deltar_single_sample ( values = signal_values, high_thresholds = signal_superior_thresholds,
-      low_thresholds = signal_inferior_thresholds, sample_detail = local_sample_detail,
-      probe_features = probe_features)
-
-    # summary signal
-    names(signal_values) <- row.names(signal_data)
-    signal_sample <- signal_single_sample( signal_values,local_sample_detail,probe_features)
+    bed_file_name <- bed_file_name(local_sample_detail$Sample_ID,local_sample_detail$Sample_Group, "DELTAR","HYPO")
+    if(!file.exists(bed_file_name))
+      deltar_single_sample ( values = signal_values, thresholds = signal_thresholds,sample_detail = local_sample_detail)
 
     if(ssEnv$showprogress)
-      progress_bar(sprintf("sample: %s",local_sample_detail$Sample_ID))
+      progress_bar(sprintf("Performed sample: %s",local_sample_detail$Sample_ID))
   }
 
   gc()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Row count result:", nrow(sample_sheet))
-  rm(signal_data)
+  if(exists("signal_data"))
+    rm(signal_data)
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Completed population analysis ")
   end_time <- Sys.time()

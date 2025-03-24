@@ -7,7 +7,8 @@
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot)
+quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot,
+  samples_sql_condition=samples_sql_condition, area, subarea)
 {
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )

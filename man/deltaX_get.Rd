@@ -4,7 +4,7 @@
 \alias{deltaX_get}
 \title{Title}
 \usage{
-deltaX_get(sample_sheet)
+deltaX_get()
 }
 \arguments{
 \item{sample_sheet}{}

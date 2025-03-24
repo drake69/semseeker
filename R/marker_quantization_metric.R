@@ -92,8 +92,8 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
           ssim_value <- ssim(original, quantized)
           res_temp$Structural_Similarity_Index <- ssim_value
 
-          vi_value <- variation_of_information(original, quantized)
-          res_temp$variation_of_information <- vi_value
+          # vi_value <- variation_of_information(original, quantized)
+          # res_temp$variation_of_information <- vi_value
 
           # calculate JSD
           # Combine the unique elements from both samples to create a common event space

@@ -9,6 +9,19 @@ inpute_missing_values <- function(signal_data){
 
   nrow_ex_ante <- nrow(signal_data)
 
+  # count missed per rows
+  n_missed_per_row <- rowSums(is.na(signal_data))
+  if (any(n_missed_per_row > 0.1 * ncol(signal_data))) {
+    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " There are rows with missing values more than 10%. I will remove them.")
+    signal_data <- signal_data[n_missed_per_row  < 0.1 * ncol(signal_data), ]
+  }
+
+  n_missed_per_col <- colSums(is.na(signal_data))
+  if (any(n_missed_per_col > 0.1 * nrow(signal_data))) {
+    log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " There are columns with missing values more than 10%. I will remove them.")
+    signal_data <- signal_data[, n_missed_per_col  < 0.1 * nrow(signal_data)]
+  }
+
   chunk_size <- 10000  # Define a chunk size
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:length(seq(1, nrow(signal_data), by = chunk_size)))

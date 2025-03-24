@@ -1,5 +1,7 @@
-execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation="", plot=FALSE, samples_sql_condition, area, subarea){
+execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation="", plot=FALSE,
+  samples_sql_condition="", area="", subarea=""){
 
+  samples_sql_condition = as.character(samples_sql_condition)
   transformation <- as.character(transformation)
   family_test <- as.character(family_test)
   # model_result <- data.frame()
@@ -52,7 +54,8 @@ execute_model <- function(family_test, tempDataFrame, sig.formula, burdenValue, 
     sink()
   }
   if (grepl("quantreg", family_test) & !grepl("quantreg-permutation", family_test)  & !grepl("mediation-quantreg", family_test))
-    model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
+    model_result <- quantreg_model(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot,
+      samples_sql_condition=samples_sql_condition, area, subarea)
 
   #   return (model_result)
   # }, error = function(e) {

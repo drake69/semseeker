@@ -8,7 +8,7 @@ bed_file_name <- function(sample_id,sample_group,marker,figure)
   }
 
   folder_to_save <- dir_check_and_create(ssEnv$result_folderData,c(as.character(sample_group),paste0(marker,"_",figure)))
-  bed_ext <- unique(ssEnv$keys_markers_figures[ ssEnv$keys_markers_figures$MARKER==marker & ssEnv$keys_markers_figures$FIGURE==figure, "EXT"])
+  bed_ext <- unique(ssEnv$keys_markers_figures_default[ ssEnv$keys_markers_figures_default$MARKER==marker & ssEnv$keys_markers_figures_default$FIGURE==figure, "EXT"])
   if(length(bed_ext)==0){
     browser()
     stop("ERROR: bed_file_name: bed_ext is empty")

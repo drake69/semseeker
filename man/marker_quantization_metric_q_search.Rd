@@ -7,9 +7,7 @@
 marker_quantization_metric_q_search(
   study,
   qs = c(2, 4, 8, 16, 32),
-  base_folder,
-  dest_folder,
-  folder_key,
+  result_folder,
   maxResources = maxResources,
   parallel_strategy = parallel_strategy,
   start_fresh = FALSE,

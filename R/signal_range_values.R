@@ -5,7 +5,7 @@
 #' @return methylation matrix as normalized distribution
 #' @importFrom doRNG %dorng%
 
-signal_range_values <- function(populationMatrix, batch_id) {
+signal_range_values <- function(populationMatrix, batch_id, probe_features) {
 
 
   ssEnv <- get_session_info()
@@ -16,8 +16,14 @@ signal_range_values <- function(populationMatrix, batch_id) {
     log_event(msg)
     stop(msg)
   }
+  thresholds_file_name <- file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"parquet")
+  if(file.exists(thresholds_file_name))
+  {
+    result <- polars::pl$read_parquet(thresholds_file_name)$to_data_frame()
+    return(result)
+  }
 
-  # populationMatrix <- signal_data
+  # populationMatrix <- result
   # populationMatrixDim <- dim(populationMatrix)
   populatioinMatrix <- as.data.frame(populationMatrix)
   populationMatrix <- populationMatrix[, !(colnames(populationMatrix) %in% "PROBE")]
@@ -38,7 +44,6 @@ signal_range_values <- function(populationMatrix, batch_id) {
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting signal thresholds calculation.")
   export = c("progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","populationMatrix","ssEnv")
   r <- 1
-
 
   # if(ncol(populationMatrix) < 1000)
   # {
@@ -118,11 +123,22 @@ signal_range_values <- function(populationMatrix, batch_id) {
 
   #
   colnames(result) <- c("signal_inferior_thresholds","signal_superior_thresholds", "signal_median_values","iqr","q1","q3")
-  result$PROBE <- row.names(populationMatrix)
+  result$PROBE <- rownames(populationMatrix)
   if(nrow(result) != nrow(populationMatrix))
     stop("I'M STOPPING HERE, No thresholds defined for the population.")
 
-  polars::as_polars_df(result)$write_parquet(file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"parquet"))
+  result <- polars::as_polars_df(result)$lazy()
+  probe_features <- polars::as_polars_df(probe_features)$lazy()
+  # rename AREA as PROBE
+  result <- probe_features$join(
+    result,
+    on = c("PROBE"),
+    how = "inner"
+  )
+  result <- result$drop(c("PROBE_WHOLE"))
+  result <- result$sort(c("CHR", "START","END"), descending = c(FALSE, FALSE,FALSE))
+  result$collect()$write_parquet(thresholds_file_name)
+
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Thresholds defined for: ", nrow(result), " probe_features.")
   gc()
   return(result)

@@ -39,7 +39,7 @@ test_that("deltaX_get", {
 
   semseeker:::create_position_pivots(mySampleSheet[mySampleSheet$Sample_Group == "Control",],keys)
 
-  mySampleSheet <- semseeker:::deltaX_get(mySampleSheet[mySampleSheet$Sample_Group != "Reference",])
+  ss <- semseeker:::deltaX_get(mySampleSheet[mySampleSheet$Sample_Group != "Reference",])
 
   # verify all DELTAX (except DELTAS and DELTAR ) are coherent with MUTATIONS
   keys <- subset(ssEnv$keys_areas_subareas_markers_figures, AREA == "POSITION")
@@ -83,6 +83,8 @@ test_that("deltaX_get", {
     pivot <- pivot[,order(colnames(pivot))]
     mutations_pivot <- mutations_pivot[,order(colnames(mutations_pivot))]
 
+    # all rows have at least one zeo
+
     testthat::expect_true(all(colnames(pivot) %in% (mySampleSheet$Sample_ID)))
     # wit few positions some sample mutation could be missing
     # testthat::expect_true(all(colnames(pivot) == unique(mySampleSheet$Sample_ID)))
@@ -109,10 +111,10 @@ test_that("deltaX_get", {
       {
         sample_id <- mySampleSheet[c,"Sample_ID"]
         sample_group <- mySampleSheet[c,"Sample_Group"]
-        mutation_bed_file_name <- bed_file_name(sample_id,sample_group,"MUTATIONS",figure)
+        mutation_bed_file_name <- semseeker:::bed_file_name(sample_id,sample_group,"MUTATIONS",figure)
         if(file.exists(mutation_bed_file_name))
         {
-          bed_file_name <- bed_file_name(sample_id,sample_group,marker,figure)
+          bed_file_name <- semseeker:::bed_file_name(sample_id,sample_group,marker,figure)
           testthat::expect_true(file.exists(bed_file_name))
         }
       }

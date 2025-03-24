@@ -54,81 +54,81 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   # browser()
   result_temp <- data.frame()
   result_temp <- foreach::foreach(g = g_start:g_end, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
-    # for(g in g_start:g_end)
-    {
-      ssEnv <- get_session_info()
+  # for(g in g_start:g_end)
+  {
+    ssEnv <- get_session_info()
 
-      burdenValue <- cols[g]
-      if(ssEnv$showprogress)
-        progress_bar(sprintf("doing genomic area: %s", stringr::str_pad(burdenValue, 10, pad = " ")))
+    burdenValue <- cols[g]
+    if(ssEnv$showprogress)
+      progress_bar(sprintf("doing genomic area: %s", stringr::str_pad(burdenValue, 10, pad = " ")))
 
-      if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>=2){
+    if(!is.null(tempDataFrame[,burdenValue]) & length(unique(tempDataFrame[,burdenValue]))>=2){
 
 
+      #
+      sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
+      # browser()
+      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5), samples_sql_condition, as.character(key$AREA), as.character(key$SUBAREA))
+
+      #
+      local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
+      local_result$MARKER <- as.character(key$MARKER)
+      local_result$FIGURE <-  as.character(key$FIGURE)
+      local_result$AREA <-  as.character(key$AREA)
+      local_result$SUBAREA <-  as.character(key$SUBAREA)
+      local_result$AREA_OF_TEST <- burdenValue
+      local_result$FAMILY.TEST <- family_test
+      local_result$transformation <- transformation
+      local_result$COVARIATES <- ifelse(length(covariates)>0,paste0(covariates,collapse=" "),NA)
+      # local_result$bartlett.pvalue <- data_distribution_info(family_test, tempDataFrame, burdenValue, independent_variable)
+
+      if (is.family_dicotomic(family_test))
+      {
         #
-        sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-        # browser()
-        model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5), samples_sql_condition, as.character(key$AREA), as.character(key$SUBAREA))
+        selector <- tempDataFrame[, independent_variable]==independent_variable1stLevel
+        independent_variableData1stLevel <- stats::na.omit(tempDataFrame[selector,burdenValue])
+        selector <- tempDataFrame[, independent_variable]==independent_variable2ndLevel
+        independent_variableData2ndLevel <- stats::na.omit(tempDataFrame[selector,burdenValue])
 
-        #
-        local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
-        local_result$MARKER <- as.character(key$MARKER)
-        local_result$FIGURE <-  as.character(key$FIGURE)
-        local_result$AREA <-  as.character(key$AREA)
-        local_result$SUBAREA <-  as.character(key$SUBAREA)
-        local_result$AREA_OF_TEST <- burdenValue
-        local_result$FAMILY.TEST <- family_test
-        local_result$transformation <- transformation
-        local_result$COVARIATES <- ifelse(length(covariates)>0,paste0(covariates,collapse=" "),NA)
-        # local_result$bartlett.pvalue <- data_distribution_info(family_test, tempDataFrame, burdenValue, independent_variable)
-
-        if (is.family_dicotomic(family_test))
+        if(length(stats::na.omit(independent_variableData2ndLevel))==0 | length(stats::na.omit(independent_variableData1stLevel))==0)
         {
-          #
-          selector <- tempDataFrame[, independent_variable]==independent_variable1stLevel
-          independent_variableData1stLevel <- stats::na.omit(tempDataFrame[selector,burdenValue])
-          selector <- tempDataFrame[, independent_variable]==independent_variable2ndLevel
-          independent_variableData2ndLevel <- stats::na.omit(tempDataFrame[selector,burdenValue])
-
-          if(length(stats::na.omit(independent_variableData2ndLevel))==0 | length(stats::na.omit(independent_variableData1stLevel))==0)
-          {
-            log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I skip this test because one of the two groups is empty." )
-            colnames(local_result) <- toupper(colnames(local_result))
-            local_result$PVALUE <- NA
-          }
-
-          local_result$CASE.LABEL <- if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA
-          local_result$COUNT_CASE <- length(independent_variableData1stLevel)
-          local_result$MEAN_CASE <- (mean(independent_variableData1stLevel))
-          local_result$SD_CASE <- (stats::sd(independent_variableData1stLevel))
-          local_result$CONTROL.LABEL <- as.character(independent_variable2ndLevel)
-          local_result$COUNT_CONTROL <- length(stats::na.omit(independent_variableData2ndLevel))
-          local_result$MEAN_CONTROL <- (mean(independent_variableData2ndLevel))
-          local_result$SD_CONTROL <- (stats::sd(independent_variableData2ndLevel))
+          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I skip this test because one of the two groups is empty." )
+          colnames(local_result) <- toupper(colnames(local_result))
+          local_result$PVALUE <- NA
         }
 
-        if (!is.family_dicotomic(family_test))
-        {
-          dependentVariableData <- as.numeric(stats::na.omit(tempDataFrame[!is.na(tempDataFrame[,independent_variable]),burdenValue]))
-          independent_variableData <- as.numeric(stats::na.omit(tempDataFrame[  ,independent_variable]))
-
-          if(sum(is.na(dependentVariableData)>0) | sum(is.na(independent_variableData)))
-          {
-            log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "The submitted data are not factorial or numeric.")
-            stop()
-          }
-        }
-
-        if(nrow(model_result)>0)
-          local_result <- cbind(local_result, model_result)
-
-        colnames(local_result) <- toupper(colnames(local_result))
-
-        # local_result
-        # result_temp <- plyr::rbind.fill(result_temp, local_result)
-        local_result
+        # local_result$CASE.LABEL <- if(exists("independent_variable1stLevel")) as.character(independent_variable1stLevel) else NA
+        # local_result$COUNT_CASE <- length(independent_variableData1stLevel)
+        # local_result$MEAN_CASE <- (mean(independent_variableData1stLevel))
+        # local_result$SD_CASE <- (stats::sd(independent_variableData1stLevel))
+        # local_result$CONTROL.LABEL <- as.character(independent_variable2ndLevel)
+        # local_result$COUNT_CONTROL <- length(stats::na.omit(independent_variableData2ndLevel))
+        # local_result$MEAN_CONTROL <- (mean(independent_variableData2ndLevel))
+        # local_result$SD_CONTROL <- (stats::sd(independent_variableData2ndLevel))
       }
+
+      if (!is.family_dicotomic(family_test))
+      {
+        dependentVariableData <- as.numeric(stats::na.omit(tempDataFrame[!is.na(tempDataFrame[,independent_variable]),burdenValue]))
+        independent_variableData <- as.numeric(stats::na.omit(tempDataFrame[  ,independent_variable]))
+
+        if(sum(is.na(dependentVariableData)>0) | sum(is.na(independent_variableData)))
+        {
+          log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "The submitted data are not factorial or numeric.")
+          stop()
+        }
+      }
+
+      if(nrow(model_result)>0)
+        local_result <- cbind(local_result, model_result)
+
+      colnames(local_result) <- toupper(colnames(local_result))
+
+      # local_result
+      # result_temp <- plyr::rbind.fill(result_temp, local_result)
+      local_result
     }
+  }
 
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I performed:",g_end," tests." )

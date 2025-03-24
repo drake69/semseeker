@@ -8,14 +8,12 @@
 #' @return list of lesion count  and probe_features count
 #'
 #' @importFrom doRNG %dorng%
-analyze_single_sample <- function(values, thresholds, figure, sample_detail, probe_features) {
+analyze_single_sample <- function(values, thresholds, figure, sample_detail) {
 
   ssEnv <- get_session_info()
-  result <- data.frame()
-  result <- result[-1]
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  "analyze_single_sample:", ssEnv$result_folderData)
 
-  mutation_annotated_sorted <- mutations_get(values, figure,thresholds, probe_features, sample_detail$Sample_ID)
+  mutation_annotated_sorted <- mutations_get(values, figure,thresholds, sample_detail$Sample_ID)
   mutation_annotated_sorted_to_save <- subset(mutation_annotated_sorted, mutation_annotated_sorted$MUTATIONS == 1)[, c("CHR", "START", "END")]
   if (nrow(mutation_annotated_sorted_to_save) != 0)
     mutation_annotated_sorted_to_save$VALUE <- 1
@@ -26,7 +24,6 @@ analyze_single_sample <- function(values, thresholds, figure, sample_detail, pro
     data_to_dump = mutation_annotated_sorted_to_save,
     fileName = file_path_build(folder_to_save,c(sample_detail$Sample_ID,"MUTATIONS",figure),"bed", add_gz=TRUE)
   )
-  result <- data.frame_add.column(result, paste("MUTATIONS_", figure, sep=""),if (!is.null(mutation_annotated_sorted_to_save)) dim(mutation_annotated_sorted_to_save)[1] else 0)
 
   lesionWeighted <- lesions_get(grouping_column = "CHR", mutation_annotated_sorted = mutation_annotated_sorted)
   if(nrow(lesionWeighted) != 0)

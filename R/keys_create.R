@@ -71,13 +71,13 @@ keys_create <- function(ssEnv, arguments)
 
   keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default, keys_position_subareas_default)
 
-  areas <- arguments[["areas"]]
+  areas <- unique(c(arguments[["areas"]],"POSITION"))
   unknown_areas <- areas[!areas %in% keys_areas_subareas_default$AREA]
   arguments[["areas"]] <- unknown_areas
   if (!is.null(areas))
     keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$AREA %in% areas,]
 
-  subareas <- arguments[["subareas"]]
+  subareas <- unique(c(arguments[["subareas"]],""))
   unknown_subareas <- subareas[!subareas %in% keys_areas_subareas_default$SUBAREA]
   # could exist WHOLE associated to AREAS where exists empty SUBAREAS
   arguments[["subareas"]] <- unknown_subareas[!(unknown_subareas %in% c("WHOLE"))]

@@ -25,6 +25,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
 
+
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE,
     figures=c("HYPER","HYPO"), areas="PROBE", ...)
 
@@ -58,7 +59,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     colnames(probes_stat) <- c("MARKER", "METRIC","POSITION","VALUE")
   }
 
-  localKeys <- localKeys[(localKeys %in% unique(probes_stat[ probes_stat$VALUE=="","MARKER"]))]
+  localKeys <- unique(localKeys[(localKeys %in% unique(probes_stat[(is.na(probes_stat$VALUE) | probes_stat$VALUE==""),"MARKER"]))])
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:(length(localKeys)))
   else
@@ -68,6 +69,8 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     for(k in 1:length(localKeys)){
       marker <- as.character(localKeys[k])
       {
+        if(ssEnv$showprogress)
+          progress_bar(sprintf("Collecting stats for marker %s", marker))
         count_m <- get_pivot_both(marker)
         if (nrow(count_m)==0)
           tempKeys <- tempKeys[-k]
@@ -77,7 +80,6 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
           log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Collecting probe stat for marker: ", marker, " \n")
           areas_name <- count_m$AREA
           count_m <- count_m[, -1]
-
           probes_stat[probes_stat$MARKER == marker  & probes_stat$METRIC== "COUNT","VALUE"] <- nrow(count_m) * ncol(count_m)
           # count per each row the number of no zero values
           markers_sum <- apply(count_m, 1, sum)
@@ -119,8 +121,6 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","VALUE"] <- markers_median_max
         }
       }
-      if(ssEnv$showprogress)
-        progress_bar(sprintf("Collecting stats for marker %s", marker))
     }
 
   utils::write.csv2(probes_stat, probes_stat_fname, row.names = FALSE)
@@ -139,6 +139,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
 
   signal_data$AREA <- toupper(signal_data$AREA)
   probes_stat <- utils::read.csv2(probes_stat_fname, header = TRUE, stringsAsFactors = FALSE)
+  probes_stat <- probes_stat[!is.na(probes_stat$POSITION),]
 
   ########################################################################################################################################################################
   ############################ PLOT MARKERS FOR A GIVEN PROBE ################################################################################################
@@ -154,6 +155,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     marker <- as.character(tempKeys[j])
     # check if the plot already has been saved
 
+
     # List files that match both strings
     files <- list.files(chart_folder, pattern = paste0(marker,".png"), full.names = TRUE)
     # Check if any matching file exists
@@ -161,6 +163,8 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
       next
 
     marker_data <- get_pivot_both(marker)
+    if(nrow(marker_data)==0)
+      next
     if(any(!(colnames(signal_data) %in% colnames(marker_data))))
     {
       lost_columns <- colnames(signal_data)[!(colnames(signal_data) %in% colnames(marker_data))]
@@ -174,8 +178,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
 
     for ( selection in c("min","max","median","q1","q3"))
     {
-
-
+      # selection <- "max"
       log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), "Generating plot for ", marker, " and ", selection, " probe")
       probe_name <- probes_stat[probes_stat$METRIC==toupper(selection) & max(probes_stat[probes_stat$METRIC==toupper(selection),"VALUE"])==probes_stat[probes_stat$METRIC==toupper(selection),"VALUE"],"POSITION"]
       if(length(probe_name)>1)
@@ -284,23 +287,3 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
 }
 
 
-get_pivot_both <- function(marker)
-{
-  pivot_file_name_hyper <- pivot_file_name_parquet(marker,"HYPER","PROBE","")
-  pivot_file_name_hypo <- pivot_file_name_parquet(marker,"HYPO","PROBE","")
-  pivot_hyper <- data.frame()
-  if(file.exists(pivot_file_name_hyper))
-    pivot_hyper <- polars::pl$read_parquet(pivot_file_name_hyper)$to_data_frame()
-  pivot_hypo <- data.frame()
-  if(file.exists(pivot_file_name_hypo))
-    pivot_hypo <- polars::pl$read_parquet(pivot_file_name_hypo)$to_data_frame()
-  # get the row with the max count of values
-  count_m <- plyr::rbind.fill(pivot_hyper, pivot_hypo)
-  count_m[is.na(count_m)] <- 0
-  # summarize per AREA doing sum
-  count_m <- count_m %>%
-    dplyr::group_by(AREA) %>%
-    dplyr::summarise(across(everything(), mean, .names = "{.col}"))
-
-  return(count_m)
-}

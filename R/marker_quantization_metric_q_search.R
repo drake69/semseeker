@@ -2,13 +2,12 @@
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
 #' @export
-marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_folder,dest_folder,folder_key,
+marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), result_folder,
   maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 {
 
   to_export <- ""
-  result_folder <- paste0(base_folder,"/", study, folder_key, qs[1], sep="")
-  ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy,
+  ssEnv <- init_env( result_folder= result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy,
     start_fresh = FALSE, areas=c("POSITION"), subareas=c(""), markers=c("DELTAS","DELTAR"), figures=c("HYPO","HYPER"), ...)
 
   study_summary <-   study_summary_get()
@@ -22,8 +21,8 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   log_event("BANNER:", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will evaluate the best quantile/bin as deltas/deltar discretisation for project \n in ", ssEnv$result_folderData)
 
 
-  dataFolder <- dir_check_and_create(dest_folder,c("Data/Distributions"))
-  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
+  dest_folder <- dir_check_and_create(ssEnv$result_folderData,c("Q_Search"))
+  filename  =  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
   # message(filename)
   result_temp <- data.frame()
   if(file.exists(filename))
@@ -45,8 +44,8 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
     # SSIM con pracma
     ssim_value <- ssim(original, quantized)
     res_temp$Structural_Similarity_Index <- ssim_value
-    vi_value <- variation_of_information(original, quantized)
-    res_temp$variation_of_information <- vi_value
+    # vi_value <- variation_of_information(original, quantized)
+    # res_temp$variation_of_information <- vi_value
     jsd <- jsd_calc(original, quantized)
     res_temp$JSD <- jsd
     result_temp <- data.frame(res_temp,"Q"=qs)
@@ -105,8 +104,8 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
         ssim_value <- ssim(original, quantized)
         res_temp$Structural_Similarity_Index <- ssim_value
 
-        vi_value <- variation_of_information(original, quantized)
-        res_temp$variation_of_information <- vi_value
+        # vi_value <- variation_of_information(original, quantized)
+        # res_temp$variation_of_information <- vi_value
 
         jsd <- jsd_calc(original, quantized)
         res_temp$JSD <- jsd
@@ -129,17 +128,12 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
     return(NULL)
   }
 
-
-  ssEnv <- init_env( result_folder =  dest_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy,
-    start_fresh = FALSE, areas=c("PROBE"), subareas=c("WHOLE"), ...)
-
   colnames(result_temp) <- toupper(colnames(result_temp))
-  dataFolder <- dir_check_and_create(dest_folder,c("Data","Distributions"))
-  filename  <-  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
+  filename  <-  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
   utils::write.csv2(result_temp, file = filename, row.names = FALSE)
 
   markers <- unique(result_temp$MARKER)
-  filename  <-  file_path_build(dest_folder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_PIVOT"),"csv")
+  filename  <-  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION_ANALYSIS_PIVOT"),"csv")
   aggregate_pivot <- data.frame()
   for (m in 1:length(markers))
   {
@@ -177,7 +171,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
     aggregate_pivot <- plyr::rbind.fill(aggregate_pivot, scores)
   }
   library(dplyr)
-  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
+  filename  =  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
   # sum the score over Q and marker
   result <- aggregate_pivot %>%
     group_by(MARKER, Q) %>%
@@ -190,15 +184,15 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   colnames(aggregate_pivot) <- aggregate_pivot[1,]
   aggregate_pivot <- aggregate_pivot[-1,]
   aggregate_pivot$Q <- rownames(aggregate_pivot)
-  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE","PIVOT"),"csv")
+  filename  =  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE","PIVOT"),"csv")
   utils::write.csv2(aggregate_pivot, file = filename, row.names = FALSE)
 
 
   # calculate best marker
 
-  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
+  filename  =  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION_ANALYSIS_ALL"),"csv")
   result_temp <- utils::read.csv2(file = filename)
-  filename  =  file_path_build(dataFolder,c(study,"Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
+  filename  =  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
   results_q <- utils::read.csv2(file =filename)
   results_q_max <- unique(results_q[,c("SCORE","MARKER")] %>%
       dplyr::group_by(MARKER) %>%
@@ -234,10 +228,59 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), base_f
   scores <- scores %>%
     dplyr::group_by(MARKER) %>%
     dplyr::summarise(SCORE = sum(SCORE))
-  filename  =  file_path_build(dataFolder,c(study,"BEST_MARKER", "ANALYSIS","SCORE"),"csv")
+  filename  =  file_path_build(dest_folder,c("BEST_MARKER", "ANALYSIS","SCORE"),"csv")
   # sort by score desc
   scores <- scores[order(-scores$SCORE),]
   utils::write.csv2(scores, file = filename, row.names = FALSE)
+
+  # best score selection
+  # getQ where SCORE is the HIGHEST for each study and marker
+
+  results_q_max <- results_q[,c("SCORE","MARKER")] %>%
+    group_by(MARKER) %>%
+    filter(SCORE == max(SCORE))
+  results_q_max <- results_q_max[results_q_max$MARKER != "MUTATIONS",]
+  results_q_max  <- unique(results_q_max)
+  results_q_max <- unique(merge(results_q_max, results_q, by=c("MARKER","SCORE")))
+  # set quantile and bins depending on study, max value and distribution of origin
+  results_q_max[results_q_max$MARKER == "DELTAQ","PARAM_NAME"] <- paste(results_q_max[results_q_max$MARKER == "DELTAQ","MARKER"],"_Q", sep="")[1]
+  results_q_max[results_q_max$MARKER == "DELTAP","PARAM_NAME"] <- paste(results_q_max[results_q_max$MARKER == "DELTAP","MARKER"],"_B", sep="")[1]
+  results_q_max[results_q_max$MARKER == "DELTARQ","PARAM_NAME"] <- paste(results_q_max[results_q_max$MARKER == "DELTARQ","MARKER"],"_Q", sep="")[1]
+  results_q_max[results_q_max$MARKER == "DELTARP","PARAM_NAME"] <- paste(results_q_max[results_q_max$MARKER == "DELTARP","MARKER"],"_B", sep="")[1]
+  results_q_max[results_q_max$MARKER == "MUTATIONS","PARAM_NAME"] <- "MUTATIONS"
+
+  results_q_max <- results_q_max[,c("SCORE","MARKER","PARAM_NAME","Q")] %>%
+    group_by(MARKER,PARAM_NAME) %>%
+    filter(Q == min(Q))
+
+  results_q_max  <- unique(results_q_max)
+  write.csv2(results_q_max, paste0(dest_folder,"/BEST_SCORE_Q_SEARCH_DISTRIBUTION_ANALYSIS_SCORE.csv"), row.names = FALSE)
+
+  ####### plot results
+
+  filename  =  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
+  results_q <- utils::read.csv2(file =filename)
+  chart_folder <- dir_check_and_create(ssEnv$result_folderChart, "Q_Search")
+  # ONLY DELTAQ, DELTAP and MUTATIONS
+  # plot x as Q and TOTAL as Y a line for each project / marker in the same plot
+  results_q_plot <- results_q %>% filter(MARKER %in% c("DELTAQ","DELTAP","MUTATIONS"))
+  gg <- ggplot2::ggplot(results_q_plot, ggplot2::aes(x=Q, y=SCORE)) +
+    ggplot2::geom_line() +
+    ggplot2::facet_wrap(~MARKER) +
+    ggplot2::theme(legend.position = "bottom") +
+    ggplot2::ylab("Score")
+  fname <- paste0(chart_folder, "/DERIVATE_FROM_DELTAS_SCORE_SEARCH.png")
+  ggplot2::ggsave(fname, gg, width=2400, height=800, units="px")
+
+  # ONLY DELTARQ and DELTARP
+  results_q_plot <- results_q %>% filter(MARKER %in% c("DELTARQ","DELTARP"))
+  gg <- ggplot2::ggplot(results_q_plot, ggplot2::aes(x=Q, y=SCORE)) +
+    ggplot2::geom_line() +
+    ggplot2::facet_wrap(~MARKER) +
+    ggplot2::theme(legend.position = "bottom") +
+    ggplot2::ylab("Score")
+  fname <- paste0(chart_folder, "/DERIVATE_FROM_DELTAR_SCORE_SEARCH.png")
+  ggplot2::ggsave(fname, gg, width=1600, height=800, units="px")
 
   close_env()
 }
@@ -252,16 +295,16 @@ load_deltax <- function(source_marker){
 
   pivot_file_nameparquet <- pivot_file_name_parquet(source_marker,"HYPER",area_position,subarea_position)
   pivot_hyper <- polars::pl$scan_parquet(pivot_file_nameparquet)
-  positions_hyper <- pivot_hyper$select(pivot_hyper$columns[1:3])$collect()$to_data_frame()
-  pivot_hyper <- pivot_hyper$drop(pivot_hyper$columns[1:3])
+  positions_hyper <- pivot_hyper$select(c("CHR","START","END"))$collect()$to_data_frame()
+  pivot_hyper <- pivot_hyper$drop(c("CHR","START","END"))
   vector_shaped_hyper <- as.vector(as.matrix(pivot_hyper$collect()$to_data_frame()))
   rm(pivot_hyper)
   vector_shaped_hyper[vector_shaped_hyper==0] <- NA
 
   pivot_file_nameparquet <- pivot_file_name_parquet(source_marker,"HYPO",area_position,subarea_position)
   pivot_hypo <- polars::pl$scan_parquet(pivot_file_nameparquet)
-  positions_hypo <- pivot_hypo$select(pivot_hypo$columns[1:3])$collect()$to_data_frame()
-  pivot_hypo <- pivot_hypo$drop(pivot_hypo$columns[1:3])
+  positions_hypo <- pivot_hypo$select(c("CHR","START","END"))$collect()$to_data_frame()
+  pivot_hypo <- pivot_hypo$drop(c("CHR","START","END"))
   vector_shaped_hypo <- as.vector(as.matrix(pivot_hypo$collect()$to_data_frame()))
   rm(pivot_hypo)
   vector_shaped_hypo[vector_shaped_hypo==0] <- NA

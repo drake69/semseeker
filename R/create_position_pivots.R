@@ -21,8 +21,8 @@ create_position_pivots <- function(population, keys)
   variables_to_export <- c("pivot", "pivot_filename", "temp_pop", "samples", "progress_bar_pop", "progress_bar_key", "progress_bar_pop",
     "sample", "sample_id", "sample_group", "pivot_filename", "marker", "figure", "area", "subarea", "s", "progress_bar_pop")
 
-  foreach::foreach(k=1:nrow(keys), .export = variables_to_export) %dorng%
-  # for (k in 1:nrow(keys))
+  # foreach::foreach(k=1:nrow(keys), .export = variables_to_export) %dorng%
+  for (k in 1:nrow(keys))
   {
     key <- keys[k,]
     marker <- as.character(key$MARKER)
@@ -65,6 +65,10 @@ create_position_pivots <- function(population, keys)
       if(!exists("pivot"))
         if (file.exists(pivot_filename))
           pivot <- polars::pl$scan_parquet(pivot_filename)
+
+      # pivot_colnames <- colnames(pivot)
+      # if(sample_id %in% pivot_colnames)
+      #   next
 
       # read bed file
       bed_file <- bed_file_name(sample_id,sample_group,marker,figure)
@@ -123,6 +127,7 @@ create_position_pivots <- function(population, keys)
       {
         # browser()
         pivot <- pivot$collect()
+        pivot <- pivot$sort(c("CHR", "START"), descending = c(FALSE, FALSE))
         pivot$write_parquet(pivot_filename)
         pivot <- pivot$lazy()
       }

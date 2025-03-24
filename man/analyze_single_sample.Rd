@@ -4,13 +4,7 @@
 \alias{analyze_single_sample}
 \title{analyze_single_sample}
 \usage{
-analyze_single_sample(
-  values,
-  thresholds,
-  figure,
-  sample_detail,
-  probe_features
-)
+analyze_single_sample(values, thresholds, figure, sample_detail)
 }
 \arguments{
 \item{values}{values of methylation}

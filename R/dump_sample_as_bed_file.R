@@ -24,6 +24,9 @@ dump_sample_as_bed_file <- function(data_to_dump, fileName) {
 
   data_to_dump <- data_to_dump[!is.na(data_to_dump$START),]
 
+  # sort by CHR START and END
+  data_to_dump <- data_to_dump[order(data_to_dump$CHR, data_to_dump$START, data_to_dump$END),]
+
   if (!plyr::empty(data_to_dump)) {
 
     log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " trying to save: ", fileName)

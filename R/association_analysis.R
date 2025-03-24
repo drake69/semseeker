@@ -48,7 +48,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   sample_groups <- c("Reference","Control","Case")
 
   study_summary <-   study_summary_get()
-  deltaX_get(study_summary)
+  deltaX_get()
   annotate_position_pivots()
 
   inference_details <- unique(inference_details)
@@ -249,7 +249,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             }
 
 
-            #
             # execute for all the areas
             if(depth_analysis>1)
             {
@@ -281,13 +280,15 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   if(exists("tempDataFrame"))
                     rm(list  =  c("tempDataFrame"))
                   key <- keys [k,]
+                  if (key$AREA=="POSITION")
+                    next
                   pivot_filename <- pivot_file_name_parquet(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
                   if (file.exists(pivot_filename))
                   {
                     areas_selection_temp <- areas_selection
-                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", pivot_filename,".")
+                    log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", pivot_filename,".")
                     tempDataFrame <- arrow::read_parquet(pivot_filename)
-                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", pivot_filename, " with ", nrow(tempDataFrame), " rows.")
+                    log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", pivot_filename, " with ", nrow(tempDataFrame), " rows.")
                     tempDataFrame[is.na(tempDataFrame)] <- 0
                     if(length(areas_selection_temp)>0)
                     {
@@ -314,7 +315,9 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
                       next
 
-                    chunk_size <- 10000  # Define a chunk size
+                    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to execute required test for:", key$MARKER, key$FIGURE, key$AREA, key$SUBAREA,".")
+
+                    chunk_size <- 50000  # Define a chunk size
                     for (i in seq(1, nrow(tempDataFrame), by = chunk_size)) {
                       {
                         chunk_indices <- i:min(i + chunk_size - 1, nrow(tempDataFrame))
@@ -443,6 +446,8 @@ association_analysis_save_results <- function(results=NULL,fileNameResults, fami
 
 
   results$DEPTH <- 3
+  # replace NA of SUBAREA with TOTAL
+  results[is.na(results$SUBAREA),"SUBAREA"] <- "TOTAL"
   results[results$SUBAREA=="SAMPLE","DEPTH"] <- 1
   selector <- grepl("TOTAL",results$AREA_OF_TEST)
   results[selector,"DEPTH"] <- 2

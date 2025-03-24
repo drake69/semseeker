@@ -5,12 +5,15 @@
 annotate_position_pivots <- function ()
 {
   start_time <- Sys.time()
-  ssEnv <- get_session_info()
+  # ssEnv <- get_session_info()
+  ssEnv <- get_session_info("~/Documents/Dati_Lavoro/cancer_stage/results/ewas_data_hub/")
+  update_session_info(ssEnv)
   # area and subarea are defined using the filename
   localKeys <-ssEnv$keys_areas_subareas_markers_figures
 
   # remove POSITION area
   localKeys <- localKeys[localKeys$AREA != "POSITION",]
+  # localKeys <- localKeys[localKeys$MARKER != "SIGNAL",]
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotating genomic area.")
 
@@ -45,73 +48,52 @@ annotate_position_pivots <- function ()
     if (!file.exists(dest_pivot_filename))
     {
       log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " File does not exists: ", dest_pivot_filename)
+      probe_features <- probe_features_get(area_subarea)
+      probe_features$CHR <- paste0("chr", probe_features$CHR)
+      # probe_features <-subset(probe_features, !is.na(eval(parse(text=area_subarea))))
+
+      # annotate file
+      if(file.exists(source_pivot_filename))
       {
-        probe_features <- probe_features_get(area_subarea)
-        probe_features$CHR <- as.factor(paste0("chr", probe_features$CHR))
-        # probe_features <-subset(probe_features, !is.na(eval(parse(text=area_subarea))))
+        probe_features$CHR <- as.character(probe_features$CHR)
+        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotating, reading pivot.")
+        probe_features <- polars::as_polars_df(probe_features)$lazy()
+        probe_features <- probe_features$with_columns(polars::pl$col(area_subarea)$alias("AREA"))$drop(area_subarea)
+        # colnames(probe_features)
+        probe_features <- probe_features$cast(list(START = polars::pl$Int32, END = polars::pl$Int32, CHR = polars::pl$String))
 
-        # annotate file
-        if(file.exists(source_pivot_filename))
-        {
-          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotatinbg, reading pivot.")
+        pivot <- polars::pl$scan_parquet(source_pivot_filename)
+        pivot <- pivot$cast(list(START = polars::pl$Int32, END = polars::pl$Int32, CHR = polars::pl$String))
+        # pivot <- polars::pl$read_parquet(source_pivot_filename)
+        pivot <- probe_features$join(
+          pivot,
+          on = c("CHR", "START", "END"),
+          how = "inner"
+        )
 
-          pivot <- polars::pl$read_parquet(source_pivot_filename)$to_data_frame()
-          if(any(grepl("END", colnames(probe_features)))) #dplyr::inner_join
-            pivot <- merge(probe_features,pivot, by = c("CHR", "START","END"), all.y = TRUE)
-          else
-            pivot <- merge(probe_features,pivot, by = c("CHR", "START"), all.y = TRUE)
+        existing_cols <- names(pivot)
+        cols_to_remove <- c("PROBE","CHR","START","END","K27","K450","K850")
+        cols_to_remove <- cols_to_remove[cols_to_remove %in% existing_cols]
+        pivot <- pivot$drop(cols_to_remove)
+        # drop row where AREA is NA
+        pivot <- pivot$drop_nulls("AREA")
+        pivot <- pivot$sort(c("AREA"), descending = c(FALSE))$collect()
 
-          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotating, annotaion executed.")
-          pivot <-subset(pivot, !is.na(eval(parse(text=area_subarea))))
-
-          if(nrow(pivot)!=0)
-          {
-            pivot_colnames <- colnames(pivot)
-            pivot_colnames[which(pivot_colnames==area_subarea)] <- "AREA"
-            colnames(pivot) <- pivot_colnames
-
-            # pivot$CHR <- as.factor(pivot$CHR)
-            # probe_features <- probe_features[(probe_features$CHR %in% unique((pivot$CHR))), ]
-
-            existing_cols <- names(pivot)
-            cols_to_remove <- c("PROBE","CHR","START","END","K27","K450","K850")
-            cols_to_remove <- cols_to_remove[cols_to_remove %in% existing_cols]
-
-            pivot <- polars::as_polars_df(pivot)$drop(cols_to_remove)
-
-            # droplevels(probe_features$CHR)
-            # droplevels(pivot$CHR)
-
-            # colname_to_preserve <- !(colnames(pivot) %in%  c("PROBE","CHR","START","END","K27","K450","K850"))
-            # pivot <- pivot[, colname_to_preserve] %>% dplyr::distinct()
-
-            # sum rows with the same AREA
-            if (localKeys[i, "DISCRETE"]) {
-              # pivot <- pivot %>%
-              #   dplyr::group_by(AREA) %>%
-              #   dplyr::summarise(across(everything(), sum, .names = "{.col}"))
-              pivot <- pivot$group_by("AREA", maintain_order = TRUE)$sum()
-            } else {
-              # pivot <- pivot %>%
-              #   dplyr::group_by(AREA) %>%
-              #   dplyr::summarise(across(everything(), mean, .names = "{.col}"))
-              pivot <- pivot$group_by("AREA", maintain_order = TRUE)$mean()
-            }
-            log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotatinbg, aggregation executed.")
-
-
-            # pivot <- polars::as_polars_df(pivot)
-            pivot$write_parquet(dest_pivot_filename)
-            # arrow::write_parquet(pivot,dest_pivot_filename)
-            log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotatinbg, writing executed marker %s figure %s, area %s subarea %s",marker, figure ,area, subarea)
-            rm(pivot)
-            #
-          }
-          else
-            ssEnv$key_missed_areas_subareas <- unique(rbind(ssEnv$key_missed_areas_subareas, localKeys[i,c("AREA","SUBAREA")]))
+        if (localKeys[i, "DISCRETE"]) {
+          pivot <- pivot$group_by("AREA", maintain_order=FALSE)$sum()
+        } else {
+          pivot <- pivot$group_by("AREA", maintain_order=FALSE)$mean()
         }
+
+        pivot$write_parquet(dest_pivot_filename)
+
+        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Annotating, annotaion executed.")
+
+        if(nrow(pivot)==0)
+          ssEnv$key_missed_areas_subareas <- unique(rbind(ssEnv$key_missed_areas_subareas, localKeys[i,c("AREA","SUBAREA")]))
       }
     }
+
 
     if(ssEnv$showprogress)
       progress_bar(sprintf("Annotating position pivots."))

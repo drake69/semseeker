@@ -33,54 +33,34 @@ semseeker <- function(sample_sheet,
   ssEnv <- get_session_info()
   log_event("BANNER:", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will search MARKERS for project \n in ", ssEnv$result_folderData)
 
-  if(is.data.frame(sample_sheet) & is.data.frame(signal_data))
-  {
-    sample_sheet <-list(sample_sheet)
+  # check if the input is a list of data frames
+  if(!is.list(sample_sheet) | is.data.frame(sample_sheet))
+    sample_sheet <- list(sample_sheet)
+  if(!is.list(signal_data))
     signal_data <- list(signal_data)
-  } else
-  {
-    if(is.data.frame(sample_sheet) | is.data.frame(signal_data))
-      stop("both sample_sheet and signal_data should be data frame!")
-    if(length(sample_sheet)!=length(signal_data))
-      stop("both sample_sheet and signal_data should have been list with the same length!")
-  }
 
-  if(length(signal_data)>1)
-  {
-    d <- 1
-    for(d in 1:length(signal_data))
-    {
-      if (ssEnv$signal_intrasample)
-        probes_to_preserve <- row.names((signal_data[[d]]))
-      else
-        probes_to_preserve <- row.names(stats::na.omit(signal_data[[d]]))
-    }
-  }
-  else
-    probes_to_preserve <- row.names(signal_data[[1]])
 
   batch_id <- 1
+  ssEnv$batch_count <- length(sample_sheet)
+  ssEnv <- update_session_info(ssEnv)
+
   for(batch_id in 1:length(sample_sheet))
   {
     # browser()
-    sample_sheet_local <- sample_sheet[[batch_id]]
+    start_time <- Sys.time()
+    ssEnv$running_batch_id <- batch_id
+    ssEnv <- update_session_info(ssEnv)
+    sample_sheet_local <- source_data_get(sample_sheet[[batch_id]])
     sample_sheet_local$Sample_ID <- name_cleaning(sample_sheet_local$Sample_ID)
     utils::write.csv2(sample_sheet_local, file = file_path_build(ssEnv$result_folderData, paste0(batch_id,"_sample_sheet_original"),"csv",FALSE))
     signal_intrasample <- TRUE
-    signal_data_local <- signal_data[[batch_id]]
-    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id, " of ", nrow(signal_data_local), " rows and ", ncol(signal_data_local), " samples.")
-    colnames(signal_data_local) <- name_cleaning(colnames(signal_data_local))
-    signal_data_local <- signal_data_local[rownames(signal_data_local) %in% probes_to_preserve,]
-    signal_data_local <- substitute_infinite(signal_data_local)
-    gc()
-    signal_data_local <- inpute_missing_values(signal_data_local)
-    gc()
-    signal_data_local <- stats::na.omit(signal_data_local)
-    analyze_batch(signal_data_local, sample_sheet_local, batch_id)
+    analyze_batch(source_data_get(signal_data[[batch_id]]), sample_sheet_local)
     create_position_pivots(sample_sheet_local,ssEnv$keys_markers_figures)
-    study_summary_total()
+    log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), "Batch Executed in:", difftime(time1 = Sys.time(), time2= start_time,units = "mins") , " minutes.")
   }
 
+  deltaX_get()
+  study_summary_total()
   annotate_position_pivots()
   log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), " Saving Sample Sheet with Results! ")
 

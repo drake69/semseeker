@@ -4,7 +4,7 @@
 \alias{mutations_get}
 \title{mutations_get}
 \usage{
-mutations_get(values, figure, thresholds, probe_features, sampleName)
+mutations_get(values, figure, thresholds, sampleName)
 }
 \arguments{
 \item{values}{values of methylation}
@@ -13,9 +13,9 @@ mutations_get(values, figure, thresholds, probe_features, sampleName)
 
 \item{thresholds}{threshold to use for comparison}
 
-\item{probe_features}{probe_features features probe, chr, start,end}
-
 \item{sampleName}{name of the sample}
+
+\item{probe_features}{probe_features features probe, chr, start,end}
 }
 \value{
 mutations

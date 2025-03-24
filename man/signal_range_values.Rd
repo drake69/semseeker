@@ -4,7 +4,7 @@
 \alias{signal_range_values}
 \title{calculate the range of signal values to define the outlier}
 \usage{
-signal_range_values(populationMatrix, batch_id)
+signal_range_values(populationMatrix, batch_id, probe_features)
 }
 \arguments{
 \item{populationMatrix}{matrix of methylation for the population under calculation}

@@ -1,0 +1,49 @@
+source_data_get <- function(source_data){
+
+  # check id source data is a path or a dataframe
+  if (!is.character(source_data))
+    return(as.data.frame(source_data))
+
+  if (!file.exists(source_data))
+  {
+    message(paste("File ", source_data, " not found"))
+    return(NULL)
+  }
+  Sys.setenv("VROOM_CONNECTION_SIZE" = "5000000")  # Imposta 5 MB
+  # check if ile extension is csv
+  if ( grepl("\\.csv$", source_data))
+    source <- as.data.frame(readr::read_csv2(source_data))
+
+  if ( grepl("\\.xls$", source_data) |  grepl("\\.xlsx$", source_data))
+  {
+    source <- as.data.frame(readxl::read_excel(source_data))
+  }
+
+
+  # check if the file is gz or rds
+  if ( grepl("\\.gz$", source_data))
+  {
+    source <- as.data.frame(readr::read_delim(source_data))
+  }
+  if ( grepl("\\.rds$", source_data) ||  grepl("\\.RDS$", source_data))
+    source <- as.data.frame(readRDS(source_data))
+
+  if ( grepl("\\.parquet$", source_data))
+    source <- as.data.frame(arrow::read_parquet(source_data))
+
+  # if exists a column PROBE, set it as rownames
+  if ("PROBE" %in% colnames(source))
+  {
+    rownames(source) <- source[,"PROBE"]
+    # remove colname PROBE
+    source <- source[, -which(colnames(source) == "PROBE")]
+  }
+
+  if (!is.data.frame(source))
+  {
+    log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y") , " source_data ", source_data, " is missed !")
+    stop()
+  }
+
+  return(as.data.frame(source))
+}

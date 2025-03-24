@@ -9,19 +9,20 @@
 #' @return mutations
 #'
 #'
-mutations_get <- function(values, figure,thresholds, probe_features, sampleName)
+mutations_get <- function(values, figure,thresholds, sampleName)
 {
+  # sort values and thresholds by chr and start
+  values <- sort_by_chr_and_start(values)
+  thresholds <- sort_by_chr_and_start(thresholds)
+
   if (figure == "HYPO") {
-    mutation <- as.numeric(values < thresholds)
+    mutation <- as.numeric(values[,4] < thresholds$signal_inferior_thresholds)
   }
   if (figure == "HYPER") {
-    mutation <- as.numeric(values > thresholds)
+    mutation <- as.numeric(values[,4] > thresholds$signal_superior_thresholds)
   }
-  mutationAnnotated <- data.frame(as.data.frame(probe_features), "MUTATIONS" = mutation, row.names = probe_features$PROBE)
+  mutationAnnotated <- data.frame("CHR" = thresholds$CHR,"START" = thresholds$START,"END"=thresholds$END, "MUTATIONS" = mutation)
   mutation_annotated_sorted <- sort_by_chr_and_start(mutationAnnotated)
 
-  if (!test_match_order(mutation_annotated_sorted$PROBE, row.names(mutation_annotated_sorted))) {
-    stop("Mutation annotation sorted is not coherent with probe informations order!")
-  }
   return(mutation_annotated_sorted)
 }
