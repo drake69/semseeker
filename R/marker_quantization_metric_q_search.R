@@ -8,7 +8,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), result
 
   to_export <- ""
   ssEnv <- init_env( result_folder= result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy,
-    start_fresh = FALSE, areas=c("POSITION"), subareas=c(""), markers=c("DELTAS","DELTAR"), figures=c("HYPO","HYPER"), ...)
+    start_fresh = FALSE, areas=c("POSITION"), subareas=c("WHOLE"), markers=c("DELTAS","DELTAR"), figures=c("HYPO","HYPER"), ...)
 
   study_summary <-   study_summary_get()
   create_position_pivots(study_summary,ssEnv$keys_areas_subareas_markers_figures)
@@ -290,7 +290,7 @@ load_deltax <- function(source_marker){
 
   ssEnv <- get_session_info()
   area_position <- "POSITION"
-  subarea_position <- ""
+  subarea_position <- "WHOLE"
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " loading: ", source_marker)
 
   pivot_file_nameparquet <- pivot_file_name_parquet(source_marker,"HYPER",area_position,subarea_position)

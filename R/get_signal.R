@@ -16,7 +16,7 @@ source_data_get <- function(source_data){
 
   if ( grepl("\\.xls$", source_data) |  grepl("\\.xlsx$", source_data))
   {
-    source <- as.data.frame(readxl::read_excel(source_data))
+    source <- as.data.frame(readxl::read_excel(source_data,col_names = TRUE))
   }
 
 

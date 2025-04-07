@@ -71,7 +71,7 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
         next
       }
-      original <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";", dec="."))
+      original <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1))
 
 
       pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
@@ -81,7 +81,7 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
         next
       }
-      quantized <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1, sep=";", dec="."))
+      quantized <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1))
 
       tryCatch(
         {

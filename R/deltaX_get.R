@@ -17,7 +17,7 @@ deltaX_get <- function()
   keys <- unique(keys)
 
   area_position <-"POSITION"
-  subarea_position <- ""
+  subarea_position <- "WHOLE"
 
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:nrow(keys))
@@ -45,8 +45,8 @@ deltaX_get <- function()
     figure <- key$FIGURE
     marker <- key$MARKER
 
-    pivot_file_nameparquet_dest_hyper <- pivot_file_name_parquet(marker,"HYPER","POSITION","")
-    pivot_file_nameparquet_dest_hypo <- pivot_file_name_parquet(marker,"HYPO","POSITION","")
+    pivot_file_nameparquet_dest_hyper <- pivot_file_name_parquet(marker,"HYPER","POSITION","WHOLE")
+    pivot_file_nameparquet_dest_hypo <- pivot_file_name_parquet(marker,"HYPO","POSITION","WHOLE")
     if(file.exists(pivot_file_nameparquet_dest_hyper) & file.exists(pivot_file_nameparquet_dest_hypo))
       next
 
@@ -101,6 +101,7 @@ deltaX_get <- function()
 save_figure <- function(colname_pivot,dim_pivot,vector_figure,positions,sample_sheet,area, subarea,marker,figure)
 {
 
+  ssEnv <- get_session_info()
   vector_figure <- matrix(vector_figure, nrow=dim_pivot[1], ncol=dim_pivot[2])
   vector_figure <- as.data.frame(vector_figure)
   colnames(vector_figure) <- colname_pivot

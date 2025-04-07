@@ -10,17 +10,17 @@ signal_range_values <- function(populationMatrix, batch_id, probe_features) {
 
   ssEnv <- get_session_info()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting signal thresholds calculation.")
-  if (sum(is.na(populationMatrix)) > 0)
-  {
-    msg <- paste0("ERROR:", format(Sys.time(), "%a %b %d %X %Y"), " There are missing values in the population matrix, apply the parameter inpute or remove the missing values.")
-    log_event(msg)
-    stop(msg)
-  }
   thresholds_file_name <- file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"parquet")
   if(file.exists(thresholds_file_name))
   {
     result <- polars::pl$read_parquet(thresholds_file_name)$to_data_frame()
     return(result)
+  }
+  if (sum(is.na(populationMatrix)) > 0)
+  {
+    msg <- paste0("ERROR:", format(Sys.time(), "%a %b %d %X %Y"), " There are missing values in the population matrix, apply the parameter inpute or remove the missing values.")
+    log_event(msg)
+    stop(msg)
   }
 
   # populationMatrix <- result

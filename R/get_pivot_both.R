@@ -6,12 +6,12 @@ get_pivot_both <- function(marker)
   ssEnv <- get_session_info()
   is_discrete <- unique(ssEnv$keys_markers_figures_default[ssEnv$keys_markers_figures_default$MARKER==marker,"DISCRETE"])
 
-  pivot_file_name_both <- pivot_file_name_parquet(marker,"BOTH","PROBE","")
+  pivot_file_name_both <- pivot_file_name_parquet(marker,"BOTH","PROBE","WHOLE")
   if(file.exists(pivot_file_name_both))
     return(arrow::read_parquet(pivot_file_name_both))
 
-  pivot_file_name_hyper <- pivot_file_name_parquet(marker,"HYPER","PROBE","")
-  pivot_file_name_hypo <- pivot_file_name_parquet(marker,"HYPO","PROBE","")
+  pivot_file_name_hyper <- pivot_file_name_parquet(marker,"HYPER","PROBE","WHOLE")
+  pivot_file_name_hypo <- pivot_file_name_parquet(marker,"HYPO","PROBE","WHOLE")
 
   if(!file.exists(pivot_file_name_hyper) && !file.exists(pivot_file_name_hypo))
     return(data.frame())

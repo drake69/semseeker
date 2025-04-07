@@ -8,6 +8,8 @@
 #' @return the working ssEnvonment
 init_env <- function(result_folder, maxResources = 90, ...)
 {
+
+  gc()
   tryCatch(
     {
       test_it <- list(...)
@@ -95,6 +97,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"showprogress",FALSE)
   arguments <- set_env_variable(arguments,"signal_intrasample",FALSE)
   arguments <- set_env_variable(arguments,"openai_api_key","")
+  arguments <- set_env_variable(arguments,"multiple_test_adj","fdr", c("BY", "fdr","BH","bonferroni"))
 
   if (!is.null(ssEnv$openai_api_key))
     Sys.setenv(OPENAI_API_KEY = ssEnv$openai_api_key)
@@ -124,6 +127,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   tmp <- tempdir()
   log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y")," data will saved in this folder:", result_folder)
   ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  ssEnv$result_folder <-  result_folder
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")

@@ -40,9 +40,10 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
       # independent_variable2ndLevel <- levels(tempDataFrame[, independent_variable])[2]
     }
   }
+  else
+    tempDataFrame <- as.data.frame(sapply(tempDataFrame, as.numeric))
 
   originalDataFrame <- tempDataFrame
-  tempDataFrame <- as.data.frame(sapply(tempDataFrame, as.numeric))
   if (independentVariableIsFactor)
     tempDataFrame[, independent_variable] <- independentVariableData
 
@@ -110,8 +111,8 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
     transformation <- paste0("NA_", transformation, sep="")
 
 
-  if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="jsd" & family_test!="t.test" & family_test!="poisson" |
-      family_test=="chisq.test" | family_test=="fisher.test" | family_test=="kruskal.test")
+  if(family_test!="binomial" & family_test!="wilcoxon" & family_test!="jsd" & family_test!="t.test" & family_test!="poisson" &
+      family_test!="chisq.test" & family_test!="fisher.test" & family_test!="kruskal.test")
   {
     variable_to_transform <- independent_variable
     if(length(covariates)>0)
@@ -173,9 +174,14 @@ data_preparation <- function(family_test,transformation,tempDataFrame, independe
   if(family_test=="binomial")
     tempDataFrame[, independent_variable] <- as.factor(tempDataFrame[, independent_variable])
 
+  # # remove rows with all NA
+  # tempDataFrame <- tempDataFrame[,colSums(is.na(tempDataFrame)) != nrow(tempDataFrame)]
+
+  # replace - with _ in colnames
+  colnames(tempDataFrame) <- gsub("-", "_", colnames(tempDataFrame))
+
   result <- list(tempDataFrame, independent_variableLevels)
   names(result) <- c("tempDataFrame", "independent_variableLevels")
-
 
   return (result)
 }

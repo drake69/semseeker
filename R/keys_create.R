@@ -64,25 +64,42 @@ keys_create <- function(ssEnv, arguments)
 
   keys_gene_subareas_default <- data.frame("AREA"="GENE", "SUBAREA"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
   keys_island_subareas_default <- data.frame("AREA"="ISLAND","SUBAREA"=c("N_SHORE","S_SHORE","N_SHELF","S_SHELF", "WHOLE"))
-  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c(""))
-  keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("","CYTOBAND"))
-  keys_probe_subareas_default <- data.frame("AREA"="PROBE","SUBAREA"=c(""))
-  keys_position_subareas_default <- data.frame("AREA"="POSITION","SUBAREA"=c(""))
+  keys_dmr_subareas_default <- data.frame("AREA"="DMR","SUBAREA"=c("WHOLE"))
+  keys_chr_subareas_default <- data.frame("AREA"="CHR","SUBAREA"=c("WHOLE","CYTOBAND"))
+  keys_probe_subareas_default <- data.frame("AREA"="PROBE","SUBAREA"=c("WHOLE"))
+  keys_position_subareas_default <- data.frame("AREA"="POSITION","SUBAREA"=c("WHOLE"))
 
   keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default, keys_position_subareas_default)
 
   areas <- unique(c(arguments[["areas"]],"POSITION"))
-  unknown_areas <- areas[!areas %in% keys_areas_subareas_default$AREA]
-  arguments[["areas"]] <- unknown_areas
-  if (!is.null(areas))
-    keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$AREA %in% areas,]
+  if ("ALL" %in% areas)
+  {
+    keys_areas_subareas_default <- keys_areas_subareas_default
+    arguments[["areas"]] <- NULL
+  }
+  else
+  {
+    unknown_areas <- areas[!areas %in% keys_areas_subareas_default$AREA]
+    arguments[["areas"]] <- unknown_areas
+    if (!is.null(areas))
+      keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$AREA %in% areas,]
+  }
 
-  subareas <- unique(c(arguments[["subareas"]],""))
-  unknown_subareas <- subareas[!subareas %in% keys_areas_subareas_default$SUBAREA]
-  # could exist WHOLE associated to AREAS where exists empty SUBAREAS
-  arguments[["subareas"]] <- unknown_subareas[!(unknown_subareas %in% c("WHOLE"))]
-  if (!is.null(subareas))
-    keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$SUBAREA %in% subareas,]
+
+  subareas <- unique(c(arguments[["subareas"]]))
+  if("ALL" %in% subareas)
+  {
+    keys_areas_subareas_default <- keys_areas_subareas_default
+    arguments[["subareas"]] <- NULL
+  }
+  else
+  {
+    unknown_subareas <- subareas[!subareas %in% keys_areas_subareas_default$SUBAREA]
+    # could exist WHOLE associated to AREAS where exists empty SUBAREAS
+    arguments[["subareas"]] <- unknown_subareas[!(unknown_subareas %in% c("WHOLE"))]
+    if (!is.null(subareas))
+      keys_areas_subareas_default <- keys_areas_subareas_default[keys_areas_subareas_default$SUBAREA %in% subareas,]
+  }
 
   ########################################################################################################################
   # combine AREAS, SUBAREAS, MARKERS and FIGURES #####

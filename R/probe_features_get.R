@@ -6,7 +6,7 @@ probe_features_get <- function(area_subarea)
   {
 
     # try to get from signal_data saved
-    pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","")
+    pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","WHOLE")
     signal_data <- polars::pl$read_parquet(pivot_file_name)
     ssEnv <- get_meth_tech(signal_data)
     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Probes get should be called once defined which tech is used.")

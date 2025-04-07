@@ -26,6 +26,9 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   g_end <- ncol(tempDataFrame)
   prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis, key)
+  # if(ncol(prepared_data$tempDataFrame) != ncol(tempDataFrame))
+  #   return(NULL)
+
   tempDataFrame <- prepared_data$tempDataFrame
   independent_variable1stLevel <- prepared_data$independent_variableLevels[1]
   independent_variable2ndLevel <- prepared_data$independent_variableLevels[2]

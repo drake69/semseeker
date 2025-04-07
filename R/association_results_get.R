@@ -21,7 +21,7 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
   }
 
 
-  results_inference <- utils::read.csv2(inferenceFile, sep=";", dec=".", row.names = NULL, header = TRUE, stringsAsFactors = FALSE)
+  results_inference <- utils::read.csv2(inferenceFile, row.names = NULL, header = TRUE, stringsAsFactors = FALSE)
   colnames(results_inference) <- name_cleaning(colnames(results_inference))
   pvalue_column <- name_cleaning(pvalue_column)
 

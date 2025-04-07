@@ -1,4 +1,4 @@
-set_env_variable <- function(arguments, var_name, var_default_value)
+set_env_variable <- function(arguments, var_name, var_default_value, check_values=NULL)
 {
 
 
@@ -16,8 +16,18 @@ set_env_variable <- function(arguments, var_name, var_default_value)
   update_session_info(ssEnv)
   log_event("INFO:",format(Sys.time(), "%a %b %d %X %Y"), " " , var_name ," ",  ssEnv[[var_name]])
 
+  if(!is.null(check_values))
+  {
+    values <- arguments[[var_name]]
+    unknown_options <- values[!values %in% check_values]
+  }
+  else
+  {
+    unknown_options <- NULL
+  }
+
   # remove from arguments var_name
-  arguments[[var_name]] <- NULL
+  arguments[[var_name]] <- unknown_options
 
   return(arguments)
 }

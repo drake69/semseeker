@@ -1,31 +1,36 @@
-#' Preliminary explorative analysys of the data
+#' Preliminary exploratory analysys of the data
 #'
-#' @param categorical_variables
-#' @param numerical_variables
+#' @param categorical_variables vector of variables or variables (with plus sign) to create exploratory pivot
+#' @param numerical_variables vector of variables to have summary
 #' @param sample_sheet path to the sample sheet
 #' @param signal_data  path to the signal data
 #' @param max_missed_sample_sheet max number of missing values in each sample sheet column
 #' @param max_missed_signal_data max number of missing values in each signal data column and row
-#' @param result_folder
-#' @param ...
-#' @param sample_id_column name of the columnwith sample ids
-#' @param exploration_phase numerioc value to preserve histor of explorative analysis
+#' @param result_folder path to the result folder
+#' @param ... other parameters to define options for semseeker
+#' @param sample_id_column name of the column with sample ids
+#' @param exploration_phase numeric value to preserve history of exploratory analysis
 #' @param sample_sheet_mapping rules to rename and remove columns
 #' @param values_mapping rules to recode values and remove samples (source missed leave blank in the mapping file)
 #'
-#' @returns reports of the explorative analysis and sample sheet, signal data cleaned
+#' @returns reports of the exploratory analysis and sample sheet, signal data cleaned
 #' @export
 #'
-explorative_analysis <- function(categorical_variables,numerical_variables, sample_sheet,signal_data, max_missed_sample_sheet = 0.3,
-  max_missed_signal_data = 0.10,sample_id_column="Sample_ID",
-  exploration_phase="0",sample_sheet_mapping = NULL, values_mapping = c(),
+exploratory_analysis <- function(categorical_variables,numerical_variables, sample_sheet,signal_data, max_missed_sample_sheet = 0.3,
+  max_missed_signal_data = 0.10,sample_id_column="Sample_ID", delete_keyword="REMOVE",
+  exploration_phase="0",
+  mapping_folder = NULL,
+  sample_sheet_mapping = NULL,
+  values_mapping = c(),
+  removal_folder = NULL,
+  removal_rules=c(),
   result_folder,  ... ) {
 
   init_env( result_folder= result_folder, ...)
 
   ssEnv <- get_session_info()
   log_event("BANNER:", format(Sys.time(), "%a %b %d %X %Y"), " SemSeeker will explore your data for project \n in ", ssEnv$result_folderData)
-  folder_path <- dir_check_and_create(ssEnv$result_folderData,paste0("Explorative_", exploration_phase))
+  folder_path <- dir_check_and_create(ssEnv$result_folderData,paste0("Exploratory_", exploration_phase))
 
   # remove Sample_Group and unique
   sample_sheet <- source_data_get(sample_sheet)
@@ -34,12 +39,13 @@ explorative_analysis <- function(categorical_variables,numerical_variables, samp
 
   step <- 0
 
+  # rename columns as defined in the sample_sheet_mapping
   if (!is.null(sample_sheet_mapping)) {
     step <- step + 1
-    map <- source_data_get(sample_sheet_mapping)
-    colun_to_remove <- map[map$Mapping == "REMOVE", "Variable"]
+    map <- source_data_get(paste0(mapping_folder,sample_sheet_mapping))
+    colun_to_remove <- map[map$Mapping == delete_keyword, "Variable"]
     sample_sheet <- sample_sheet[,!(colnames(sample_sheet) %in% colun_to_remove)]
-    map <- map[map$Mapping != "REMOVE",]
+    map <- map[map$Mapping != delete_keyword,]
     # rename columns
     for (i in 1:nrow(map))
     {
@@ -51,12 +57,13 @@ explorative_analysis <- function(categorical_variables,numerical_variables, samp
     write.csv2(sample_sheet, file_path, row.names = FALSE)
   }
 
+  # maps values in columns as defined in the values_mapping
   if(length(values_mapping)>0)
   {
     step <- step + 1
     for (i in 1:length(values_mapping))
     {
-      map <- source_data_get(values_mapping[i])
+      map <- source_data_get(paste0(mapping_folder,values_mapping[i]))
       from <- colnames(map)[1]
       to <- colnames(map)[2]
       if (from==to)
@@ -75,13 +82,41 @@ explorative_analysis <- function(categorical_variables,numerical_variables, samp
       sample_sheet <- merge(sample_sheet,map,by.x=from,by.y=from,all.x=TRUE)
       # sample_sheet[sample_sheet[,to] == random_string,from] <- NA
       # remove where to is REMOVE
-      sample_sheet <- sample_sheet[sample_sheet[,to] != "REMOVE",]
+      sample_sheet <- sample_sheet[sample_sheet[,to] != delete_keyword,]
       # remove column of from
       sample_sheet <- sample_sheet[,!(colnames(sample_sheet)==from)]
     }
     file_path <- file_path_build(folder_path,c(step, "cleaned_sample_sheet") ,"csv")
     write.csv2(sample_sheet, file_path, row.names = FALSE)
   }
+
+  # remove samples as defined in the removal_rules file
+  if(length(removal_rules)>0)
+    for (variable in removal_rules) {
+      variable_splitted <- strsplit(variable,"\\+")
+      variable_1 <- variable_splitted[[1]][1]
+      variable_2 <- variable_splitted[[1]][2]
+      file_path <- file_path_build(removal_folder, c(variable,"pivot"),"xlsx")
+      rules <- source_data_get(file_path)
+      # get first column
+      first_var <- data.frame("variable_1"= rules[,variable_1])
+      # other vars
+      removal_details <- data.frame()
+      for (i in 2:ncol(rules))
+      {
+        values <- data.frame( "values"=rules[,i])
+        values$variable_2 <- colnames(rules)[i]
+        tmp <- cbind(first_var,values)
+        removal_details <- plyr::rbind.fill(removal_details, tmp)
+      }
+      removal_details <- subset(removal_details, removal_details$values == delete_keyword)
+      for (r in 1:nrow(removal_details))
+      {      # remove from sample sheet
+        selector <- (sample_sheet[,variable_1] %in% removal_details[r,1]) & (sample_sheet[,variable_2] %in% removal_details[r,3])
+        sample_sheet <- subset(sample_sheet, !selector)
+      }
+    }
+
 
   sample_sheet[, sample_id_column] <- name_cleaning(sample_sheet[, sample_id_column])
   signal_data_original <- signal_data
@@ -104,7 +139,10 @@ explorative_analysis <- function(categorical_variables,numerical_variables, samp
   step <- step + 1
   # Run the function on your dataframe
   sample_sheet_report <- describe_dataframe(sample_sheet)
+  # order desc by Missing_Values_Percent
+  sample_sheet_report <- sample_sheet_report[order(-sample_sheet_report$Missing_Values_Percent),]
   file_path <- file_path_build(folder_path,c(step,"sample_sheet_report"),"csv")
+  sample_sheet_report[sample_sheet_report=="0 (0%)"] <- " "
   write.csv2(sample_sheet_report, file_path, row.names = FALSE)
   save_latex_table(sample_sheet_report, file_path, paste0("Descriptive statistics of the sample sheet ", collapse = " "))
 
@@ -225,6 +263,8 @@ explorative_analysis <- function(categorical_variables,numerical_variables, samp
       colnames(total_row)[which(colnames(total_row)=="Col1")] <- first_col
       pivot_rel_freq <- plyr::rbind.fill(pivot_rel_freq, total_row)
       file_path <- file_path_build(folder_path, c(step, variable,"pivot"),"csv")
+      # replace 0 (0%) with null string
+      pivot_rel_freq[pivot_rel_freq=="0 (0%)"] <- " "
       write.csv2(pivot_rel_freq, file_path, row.names = FALSE)
       save_latex_table(pivot_rel_freq, file_path, paste0("Descriptive statistics for ",variable,sep=" ", collapse = " "))
     }
@@ -261,6 +301,7 @@ explorative_analysis <- function(categorical_variables,numerical_variables, samp
     if(nrow(num_res_data)==0)
       return()
     file_path <- file_path_build(folder_path,c(step, "numeric_variable_pivot"),"csv")
+    num_res_data[num_res_data=="0 (0%)"] <- " "
     write.csv2(num_res_data, file_path, row.names = FALSE)
     save_latex_table(num_res_data, file_path, "Descriptive statistics for numerioc variables" )
   }
@@ -306,6 +347,7 @@ explorative_analysis <- function(categorical_variables,numerical_variables, samp
     "Is Beta"=ssEnv$beta)
 
   file_path <- file_path_build(folder_path, c(step,"signal_data_report"),"csv")
+  signal_data_report[signal_data_report=="0 (0%)"] <- " "
   write.csv2(signal_data_report, file_path, row.names = FALSE)
   save_latex_table(signal_data_report, file_path, "Signal data summary" )
 

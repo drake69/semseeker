@@ -1,4 +1,4 @@
-study_summary_get <- function()
+study_summary_get <- function(sql_sample_selection="")
 {
   ssEnv <- get_session_info()
   summary_file <- file_path_build( ssEnv$result_folderData, "sample_sheet_result","csv")
@@ -12,10 +12,14 @@ study_summary_get <- function()
   }
 
   study_summary <-   utils::read.csv2(summary_file)
+  study_summary <- filter_sql(sql_sample_selection, study_summary)
+
   reference <- study_summary[study_summary$Sample_Group == "Reference",]
   no_reference <- study_summary[study_summary$Sample_Group != "Reference",]
   reference <- reference[!(reference$Sample_ID %in% no_reference$Sample_ID), ]
+
   study_summary <- rbind(no_reference, reference)
+
   if(nrow(reference)==0)
     study_summary <- no_reference
 

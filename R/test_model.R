@@ -124,7 +124,9 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
         p_value <- kruska_wallis_summary[i,j][1]
         row <- as.character(rownames(kruska_wallis_summary)[i])
         col <- as.character(colnames(kruska_wallis_summary)[j])
-        pval_name <- paste0("PVALUE_KW_",as.character(row),"_",as.character(col),sep="")
+        if(i!=j)
+          next
+        pval_name <- paste0("PVALUE_KW_",as.character(col),"_",as.character(row),sep="")
         significative <- significative & (p_value < as.numeric(ssEnv$alpha))
         kw_pvalue_max <- max(kw_pvalue_max, p_value,nan.rm = TRUE)
         p_value <- data.frame(p_value)
@@ -170,6 +172,15 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
 
   if(family_test=="wilcoxon")
   {
+
+    if(length(levels(tempDataFrame[,independent_variable])) !=2)
+    {
+      res$pvalue <- NA
+      res$r_model <- "stats_wilcox.test"
+      res$Wilcox_Value <- 0
+      return(res)
+    }
+
     if (plot)
       box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
 

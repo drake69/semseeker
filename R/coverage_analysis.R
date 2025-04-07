@@ -6,15 +6,19 @@ coverage_analysis <- function(observed_probes)
   ssEnv <- get_session_info()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Started Coverage analysis.")
   keys <- ssEnv$keys_areas_subareas
+  keys <- keys[keys$AREA != "POSITION",]
+  keys <- keys[keys$AREA != "PROBE",]
+  if(plyr::empty(keys))
+  {
+    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " No keys found for coverage analysis.")
+    return()
+  }
   for ( k in 1:nrow(keys))
   {
     # k <- 16
     subarea <- as.character(keys[k,"SUBAREA"])
     area <-  as.character(keys[k,"AREA"])
     area_subarea <- as.character(keys[k,"COMBINED"])
-
-    if(area=="POSITION")
-      next
 
     if(!grepl("_",area_subarea))
       area_subarea <- paste(area_subarea,"_","WHOLE",sep="")
@@ -41,7 +45,8 @@ coverage_analysis <- function(observed_probes)
     else
     {
       coverage <- total_count
-      coverage$COUNT_COVERED <- 0
+      if(nrow(total_count)>0)
+        coverage$COUNT_COVERED <- 0
       # coverage <- merge(total_count, covered_count, by=area_subarea, all.x = TRUE)
     }
 

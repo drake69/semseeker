@@ -126,7 +126,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   utils::write.csv2(probes_stat, probes_stat_fname, row.names = FALSE)
   # remove SIGNAL from tempKeys
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
-  fname <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","")
+  fname <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","WHOLE")
   signal_data <- polars::pl$read_parquet(fname)$to_data_frame()
 
   # threshold_data <- fst::read_fst(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))

@@ -28,7 +28,7 @@ create_position_pivots <- function(population, keys)
     marker <- as.character(key$MARKER)
     figure <- as.character(key$FIGURE)
     area <- as.character("POSITION")
-    subarea <- as.character("")
+    subarea <- as.character("WHOLE")
     if(is.na(marker) || is.na(figure) || is.na(area) || is.na(subarea))
       next
     pivot_filename <- pivot_file_name_parquet(marker, figure, area, subarea)

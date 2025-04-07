@@ -14,8 +14,16 @@ inference_file_name <- function(inference_detail, marker, folder,file_extension=
   if(is.null(covariates) || length(covariates)  ==  0)
     file_suffix <- ""
   else
+  {
+    long_covariates <- length(covariates) > 2
+    # split each covariates by _
+    if (long_covariates)
+    {
+      covariates <- unlist(t(strsplit( gsub(" ","",covariates),split  =  "_", fixed  =  T)))
+      covariates <- unique(covariates)
+    }
     file_suffix <- paste(covariates, collapse = "_")
-
+  }
 
   file_result_prefix <- paste("DEPTH",depth_analysis, file_result_prefix,sep = "_")
   file_result_prefix = paste(prefix, file_result_prefix, sep = "_")

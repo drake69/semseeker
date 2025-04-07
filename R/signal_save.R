@@ -2,7 +2,7 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
 {
   ssEnv <- get_session_info()
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Saving signal data.")
-  pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION","")
+  pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION","WHOLE")
   if(file.exists(pivot_file_name))
   {
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Signal data already saved.")
@@ -16,7 +16,7 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
   # move AREA to the first column
   signal_data <- signal_data[, c(ncol(signal_data), 1:(ncol(signal_data)-1))]
 
-  pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","")
+  pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","WHOLE")
   polars::as_polars_df(signal_data)$write_parquet(pivot_file_name)
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), "Signal data saved with probe.")
 
@@ -33,7 +33,7 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
   )
   signal_data <- signal_data$drop(c("PROBE","PROBE_WHOLE","AREA"))
   signal_data <- signal_data$sort(c("CHR", "START","END"), descending = c(FALSE, FALSE,FALSE))
-  pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION","")
+  pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION","WHOLE")
 
   signal_data$collect()$write_parquet(pivot_file_name)
 

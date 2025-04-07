@@ -57,11 +57,12 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
       )
     )
     # Build the polynomial model with covariates
-    polynomial_model_result <- stats::lm(formula, data = train.data)
+    polynomial_model_result <- stats::lm(formula, data = train.data, na.action = na.exclude)
   }
   else
     # Build the polynomial_model_result
-    polynomial_model_result <- stats::lm(eval(parse(text=dependent_variable)) ~ stats::poly(eval(parse(text=independent_variable)), degree, raw = TRUE), data = train.data)
+    polynomial_model_result <- stats::lm(eval(parse(text=dependent_variable)) ~ stats::poly(eval(parse(text=independent_variable)),
+      degree, raw = TRUE), data = train.data, na.action = na.exclude)
 
 
 
@@ -94,6 +95,9 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     row_name <- rownames(coefficients)[i]
     # browser()
     pval_name <- name_cleaning(paste0("pvalue_",row_name))
+    pval_name <- name_cleaning(gsub("_STATS_POLY_EVAL_PARSE_TEXT_EQ","",pval_name))
+    pval_name <- name_cleaning(gsub("_RAW_EQ_TRUE","",pval_name))
+    pval_name <- name_cleaning(gsub("INDEPENDENT_VARIABLE",independent_variable,pval_name))
     p_value <- data.frame(p_value)
     significative <- significative & p_value < as.numeric(ssEnv$alpha)
     colnames(p_value) <- pval_name
@@ -108,6 +112,21 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   if(plot)
   {
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(samples_sql_condition)))
+
+    if(is.null(covariates) || length(covariates)  ==  0)
+      file_suffix <- ""
+    else
+    {
+      long_covariates <- length(covariates) > 2
+      # split each covariates by _
+      if (long_covariates)
+      {
+        covariates <- unlist(t(strsplit( gsub(" ","",covariates),split  =  "_", fixed  =  T)))
+        covariates <- unique(covariates)
+      }
+      covariates <- paste(covariates, collapse = "_")
+    }
+
     filename  =  file_path_build(chartFolder,
       c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, covariates, area, subarea),
       ssEnv$plot_format)

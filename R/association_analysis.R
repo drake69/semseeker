@@ -47,7 +47,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   localKeys <- ssEnv$keys_markers_figures
   sample_groups <- c("Reference","Control","Case")
 
-  study_summary <-   study_summary_get()
   deltaX_get()
   annotate_position_pivots()
 
@@ -71,9 +70,12 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     # remove covariates with length zero
     covariates <- covariates[lengths(covariates)  !=  0]
     covariates <- covariates[covariates  !=  ""]
-    family_test <- inference_detail$family_test
-    # filter samples using samples_sql_condition
-    study_summary <- filter_sql(inference_detail$samples_sql_condition, study_summary)
+    family_test <- as.character(inference_detail$family_test)
+    study_summary <-   study_summary_get(inference_detail$samples_sql_condition)
+
+    # dummify covariates dummy
+    # covariates <- dummify_covariates(covariates, study_summary)
+
     # browser()
     results <- data.frame()
     if (validate_family_test(family_test))
@@ -400,6 +402,8 @@ association_analysis_save_results <- function(results=NULL,fileNameResults, fami
   if(nrow(results)==0)
     return()
 
+  ssEnv <- get_session_info()
+
   # there is a bug which mantain more family test in the same results file
   # so we need to filter the results
   # browser()
@@ -425,20 +429,18 @@ association_analysis_save_results <- function(results=NULL,fileNameResults, fami
   {
     for (p in 1:length(pvalue_columns))
     {
-      methods <- c("BY", "fdr","BH","bonferroni")
-      for(method in 1:3)
-      {
-        col_p <- toupper(paste0(pvalue_columns[p], "_ADJ_ALL_", methods[method]))
-        results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  methods[method])
-        colnames(results) <- toupper(colnames(results))
-      }
+      col_p <- toupper(paste0(pvalue_columns[p], "_ADJ_ALL_", ssEnv$multiple_test_adj))
+      results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  ssEnv$multiple_test_adj)
+      colnames(results) <- toupper(colnames(results))
     }
 
+    pvalue_adj_colname <- name_cleaning(paste0("PVALUE_ADJ_ALL_", ssEnv$multiple_test_adj))
+
     if (nrow(results)>0)
-      results <- results[order(results$PVALUE_ADJ_ALL_FDR),]
+      results <- results[order(results[,pvalue_adj_colname]),]
 
     if(filter_p_value)
-      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results$PVALUE_ADJ_ALL_FDR < as.numeric(ssEnv$alpha))
+      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results[,pvalue_adj_colname] < as.numeric(ssEnv$alpha))
   }
 
   if(nrow(results)==0)
@@ -456,6 +458,11 @@ association_analysis_save_results <- function(results=NULL,fileNameResults, fami
   results[results == " "] <- NA
   # remove columns where all rows are NA
   results <- results[, colSums(is.na(results)) < nrow(results)]
+
+  # check if exists at least a column with PVALUE
+  if(!any(grepl("PVALUE", colnames(results))))
+    return()
+
   utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
 
 

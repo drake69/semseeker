@@ -3,7 +3,7 @@ filter_sql <- function(sql_conditions, data_frame)
 
   # browser()
   # check if sql_conditions is am empty string
-  if (length(sql_conditions) == 0)
+  if (length(sql_conditions) == 0 )
     return(data_frame)
 
   for ( s in 1:length(sql_conditions))

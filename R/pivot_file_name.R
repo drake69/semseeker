@@ -10,7 +10,7 @@ pivot_file_name <- function(marker,figure,area,subarea,add_gz=TRUE)
 
 pivot_file_name_parquet <- function(marker,figure,area,subarea)
 {
-  # if(marker=="SIGNAL" & figure=="MEAN" & area=="PROBE" & subarea=="")
+  # if(marker=="SIGNAL" & figure=="MEAN" & area=="PROBE" & subarea=="WHOLE")
   #   browser()
 
   ssEnv <- get_session_info()

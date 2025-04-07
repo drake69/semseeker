@@ -42,7 +42,7 @@ annotate_position_pivots <- function ()
     area <- as.character(localKeys[i,"AREA"])
     # TO DO: remove subarea whole from probe features
     area_subarea <- paste(area,"_", ifelse (subarea=="","WHOLE",subarea) , sep="")
-    source_pivot_filename <- pivot_file_name_parquet(marker, figure, "POSITION","")
+    source_pivot_filename <- pivot_file_name_parquet(marker, figure, "POSITION","WHOLE")
     dest_pivot_filename <- pivot_file_name_parquet(marker, figure, area,subarea)
     # i <- 1
     if (!file.exists(dest_pivot_filename))
