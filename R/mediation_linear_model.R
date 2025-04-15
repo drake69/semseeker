@@ -1,5 +1,6 @@
 # (family_test, tempDataFrame, sig.formula, transformation, plot)
-mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea) {
+mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+{
 
   model_params <- unlist(strsplit(as.character(family_test),"_"))
   permutations_test <- as.numeric(model_params[2])

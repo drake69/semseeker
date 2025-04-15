@@ -1,4 +1,4 @@
-log_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
+log_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
 {
 
   ssEnv <- get_session_info()

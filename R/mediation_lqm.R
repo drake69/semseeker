@@ -1,4 +1,4 @@
-mediation_quantreg_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
+mediation_quantreg_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
 {
   # mediation_lqm_model
   ssEnv <- get_session_info()

@@ -1,4 +1,4 @@
-polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea)
+polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
 {
 
   ssEnv <- get_session_info()
@@ -102,7 +102,8 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     significative <- significative & p_value < as.numeric(ssEnv$alpha)
     colnames(p_value) <- pval_name
     res <- cbind(res, p_value)
-    res$pvalue <- max(c(res$pvalue, p_value[1,1]))
+    if (grepl(independent_variable, pval_name))
+      res$pvalue <- max(c(res$pvalue, p_value[1,1]), na.rm = TRUE)
   }
 
   colnames(significative) <- "SIGNIFICATIVE"
@@ -135,15 +136,15 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     train.data$predicted <- predict(polynomial_model_result, newdata = train.data)
 
     if(length(covariates)>0)
-    {    library(ggplot2)
+    {
       # Plot the data and the polynomial fit
       ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
         ggplot2::geom_point(color = ssEnv$color_palette[1]) +
         ggplot2::geom_line(ggplot2::aes_string(y = "predicted"), color = ssEnv$color_palette_darker[2]) +
         ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE), color = ssEnv$color_palette_darker[3]) +
-        xlab(independent_variable) +
-        ylab(dependent_variable) +
-        ggtitle("")
+        ggplot2::xlab(independent_variable) +
+        ggplot2::ylab(dependent_variable) +
+        ggplot2::ggtitle("")
       # browser()
       # formula_string <- paste0(dependent_variable, " ~ poly(", independent_variable, ", ", degree, ", raw = TRUE)",
       #   ifelse(length(covariates) > 0, paste0(" + ", paste(covariates, collapse = " + ")), ""))

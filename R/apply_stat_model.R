@@ -71,7 +71,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       #
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
       # browser()
-      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 5), samples_sql_condition, as.character(key$AREA), as.character(key$SUBAREA))
+      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 10), samples_sql_condition, as.character(key$AREA), as.character(key$SUBAREA))
 
       #
       local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
@@ -80,7 +80,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       local_result$AREA <-  as.character(key$AREA)
       local_result$SUBAREA <-  as.character(key$SUBAREA)
       local_result$AREA_OF_TEST <- burdenValue
-      local_result$FAMILY.TEST <- family_test
+      local_result$FAMILY_TEST <- family_test
       local_result$transformation <- transformation
       local_result$COVARIATES <- ifelse(length(covariates)>0,paste0(covariates,collapse=" "),NA)
       # local_result$bartlett.pvalue <- data_distribution_info(family_test, tempDataFrame, burdenValue, independent_variable)

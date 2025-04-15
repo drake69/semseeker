@@ -49,7 +49,7 @@ pathway_pathfindR <- function(study,
           existing_keys <- unique(pathway_report[pathway_report$source==db,"key"])
 
         if(ssEnv$showprogress)
-          progress_bar(sprintf("Searching for pathway using pathfindR for %s",keys[i,]$AREA,,keys[i,]$SUBAREA,keys[i,]$MARKER,,keys[i,]$FIGURE))
+          progress_bar(sprintf("Searching for pathway using pathfindR for %s, %s, %s, %s",keys[i,]$AREA,keys[i,]$SUBAREA,keys[i,]$MARKER,keys[i,]$FIGURE))
 
         key <- paste(keys[i,]$AREA,keys[i,]$SUBAREA,keys[i,]$MARKER,keys[i,]$FIGURE, sep="_")
 

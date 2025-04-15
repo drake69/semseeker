@@ -39,7 +39,7 @@ association_to_association <- function(inference_details_origin, inference_detai
     data_origin$KEY <- paste(data_origin$FIGURE, data_origin$AREA, data_origin$SUBAREA, data_origin$AREA_OF_TEST, sep = "_")
     data$KEY <- paste(data$FIGURE, data$AREA, data$SUBAREA, data$AREA_OF_TEST, sep = "_")
     data_origin <- data_origin[!(data_origin$KEY %in% data$KEY),]
-    data_origin$FAMILY.TEST <- inference_details$family_test
+    data_origin$FAMILY_TEST <- inference_details$family_test
 
     data <- rbind(data, data_origin)
     data$KEY <- NA

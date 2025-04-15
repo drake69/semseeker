@@ -1,15 +1,14 @@
 # Function to calculate the collinearity score among covariates
 calculate_collinearity_score <- function(df) {
-  # # Install and load required packages
-  # if (!require("car")) install.packages("car")
-  # library(car)
-  # Calculate VIF for each variable using a linear model where each variable is regressed on all others
 
-  
+  # Calculate VIF for each variable using a linear model where each variable is regressed on all others
   vif_values <- apply(df, 2, function(var) {
     lm_model <- stats::lm(var ~ ., data = df)
     return(max(car::vif(lm_model)))
   })
+
+  removal_values <- colnames(df)[which(vif_values > 1)]  # VIF threshold set to 10
+
 
   # Calculate Condition Index
   X <- as.matrix(df)
@@ -27,12 +26,11 @@ calculate_collinearity_score <- function(df) {
   # Aggregate score (weights can be adjusted as needed)
   total_score <- (vif_score * 0.5) + (condition_index_score * 0.3) + (pca_score * 0.2)
 
-  if((vif_score > 5) | (condition_index_score > 0.5) | (pca_score < 0.5)) {
-    log_event("ERROR: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), " - Collinearity check failed. VIF: ", vif_score, ", Condition Index: ", condition_index_score, ", PCA: ", pca_score)
+  if(length(removal_values)!=0) {
+    log_event("WARNING: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), " - Collinearity check failed. VIF: ", vif_score, ", Condition Index: ", condition_index_score, ", PCA: ", pca_score)
+    log_event("WARNING: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), " - Variables should be removed: ", paste(removal_values, collapse = ", "))
+    return(removal_values)
   }
-
-  total_score <- total_score / 5  # Normalize to 0-1 scale
-
-  return(total_score)
+  return(c())
 }
 

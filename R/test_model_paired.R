@@ -1,4 +1,4 @@
-test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot , samples_sql_condition="", area, subarea)
+test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot , samples_sql_condition="", area, subarea, marker, figure)
 {
   ssEnv <- get_session_info()
   res <- data.frame(pvalue=NA)

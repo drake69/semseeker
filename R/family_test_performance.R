@@ -47,7 +47,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
           # read the file
           file <- utils::read.csv2(file_name)
           file <- file[file$DEPTH == depths,]
-          # file$FAMILY.TEST <- paste(family_test, inference_detail$independent_variable, sep="_")
+          # file$FAMILY_TEST <- paste(family_test, inference_detail$independent_variable, sep="_")
           metrics_name_collect(file)
           file$KEY <- paste(file$FIGURE,file$AREA,file$SUBAREA, sep="_")
           file <- file[file$FIGURE %in% selected_figures,]
@@ -100,7 +100,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
           filtered_metric <- filtered_metrics[m]
           # filtered_metric <- "MAE"
           # create a plot
-          p <- ggplot2::ggplot(final[final$MARKER==marker,c("FAMILY.TEST",filtered_metric)], ggplot2::aes_string(x="FAMILY.TEST", y=filtered_metric, fill="FAMILY.TEST")) +
+          p <- ggplot2::ggplot(final[final$MARKER==marker,c("FAMILY_TEST",filtered_metric)], ggplot2::aes_string(x="FAMILY_TEST", y=filtered_metric, fill="FAMILY_TEST")) +
             ggplot2::geom_boxplot() +
             ggplot2::theme_minimal() +
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),

@@ -16,7 +16,7 @@
 #' filter_p_value report after adjusting saves only significant nominal p-value
 #' @param result_folder where semseeker's results are stored, the root folder
 #' @param maxResources percentage of max system's resource to use
-#' @param parallel_strategy which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster
+#' @param parallel_strategy which strategy to use for parallel execution see future vignette: possible values, none, multisession,sequential, multicore, cluster
 #' @param ... other options to filter elaborations
 #'
 #' @importFrom doRNG %dorng%
@@ -62,9 +62,12 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     start_time <- Sys.time()
     processed_items <- 0
     inference_detail <- inference_details[z,]
-    collinearity_check <- ifelse(is.null(inference_detail$collinearity_check),FALSE,inference_detail$collinearity_check)
+
     filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
 
+    collinearity_check <- ifelse(is.null(inference_detail$collinearity_check),FALSE,inference_detail$collinearity_check)
+    covariates_dummy <- inference_detail$covariates_dummy
+    covariates_pca <- ifelse(is.null(inference_detail$covariates_pca),FALSE,inference_detail$covariates_pca)
     covariates <- inference_detail$covariates
     covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
     # remove covariates with length zero
@@ -74,9 +77,24 @@ association_analysis <- function(inference_details,result_folder, maxResources =
     study_summary <-   study_summary_get(inference_detail$samples_sql_condition)
 
     # dummify covariates dummy
-    # covariates <- dummify_covariates(covariates, study_summary)
+    if(length(covariates_dummy) > 0)
+    {
+      covariates_dummy <- if(length(covariates_dummy) !=  0 && !is.null(covariates_dummy)) unlist(t(strsplit( gsub(" ","",covariates_dummy),split  =  "+", fixed  =  T)))
+      if(length(covariates_dummy) > 0)
+        for(i in 1:length(covariates_dummy))
+        {
+          covariate_dummy <- covariates_dummy[i]
+          encoded_covariate <- fastDummies::dummy_cols(study_summary, select_columns = covariate_dummy, remove_first_dummy = TRUE)
+          encoded_covariate <- encoded_covariate[, !(colnames(encoded_covariate) %in% colnames(study_summary))]
+          encoded_covariate <- encoded_covariate[,  !(colnames(encoded_covariate) %in% c("X"))]
+          encoded_columns <- name_cleaning(colnames(encoded_covariate))
+          colnames(encoded_covariate) <- encoded_columns
+          study_summary <- cbind(study_summary, encoded_covariate)
+          covariates <- unique(c(covariates, colnames(encoded_covariate)))
+        }
+    }
 
-    # browser()
+    #
     results <- data.frame()
     if (validate_family_test(family_test))
     {
@@ -122,6 +140,33 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         else
         {
 
+          if(covariates_pca)
+          {
+            # check if covariates are numeric
+            if(length(covariates)  !=  0)
+            {
+              # check if all covariates are numeric
+              if(!all(sapply(study_summary[,covariates], is.numeric)))
+                log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Not all covariates are numeric! Skipped.")
+
+              # replace covariates with PCA
+              pca_result <- stats::prcomp(study_summary[,covariates], center = TRUE, scale. = TRUE)
+              pca_result <- pca_result$x
+              # pca_result <- stats::predict(pca_result, study_summary[,covariates])
+              pca_result <- as.data.frame(pca_result)
+              write.csv2(pca_result,file_path_build(ssEnv$result_folderData,c("PCA", covariates_dummy),".csv"))
+              colnames(pca_result) <- paste0("PC", 1:ncol(pca_result))
+              covariates <- colnames(pca_result)
+              study_summary <- cbind(study_summary, pca_result)
+            }
+          }
+          covariates_to_remove <- calculate_collinearity_score(study_summary[,covariates])
+          if(length(covariates_to_remove) > 0)
+          {
+            log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " The following covariates are collinear and will be removed: ", paste(covariates_to_remove, collapse = ", "))
+            covariates <- setdiff(covariates, covariates_to_remove)
+          }
+
           if(is.null(covariates) || length(covariates)  ==  0)
           {
             sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable)])
@@ -159,6 +204,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             next
           }
 
+
           ######################################################################################################
           # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
           # binomiale che si vuole usare per la regressione logistica
@@ -166,16 +212,16 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           # min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
           # min_covariates_length <- ifelse(grepl("mediation-linear", family_test), 2, 1 )
           # min_covariates_length <- ifelse(grepl("mediation-ridge", family_test), length(covariates),1 )
-          if(collinearity_check)
-            # check collinearity of covariates
+
+          if(length(covariates_to_remove)>0)
           {
-            collinearity_score <- calculate_collinearity_score(study_summary[,covariates])
-            if(collinearity_score > 0.7)
-            {
-              log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Collinearity score of covariates is too high!")
+            log_event("WARNING: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), " - Variables removed: ", paste(covariates_to_remove, collapse = ", "))
+            if(collinearity_check)
               next
-            }
           }
+
+
+
           markers <- unique(localKeys$MARKER)
           for (a in 1:length(markers))
           {
@@ -226,7 +272,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
                     # remove rows with missing values
                     study_summary_local <- study_summary_local[complete.cases(study_summary_local[, column_selectors]),]
-                    # browser()
+                    #
                   }
                   result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
                     key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
@@ -247,7 +293,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               results[results == ""] <- NA
               # remove columns where all rows are NA
               results <- results[, colSums(is.na(results)) < nrow(results)]
-              # utils::write.csv2(results, fileNameResults , row.names  =  FALSE)
+              results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
+              association_analysis_save_results(results,fileNameResults, family_test, filter_p_value )
             }
 
 
@@ -259,18 +306,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
               file_good <- file.exists(fileNameResults) && file.info(fileNameResults)$size  >10
               dototal <- TRUE
-              old_results <- data.frame()
-              # clean keys from already done association
-              if(file_good)
-              {
-                old_results <- unique(utils::read.csv2(fileNameResults, header  =  T))
-                old_results_filtered <- old_results[(old_results$DEPTH  !=  1),]
-                dototal <- !any(old_results_filtered$DEPTH == 2)
-                old_results_filtered <- old_results_filtered[(old_results_filtered$DEPTH !=2),]
-                keys_markers_figures_areas_done <- unlist(apply(unique(old_results_filtered [, c("MARKER","FIGURE","AREA","SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-                keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA","SUBAREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
-                keys <- keys[!( keys_to_be_done %in% keys_markers_figures_areas_done), ]
-              }
 
               nkeys <- nrow(keys)
               variables_to_export_nested <- c("variables_to_export", "keys", "sample_names", "independent_variable", "covariates",
@@ -290,6 +325,16 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     areas_selection_temp <- areas_selection
                     log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", pivot_filename,".")
                     tempDataFrame <- arrow::read_parquet(pivot_filename)
+
+                    if(file.exists(fileNameResults) && file.info(fileNameResults)$size  >10)
+                    {
+                      old_results <- unique(utils::read.csv2(fileNameResults, header  =  T))
+                      area_to_remove <- old_results[old_results$MARKER==key$MARKER & old_results$FIGURE==key$FIGURE
+                        & old_results$SUBAREA==key$SUBAREA & old_results$AREA==key$AREA,"AREA_OF_TEST"]
+                      tempDataFrame <- tempDataFrame[!(tempDataFrame$AREA %in% area_to_remove),]
+                      results <- old_results
+                      rm(old_results)
+                    }
                     log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", pivot_filename, " with ", nrow(tempDataFrame), " rows.")
                     tempDataFrame[is.na(tempDataFrame)] <- 0
                     if(length(areas_selection_temp)>0)
@@ -309,7 +354,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       {
                         # areas_selection_temp <- gsub(":","_",gsub("'","_",gsub("-","_",areas_selection_temp)))
                         # names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
-                        tempDataFrame <- tempDataFrame[ tempDataFrame[,1] %in% areas_selection_temp, ]
+                        tempDataFrame <- tempDataFrame[ tempDataFrame$AREA %in% areas_selection_temp, ]
                       }
                     }
                     if(is.null(dim(tempDataFrame)))
@@ -319,7 +364,8 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
                     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to execute required test for:", key$MARKER, key$FIGURE, key$AREA, key$SUBAREA,".")
 
-                    chunk_size <- 50000  # Define a chunk size
+                    batch <- 0
+                    chunk_size <- ceiling(6000000/ncol(tempDataFrame))  # Define a chunk size
                     for (i in seq(1, nrow(tempDataFrame), by = chunk_size)) {
                       {
                         chunk_indices <- i:min(i + chunk_size - 1, nrow(tempDataFrame))
@@ -330,6 +376,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                         tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
                         tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
                         log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Transposed pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch) -1 , " columns.")
+                        batch <- batch + 1
                         if(nrow(tempDataFrameBatch)>1)
                         {
                           tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
@@ -355,9 +402,14 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                             session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
 
                           results <- plyr::rbind.fill(results, result_temp_local_batch)
+                          results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
+                          # save every 100 rows
                         }
+                        if ( batch %% 10 == 0)
+                          association_analysis_save_results(results,fileNameResults, family_test, filter_p_value )
                       }
                     }
+                    association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
                   }
                   else
                     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " File not found:", pivot_filename,".")
@@ -366,11 +418,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     results <- subset(results, MARKER == key$MARKER)
                 }
 
-              if (exists("old_results"))
-              {
-                results <- plyr::rbind.fill(results, old_results)
-                rm(old_results)
-              }
             }
 
             if(exists("result_temp_foreach"))
@@ -396,7 +443,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   close_env()
 }
 
-association_analysis_save_results <- function(results=NULL,fileNameResults, family_test, filter_p_value ){
+association_analysis_save_results <- function(results=NULL,fileNameResults, family_test, filter_p_value, append=FALSE ){
 
 
   if(nrow(results)==0)
@@ -406,9 +453,9 @@ association_analysis_save_results <- function(results=NULL,fileNameResults, fami
 
   # there is a bug which mantain more family test in the same results file
   # so we need to filter the results
-  # browser()
-  colnames(results) <- toupper(colnames(results))
-  results <- subset(results, FAMILY.TEST==as.character(family_test))
+  #
+  colnames(results) <- name_cleaning(colnames(results))
+  results <- subset(results, FAMILY_TEST==as.character(family_test))
 
   # check if results is empty
   if(is.null(results))
@@ -417,54 +464,55 @@ association_analysis_save_results <- function(results=NULL,fileNameResults, fami
   if(nrow(results)==0)
     return()
 
-  results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
-  results <- unique(results)
-
-  pvalue_columns <- colnames(results)[grepl("PVALUE", colnames(results)) & !grepl("_ADJ", colnames(results))]
-
-  # remove all existing column adjusted all pvalues
-  results <- results[,!grepl("_ADJ_ALL_", colnames(results))]
-
-  if (exists("results") & length(pvalue_columns)>0)
+  if (!append)
   {
-    for (p in 1:length(pvalue_columns))
+    results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
+    results <- unique(results)
+
+    pvalue_columns <- colnames(results)[grepl("PVALUE", colnames(results)) & !grepl("_ADJ", colnames(results))]
+
+    # remove all existing column adjusted all pvalues
+    results <- results[,!grepl("_ADJ_ALL_", colnames(results))]
+
+    if (exists("results") & length(pvalue_columns)>0)
     {
-      col_p <- toupper(paste0(pvalue_columns[p], "_ADJ_ALL_", ssEnv$multiple_test_adj))
-      results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  ssEnv$multiple_test_adj)
-      colnames(results) <- toupper(colnames(results))
+      for (p in 1:length(pvalue_columns))
+      {
+        col_p <- name_cleaning(paste0(pvalue_columns[p], "_ADJ_ALL_", ssEnv$multiple_test_adj))
+        results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  ssEnv$multiple_test_adj)
+        colnames(results) <- name_cleaning(colnames(results))
+      }
+
+      pvalue_adj_colname <- name_cleaning(paste0("PVALUE_ADJ_ALL_", ssEnv$multiple_test_adj))
+
+      if (nrow(results)>0)
+        results <- results[order(results[,pvalue_adj_colname]),]
+
+      if(filter_p_value)
+        results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results[,pvalue_adj_colname] < as.numeric(ssEnv$alpha))
     }
 
-    pvalue_adj_colname <- name_cleaning(paste0("PVALUE_ADJ_ALL_", ssEnv$multiple_test_adj))
+    if(nrow(results)==0)
+      return()
 
-    if (nrow(results)>0)
-      results <- results[order(results[,pvalue_adj_colname]),]
+    results$DEPTH <- 3
+    # replace NA of SUBAREA with TOTAL
+    results[is.na(results$SUBAREA),"SUBAREA"] <- "TOTAL"
+    results[results$SUBAREA=="SAMPLE","DEPTH"] <- 1
+    selector <- grepl("TOTAL",results$AREA_OF_TEST)
+    results[selector,"DEPTH"] <- 2
+    # replace empty with NA
+    results[results == ""] <- NA
+    results[results == " "] <- NA
+    # remove columns where all rows are NA
+    results <- results[, colSums(is.na(results)) < nrow(results)]
 
-    if(filter_p_value)
-      results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results[,pvalue_adj_colname] < as.numeric(ssEnv$alpha))
+    # check if exists at least a column with PVALUE
+    if(!any(grepl("PVALUE", colnames(results))))
+      return()
   }
 
-  if(nrow(results)==0)
-    return()
-
-
-  results$DEPTH <- 3
-  # replace NA of SUBAREA with TOTAL
-  results[is.na(results$SUBAREA),"SUBAREA"] <- "TOTAL"
-  results[results$SUBAREA=="SAMPLE","DEPTH"] <- 1
-  selector <- grepl("TOTAL",results$AREA_OF_TEST)
-  results[selector,"DEPTH"] <- 2
-  # replace empty with NA
-  results[results == ""] <- NA
-  results[results == " "] <- NA
-  # remove columns where all rows are NA
-  results <- results[, colSums(is.na(results)) < nrow(results)]
-
-  # check if exists at least a column with PVALUE
-  if(!any(grepl("PVALUE", colnames(results))))
-    return()
-
   utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
-
 
 }
 

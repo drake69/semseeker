@@ -26,7 +26,7 @@ apply_stat_model_sig_formula <- function (family_test, burdenValue, independent_
     sig.formula <- stats::as.formula(paste0(burdenValue,"~", covariates_model, sep=""))
   }
 
-  if (family_test=="binomial")
+  if ( family_test=="multinomial" | family_test=="binomial")
   {
     # inversion of roles for variable
     if(is.null(covariates) || length(covariates)==0)

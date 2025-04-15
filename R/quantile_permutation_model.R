@@ -34,7 +34,7 @@ compute_quantile_delta_permutation <- function(sig.formula,df, shuffle = FALSE, 
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot =plot, samples_sql_condition=samples_sql_condition, area, subarea)
+quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot =plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
 {
   quantile_params <- unlist(strsplit(as.character(family_test),"_"))
 

@@ -3,7 +3,7 @@
 pathway_STRINGdb <- function(study,
   statistic_parameter="",
   adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
-  inference_details, significance = TRUE)
+  inference_details, significance = TRUE, stringDBVersion = "12.0")
 {
 
   #
@@ -31,8 +31,8 @@ pathway_STRINGdb <- function(study,
   else
     progress_bar <- ""
 
-  string_db <- STRINGdb::STRINGdb$new(version="11.5", species=9606, # 9606 is the taxonomy ID for Homo sapiens
-    score_threshold=400, input_directory="")
+  string_db <- STRINGdb::STRINGdb$new(version=stringDBVersion, species=9606, # 9606 is the taxonomy ID for Homo sapiens
+    score_threshold=200, input_directory="")
 
   for(id in 1:nrow(inference_details))
   {

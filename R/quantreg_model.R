@@ -8,7 +8,7 @@
 #' @param tests_count count of total executed tests
 #'
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot,
-  samples_sql_condition=samples_sql_condition, area, subarea)
+  samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
 {
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )

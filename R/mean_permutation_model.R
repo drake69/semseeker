@@ -179,7 +179,7 @@ compute_mean_delta_permutation_gpu <- function(sig.formula,df, n_permutations, s
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-mean_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable,plot, samples_sql_condition=samples_sql_condition, area, subarea)
+mean_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable,plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
 {
   ssEnv <- get_session_info()
   n_permutations <- NA
