@@ -1,5 +1,5 @@
-# (family_test, tempDataFrame, sig.formula, transformation, plot)
-mediation_quantreg_model_1 <- function(family_test,tempDataFrame, sig.formula, transformation, plot) {
+# (family_test, tempDataFrame, sig.formula, transformation_y, plot)
+mediation_quantreg_model_1 <- function(family_test,tempDataFrame, sig.formula, transformation_y, plot) {
 
   ssEnv <- get_session_info()
 
@@ -57,7 +57,7 @@ mediation_quantreg_model_1 <- function(family_test,tempDataFrame, sig.formula, t
 
   perms <- sort(unique(c(permutations_test, permutations)))
 
-  for (i in 1:length(perms)) {
+  for (i in seq_along(perms)) {
 
     env <- new.env()
     env$mediate_env <- mediation::mediate

@@ -26,7 +26,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
 
       column_of_id <- key_enrichment_format[pt,"column_of_id"]
-      column_of_pvalue <- key_enrichment_format[pt,"column_of_pvalue"]
+      column_of_adj_pvalue <- key_enrichment_format[pt,"column_of_adj_pvalue"]
       column_of_description <- key_enrichment_format[pt,"column_of_description"]
       column_of_enrichment <- key_enrichment_format[pt,"column_of_enrichment"]
 
@@ -40,11 +40,11 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         else
           path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition), name_cleaning(inference_detail$association_results_sql_condition)))
         family_test <- inference_detail$family_test
-        transformation <- as.character(inference_detail$transformation)
+        transformation_y <- as.character(inference_detail$transformation_y)
         independent_variable <- inference_detail$independent_variable
         covariates <- paste(inference_detail$covariates, collapse="_")
 
-        file_prfx <- paste(independent_variable, transformation,family_test,covariates, pvalue_column,ssEnv$alpha, sep="_")
+        file_prfx <- paste(independent_variable, transformation_y,family_test,covariates, pvalue_column,ssEnv$alpha, sep="_")
 
         aggregated_patwhay_result_total <- data.frame()
         missed_keys <- data.frame()
@@ -90,7 +90,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           else
             pathway_result <- utils::read.csv2(file_name)
 
-          cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
+          cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_adj_pvalue)
           # check column names contain the required columns
           if(!all(cols_to_check %in% colnames(pathway_result)))
           {
@@ -130,11 +130,11 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, SS_RANK <= top)
 
         if(key_enrichment_format[pt,"label"]!="phenolyzer" & length(keywords)>0)
-          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] <= pathway_alpha,]
+          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_adj_pvalue] <= pathway_alpha,]
 
-        # remove rows where column_of_pvalue is greater than alpha
+        # remove rows where column_of_adj_pvalue is greater than alpha
         if(key_enrichment_format[pt,"label"]=="phenolyzer")
-          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] > 0.33,]
+          aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_adj_pvalue] > 0.33,]
 
         if(key_enrichment_format[pt,"label"]=="pathfindR")
           aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total$support > 0.5,]
@@ -158,9 +158,9 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         {
           for (i in 1:nrow(missed_keys))
           {
-            empty_row <- data.frame(column_of_id=NA, column_of_description =NA, column_of_pvalue=NA, column_of_enrichment =NA, missed_keys[i,c("MARKER","FIGURE","AREA","SUBAREA")])
+            empty_row <- data.frame(column_of_id=NA, column_of_description =NA, column_of_adj_pvalue=NA, column_of_enrichment =NA, missed_keys[i,c("MARKER","FIGURE","AREA","SUBAREA")])
             empty_row$key <- paste(empty_row$MARKER,empty_row$FIGURE,empty_row$AREA,empty_row$SUBAREA,sep="_")
-            colnames(empty_row) <- c(column_of_id, column_of_description, column_of_pvalue, column_of_enrichment, "MARKER","FIGURE","AREA","SUBAREA","key")
+            colnames(empty_row) <- c(column_of_id, column_of_description, column_of_adj_pvalue, column_of_enrichment, "MARKER","FIGURE","AREA","SUBAREA","key")
             aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, empty_row)
           }
         }
@@ -169,8 +169,8 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         # save it
         utils::write.csv2(aggregated_patwhay_result, file_path_build(baseFolder =  path, detailsFilename =  paste(file_prfx,"_aggregated_patwhay_result", sep="_"), extension = "csv"))
 
-        fdr <- aggregate(aggregated_patwhay_result[, column_of_pvalue], by = list(aggregated_patwhay_result[,column_of_id]), FUN = mean)
-        colnames(fdr) <- c( column_of_id, column_of_pvalue)
+        fdr <- aggregate(aggregated_patwhay_result[, column_of_adj_pvalue], by = list(aggregated_patwhay_result[,column_of_id]), FUN = mean)
+        colnames(fdr) <- c( column_of_id, column_of_adj_pvalue)
         aggregated_patwhay_result <- unique(aggregated_patwhay_result[,c(column_of_id,"key",column_of_description)])
         aggregated_patwhay_result <- na.omit(aggregated_patwhay_result)
         categories <- unique(na.omit(aggregated_patwhay_result$key))
@@ -202,7 +202,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
         # foreach key add a column with column_of_enrichment
         kk <- unique(aggregated_patwhay_result$key)
-        for (key in 1:length(kk))
+        for (key in seq_along(kk))
         {
           pp <- aggregated_patwhay_result_total[aggregated_patwhay_result_total$key == kk[key],c(column_of_id,column_of_enrichment)]
           colnames(pp) <- c(column_of_id, paste("enrichment_",kk[key],sep = ""))
@@ -211,7 +211,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
         # add support to avaluate the quality of the gene set
         if(key_enrichment_format[pt,"label"]=="pathfindR")
-          for (key in 1:length(kk))
+          for (key in seq_along(kk))
           {
             pp <- aggregated_patwhay_result_total[aggregated_patwhay_result_total$key == kk[key],c(column_of_id,"support")]
             colnames(pp) <- c(column_of_id, paste("SUPPORT_",kk[key],sep = ""))
@@ -234,7 +234,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
         # aggregate fdr
         colnames(aggregated_patwhay_result_total)[which(colnames(aggregated_patwhay_result_total)==column_of_id)] <- "column_of_id_label"
-        fdr <- reshape2::dcast(aggregated_patwhay_result_total, column_of_id_label ~ MARKER , value.var = column_of_pvalue, fun.aggregate = mean)
+        fdr <- reshape2::dcast(aggregated_patwhay_result_total, column_of_id_label ~ MARKER , value.var = column_of_adj_pvalue, fun.aggregate = mean)
         colnames(fdr)[which(colnames(fdr)=="column_of_id_label")] <- column_of_id
         # add from 2 to end of columns FDR
         colnames(fdr)[2:ncol(fdr)] <- paste("FDR_MEAN_",colnames(fdr)[2:ncol(fdr)],sep = "")
@@ -399,7 +399,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         if (length(differences)>0)
         {
           filename <- paste(path, "/",file_prfx,"_differences_",key_enrichment_format[pt,"label"],".csv",sep = "")
-          for (d in 1:length(differences))
+          for (d in seq_along(differences))
           {
             tt2 <- merge(differences[d], names(differences[d]) )
             colnames(tt2) <- c(column_of_id,"KEY")
@@ -412,7 +412,7 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
       # remove all files ending with .log
       # files <- list.files(ssEnv$result_folderPathway, pattern = ".log")
-      # for ( f in 1:length(files))
+      # for ( f in seq_along(files))
       # {
       #   file <- files[f]
       #   unlink(paste(ssEnv$result_folderPathway, "/", file, sep = ""), recursive = TRUE, force = TRUE)
@@ -427,7 +427,7 @@ find_unique_gene_sets <- function(split_list) {
   unique_sets <- list()
   keys <- names(split_list)
 
-  for (k in 1:length(keys)) {
+  for (k in seq_along(keys)) {
 
     key <- keys[k]
     # Start with the current key's gene sets

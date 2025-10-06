@@ -36,8 +36,13 @@ compute_spearman_permutation <- function(sig.formula,df, shuffle = FALSE)
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-spearman_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable,plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+spearman_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable,plot, samples_sql_condition=samples_sql_condition, key)
 {
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
+
   spearman_params <- unlist(strsplit(as.character(family_test),"_"))
   res <- data.frame()
   # spearman_params template spearman + first_round_of_permutations + second_round_of_permutations + confidence_interval_of_beta

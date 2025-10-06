@@ -19,12 +19,26 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
     stop()
   }
 
+
+  inference_details <- subset(inference_details, depth_analysis ==3)
   for ( a in alphas)
   {
     for (id in 1:nrow(inference_details))
     {
       inference_detail <- inference_details[id,]
-      for (i in 1:length(pvalue_columns)){
+      inference_detail_prettified <- t(inference_detail)
+      # Generate a plain text table using kable
+      inference_detail_prettified <- knitr::kable(inference_detail_prettified, format = "simple",
+        align = "l",    # Left align for all columns
+        digits = 2,     # Number of digits for numeric columns
+        row.names = TRUE) # Suppress row names
+
+      inference_detail_prettified <- paste(inference_detail_prettified, collapse = "\n")
+      log_event("JOURNAL: ##############################################################################################################")
+      log_event("JOURNAL: ", format(Sys.time(), "%a %b %d %X %Y"), " \nStarting pathway for inference detail:\n", inference_detail_prettified)
+      log_event("JOURNAL: Gene are selected by the sql_area_selection in the inference details above, also filtered using ", pvalue_columns, "columns. \nWith an alpha limit having value: ", a)
+
+      for (i in seq_along(pvalue_columns)){
 
         pvalue_column <- pvalue_columns[i]
         ssEnv$alpha <- a
@@ -133,4 +147,6 @@ gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_gl
       }
     }
   }
+
+  close_env()
 }

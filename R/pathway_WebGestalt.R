@@ -29,10 +29,10 @@ pathway_WebGestalt <- function(study,
 
   for (i in 1:nrow(keys))
   {
-    for( t in 1:length(types))
+    for( t in seq_along(types))
     {
       type <- types[t]
-      for ( em in 1:length(enrich_methods))
+      for ( em in seq_along(enrich_methods))
       {
         projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  ,
           pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
@@ -45,8 +45,7 @@ pathway_WebGestalt <- function(study,
           pp <- utils::read.csv2(filenameResult,stringsAsFactors = FALSE)
           if(nrow(pp)==0)
             next
-          pp <- enrichment_analysy_add_category("WebGestalt",pp)
-          utils::write.csv2(pp,filenameResult,row.names = FALSE)
+          pathway_result_save(pp, filenameResult, "WebGestalt")
           next
         }
 
@@ -218,7 +217,7 @@ pathway_WebGestalt <- function(study,
     {
       projectName <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=""  , pvalue_column=pvalue_column, as.numeric(ssEnv$alpha), significance)
       filenameResult = file_path_build(path,projectName,"csv")
-      utils::write.csv2(enrichResultFinal, filenameResult)
+      pathway_result_save(enrichResultFinal, filenameResult, "WebGestalt")
       rm(enrichResultFinal)
     }
   }

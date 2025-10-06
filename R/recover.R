@@ -17,7 +17,7 @@ recover <- function(result_folder, maxResources = 90,
   study_summary <-   study_summary_get()
 
   create_position_pivots(study_summary,ssEnv$keys_markers_figures)
-  deltaX_get(study_summary)
+  deltaX_get()
   study_summary_total()
   annotate_position_pivots()
 }

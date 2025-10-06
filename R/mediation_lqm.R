@@ -1,7 +1,11 @@
-mediation_quantreg_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+mediation_quantreg_model <- function(family_test,tempDataFrame, sig.formula, transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {
   # mediation_lqm_model
   ssEnv <- get_session_info()
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
 
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
   tau <- as.numeric(quantreg_params[2])

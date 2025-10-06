@@ -11,11 +11,11 @@ dir_check_and_create <- function  (baseFolder, subFolders)
 
   folderSep <- as.character(.Platform$file.sep)
   parts <- unlist(strsplit(as.character(baseFolder), folderSep))
-  # do.call(file.path, as.list(c(parts[1:length(parts) - 1], subFolders)))
+  # do.call(file.path, as.list(c(parts[seq_along(parts) - 1], subFolders)))
   subFolders <- as.vector(sapply(subFolders, as.character))
-  subFolders <-c(parts[1:length(parts)], subFolders)
+  subFolders <-c(parts[seq_along(parts)], subFolders)
 
-  for( y in 1:length(subFolders))
+  for( y in seq_along(subFolders))
   {
 
     subFolder <- subFolders[y]

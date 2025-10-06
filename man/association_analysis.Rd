@@ -20,7 +20,7 @@ tipo di regressioni: gaussian, poisson, binomial,quantreg_tau_runs(both as numbe
 tipi di test: wilcoxon, stats::t.test,
 tipi di correlazioni: pearson, kendall, spearman
 MUTATIONS_* ~ tcdd_mother + exam_age
-transformation to be applied to dependent variable
+transformation_y to be applied to dependent variable
 (mutations and lesions): scale, log, log2, log10, exp, none, quantile_quantiles(as number) eg quantile_3
 DEPTH analysis:
 1: sample level

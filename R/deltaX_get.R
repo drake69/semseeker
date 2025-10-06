@@ -132,7 +132,7 @@ save_figure <- function(colname_pivot,dim_pivot,vector_figure,positions,sample_s
     # drop rows with NA
     result <- result[complete.cases(result),]
     result <- result[result[,4]>0,]
-    bed_file_name <- bed_file_name(sample_id,sample_group,marker,figure)
-    dump_sample_as_bed_file(result,bed_file_name)
+    bed_filename <- bed_file_name(sample_id,sample_group,marker,figure)
+    dump_sample_as_bed_file(result,bed_filename)
   }
 }

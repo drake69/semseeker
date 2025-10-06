@@ -1,9 +1,13 @@
 # Function to calculate mediation effects using Ridge Regression
-mediation_ridge_model <-  function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+mediation_ridge_model <-  function(family_test,tempDataFrame, sig.formula, transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {
   # function(tempDataFrame, treatment, mediator, outcome,covariates, lambda = 0.1, permutations = 1000) {
 
 
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
 
   ssEnv <- get_session_info()
 
@@ -138,7 +142,7 @@ mediation_ridge_model <-  function(family_test,tempDataFrame, sig.formula, trans
       })
   }
 
-  for (i in 1:length(perms)) {
+  for (i in seq_along(perms)) {
 
     permutations <- perms[i]
 

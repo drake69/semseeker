@@ -1,4 +1,4 @@
-relu_model <- function (family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition)
+relu_model <- function (family_test, tempDataFrame, sig.formula, transformation_y, plot, samples_sql_condition)
 {
 
   #
@@ -56,7 +56,7 @@ relu_model <- function (family_test, tempDataFrame, sig.formula, transformation,
   })
 
   predictions <- stats::predict(relu_model_result)
-  if(nrow(test.data) != 0)
+  if(partition_percentage < 1)
   {
     # Make predictions
     predictions_test <- stats::predict(relu_model_result, newdata = test.data)
@@ -69,7 +69,6 @@ relu_model <- function (family_test, tempDataFrame, sig.formula, transformation,
   coefficients <- coef(summary(relu_model_result))
   # conf_int <- confint(relu_model_result)
 
-  significative <- TRUE
   # for a and b extract the p-value
   for (i in 1:nrow(coefficients)) {
     # i <- 1
@@ -78,7 +77,6 @@ relu_model <- function (family_test, tempDataFrame, sig.formula, transformation,
     pval_name <- paste0("relu_",row_name,"_PVALUE",sep="")
     p_value <- data.frame(p_value)
     colnames(p_value) <- pval_name
-    significative <- significative & p_value < as.numeric(ssEnv$alpha)
 
     relu_coef_estimate <- data.frame(relu_a_estimate = coefficients[i,1])
     colnames(relu_coef_estimate) <- toupper(paste0("relu_",row_name,"_ESTIMATE",sep=""))
@@ -86,11 +84,6 @@ relu_model <- function (family_test, tempDataFrame, sig.formula, transformation,
     res <- cbind(res, p_value, relu_coef_estimate)
   }
 
-  # Add the max p-value
-  res$pvalue <- max(coefficients[,4])
-  # Add the significative
-  colnames(significative) <- "SIGNIFICATIVE"
-  res <- cbind(res, significative)
   # remove rowname from res
   rownames(res) <- NULL
   # res$sig.fromula <- as.character(sig.formula)
@@ -98,17 +91,17 @@ relu_model <- function (family_test, tempDataFrame, sig.formula, transformation,
   if(plot & !any(is.na(predictions)))
   {
     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(samples_sql_condition)))
-    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
+    filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation_y), dependent_variable),ssEnv$plot_format)
 
     ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
       ggplot2::geom_point(color = ssEnv$color_palette[1]) +
       ggplot2::stat_function(na.rm = TRUE, fun = function(x) (res$relu_A_ESTIMATE * exp(res$relu_B_ESTIMATE * x)), color = ssEnv$color_palette_darker[3]) +
-      ggplot2::stat_smooth(method = "loess", color = ssEnv$color_palette[2], se = FALSE) +
+      ggplot2::stat_smooth(method = "loess", color = ssEnv$color_palette[2], se = TRUE) +
       ggplot2::ggtitle("") +
       ggplot2::xlab(independent_variable) +
       ggplot2::ylab(dependent_variable)
 
-    if(nrow(test.data) != 0)
+    if(partition_percentage < 1)
     {
       ggp <- ggp + ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions_test, x = eval(parse(text=independent_variable))), color = ssEnv$color_palette_darker[3])+
         ggplot2::geom_point(data = test.data, ggplot2::aes(y = dependent_variable, x = eval(parse(text=independent_variable))), color = ssEnv$ssEnv$color_palette[2])+

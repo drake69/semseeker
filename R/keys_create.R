@@ -2,7 +2,7 @@ keys_create <- function(ssEnv, arguments)
 {
 
   # remove BOTH and BOTHSUM
-  #
+  ssEnv$default <- list()
   ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Reference","Control","Case"))
   ##### MANAGE MARKERS AND FIGURES #####
   # set default values
@@ -44,6 +44,7 @@ keys_create <- function(ssEnv, arguments)
   keys_markers_figures_default <- keys_markers_figures_default[!(keys_markers_figures_default$FIGURE=="BOTH" | keys_markers_figures_default$FIGURE=="BOTHSUM"),]
 
   ssEnv$keys_markers_figures_default <- keys_markers_figures_default
+  ssEnv$default$keys_markers_figures_default <- keys_markers_figures_default
 
   figures <- arguments[["figures"]]
   unknown_figures <- figures[!figures %in% keys_markers_figures_default$FIGURE]
@@ -70,6 +71,7 @@ keys_create <- function(ssEnv, arguments)
   keys_position_subareas_default <- data.frame("AREA"="POSITION","SUBAREA"=c("WHOLE"))
 
   keys_areas_subareas_default <- rbind(keys_gene_subareas_default, keys_island_subareas_default, keys_dmr_subareas_default, keys_chr_subareas_default, keys_probe_subareas_default, keys_position_subareas_default)
+  ssEnv$default$keys_areas_subareas_default <- keys_areas_subareas_default
 
   areas <- unique(c(arguments[["areas"]],"POSITION"))
   if ("ALL" %in% areas)
@@ -155,13 +157,13 @@ keys_create <- function(ssEnv, arguments)
 
   ########################################################################################################################
   # prepare keys for enrichment analysis report format
-  key_enrichment_format <- data.frame("type"="Pathway", "label"="STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment")
-  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="Phenolyzer_STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_pvalue"="fdr","column_of_enrichment"="fold_enrichment"))
-  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Pathway","label"="WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
-  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Pathway","label"="Phenolyzer_WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_pvalue"="FDR","column_of_enrichment"="enrichmentRatio"))
-  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Phenotype","label"="phenolyzer","column_of_id"="Description","column_of_description"="Description","column_of_pvalue"="Score","column_of_enrichment"="Score"))
-  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="pathfindR","column_of_id"="ID","column_of_description"="Term_Description", "column_of_pvalue"="highest_p","column_of_enrichment"="Fold_Enrichment"))
-  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="ctdR","column_of_id"="ChemicalID","column_of_description"="ChemicalName", "column_of_pvalue"="padj","column_of_enrichment"="foldEnrichment"))
+  key_enrichment_format <- data.frame("type"="Pathway", "label"="STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_adj_pvalue"="fdr","column_of_enrichment"="fold_enrichment","column_of_pvalue"="p_value")
+  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="Phenolyzer_STRINGdb","column_of_id"="term","column_of_description"="description", "column_of_adj_pvalue"="fdr","column_of_enrichment"="fold_enrichment","column_of_pvalue"="p_value"))
+  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Pathway","label"="WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_adj_pvalue"="FDR","column_of_enrichment"="enrichmentRatio","column_of_pvalue"="pValue"))
+  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Pathway","label"="Phenolyzer_WebGestalt","column_of_id"="geneSet","column_of_description"="description","column_of_adj_pvalue"="FDR","column_of_enrichment"="enrichmentRatio","column_of_pvalue"="pValue"))
+  key_enrichment_format <- rbind(key_enrichment_format, data.frame("type"="Phenotype","label"="phenolyzer","column_of_id"="Description","column_of_description"="Description","column_of_adj_pvalue"="Score","column_of_enrichment"="Score","column_of_pvalue"=""))
+  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="pathfindR","column_of_id"="ID","column_of_description"="Term_Description", "column_of_adj_pvalue"="highest_p","column_of_enrichment"="Fold_Enrichment", "column_of_pvalue"="highest_p"))
+  key_enrichment_format <- rbind(key_enrichment_format,data.frame("type"="Pathway", "label"="ctdR","column_of_id"="ChemicalID","column_of_description"="ChemicalName", "column_of_adj_pvalue"="padj","column_of_enrichment"="foldEnrichment","column_of_pvalue"="pvalue"))
 
   ssEnv$key_enrichment_format <- key_enrichment_format
 

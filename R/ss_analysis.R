@@ -36,7 +36,7 @@ ss_analysis <-
     # as vector of character
     result_colnames <- c("MARKER", "FIGURE", "AREA", "SUBAREA", "AREA_OF_TEST","Case","Control", "SENSITIVITY", "SPECIFICITY",
       "P_to_be_Case_cond_to_be_Epimutated","P_to_be_Control_cond_to_be_Not_Epimutated","SCORE","BURDEN","JSD")
-    for (a in 1:length(markers))
+    for (a in seq_along(markers))
     {
       # a <- 2
       dest_path <- dir_check_and_create(ssEnv$result_folderEuristic, samples_sql_selection)

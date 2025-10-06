@@ -135,7 +135,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), result
   markers <- unique(result_temp$MARKER)
   filename  <-  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION_ANALYSIS_PIVOT"),"csv")
   aggregate_pivot <- data.frame()
-  for (m in 1:length(markers))
+  for (m in seq_along(markers))
   {
 
     # m <- 1

@@ -2,6 +2,12 @@ get_meth_tech <- function(signal_data)
 {
   ssEnv <- get_session_info()
 
+  # if(ssEnv$tech != "")
+  # {
+  #   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " The tech is already defined as:", ssEnv$tech)
+  #   return(ssEnv)
+  # }
+
   if(nrow(signal_data) == 485512)
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " seems a 450k dataset.")
 
@@ -14,13 +20,14 @@ get_meth_tech <- function(signal_data)
   if(nrow(signal_data) > 866562)
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " seems a WGBS dataset.")
 
+
+  probe_features <- semseeker::pp_tot[,c("PROBE","CHR","K27","K450","K850")]
   # if doesn't exist column PROBE
   if(!"PROBE" %in% colnames(signal_data))
     signal_data_probe <- rownames(signal_data)
   else
     signal_data_probe <- signal_data$PROBE
 
-  probe_features <- semseeker::pp_tot[,c("PROBE","CHR","K27","K450","K850")]
   # get only probe_features that are in the signal_data_probe
   probe_features <- probe_features[probe_features$PROBE %in% signal_data_probe,]
   # signal_data_check <- merge(signal_data,probe_features, by="PROBE")
@@ -86,5 +93,6 @@ get_meth_tech <- function(signal_data)
 
   update_session_info(ssEnv)
 
+  log_event("JOURNAL: The tech is defined as:", ssEnv$tech)
   return(ssEnv)
 }

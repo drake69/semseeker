@@ -32,6 +32,10 @@ delta_single_sample <- function ( values, thresholds, sample_detail) {
   dump_sample_as_bed_file(data_to_dump = deltas_hyper, fileName = file_path_build(folder_to_save,c(as.character(sample_detail$Sample_ID),"DELTAS","HYPER"),"bedgraph", add_gz=TRUE))
 
   ### get deltas HYPO #########################################################
+  # if(length(low_thresholds)!=length(high_thresholds) || nrow(values[,4])!=length(high_thresholds))
+  # {
+  #   stop("ERROR: I'm stopping here the values and thresholds have different number of rows!")
+  # }
   deltas_hypo <- data.frame("CHR"= thresholds$CHR,"START"= thresholds$START, "END"=thresholds$END, "DELTA"=  low_thresholds - values[,4])
   deltas_hypo <- sort_by_chr_and_start(deltas_hypo)
   # save only deltas of epimutation

@@ -9,11 +9,10 @@ quantile_permutation_model(
   sig.formula,
   tempDataFrame,
   independent_variable,
-  transformation,
+  transformation_y,
   plot = plot,
   samples_sql_condition = samples_sql_condition,
-  area,
-  subarea
+  key
 )
 }
 \arguments{

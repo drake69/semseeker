@@ -4,7 +4,7 @@ log_event <- function(...)
   # append log_event to log file
   log_events <- list(...)
   log_event_to_save <- ""
-  for (i in 1:length(log_events))
+  for (i in seq_along(log_events))
   {
     log_event_to_save <- paste0(log_event_to_save, log_events[i], sep =" ")
   }
@@ -37,6 +37,18 @@ log_event <- function(...)
     verbosity <- as.numeric(ssEnv$verbosity)
 
   cat(log_event_to_save, "\n", file = log_file, append = TRUE)
+
+  file_name <- "console_session_output.log"
+  log_file <- file.path(ssEnv$session_folder,file_name)
+  cat(log_event_to_save, "\n", file = log_file, append = TRUE)
+
+  if(grepl("^JOURNAL", log_event_to_save))
+  {
+    file_name <- "lab_journal.log"
+    journal_file <- file.path(ssEnv$session_folder,file_name)
+    log_event_to_save <- gsub("^JOURNAL: ", "", log_event_to_save)
+    cat(log_event_to_save, "\n", file = journal_file, append = TRUE)
+  }
 
   # if verbosity is 1, only print ERROR messages
   if (verbosity == 1 && grepl("^ERROR", log_event_to_save) || grepl("^BANNER", log_event_to_save) && !testthat::is_testing())

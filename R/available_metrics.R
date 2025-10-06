@@ -16,7 +16,7 @@ available_metrics <- function(inference_details,result_folder, ...)
   {
     start_time <- Sys.time()
     inference_detail <- inference_details[z,]
-    for (a in 1:length(markers) )
+    for (a in seq_along(markers) )
     {
       if (exists("results_inference"))
         rm(results_inference)

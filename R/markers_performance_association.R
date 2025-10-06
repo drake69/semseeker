@@ -29,15 +29,15 @@ markers_performance_association <- function(inference_details, result_folder, pv
       inference_detail <- inference_details[id,]
       depth_analysis <- inference_detail$depth_analysis
       family_test <- inference_detail$family_test
-      transformation <- as.character(inference_detail$transformation)
-      if(transformation == "")
-        transformation <- "none"
-      filtered_metrics <- metrics_filter(model_metrics, as.character(transformation))
+      transformation_y <- as.character(inference_detail$transformation_y)
+      if(transformation_y == "")
+        transformation_y <- "none"
+      filtered_metrics <- metrics_filter(model_metrics, as.character(transformation_y))
       covariates <- paste0(inference_detail$covariates, collapse = "_")
       independent_variable <- inference_detail$independent_variable
 
       final <- data.frame()
-      for (m in 1:length(markers))
+      for (m in seq_along(markers))
       {
         marker <- markers[m]
         # marker <- "DELTAQ"
@@ -168,12 +168,12 @@ markers_performance_association <- function(inference_details, result_folder, pv
         scores <- data.frame("MARKER"="","FIGURE"="","METRIC"="","SCORE"="")[-1,]
         figures <- unique(keys$FIGURE)
         # #
-        for (f in 1:length(figures))
+        for (f in seq_along(figures))
         {
           fig <- figures[f]
           row <- row  + 1
           col <- 0
-          for( m in 1:length(filtered_metrics)){
+          for( m in seq_along(filtered_metrics)){
             metric <- filtered_metrics[m]
             col <- col + 1
             # metric <- "MAE"
@@ -216,7 +216,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
             #   next
             # scores <- metrics_ranking(metric,final_temp, scores, fig, "REBASED")
 
-            bar_colors <- ssEnv$color_palette[1:length(unique(final_temp$MARKER))]
+            bar_colors <- ssEnv$color_palette[seq_along(unique(final_temp$MARKER))]
             min_rebased <- min(final_temp$REBASED, na.rm = TRUE)
             max_rebased <- max(final_temp$REBASED, na.rm = TRUE)
 
@@ -255,7 +255,7 @@ markers_performance_association <- function(inference_details, result_folder, pv
         }
 
         # create a prefix for the file name
-        prfx <- paste( independent_variable, transformation,family_test, ssEnv$alpha ,covariates, area, subarea, paste0(markers,collapse="_"))
+        prfx <- paste( independent_variable, transformation_y,family_test, ssEnv$alpha ,covariates, area, subarea, paste0(markers,collapse="_"))
         if(length(plot_list) != 0)
         {
 

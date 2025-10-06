@@ -32,7 +32,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
 
   localKeys <- unique(ssEnv$keys_markers_figures$MARKER)
   tempKeys <- localKeys
-  for(k in 1:length(localKeys)){
+  for(k in seq_along(localKeys)){
     marker <- as.character(localKeys[k])
     pivot_subfolder <- dir_check_and_create(result_folderPivot,marker)
     fname_both <- file_path_build( pivot_subfolder ,c(marker, "BOTH", "PROBE","WHOLE"),"csv", add_gz = TRUE)
@@ -46,7 +46,7 @@ manhattan_plot_marker_per_sample <- function( sample_name = "NAME", probes_range
   # remove SIGNAL from tempKeys
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
 
-  for(j in 1:length(tempKeys))
+  for(j in seq_along(tempKeys))
   {
 
     marker <- as.character(tempKeys[j])

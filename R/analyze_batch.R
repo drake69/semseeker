@@ -10,6 +10,11 @@ analyze_batch <- function(signal_data, sample_sheet)
   {
     signal_data <- substitute_infinite(signal_data)
     signal_data <- inpute_missing_values(signal_data)
+  } else
+  {
+    signal_data <- polars::pl$read_parquet(pivot_file_name)$to_data_frame()
+    if("CHR" %in% colnames(signal_data))
+      signal_data <- position_pivot_to_probe(signal_data)
   }
 
   signal_data <- as.data.frame(signal_data)
@@ -34,18 +39,6 @@ analyze_batch <- function(signal_data, sample_sheet)
     stop()
   }
 
-  # if(!is.null(inferenceDetails))
-  # {
-  #   covariates <- unlist(t(strsplit( gsub(" ","",inferenceDetails$covariates),split = "+", fixed = T)))
-  #
-  #   if ( length(covariates)>0 & !( covariates  %in% colnames(sample_sheet)))
-  #   {
-  #     log_event(covariates[!(covariates%in% colnames(sample_sheet))])
-  #     stop("The covariates value are not available in the sample sheet!")
-  #   }
-  # }
-
-
   sample_group_checkResult <- sample_group_check(sample_sheet, signal_data)
   if(!is.null(sample_group_checkResult))
   {
@@ -58,9 +51,7 @@ analyze_batch <- function(signal_data, sample_sheet)
   referencePopulationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == "Reference", ]
   referencePopulationMatrix <- data.frame(PROBE = row.names(signal_data), signal_data[, referencePopulationSampleSheet$Sample_ID])
 
-  #
   # signal_data <- data.frame(PROBE = row.names(signal_data), signal_data[ , which(!(colnames(signal_data)%in%referencePopulationSampleSheet$Sample_ID))]  )
-
 
   if (plyr::empty(referencePopulationMatrix) ||
       ncol(referencePopulationMatrix) < 2) {
@@ -86,8 +77,8 @@ analyze_batch <- function(signal_data, sample_sheet)
   i <- 0
   variables_to_export <- c( "ssEnv", "sample_sheet", "signal_data", "analyze_population",
     "populationControlRangeBetaValues", "PROBES","probe_features")
-  # resultSampleSheet <- foreach::foreach(i = 1:length(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
-  for (i in 1:length(ssEnv$keys_sample_groups[,1]))
+  # resultSampleSheet <- foreach::foreach(i = seq_along(ssEnv$keys_sample_groups[,1]), .combine = rbind, .export = variables_to_export ) %dorng%
+  for (i in seq_along(ssEnv$keys_sample_groups[,1]))
   {
     sample_group <- ssEnv$keys_sample_groups[i,1]
     populationSampleSheet <- sample_sheet[sample_sheet$Sample_Group == sample_group, ]

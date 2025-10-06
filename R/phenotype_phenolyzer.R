@@ -186,7 +186,7 @@ phenotype_phenolyzer <- function(study,
     path <- dir_check_and_create(baseFolder = base_path, subFolders = "worldcloud")
     # copy all files ending with _wordcloud.png to the worldcloud folder
     wordcloud_files <- list.files(tempFolder, pattern = "_wordcloud.png", full.names = TRUE)
-    for (w in 1:length(wordcloud_files))
+    for (w in seq_along(wordcloud_files))
     {
       wordcloud_file <- wordcloud_files[w]
       phenotype_analysis_name <- phenotype_analysis_name( inference_detail = inference_detail,key = keys[i,], prefix="",suffix=paste(disease_label,"_wordcloud",sep=""), pvalue_column=pvalue_column, ssEnv$alpha, significance)
@@ -198,7 +198,7 @@ phenotype_phenolyzer <- function(study,
     # copy all files ending with _diseases.png to the worldcloud folder
     diseases_files <- list.files(tempFolder, pattern = "_diseases", full.names = TRUE)
 
-    for (w in 1:length(diseases_files))
+    for (w in seq_along(diseases_files))
     {
 
       diseases_file <- diseases_files[w]
@@ -221,9 +221,9 @@ phenotype_phenolyzer <- function(study,
   }
 
   # family_test <- inference_detail$family_test
-  # transformation <- inference_detail$transformation
+  # transformation_y <- inference_detail$transformation_y
   # significance_label <- ifelse(significance, "significant", "non_significant")
-  # analysis_name <- paste("summary",pvalue_column, significance_label, ssEnv$alpha, as.character(transformation), as.character(family_test), sep="_")
+  # analysis_name <- paste("summary",pvalue_column, significance_label, ssEnv$alpha, as.character(transformation_y), as.character(family_test), sep="_")
   # phenotype_report_path <- file_path_build(base_path,analysis_name,"csv")
   # if(file.exists(phenotype_report_path))
   # {

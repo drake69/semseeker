@@ -11,8 +11,7 @@ spearman_permutation(
   independent_variable,
   plot,
   samples_sql_condition = samples_sql_condition,
-  area,
-  subarea
+  key
 )
 }
 \arguments{

@@ -25,7 +25,6 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, ...)
 {
 
-
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE,
     figures=c("HYPER","HYPO"), areas="PROBE", ...)
 
@@ -49,6 +48,10 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   # low_signal_probes <- 0.1 * high_signal_probes
   low_signal_probes <- 0
   probes_stat_fname <- file_path_build( ssEnv$result_folderData, "PROBES_STAT","csv")
+
+  if(((probe_name_max != "cg11680158") | (probe_name_min != "cg11680158")) & file.exists(probes_stat_fname))
+    unlink(probes_stat_fname)
+
   if (file.exists(probes_stat_fname))
     probes_stat <- utils::read.csv2(probes_stat_fname, header = TRUE, stringsAsFactors = FALSE)
   else
@@ -59,6 +62,8 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     colnames(probes_stat) <- c("MARKER", "METRIC","POSITION","VALUE")
   }
 
+
+
   localKeys <- unique(localKeys[(localKeys %in% unique(probes_stat[(is.na(probes_stat$VALUE) | probes_stat$VALUE==""),"MARKER"]))])
   if(ssEnv$showprogress)
     progress_bar <- progressr::progressor(along = 1:(length(localKeys)))
@@ -66,7 +71,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     progress_bar <- ""
 
   if (length(localKeys) != 0)
-    for(k in 1:length(localKeys)){
+    for(k in seq_along(localKeys)){
       marker <- as.character(localKeys[k])
       {
         if(ssEnv$showprogress)
@@ -85,40 +90,58 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
           markers_sum <- apply(count_m, 1, sum)
           #Q1
           markers_sum_q1 <- quantile(markers_sum, 0.25)
-          probes_name_q1 <- areas_name[which(markers_sum <= markers_sum_q1)]
+          q1_index <- which.min(abs(markers_sum - markers_sum_q1))
+          probes_name_q1 <- areas_name[q1_index]
           if (length(probes_name_q1) > 1)
             probes_name_q1 <- probes_name_q1[1]
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q1","POSITION"] <- probes_name_q1
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q1","VALUE"] <- markers_sum_q1
           #Q3
           markers_sum_q3 <- quantile(markers_sum, 0.75)
-          probes_name_q3 <- areas_name[which(markers_sum >= markers_sum_q3)]
+          q3_index <- which.min(abs(markers_sum - markers_sum_q3))
+          probes_name_q3 <- areas_name[q3_index]
           if (length(probes_name_q3) > 1)
             probes_name_q3 <- probes_name_q3[1]
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q3","POSITION"] <- probes_name_q3
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "Q3","VALUE"] <- markers_sum_q3
           #MAX
-          markers_sum_max <- max(markers_sum)
-          probe_name_max <- areas_name[which.max(markers_sum)]
-          if (length(probe_name_max) > 1)
-            probe_name_max <- probe_name_max[1]
+          if((probe_name_max != "cg11680158"))
+          {
+            max_index <- which.max(markers_sum)
+            markers_sum_max <- markers_sum[max_index]
+            probe_name_max <- areas_name[max_index]
+          }
+          else
+          {
+            markers_sum_max <- max(markers_sum)
+            if (length(probe_name_max) > 1)
+              probe_name_max <- probe_name_max[1]
+          }
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MAX","POSITION"] <- probe_name_max
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MAX","VALUE"] <- markers_sum_max
           #MIN
-          markers_sum_min <- min(markers_sum)
-          probe_name_min <- areas_name[which.min(markers_sum)]
-          if (length(probe_name_min) > 1)
-            probe_name_min <- probe_name_min[1]
+          if((probe_name_min != "cg11680158"))
+          {
+            min_index <- which.min(markers_sum)
+            markers_sum_min <- markers_sum[min_index]
+            probe_name_min <- areas_name[min_index]
+          }
+          else
+          {
+            markers_sum_min <- min(markers_sum)
+            if (length(probe_name_min) > 1)
+              probe_name_min <- probe_name_min[1]
+          }
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MIN","POSITION"] <- probe_name_min
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MIN","VALUE"] <- markers_sum_min
           #MEDIAN
-          markers_median <- apply(count_m, 1, median)
-          markers_median_max <- max(markers_median)
-          probe_name_median <- areas_name[which(markers_median==markers_median_max)]
+          markers_median <- quantile(markers_sum, 0.5)
+          median_index <- which.min(abs(markers_sum - markers_median))
+          probe_name_median <- areas_name[median_index]
           if (length(probe_name_median) > 1)
             probe_name_median <- probe_name_median[1]
           probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","POSITION"] <- probe_name_median
-          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","VALUE"] <- markers_median_max
+          probes_stat[(probes_stat$MARKER == marker) & probes_stat$METRIC== "MEDIAN","VALUE"] <- markers_median
         }
       }
     }
@@ -150,7 +173,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   else
     progress_bar <- ""
 
-  for(j in 1:length(tempKeys))
+  for(j in seq_along(tempKeys))
   {
     marker <- as.character(tempKeys[j])
     # check if the plot already has been saved
@@ -169,7 +192,7 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
     {
       lost_columns <- colnames(signal_data)[!(colnames(signal_data) %in% colnames(marker_data))]
       #  add column with zeros to marker data
-      for(l in 1:length(lost_columns))
+      for(l in seq_along(lost_columns))
         marker_data[[lost_columns[l]]] <- 0
     }
     # marker_data <- marker_data[,colnames(marker_data) %in% colnames(signal_data)]
@@ -215,15 +238,44 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
       data_to_plot <- data.frame(samples = samples, signal_to_plot = as.numeric(probe_marker), outlier)
       marker_bar_end <- 0
 
-      pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(samples)), y = signal_to_plot, color = outlier)) +
-        ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.5) +
+      # pp <- ggplot2::ggplot(data_to_plot, ggplot2::aes(x = as.numeric(as.factor(samples)), y = signal_to_plot, colour = outlier)) +
+      #   ggplot2::geom_segment(ggplot2::aes(xend = as.numeric(factor(samples)), yend = marker_bar_end), color = marker_segment_color, alpha = 0.5) +
+      #   ggplot2::geom_point(alpha = 0.6) +
+      #   ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, "Non-outlier" = non_outlier_color,"Reference" = reference_samples_color)) +
+      #   # ggplot2::labs(x = "Sample", y = marker, title = paste0(marker, " found among all samples for probe ", probe_name)) +
+      #   ggplot2::labs(x = "Sample", y = marker, title = "") +
+      #   ggplot2::theme_classic() +
+      #   ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
+      # # ggplot2::scale_x_continuous(limits = c(1, NA)) # Adjust the limits to exclude 0
+
+      pp <- ggplot2::ggplot(
+        data_to_plot,
+        ggplot2::aes(x = as.numeric(factor(samples)), y = signal_to_plot, colour = outlier)
+      ) +
+        ggplot2::geom_segment(
+          ggplot2::aes(
+            x = as.numeric(factor(samples)),
+            xend = as.numeric(factor(samples)),
+            y = marker_bar_end,
+            yend = signal_to_plot
+          ),
+          color = marker_segment_color,
+          alpha = 0.5
+        ) +
         ggplot2::geom_point(alpha = 0.6) +
-        ggplot2::scale_color_manual(values = c("Hyper" = hyper_color, "Hypo"= hypo_color, "Non-outlier" = non_outlier_color,"Reference" = reference_samples_color)) +
-        # ggplot2::labs(x = "Sample", y = marker, title = paste0(marker, " found among all samples for probe ", probe_name)) +
+        ggplot2::scale_color_manual(values = c(
+          "Hyper" = hyper_color,
+          "Hypo" = hypo_color,
+          "Non-outlier" = non_outlier_color,
+          "Reference" = reference_samples_color
+        )) +
         ggplot2::labs(x = "Sample", y = marker, title = "") +
         ggplot2::theme_classic() +
-        ggplot2::theme(legend.position = "none", axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5), plot.title = ggplot2::element_text(hjust = 0.5))
-      # ggplot2::scale_x_continuous(limits = c(1, NA)) # Adjust the limits to exclude 0
+        ggplot2::theme(
+          legend.position = "none",
+          axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5),
+          plot.title = ggplot2::element_text(hjust = 0.5)
+        )
 
       plot_filename <- file_path_build(chart_folder,c(selection, probe_name,marker),ssEnv$plot_format)
       ggplot2::ggsave(filename =plot_filename,plot = pp,units = "in", width = 6, height = 2, dpi=as.numeric(ssEnv$plot_resolution_ppi))

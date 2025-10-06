@@ -7,7 +7,7 @@ association_to_association <- function(inference_details_origin, inference_detai
   ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
   localKeys <- ssEnv$keys_markers_figures
   markers <- unique(localKeys$MARKER)
-  for (a in 1:length(markers))
+  for (a in seq_along(markers))
   {
 
     marker <- markers[a]

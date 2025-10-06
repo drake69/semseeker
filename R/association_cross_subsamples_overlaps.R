@@ -164,7 +164,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
     aggregated_results_table$AREA <- gsub("-", "_", aggregated_results_table$AREA)
     aggregated_results_table$AREA <- gsub("_", "-", aggregated_results_table$AREA)
     markers <- unique(aggregated_results_table[, c("MARKER")])
-    # for (i in 1:length(markers))
+    # for (i in seq_along(markers))
     # {
     #   marker <- markers[i]
     #   filename <- inference_file_name(inference_detail, marker,ssEnv$result_folderInference,file_extension = "csv",suffix = "", prefix = "")
@@ -208,7 +208,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
           area_set$SAMPLES_SQL_CONDITION <- name_cleaning(area_set$SAMPLES_SQL_CONDITION)
           inference_details$samples_sql_condition <- as.character(inference_details$samples_sql_condition)
           area_set$SAMPLES_SQL_CONDITION <- as.character(area_set$SAMPLES_SQL_CONDITION)
-          for (j in 1:length(new_label))
+          for (j in seq_along(new_label))
           {
             area_set[name_cleaning(area_set$SAMPLES_SQL_CONDITION)==name_cleaning(old_label[j]),"SAMPLES_SQL_CONDITION"] <- name_cleaning(new_label[j])
             inference_details[name_cleaning(inference_details$samples_sql_condition)==name_cleaning(old_label[j]),"samples_sql_condition"] <- name_cleaning(new_label[j])
@@ -256,7 +256,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
           # # Create a Venn diagram using ggvenn
           # venn_plot <- ggvenn::ggvenn(
           #   data = SPLIT,
-          #   fill_color = color_palette[1:length(SPLIT)],
+          #   fill_color = color_palette[seq_along(SPLIT)],
           #   set_name_color = "white"
           # )
           #
@@ -270,7 +270,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
           #   ) +
           #   ggplot2::scale_fill_identity() +
           #   ggplot2::scale_fill_manual(
-          #     values = color_palette[1:length(SPLIT)],
+          #     values = color_palette[seq_along(SPLIT)],
           #     labels = categories
           #   ) +
           #   ggplot2::guides(fill = ggplot2::guide_legend(title = NULL, override.aes = list(color = NA)))
@@ -330,7 +330,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
           # suppressMessages(
           #   VennDiagram::venn.diagram(
           #     x = SPLIT,
-          #     # fill = color_palette[1:length(SPLIT)],
+          #     # fill = color_palette[seq_along(SPLIT)],
           #     alpha = 0.5,
           #     category.names = categories,
           #     cat.col = rep("black", length(SPLIT)),
@@ -365,7 +365,7 @@ association_cross_subsamples_overlaps <- function(inference_details,alpha = 0.05
     # unlink(dest_folder, recursive = TRUE)
     # remove all files ending with .log
     # files <- list.files(ssEnv$result_folderInference, pattern = ".log")
-    # for (f in 1:length(files))
+    # for (f in seq_along(files))
     # {
     #   file <- files[f]
     #   file.remove(paste(ssEnv$result_folderInference, "/", file, sep = ""))

@@ -37,7 +37,7 @@ pathway_pathfindR <- function(study,
     for(i in 1:nrow(keys))
     {
       seq <- 0
-      for(k in 1:length(path_dbs))
+      for(k in seq_along(path_dbs))
       {
         progress <- progress + 1
         db <- path_dbs[k]
@@ -66,8 +66,9 @@ pathway_pathfindR <- function(study,
 
         if(file.exists(pathway_report_path))
         {
+          result_pathway <- utils::read.csv2(pathway_report_path)
+          pathway_result_save(result_pathway, pathway_report_path, "pathfindR")
           next
-          # pathway_report <- utils::read.csv2(pathway_report_path)
           # existing_db <-   unique(pathway_report$source)
         }
 
@@ -161,15 +162,11 @@ pathway_pathfindR <- function(study,
       }
       if(exists("result_pathway"))
       {
-        if(nrow(result_pathway)!=0)
-        {
-          output_temp$FDR <-stats::p.adjust(output_temp$highest_p, method = "fdr")
-          result_pathway$PHENOTYPE <- grepl(study,result_pathway$Term_Description, ignore.case = T)
-          utils::write.csv2(result_pathway, pathway_report_path)
-          rm(result_pathway)
-        }
+        pathway_result_save(result_pathway, pathway_report_path, "pathfindR")
       }
     }
 
   }
 }
+
+

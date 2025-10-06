@@ -33,5 +33,9 @@ substitute_infinite <- function(x) {
     }
   }
   # table(is.infinite(x))
+
+  post_inf_vals <- !is.finite(x)
+  log_event("JOURNAL: Replaced ", n_inf_values, " infinite values with max/min values.")
+
   as.data.frame(x)
 }

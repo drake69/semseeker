@@ -25,7 +25,7 @@ taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column
         disease <- ""
 
       column_of_id <- key_enrichment_format[pt,"column_of_id"]
-      column_of_pvalue <- key_enrichment_format[pt,"column_of_pvalue"]
+      column_of_adj_pvalue <- key_enrichment_format[pt,"column_of_adj_pvalue"]
       column_of_description <- key_enrichment_format[pt,"column_of_description"]
       column_of_enrichment <- key_enrichment_format[pt,"column_of_enrichment"]
 
@@ -39,11 +39,11 @@ taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column
         else
           path <- dir_check_and_create(ssEnv$result_folderPhenotype,c(key_enrichment_format[pt,"label"],name_cleaning(inference_detail$areas_sql_condition),name_cleaning(inference_detail$samples_sql_condition), name_cleaning(inference_detail$association_results_sql_condition)))
         family_test <- inference_detail$family_test
-        transformation <- as.character(inference_detail$transformation)
+        transformation_y <- as.character(inference_detail$transformation_y)
         independent_variable <- inference_detail$independent_variable
         covariates <- paste(inference_detail$covariates, collapse="_")
 
-        file_prfx <- paste(independent_variable, transformation,family_test,covariates, pvalue_column,ssEnv$alpha, sep="_")
+        file_prfx <- paste(independent_variable, transformation_y,family_test,covariates, pvalue_column,ssEnv$alpha, sep="_")
 
         missed_keys <- data.frame()
         for (i in 1:nrow(keys))
@@ -89,7 +89,7 @@ taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column
             pathway_result <- utils::read.csv2(file_name)
 
           pathway_result <- enrichment_analysy_add_category(data =  pathway_result, source =  key_enrichment_format[pt,"label"])
-          cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
+          cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_adj_pvalue)
           # check column names contain the required columns
           if(!all(cols_to_check %in% colnames(pathway_result)))
           {
@@ -117,7 +117,7 @@ taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column
 
           # assign the same column name
           colnames(pathway_result)[colnames(pathway_result)==column_of_id] <- "ID"
-          colnames(pathway_result)[colnames(pathway_result)==column_of_pvalue] <- "FDR"
+          colnames(pathway_result)[colnames(pathway_result)==column_of_adj_pvalue] <- "FDR"
           colnames(pathway_result)[colnames(pathway_result)==column_of_description] <- "DESCRIPTION"
           colnames(pathway_result)[colnames(pathway_result)==column_of_enrichment] <- "ENRICHMENT"
 
@@ -128,7 +128,7 @@ taxonomies_armonyser <- function(inference_details, result_folder, pvalue_column
           pathway_result$key <- keys[i,"COMBINED"]
           pathway_result$independent_variable <- independent_variable
           pathway_result$covariates <- covariates
-          pathway_result$transformation <- transformation
+          pathway_result$transformation_y <- transformation_y
           pathway_result$family_test <- family_test
           pathway_result$areas_sql_condition <- inference_detail$areas_sql_condition
           pathway_result$samples_sql_condition <- inference_detail$samples_sql_condition

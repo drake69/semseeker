@@ -4,29 +4,54 @@
 #' @param tempDataFrame data frame to use for the model
 #' @param sig.formula formula to apply the model
 #'
-glm_model <- function(family_test, tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+glm_model <- function(family_test, tempDataFrame, sig.formula, transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {
+
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
+
   result_glm  <- stats::glm( sig.formula, family = as.character(family_test), data = as.data.frame(tempDataFrame))
-  res <- data.frame("pvalue" = summary(result_glm)$coeff[-1, 4][1])
-  #
-  res$statistic_parameter <- (summary(result_glm)$coeff[-1, 1][1])
-  res$aic_value <- (result_glm$aic)
-  res$std.error <- summary(result_glm)$coeff[-1, 2][1]
+
+  res <- data.frame("aic_value" = result_glm$aic)
 
   dep_var <- sig.formula_vars(sig.formula)
   dependent_variable <- dep_var$dependent_variable
   independent_variable <- dep_var$independent_variable
 
+  coefficients <- summary(result_glm)$coeff
+  # extract the p-value
+  for (i in 1:nrow(coefficients)) {
+    # i <- 1
+    p_value <- coefficients[i,4]
+    row_name <- rownames(coefficients)[i]
+    pval_name <- name_cleaning(paste0(row_name,"_PVALUE",sep=""))
+    p_value <- data.frame(p_value)
+    colnames(p_value) <- pval_name
+
+    coef_estimate <- data.frame(coef_estimate = coefficients[i,1])
+    colnames(coef_estimate) <- name_cleaning(paste0(row_name,"_ESTIMATE",sep=""))
+
+    res <- cbind(res, p_value, coef_estimate)
+  }
+
+  # faking predictions until next improvement
+  training.samples <- caret::createDataPartition(tempDataFrame[, dependent_variable], p = 1, list = FALSE)
+  train.data <- tempDataFrame[training.samples, ]
+  test.data <- tempDataFrame[-training.samples, ]
+  predictions <- stats::predict(result_glm)
+  res <- cbind(res, model_performance(predictions, train.data[,dependent_variable], c(),c()))
+
   if(family_test=="gaussian")
   {
-    #
+    ggp <- NULL
     residuals <-  result_glm$resid
     #calculate shapiro of working residuals
-    res$shapiro_pvalue_residuals <- if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value) else NA
+    res$residuals_normality <- as.logical(if(length(residuals)>3 & length(unique(residuals))>3) (stats::shapiro.test(residuals)$p.value > 0.05) else NA)
     # calculate residuals homoschedadasticity
-    res$residuals_breusch_pagan_pvalue_compl <- 1- lmtest::bptest(result_glm)$p.value
+    res$residuals_homoschedasticity <- as.logical(lmtest::bptest(result_glm)$p.value > 0.05)
 
-    res <- cbind(res,model_performance(fitted_values = result_glm$fitted.values, expected_values = tempDataFrame[,independent_variable],c(),c()))
     if(plot)
     {
       #
@@ -43,12 +68,12 @@ glm_model <- function(family_test, tempDataFrame, sig.formula, transformation, p
 
   }
 
-  ggp <- NULL
   if(family_test=="binomial")
   {
+    ggp <- NULL
     if(plot)
     {
-      # ggp <- box.plot(dataFrameToPlot, independent_variable,burdenValue, transformation, family_test)
+      # ggp <- box.plot(dataFrameToPlot, independent_variable,burdenValue, transformation_y, family_test)
       #
       ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
         ggplot2::geom_point( color = ssEnv$color_palette[1] ) +
@@ -65,19 +90,18 @@ glm_model <- function(family_test, tempDataFrame, sig.formula, transformation, p
 
   if (!is.null(ggp) & plot==TRUE){
 
-    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-    filename  =  file_path_build(
-      baseFolder =  chartFolder,
-      detailsFilename = c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),
-      extension = ssEnv$plot_format,add_gz = FALSE)
+    chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL", name_cleaning(samples_sql_condition)))
+    filename  =  file_path_build(chartFolder,
+      c(as.character(family_test), independent_variable,"Vs",as.character(transformation_y), dependent_variable, covariates, key$COMBINED),
+      ssEnv$plot_format)
 
     ggplot2::ggsave(
       filename,
       plot = ggp,
       scale = 1,
-      width = 1240,
-      height = 1240,
-      units = c("px"),
+      width = 9,
+      height = 9,
+      units = c("in"),
       dpi = as.numeric(ssEnv$plot_resolution_ppi)
     )
 

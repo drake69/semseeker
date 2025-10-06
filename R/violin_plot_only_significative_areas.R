@@ -1,5 +1,5 @@
 #' @importFrom doRNG %dorng%
-violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, marker,area, subarea, independent_variable, transformation)
+violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, marker,area, subarea, independent_variable, transformation_y)
 {
   inference_inference_file <- ""
   area <- ""
@@ -13,7 +13,7 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
   areas <- utils::read.csv2(file.path(ssEnv$result_folderData, "/Pivots/", figure,"/", paste(figure,"_",marker,"_",area,"_",subarea, ".csv", sep="")))
   results_inference <- utils::read.csv2(file.path(ssEnv$result_folderInference,inference_file_name))
   results_inference <- subset(results_inference, "MARKER"==marker & "FIGURE"==figure & "AREA" == area & "SUBAREA" == subarea
-    & "INDIPENDENT.VARIABLE"==independent_variable)
+    & "INDIPENDENT_VARIABLE"==independent_variable)
 
   #pivot hase SAMPLEID over the genomic area of interest
   areas <- areas[areas$SAMPLEID %in% results_inference[results_inference$PVALUE_ADJ_ALL_BH< as.numeric(ssEnv$alpha), "AREA_OF_TEST"], ]
@@ -39,11 +39,11 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
     #   metaareas_f <- temp
   }
   metaareas_f$SAMPLE_GROUP <- sprintf("%02d",metaareas_f[,"SAMPLE_GROUP"])
-  if(transformation=="log10")
+  if(transformation_y=="log10")
     metaareas_f$VALUE <- log10(metaareas_f$VALUE)
-  if (transformation=="scale")
+  if (transformation_y=="scale")
     metaareas_f$VALUE <- scale(metaareas_f$VALUE)
-  if (transformation=="none")
+  if (transformation_y=="none")
     metaareas_f$VALUE <- metaareas_f$VALUE
 
   p1 <- ggplot2::ggplot(metaareas_f, ggplot2::aes(x="SAMPLE_GROUP", y="VALUE")) + ggplot2::geom_violin()

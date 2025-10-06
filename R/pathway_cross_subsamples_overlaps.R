@@ -42,14 +42,14 @@ pathway_cross_subsamples_overlaps <- function(inference_details,pathways_sql_sel
   for (pt in 1:nrow(key_enrichment_format))
   {
     column_of_id <- key_enrichment_format[pt,"column_of_id"]
-    column_of_pvalue <- key_enrichment_format[pt,"column_of_pvalue"]
+    column_of_adj_pvalue <- key_enrichment_format[pt,"column_of_adj_pvalue"]
     column_of_description <- key_enrichment_format[pt,"column_of_description"]
     column_of_enrichment <- key_enrichment_format[pt,"column_of_enrichment"]
     enrichment_package <- key_enrichment_format[pt,"label"]
     signal_suffixes <-c("","with_signal","without_signal")
     for (s in 1:3)
     {
-      for (z in 1:length(association_results_sql_conditions))
+      for (z in seq_along(association_results_sql_conditions))
       {
         association_results_sql_condition <- name_cleaning(association_results_sql_conditions[z])
         for (a in 1:nrow(localKeys))
@@ -77,13 +77,13 @@ pathway_cross_subsamples_overlaps <- function(inference_details,pathways_sql_sel
                 temp_res$association_results_sql_condition <- name_cleaning(inference_details[i,"association_results_sql_condition"])
                 ff <- new_label_samples_sql_condition
                 gg <- old_label_samples_sql_condition
-                for (j in 1:length(ff))
+                for (j in seq_along(ff))
                 {
                   temp_res[name_cleaning(temp_res$SAMPLES_SQL_CONDITION)==name_cleaning(gg[j]),"SAMPLES_SQL_CONDITION"] <- name_cleaning(ff[j])
                 }
                 ff <- new_label_association_results_sql_condition
                 gg <- old_label_association_results_sql_condition
-                for (j in 1:length(ff))
+                for (j in seq_along(ff))
                 {
                   temp_res[name_cleaning(temp_res$association_results_sql_condition)==name_cleaning(gg[j]),"association_results_sql_condition"] <- name_cleaning(ff[j])
                 }
@@ -98,7 +98,7 @@ pathway_cross_subsamples_overlaps <- function(inference_details,pathways_sql_sel
         if(nrow(pathway_results)==0)
           next
 
-        pathway_results <- subset(pathway_results, pathway_results[,column_of_pvalue]<=as.numeric(ssEnv$alpha))
+        pathway_results <- subset(pathway_results, pathway_results[,column_of_adj_pvalue]<=as.numeric(ssEnv$alpha))
         # Using with() for cleaner code
         pathway_results$KEY_SELECTOR <- with(pathway_results,
           as.factor(paste0(SAMPLES_SQL_CONDITION,"_",association_results_sql_condition))
@@ -144,7 +144,7 @@ pathway_cross_subsamples_overlaps <- function(inference_details,pathways_sql_sel
               "_",
               independent_variable,
               "_",
-              name_cleaning(column_of_pvalue),
+              name_cleaning(column_of_adj_pvalue),
               "_",
               name_cleaning(ssEnv$alpha),
               "_",

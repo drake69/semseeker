@@ -11,7 +11,7 @@ association_cross_studies_meta_analysis <- function(inference_details,statistic_
     results_inference_for <- subset(results_inference, FIGURE==keys[k,"FIGURE"] & SUBAREA==keys[k,"SUBAREA"])
     results_inference_for <- na.omit(results_inference_for[,c("BETA","STD.ERROR","STUDY",pvalue_column,"AREA_OF_TEST")])
     areas <- na.omit(unique(results_inference[, "AREA_OF_TEST"]))
-    for (g in 1:length(areas))
+    for (g in seq_along(areas))
     {
       # g <- 1
       first_area <- areas[g]

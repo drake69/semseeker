@@ -13,23 +13,26 @@ inpute_missing_values <- function(signal_data){
   n_missed_per_row <- rowSums(is.na(signal_data))
   if (any(n_missed_per_row > 0.1 * ncol(signal_data))) {
     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " There are rows with missing values more than 10%. I will remove them.")
+    log_evet ("JOURNAL: ", format(Sys.time(), "%a %b %d %X %Y"), " Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/(nrow(signal_data)*ncol(signal_data)), 2), " % of the data.")
     signal_data <- signal_data[n_missed_per_row  < 0.1 * ncol(signal_data), ]
   }
 
   n_missed_per_col <- colSums(is.na(signal_data))
   if (any(n_missed_per_col > 0.1 * nrow(signal_data))) {
     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " There are columns with missing values more than 10%. I will remove them.")
+    log_event("JOURNAL: ", format(Sys.time(), "%a %b %d %X %Y"), " There are columns with missing values more than 10%. I will remove them.")
     signal_data <- signal_data[, n_missed_per_col  < 0.1 * nrow(signal_data)]
   }
 
   chunk_size <- 10000  # Define a chunk size
   if(ssEnv$showprogress)
-    progress_bar <- progressr::progressor(along = 1:length(seq(1, nrow(signal_data), by = chunk_size)))
+    progress_bar <- progressr::progressor(along = seq_along(seq(1, nrow(signal_data), by = chunk_size)))
   else
     progress_bar <- ""
 
   n_item = nrow(signal_data)*ncol(signal_data)/100
   log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/n_item, 2), " % of the data.")
+  log_event("JOURNAL: Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/n_item, 2), " % of the data.")
   if (ssEnv$inpute=="median")
   {
     # Assuming signal_data is a matrix or data frame
@@ -86,6 +89,7 @@ inpute_missing_values <- function(signal_data){
   if (nrows_ex_post < nrow_ex_ante)
   {
     log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Dropping rows with all missing values. Number of rows dropped: ", nrow_ex_ante - nrows_ex_post)
+    log_event("JOURNAL: Dropped rows with all missing values. Number of rows dropped: ", nrow_ex_ante - nrows_ex_post)
   }
   n_na <- sum(is.na(signal_data))
   log_event("INFO:", format(Sys.time(), "%a %b %d %X %Y") ," Imputation completed. Number of missing values: ", n_na)

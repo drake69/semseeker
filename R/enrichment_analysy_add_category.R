@@ -65,7 +65,7 @@ enrichment_analysy_add_category <- function(source, data)
     if(nrow(to_rank)==0)
       next
     # fdr
-    column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_pvalue"]
+    column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_adj_pvalue"]
     if(!any(column_to_rank %in% colnames(to_rank)))
       browser()
     # message(column_to_rank)
@@ -76,6 +76,12 @@ enrichment_analysy_add_category <- function(source, data)
       to_rank$SS_RANK_FDR <- normalize_minimize(to_rank[,column_to_rank])
       to_rank$SS_RANK_FDR <- rank(-to_rank$SS_RANK_FDR, ties.method = "min")
     }
+    to_rank$SIGNIFICATIVE <- (to_rank[,column_to_rank] < as.numeric(ssEnv$alpha))
+    # get max rank of column_of_adj_pvalue when is lower than alpha
+    max_rank_pvalue <- max(to_rank$SS_RANK_FDR[to_rank[,column_to_rank] < as.numeric(ssEnv$alpha)], na.rm = TRUE)
+    # replace for all values of SS_RANK_FDR that are higher than alpha
+    to_rank$SS_RANK_FDR[to_rank[,column_to_rank] >= as.numeric(ssEnv$alpha)] <- max_rank_pvalue + 1
+
     column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_enrichment"]
     if(!any(column_to_rank %in% colnames(to_rank)))
       browser()

@@ -1,6 +1,11 @@
-# (family_test, tempDataFrame, sig.formula, transformation, plot)
-mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+# (family_test, tempDataFrame, sig.formula, transformation_y, plot)
+mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {
+
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
 
   model_params <- unlist(strsplit(as.character(family_test),"_"))
   permutations_test <- as.numeric(model_params[2])
@@ -46,7 +51,7 @@ mediation_linear_model <- function(family_test,tempDataFrame, sig.formula, trans
 
   perms <- sort(unique(c(permutations_test, permutations)))
 
-  for (i in 1:length(perms)) {
+  for (i in seq_along(perms)) {
 
     env <- new.env()
     env$mediate_env <- mediation::mediate

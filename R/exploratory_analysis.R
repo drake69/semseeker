@@ -61,7 +61,7 @@ exploratory_analysis <- function(categorical_variables,numerical_variables, samp
   if(length(values_mapping)>0)
   {
     step <- step + 1
-    for (i in 1:length(values_mapping))
+    for (i in seq_along(values_mapping))
     {
       map <- source_data_get(paste0(mapping_folder,values_mapping[i]))
       from <- colnames(map)[1]
@@ -117,8 +117,18 @@ exploratory_analysis <- function(categorical_variables,numerical_variables, samp
       }
     }
 
+  if(ncol(sample_sheet) < 2)
+  {
+    log_event("ERROR: ",format(Sys.time(), "%a %b %d %X %Y")," Not enough columns found in the sample sheet")
+    stop("Not enough column found in the sample sheet")
+  }
 
-  sample_sheet[, sample_id_column] <- name_cleaning(sample_sheet[, sample_id_column])
+  tryCatch({
+    sample_sheet <- sample_sheet[!is.na(sample_sheet[,sample_id_column]),]
+  }, error = function(e) {
+    log_event("ERROR: ",format(Sys.time(), "%a %b %d %X %Y")," Sample ID column not found in the sample sheet")
+    stop("Sample ID column not found in the sample sheet")
+  })
   signal_data_original <- signal_data
 
   # describe the sample sheet
@@ -306,7 +316,7 @@ exploratory_analysis <- function(categorical_variables,numerical_variables, samp
     save_latex_table(num_res_data, file_path, "Descriptive statistics for numerioc variables" )
   }
 
-  signal_data <- source_data_get(signal_data)
+  signal_data <- source_data_get(signal_data, TRUE)
   colnames(signal_data) <- name_cleaning(colnames(signal_data))
 
   # signal_data <- signal_data[1:1000,]

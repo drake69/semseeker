@@ -21,8 +21,8 @@ batch_correlation_check <- function() {
     key <- localKeys[i,]
     sample_groups <- as.data.frame(unique(sample_sheet$Sample_Group))
     sub_export <- c(to_export,"sample_groups", "ssEnv","key")
-    total_data_for <- foreach::foreach(g = 1:length(sample_groups), .combine = rbind, .export = sub_export ) %dorng%
-      # for(g in 1:length(sample_groups))
+    total_data_for <- foreach::foreach(g = seq_along(sample_groups), .combine = rbind, .export = sub_export ) %dorng%
+      # for(g in seq_along(sample_groups))
       {
         pop <- sample_groups[g]
         tempresult_folderData <- dir_check_and_create(ssEnv$result_folderData,c(as.character(pop) ,paste(as.character(key$MARKER),"_",as.character(key$FIGURE),sep="")))

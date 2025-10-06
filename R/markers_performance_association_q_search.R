@@ -21,8 +21,8 @@ markers_performance_association_q_search <- function(inference_details, result_f
   inference_details <- as.data.frame(inference_details)
 
 
-  # foreach::foreach(m = 1:length(markers)) %dorng%
-  for (m in 1:length(markers))
+  # foreach::foreach(m = seq_along(markers)) %dorng%
+  for (m in seq_along(markers))
   {
     marker <- markers[m]
     for (id in 1:nrow(inference_details))
@@ -31,8 +31,8 @@ markers_performance_association_q_search <- function(inference_details, result_f
       inference_detail <- inference_details[id,]
       depth_analysis <- inference_detail$depth_analysis
       family_test <- inference_detail$family_test
-      transformation <- as.character(inference_detail$transformation)
-      filtered_metrics <- metrics_filter(model_metrics, as.character(transformation))
+      transformation_y <- as.character(inference_detail$transformation_y)
+      filtered_metrics <- metrics_filter(model_metrics, as.character(transformation_y))
       covariates <- paste0(inference_detail$covariates, collapse = "_")
       independent_variable <- inference_detail$independent_variable
 
@@ -150,10 +150,10 @@ markers_performance_association_q_search <- function(inference_details, result_f
         scores <- data.frame("Q"="","FIGURE"="","METRIC"="","SCORE"="")[-1,]
         figures <- unique(keys$FIGURE)
         # #
-        for (f in 1:length(figures))
+        for (f in seq_along(figures))
         {
           fig <- figures[f]
-          for( m in 1:length(filtered_metrics)){
+          for( m in seq_along(filtered_metrics)){
             metric <- filtered_metrics[m]
             # metric <- "MAE"
             final_temp <- final[final$FIGURE==fig,]
@@ -183,7 +183,7 @@ markers_performance_association_q_search <- function(inference_details, result_f
         }
 
         #
-        prfx <- paste(study, independent_variable, transformation,family_test, ssEnv$alpha ,covariates, area, subarea, marker, collapse="_")
+        prfx <- paste(study, independent_variable, transformation_y,family_test, ssEnv$alpha ,covariates, area, subarea, marker, collapse="_")
         if(nrow(scores) != 0)
         {
           # score_max <- sum(scores$SCORE)

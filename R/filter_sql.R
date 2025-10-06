@@ -6,9 +6,9 @@ filter_sql <- function(sql_conditions, data_frame)
   if (length(sql_conditions) == 0 )
     return(data_frame)
 
-  for ( s in 1:length(sql_conditions))
+  for ( s in seq_along(sql_conditions))
   {
-    sql_condition <- sql_conditions[s]
+    sql_condition <- as.character(sql_conditions[s])
     sql_condition <- trimws(sql_condition)
     if(!is.na(sql_condition))
       if(!is.null(sql_condition))

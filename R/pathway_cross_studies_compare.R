@@ -19,7 +19,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
       if(!dir.exists(dest_folder))
         dir.create(dest_folder)
       # Load library
-      for (i in 1:length(keys))
+      for (i in seq_along(keys))
       {
         pathway_set <- pathway_inference_comb[pathway_inference_comb$key == keys[i],]
         pathway_set <- pathway_set[ ,c("ID","STUDY") ]
@@ -90,7 +90,7 @@ pathway_cross_studies_compare <- function(result_folder, ...){
     }
   }
 
-  for (i in 1:length(keys))
+  for (i in seq_along(keys))
   {
     pathway_set <- pathway_inference_comb[pathway_inference_comb$key == keys[i],]
     pathway_set <- pathway_set[ ,c("ID","STUDY") ]

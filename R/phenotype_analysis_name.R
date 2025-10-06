@@ -9,8 +9,13 @@ phenotype_analysis_name <- function(inference_detail, key,prefix = "", suffix=""
   covariates_pca <- ifelse(is.null(inference_detail$covariates_pca),FALSE,inference_detail$covariates_pca)
 
   family_test <- inference_detail$family_test
-  transformation <- inference_detail$transformation
-  independent_variable <- gsub(" ","", inference_detail$independent_variable)
+  transformation_y <- inference_detail$transformation_y
+
+  inference_detail$independent_variable <- gsub("_SCALED","",as.character(inference_detail$independent_variable))
+  if(inference_detail$transformation_x=="scale")
+    inference_detail$independent_variable <- paste0(inference_detail$independent_variable, "_SCALED")
+  independent_variable <- split_and_clean(inference_detail$independent_variable)
+
   significance_label <- ifelse(significance, "significant", "non_significant")
 
   if(is.null(covariates) || length(covariates)  ==  0)
@@ -21,12 +26,12 @@ phenotype_analysis_name <- function(inference_detail, key,prefix = "", suffix=""
   file_suffix = paste(file_suffix, suffix, sep = "_")
 
   if(length(covariates_dummy)!=0)
-    file_suffix <- paste0(file_suffix, "dummy", sep = "_")
+    file_suffix <- paste0(file_suffix,paste(covariates_dummy, collapse = "_"), "_dummy", sep = "_")
 
-  if(covariates_pca)
+  if(length(covariates_pca)>0)
     file_suffix <- paste0(file_suffix, "pca", sep = "_")
 
-  analysis_name <- paste(as.character(key$MARKER),as.character(key$FIGURE),as.character(key$AREA),as.character(key$SUBAREA), pvalue_column, significance_label, alpha, prefix , as.character(transformation), as.character(family_test), file_suffix, sep="_")
+  analysis_name <- paste(as.character(key$MARKER),as.character(key$FIGURE),as.character(key$AREA),as.character(key$SUBAREA), pvalue_column, significance_label, alpha, prefix , as.character(transformation_y), as.character(family_test), file_suffix, sep="_")
 
   analysis_name <- name_cleaning(analysis_name)
 

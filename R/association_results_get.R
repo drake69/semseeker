@@ -16,7 +16,7 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
 
   if(!file.exists(inferenceFile))
   {
-    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"),  " Inference file does not exist: ", inferenceFile)
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"),  " Inference file does not exist: ", inferenceFile)
     return(data.frame())
   }
 
@@ -28,13 +28,19 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
   # check columns exist
   if((!pvalue_column %in% colnames(results_inference)))
   {
-    log_event("DEBUG:", pvalue_column, " column does not exist in inference file: ", inferenceFile)
+    log_event("ERROR:", pvalue_column, " column does not exist in inference file: ", inferenceFile)
+    stop()
     return(data.frame())
   }
 
-  metrics_name_collect(results_inference)
+  # remove rows ehere pvalue_column is inf or -inf
+  results_inference <- results_inference[!is.infinite(results_inference[,pvalue_column]),]
 
+  metrics_name_collect(results_inference)
+  multiple_test_adj <- name_cleaning(ssEnv$multiple_test_adj)
   results_inference <- subset(results_inference,DEPTH==3)
+  results_inference$SIGNIFICATIVE_ADJ <- apply(results_inference[, grepl(multiple_test_adj,colnames(results_inference))], 1, function(x) all(x < as.numeric(ssEnv$alpha)))
+  results_inference$SIGNIFICATIVE <- apply(results_inference[, grepl("PVALUE", colnames(results_inference)) & !grepl(multiple_test_adj,colnames(results_inference))], 1, function(x) all(x < as.numeric(ssEnv$alpha)))
   # results_inference <- results_inference[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","STATISTIC_PARAMETER",pvalue_column,"PVALUE","DEPTH")]
 
   results_inference[results_inference$AREA==area,"AREA_OF_TEST"] <- gsub(results_inference[results_inference$AREA==area,"AREA_OF_TEST"] , pattern="_", replacement="-")
@@ -51,7 +57,7 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
 
   areas <- unique(results_inference$AREA)
   if(adjust_per_area)
-    for (a in 1:length(areas))
+    for (a in seq_along(areas))
     {
       area <- areas[a]
       results_inference_area <- results_inference[results_inference$AREA==area,]

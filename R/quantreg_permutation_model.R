@@ -32,10 +32,14 @@ compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
-quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {
   #
   ssEnv <- get_session_info()
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
 
   lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
@@ -77,7 +81,7 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
 
   perms <- sort(unique(c(n_permutations, n_permutations_test)), decreasing = F)
 
-  for(p in 1:length(perms))
+  for(p in seq_along(perms))
   {
     perm <- perms[p]
     res$n_permutations <- perm
@@ -94,7 +98,7 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   predicted_values <- lqmm::predict.lqm(model, tempDataFrame)
   expected_values <- tempDataFrame[,dependent_variable]
   res <- quantreg_metrics(predicted_values = predicted_values, expected_values = expected_values,
-    tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation = transformation,
+    tau = tau, res = res, family_test = family_test, independent_variable = independent_variable, transformation_y = transformation_y,
     dependent_variable = dependent_variable, permutation_vector = permutated_regression_coefficient, plot = plot)
 
   if(length(permutated_regression_coefficient) == n_permutations_test)

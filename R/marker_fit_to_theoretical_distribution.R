@@ -3,7 +3,7 @@
 marker_fit_to_theoretical_distribution <- function()
 {
 
-  browser()
+
   # result_folder, maxResources = 90, parallel_strategy  = "multisession", ...
 
   # ssEnv <- init_env( result_folder =  result_folder, maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
@@ -137,7 +137,7 @@ marker_fit_to_theoretical_distribution <- function()
         #
         #   p <- p + ggplot2::scale_color_manual(
         #     name = "Theoretical Densities",
-        #     values = setNames(colors_dist[1:length(fits)], sapply(fits, `[[`, "distname"))
+        #     values = setNames(colors_dist[seq_along(fits)], sapply(fits, `[[`, "distname"))
         #   )
         # }
 
@@ -153,7 +153,7 @@ marker_fit_to_theoretical_distribution <- function()
 
         legend_labels <- character(0)
         if(length(fits)>0)
-          for (fd in 1:length(fits))
+          for (fd in seq_along(fits))
           {
             # fd <-2
             if(length(aic_values)>0)

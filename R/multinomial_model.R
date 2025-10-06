@@ -1,27 +1,17 @@
-polynomial_model <- function (family_test, tempDataFrame, sig.formula , transformation, plot, samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+multinomial_model <- function (family_test, tempDataFrame, sig.formula , transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {
 
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
+
+  browser()
   ssEnv <- get_session_info()
 
-  # polynomial_degree_partition-partition_percentage
-  polynomial_params <- unlist(strsplit(as.character(family_test),"_"))
-
-  if(length(polynomial_params)!=3)
-  {
-    log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " The polynomial model must have 3 parameters: polynomial followed by degree and partition percentage eg: polynomial_2_1 " )
-  }
-
-  degree <- as.numeric(polynomial_params[2])
-  res <- data.frame("PL_DEGREE"= degree)
-  partition_percentage <- as.numeric(polynomial_params[3])
-  res$PL_PERC <- partition_percentage
-  # res$sig.fromula <- as.character(sig.formula)
-
-  if(length(polynomial_params)==4)
-    res$r_model <- paste0("polynomial",polynomial_params[4], sep="")
-  else
-    res$r_model <- "polynomial"
-
+  # multinomial_degree_partition-partition_percentage
+  multinomial_params <- family_test
+  res <-  data.frame("r_model","multinomial")
 
   tempDataFrame <- as.data.frame(tempDataFrame)
   dep_var <- sig.formula_vars(sig.formula)
@@ -29,8 +19,8 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   independent_variable <- dep_var$independent_variable
   covariates <- dep_var$covariates
 
-  if(length(polynomial_params)==4)
-    if(polynomial_params[4]=="predictor")
+  if(length(multinomial_params)==4)
+    if(multinomial_params[4]=="predictor")
     {
       dependent_variable <- dep_var$independent_variable
       independent_variable <- dep_var$dependent_variable
@@ -39,53 +29,38 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   if (nrow(tempDataFrame) == 0)
     return(res)
 
-  # Split the data into training and test set
-  training.samples <- tempDataFrame[, dependent_variable] %>% caret::createDataPartition(p = partition_percentage, list = FALSE)
+  tempDataFrame[, dependent_variable] <- as.factor(tempDataFrame[, dependent_variable])
+  multinomial_model_result <- nnet::multinom( sig.formula, data = tempDataFrame)
 
-  train.data  <- tempDataFrame[training.samples, ]
-  test.data <- tempDataFrame[-training.samples, ]
-
-  # browser()
-  # Build the formula for the model
-  if(length(covariates)>0)
-  {
-    formula <- as.formula(
-      paste(
-        dependent_variable,
-        "~ stats::poly(", independent_variable, ",", degree, ", raw = TRUE) +",
-        paste(covariates, collapse = " + ")
-      )
-    )
-    # Build the polynomial model with covariates
-    polynomial_model_result <- stats::lm(formula, data = train.data, na.action = na.exclude)
-  }
-  else
-    # Build the polynomial_model_result
-    polynomial_model_result <- stats::lm(eval(parse(text=dependent_variable)) ~ stats::poly(eval(parse(text=independent_variable)),
-      degree, raw = TRUE), data = train.data, na.action = na.exclude)
-
-
-
-  # check id polynomial_model_result is null
-  if(is.null(polynomial_model_result))
+  # check id multinomial_model_result is null
+  if(is.null(multinomial_model_result))
     return(res)
 
-  predictions <- stats::predict(polynomial_model_result)
-  if(nrow(test.data) != 0)
-  {
-    # Make predictions
-    predictions_test <- stats::predict(polynomial_model_result, newdata = test.data)
-    res <- cbind(res, model_performance(predictions, train.data[,dependent_variable], predictions_test, test.data[,dependent_variable]))
-  }
-  else
-    res <- cbind(res, model_performance(predictions, train.data[,dependent_variable], c(),c()))
 
   # Coefficients and Confidence Intervals
-  coefficients <- coef(summary(polynomial_model_result))
-  # conf_int <- confint(polynomial_model_result)
+  coefficients <- coef(multinomial_model_result)
+
+  # Ottieni i coefficienti e gli errori standard
+  coefficients <- model_summary$coefficients
+  std_errors <- model_summary$standard.errors
+
+  # Calcola z-score e p-value
+  z_scores <- coefficients / std_errors
+  p_values <- 2 * (1 - pnorm(abs(z_scores)))
+
+  # Ricostruisci il data frame in formato lungo (long format)
+  results_df <- data.frame(
+    classe = rep(rownames(coefficients), times = ncol(coefficients)),
+    variabile = rep(colnames(coefficients), each = nrow(coefficients)),
+    coefficiente = as.vector(coefficients),
+    errore_std = as.vector(std_errors),
+    z_score = as.vector(z_scores),
+    p_value = as.vector(p_values)
+  )
+
+
 
   res$pvalue <- 0
-  significative <- TRUE
   # browser()
   # for each degree extract the p-value
   for (i in 1:(nrow(coefficients))) {
@@ -99,15 +74,12 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     pval_name <- name_cleaning(gsub("_RAW_EQ_TRUE","",pval_name))
     pval_name <- name_cleaning(gsub("INDEPENDENT_VARIABLE",independent_variable,pval_name))
     p_value <- data.frame(p_value)
-    significative <- significative & p_value < as.numeric(ssEnv$alpha)
     colnames(p_value) <- pval_name
     res <- cbind(res, p_value)
     if (grepl(independent_variable, pval_name))
       res$pvalue <- max(c(res$pvalue, p_value[1,1]), na.rm = TRUE)
   }
 
-  colnames(significative) <- "SIGNIFICATIVE"
-  res <- cbind(res, significative)
   # remove rowname from res
   rownames(res) <- NULL
   if(plot)
@@ -129,15 +101,15 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
     }
 
     filename  =  file_path_build(chartFolder,
-      c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, covariates, area, subarea),
+      c(as.character(family_test), independent_variable,"Vs",as.character(transformation_y), dependent_variable, covariates, area, subarea),
       ssEnv$plot_format)
 
     # Predict the values for the plot
-    train.data$predicted <- predict(polynomial_model_result, newdata = train.data)
+    train.data$predicted <- predict(multinomial_model_result, newdata = train.data)
 
     if(length(covariates)>0)
     {
-      # Plot the data and the polynomial fit
+      # Plot the data and the multinomial fit
       ggp <- ggplot2::ggplot(train.data, ggplot2::aes_string(x = independent_variable, y = dependent_variable)) +
         ggplot2::geom_point(color = ssEnv$color_palette[1]) +
         ggplot2::geom_line(ggplot2::aes_string(y = "predicted"), color = ssEnv$color_palette_darker[2]) +
@@ -167,7 +139,7 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
         ggplot2::ylab(dependent_variable)
     }
 
-    if (nrow(test.data) != 0)
+    if (partition_percentage < 1)
       ggp <- ggp + ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions_test, x = eval(parse(text=independent_variable))), color = ssEnv$color_palette_darker[3]) +
       ggplot2::xlab(independent_variable) +
       ggplot2::ylab(dependent_variable)
@@ -201,9 +173,9 @@ polynomial_model <- function (family_test, tempDataFrame, sig.formula , transfor
   # ggplot2::ggplot(train.data, ggplot2::aes(eval(parse(text=independent_variable)), eval(parse(text=dependent_variable))) ) +
   #   ggplot2::geom_point( color = ssEnv$color_palette[1] ) + ggplot2::stat_smooth(method = lm, formula = y ~ poly(x, degree, raw = TRUE)) +
   #   ggplot2::geom_point(data = test.data, ggplot2::aes(y = predictions), color = ssEnv$color_palette[2]) +
-  #   ggplot2::geom_point(data = data.frame(train.data,polynomial_model_result$residuals) , ggplot2::aes(y = polynomial_model_result$residuals), color = "cyan")
+  #   ggplot2::geom_point(data = data.frame(train.data,multinomial_model_result$residuals) , ggplot2::aes(y = multinomial_model_result$residuals), color = "cyan")
   #
   return (res)
 }
 
-# polynomial_model_result("polynomial_4_0.8", sample_sheet, "DELTARQ_HYPO ~ Age")
+# multinomial_model_result("multinomial_4_0.8", sample_sheet, "DELTARQ_HYPO ~ Age")

@@ -7,7 +7,7 @@
 #' tipi di test: wilcoxon, stats::t.test,
 #' tipi di correlazioni: pearson, kendall, spearman
 #' MUTATIONS_* ~ tcdd_mother + exam_age
-#' transformation to be applied to dependent variable
+#' transformation_y to be applied to dependent variable
 #' (mutations and lesions): scale, log, log2, log10, exp, none, quantile_quantiles(as number) eg quantile_3
 #' DEPTH analysis:
 #' 1: sample level
@@ -51,11 +51,32 @@ association_analysis <- function(inference_details,result_folder, maxResources =
   annotate_position_pivots()
 
   inference_details <- unique(inference_details)
+  # Assuming your dataset is named 'inference_details'
+  cleaned_data <- inference_details %>%
+    dplyr::group_by(dplyr::across(-depth_analysis)) %>%  # Group by all columns except 'depth_of_analysis'
+    dplyr::slice_max(depth_analysis, n = 1) %>%  # Keep row with max 'depth_of_analysis' per group
+    dplyr::ungroup()  # Remove grouping
+
+  # View result
+  head(cleaned_data)
+
+
   # variables_to_export <- c("n", "working_data", "sig.formula", "tau", "lqm_control", "estimate", "independent_variable", "inference_details", "ssEnv", "%dorng%", "k", "iter", "RNGseed", "checkRNGversion",
   #                          "getRNG", "%||%", ".getDoParName", "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", ".getRNGattribute", "isNumber", "isReal", "isInteger", ".foreachGlobals", "RNGprovider", ".RNGkind_length", "tail",
   #                          "file_path_build", "dir_check_and_create", "apply_stat_model", "doRNGversion", ".getRNG", "hasRNG", "nextRNG", "RNGkind", "setRNG", "RNGstr")
 
   # foreach::foreach(z  =  1:nrow(inference_details), .export  =  variables_to_export) %dorng%
+  # remove columns with all NA values or empty string
+  inference_details <- as.data.frame(inference_details)
+  expected_values <- c("independent_variable","family_test","covariates","covariates_dummy","transformation_y",
+    "depth_analysis","filter_p_value","samples_sql_condition",
+    "collinearity_check","covariates_pca")
+  expected_values <- expected_values[!expected_values %in% colnames(inference_details)]
+  for (ev in expected_values)
+  {
+    inference_details[,ev] <- NA
+  }
+
   for(z in 1:nrow(inference_details))
   {
     results <- data.frame()
@@ -65,42 +86,33 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
     filter_p_value <- if(!is.null(inference_detail$filter_p_value)) inference_detail$filter_p_value else TRUE
 
-    collinearity_check <- ifelse(is.null(inference_detail$collinearity_check),FALSE,inference_detail$collinearity_check)
-    covariates_dummy <- inference_detail$covariates_dummy
-    covariates_pca <- ifelse(is.null(inference_detail$covariates_pca),FALSE,inference_detail$covariates_pca)
-    covariates <- inference_detail$covariates
-    covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
-    # remove covariates with length zero
-    covariates <- covariates[lengths(covariates)  !=  0]
-    covariates <- covariates[covariates  !=  ""]
-    family_test <- as.character(inference_detail$family_test)
+    inference_detail_prettified <- t(inference_detail)
+    # Generate a plain text table using kable
+    inference_detail_prettified <- knitr::kable(inference_detail_prettified, format = "simple",
+      align = "l",    # Left align for all columns
+      digits = 2,     # Number of digits for numeric columns
+      row.names = TRUE) # Suppress row names
+
+    # Join into a single string
+    inference_detail_prettified <- paste(inference_detail_prettified, collapse = "\n")
+    log_event("JOURNAL: ##############################################################################################################")
+    log_event("JOURNAL: ", format(Sys.time(), "%a %b %d %X %Y"), " \nStarting association analysis for inference detail:\n", inference_detail_prettified)
+
+    family_test <- split_and_clean(inference_detail$family_test)
+
     study_summary <-   study_summary_get(inference_detail$samples_sql_condition)
 
-    # dummify covariates dummy
-    if(length(covariates_dummy) > 0)
-    {
-      covariates_dummy <- if(length(covariates_dummy) !=  0 && !is.null(covariates_dummy)) unlist(t(strsplit( gsub(" ","",covariates_dummy),split  =  "+", fixed  =  T)))
-      if(length(covariates_dummy) > 0)
-        for(i in 1:length(covariates_dummy))
-        {
-          covariate_dummy <- covariates_dummy[i]
-          encoded_covariate <- fastDummies::dummy_cols(study_summary, select_columns = covariate_dummy, remove_first_dummy = TRUE)
-          encoded_covariate <- encoded_covariate[, !(colnames(encoded_covariate) %in% colnames(study_summary))]
-          encoded_covariate <- encoded_covariate[,  !(colnames(encoded_covariate) %in% c("X"))]
-          encoded_columns <- name_cleaning(colnames(encoded_covariate))
-          colnames(encoded_covariate) <- encoded_columns
-          study_summary <- cbind(study_summary, encoded_covariate)
-          covariates <- unique(c(covariates, colnames(encoded_covariate)))
-        }
-    }
-
-    #
     results <- data.frame()
     if (validate_family_test(family_test))
     {
-      transformation <- inference_detail$transformation
-      if(is.null(transformation) || length(transformation)  ==  0)
-        transformation <- NULL
+      transformation_y <- inference_detail$transformation_y
+      if(is.null(transformation_y) || length(transformation_y)  ==  0)
+        transformation_y <- NULL
+
+      res_model_covariates <- covariates_model(inference_detail, study_summary)
+      study_summary <- res_model_covariates$study_summary
+      covariates <- res_model_covariates$covariates
+      inference_detail <- res_model_covariates$inference_detail
 
       independent_variable <- gsub(" ","", inference_detail$independent_variable)
 
@@ -123,7 +135,6 @@ association_analysis <- function(inference_details,result_folder, maxResources =
           log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missed DEPTH analysis inference forced to 1.")
         }
 
-
         # transform independent variable as factor
         if(family_test  ==  "binomial" || family_test  ==  "wilcoxon" || family_test  ==  "t.test")
           study_summary[,independent_variable] <- as.factor(study_summary[,independent_variable])
@@ -139,49 +150,12 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         }
         else
         {
-
-          if(covariates_pca)
-          {
-            # check if covariates are numeric
-            if(length(covariates)  !=  0)
-            {
-              # check if all covariates are numeric
-              if(!all(sapply(study_summary[,covariates], is.numeric)))
-                log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Not all covariates are numeric! Skipped.")
-
-              # replace covariates with PCA
-              pca_result <- stats::prcomp(study_summary[,covariates], center = TRUE, scale. = TRUE)
-              pca_result <- pca_result$x
-              # pca_result <- stats::predict(pca_result, study_summary[,covariates])
-              pca_result <- as.data.frame(pca_result)
-              write.csv2(pca_result,file_path_build(ssEnv$result_folderData,c("PCA", covariates_dummy),".csv"))
-              colnames(pca_result) <- paste0("PC", 1:ncol(pca_result))
-              covariates <- colnames(pca_result)
-              study_summary <- cbind(study_summary, pca_result)
-            }
-          }
-          covariates_to_remove <- calculate_collinearity_score(study_summary[,covariates])
-          if(length(covariates_to_remove) > 0)
-          {
-            log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " The following covariates are collinear and will be removed: ", paste(covariates_to_remove, collapse = ", "))
-            covariates <- setdiff(covariates, covariates_to_remove)
-          }
-
           if(is.null(covariates) || length(covariates)  ==  0)
           {
             sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable)])
           }
           else
           {
-            #transform in factor not numeric covariate
-            for(cc in 1:length(covariates))
-            {
-              cname <- covariates[cc]
-              if(!is.numeric(stats::na.omit(study_summary[,cname])))
-              {
-                study_summary[,cname] <- as.factor(study_summary[,cname])
-              }
-            }
             sample_names <- data.frame(study_summary[, c("Sample_ID", independent_variable, covariates)])
           }
 
@@ -204,32 +178,15 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             next
           }
 
-
-          ######################################################################################################
-          # sample_names deve avere due colonne la prima con il nome del campione e la seconda con la variabile categorica
-          # binomiale che si vuole usare per la regressione logistica
-          #
-          # min_covariates_length <- ifelse(grepl("mediation-quantreg", family_test), 2, 1 )
-          # min_covariates_length <- ifelse(grepl("mediation-linear", family_test), 2, 1 )
-          # min_covariates_length <- ifelse(grepl("mediation-ridge", family_test), length(covariates),1 )
-
-          if(length(covariates_to_remove)>0)
-          {
-            log_event("WARNING: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), " - Variables removed: ", paste(covariates_to_remove, collapse = ", "))
-            if(collinearity_check)
-              next
-          }
-
-
-
           markers <- unique(localKeys$MARKER)
-          for (a in 1:length(markers))
+          for (a in seq_along(markers))
           {
             results <- data.frame()
             keys <- localKeys[localKeys$MARKER==markers[a],]
             keys <- unique(keys)
             cols <- keys$COMBINED
             fileNameResults <- inference_file_name(inference_detail, markers[a], ssEnv$result_folderInference,prefix= ifelse(areas_selection==c(),"",paste(areas_selection, "_", sep = "")))
+            log_event("JOURNAL:","Result saved into file:", fileNameResults, ".")
             if (sum(cols %in% colnames(study_summary))!=0)
             {
               # temporaneamente filtriamo per le colonne esistenti
@@ -275,7 +232,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     #
                   }
                   result_temp <- apply_stat_model(tempDataFrame  =  study_summary_local[, column_selectors], g_start  =  g_start , family_test  =  family_test, covariates  =  covariates,
-                    key  =  key, transformation  =  transformation, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
+                    key  =  key, transformation_y  =  transformation_y, dototal  =  FALSE, session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition, ...)
                   results <- plyr::rbind.fill(results, result_temp)
                 }
 
@@ -309,7 +266,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
               nkeys <- nrow(keys)
               variables_to_export_nested <- c("variables_to_export", "keys", "sample_names", "independent_variable", "covariates",
-                "family_test", "transformation", "ssEnv", "depth_analysis","file_path_build", "apply_stat_model")
+                "family_test", "transformation_y", "ssEnv", "depth_analysis","file_path_build", "apply_stat_model")
               if(nrow(keys)>0)
                 # result_temp_foreach <- foreach::foreach(k  =  1:nkeys, .combine  =  rbind, .export  =  variables_to_export_nested) %dorng%
                 for (k in 1:nkeys)
@@ -332,7 +289,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                       area_to_remove <- old_results[old_results$MARKER==key$MARKER & old_results$FIGURE==key$FIGURE
                         & old_results$SUBAREA==key$SUBAREA & old_results$AREA==key$AREA,"AREA_OF_TEST"]
                       tempDataFrame <- tempDataFrame[!(tempDataFrame$AREA %in% area_to_remove),]
-                      results <- old_results
+                      results <- plyr::rbind.fill(results, old_results)
                       rm(old_results)
                     }
                     log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Read pivot:", pivot_filename, " with ", nrow(tempDataFrame), " rows.")
@@ -356,7 +313,13 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                         # names_area <- gsub(":","_",gsub("'","_",gsub("-","_",tempDataFrame[,1])))
                         tempDataFrame <- tempDataFrame[ tempDataFrame$AREA %in% areas_selection_temp, ]
                       }
+
+                      if(nrow(tempDataFrame) == 0)
+                      {
+                        log_event("BANNER: ", format(Sys.time(), "%a %b %d %X %Y"), " No areas selected for the analysis! Skipped.")
+                      }
                     }
+
                     if(is.null(dim(tempDataFrame)))
                       next
                     if(plyr::empty(tempDataFrame) | nrow(tempDataFrame)==0)
@@ -367,48 +330,47 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                     batch <- 0
                     chunk_size <- ceiling(6000000/ncol(tempDataFrame))  # Define a chunk size
                     for (i in seq(1, nrow(tempDataFrame), by = chunk_size)) {
-                      {
-                        chunk_indices <- i:min(i + chunk_size - 1, nrow(tempDataFrame))
-                        tempDataFrameBatch <- as.data.frame(tempDataFrame)[chunk_indices,]
-                        rownames(tempDataFrameBatch) <- tempDataFrameBatch[,1]
-                        tempDataFrameBatch <- tempDataFrameBatch[,-1]
-                        tempDataFrameBatch <- t(tempDataFrameBatch)
-                        tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                        tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
-                        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Transposed pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch) -1 , " columns.")
-                        batch <- batch + 1
-                        if(nrow(tempDataFrameBatch)>1)
-                        {
-                          tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
-                          log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Merged pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch), " columns.")
-                          tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                          tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
-                          tempDataFrameBatch <- tempDataFrameBatch[,-1]
-                          cols <- (colnames(tempDataFrameBatch))
-                          tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
-                          if(length(colnames(tempDataFrameBatch)) !=  length(cols))
-                            stop("ERROR: I'm stopping here data to associate are not correct, file a bug!")
-                          colnames(tempDataFrameBatch) <- cols
-                          # two are the sample_id and the sample_group
-                          g_start <- 2 + length(covariates)
-                          processed_items <- processed_items + ncol(tempDataFrameBatch) - g_start
-                          if(any(is.na(tempDataFrameBatch)))
-                          {
-                            log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
-                            # next
-                          }
-                          result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
-                            key  =  key, transformation =  transformation, dototal  =  dototal,
-                            session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition,  ...)
 
-                          results <- plyr::rbind.fill(results, result_temp_local_batch)
-                          results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
-                          # save every 100 rows
+                      chunk_indices <- i:min(i + chunk_size - 1, nrow(tempDataFrame))
+                      tempDataFrameBatch <- as.data.frame(tempDataFrame)[chunk_indices,]
+                      rownames(tempDataFrameBatch) <- tempDataFrameBatch[,1]
+                      tempDataFrameBatch <- tempDataFrameBatch[,-1]
+                      tempDataFrameBatch <- t(tempDataFrameBatch)
+                      tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                      tempDataFrameBatch$Sample_ID <- rownames(tempDataFrameBatch)
+                      log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Transposed pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch) -1 , " columns.")
+                      batch <- batch + 1
+                      if(nrow(tempDataFrameBatch)>1)
+                      {
+                        tempDataFrameBatch <-  merge( x  =   sample_names, y  =   tempDataFrameBatch,  by.x  =  "Sample_ID",  by.y  =  "Sample_ID" , all.x  =  TRUE)
+                        log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Merged pivot:", pivot_filename, " with ", ncol(tempDataFrameBatch), " columns.")
+                        tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                        tempDataFrameBatch[is.na(tempDataFrameBatch)] <- 0
+                        tempDataFrameBatch <- tempDataFrameBatch[,-1]
+                        cols <- (colnames(tempDataFrameBatch))
+                        tempDataFrameBatch <- as.data.frame(tempDataFrameBatch)
+                        if(length(colnames(tempDataFrameBatch)) !=  length(cols))
+                          stop("ERROR: I'm stopping here data to associate are not correct, file a bug!")
+                        colnames(tempDataFrameBatch) <- cols
+                        # two are the sample_id and the sample_group
+                        g_start <- 2 + length(covariates)
+                        processed_items <- processed_items + ncol(tempDataFrameBatch) - g_start
+                        if(any(is.na(tempDataFrameBatch)))
+                        {
+                          log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Missing values in the data frame!")
+                          # next
                         }
-                        if ( batch %% 10 == 0)
-                          association_analysis_save_results(results,fileNameResults, family_test, filter_p_value )
+                        result_temp_local_batch <- apply_stat_model(tempDataFrame  =  tempDataFrameBatch, g_start  =  g_start, family_test  =  family_test, covariates  =  covariates,
+                          key  =  key, transformation_y =  transformation_y, dototal  =  (length(areas_selection_temp)==0),
+                          session_folder =  ssEnv$session_folder, independent_variable, depth_analysis,inference_detail$samples_sql_condition, ...)
+
+                        results <- plyr::rbind.fill(results, result_temp_local_batch)
+                        results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
+                        # save every 100 rows
                       }
+                      association_analysis_save_results(results,fileNameResults, family_test, filter_p_value )
                     }
+
                     association_analysis_log(cbind(inference_detail,keys[k,]), start_time, Sys.time(), processed_items)
                   }
                   else
@@ -436,110 +398,17 @@ association_analysis <- function(inference_details,result_folder, maxResources =
         }
       }
     }
+    if(nrow(results) != 0)
+    {
+      results$TRANSFORMATION_X <- inference_detail$transformation_x
+      association_analysis_save_results(results,fileNameResults, family_test, filter_p_value )
+    }
     total_time <- difftime(Sys.time(), start_time, units  =  "mins")
     end_time <- Sys.time()
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Finished processing association analysis for ", processed_items, " items in ", total_time, " minutes." )
+    log_event("JOURNAL:", format(Sys.time(), "%a %b %d %X %Y"), " Association Analysis finished in ", total_time, " minutes. \n ####################################################" )
   }
   close_env()
 }
 
-association_analysis_save_results <- function(results=NULL,fileNameResults, family_test, filter_p_value, append=FALSE ){
 
-
-  if(nrow(results)==0)
-    return()
-
-  ssEnv <- get_session_info()
-
-  # there is a bug which mantain more family test in the same results file
-  # so we need to filter the results
-  #
-  colnames(results) <- name_cleaning(colnames(results))
-  results <- subset(results, FAMILY_TEST==as.character(family_test))
-
-  # check if results is empty
-  if(is.null(results))
-    return()
-
-  if(nrow(results)==0)
-    return()
-
-  if (!append)
-  {
-    results <- results[,!grepl("SAMPLES_SQL_CONDITION", colnames(results))]
-    results <- unique(results)
-
-    pvalue_columns <- colnames(results)[grepl("PVALUE", colnames(results)) & !grepl("_ADJ", colnames(results))]
-
-    # remove all existing column adjusted all pvalues
-    results <- results[,!grepl("_ADJ_ALL_", colnames(results))]
-
-    if (exists("results") & length(pvalue_columns)>0)
-    {
-      for (p in 1:length(pvalue_columns))
-      {
-        col_p <- name_cleaning(paste0(pvalue_columns[p], "_ADJ_ALL_", ssEnv$multiple_test_adj))
-        results[,col_p] <- stats::p.adjust(results[,pvalue_columns[p]],method  =  ssEnv$multiple_test_adj)
-        colnames(results) <- name_cleaning(colnames(results))
-      }
-
-      pvalue_adj_colname <- name_cleaning(paste0("PVALUE_ADJ_ALL_", ssEnv$multiple_test_adj))
-
-      if (nrow(results)>0)
-        results <- results[order(results[,pvalue_adj_colname]),]
-
-      if(filter_p_value)
-        results <- subset(results, results$PVALUE < as.numeric(ssEnv$alpha) | results[,pvalue_adj_colname] < as.numeric(ssEnv$alpha))
-    }
-
-    if(nrow(results)==0)
-      return()
-
-    results$DEPTH <- 3
-    # replace NA of SUBAREA with TOTAL
-    results[is.na(results$SUBAREA),"SUBAREA"] <- "TOTAL"
-    results[results$SUBAREA=="SAMPLE","DEPTH"] <- 1
-    selector <- grepl("TOTAL",results$AREA_OF_TEST)
-    results[selector,"DEPTH"] <- 2
-    # replace empty with NA
-    results[results == ""] <- NA
-    results[results == " "] <- NA
-    # remove columns where all rows are NA
-    results <- results[, colSums(is.na(results)) < nrow(results)]
-
-    # check if exists at least a column with PVALUE
-    if(!any(grepl("PVALUE", colnames(results))))
-      return()
-  }
-
-  utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
-
-}
-
-association_analysis_log <- function(inference_detail, start_time, end_time, processed_items)
-{
-  ssEnv <- get_session_info()
-  log_folder <- ssEnv$session_folder
-  association_file <- paste0(log_folder, "/association_analysis.csv")
-  inference_detail$node_name <- as.character(Sys.info()["nodename"])
-  inference_detail$session_id <- ssEnv$session_id
-  # inference_detail$start_time <- as.character(format(start_time, "%a %b %d %X %Y"))
-  # inference_detail$end_time <- as.character(format(end_time, "%a %b %d %X %Y"))
-  inference_detail$processed_time <- as.numeric(difftime(end_time, start_time, units  =  "mins"))
-  inference_detail$processed_items <- processed_items
-  if(!file.exists(association_file))
-  {
-    utils::write.csv2(inference_detail, file  =  association_file, row.names  =  FALSE, col.names  =  TRUE)
-  } else
-  {
-    # convert all columns of inference detail as character
-    tryCatch({
-      association_file_data <- utils::read.csv2(association_file, header  =  TRUE, stringsAsFactors  =  FALSE)
-      association_file_data <- plyr::rbind.fill(inference_detail, association_file_data)
-      utils::write.csv2(association_file_data, file  =  association_file, row.names  =  FALSE, col.names  =  TRUE)
-    }, error = function(e) {
-      # print("ERROR: I'm stopping here, data to associate are not correct, file a bug!")
-    })
-  }
-
-}

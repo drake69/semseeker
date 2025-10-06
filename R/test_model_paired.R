@@ -1,4 +1,4 @@
-test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot , samples_sql_condition="", area, subarea, marker, figure)
+test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation_y, plot , samples_sql_condition="", key)
 {
   ssEnv <- get_session_info()
   res <- data.frame(pvalue=NA)
@@ -44,7 +44,7 @@ test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenVal
   if(family_test=="wilcoxon.paired")
   {
     if (plot)
-      box.plot(tempDataFrameOriginal, independent_variable,burdenValue, transformation, family_test, samples_sql_condition, area, subarea)
+      box.plot(tempDataFrameOriginal, independent_variable,burdenValue, transformation_y, family_test, samples_sql_condition, key)
 
     result_w  <- suppressWarnings(stats::wilcox.test(tempDataFrame[,first_category], tempDataFrame[,second_category], exact=TRUE, paired = T))
     res$pvalue <- result_w$p.value
@@ -91,7 +91,7 @@ test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenVal
   if(family_test=="t.test.paired")
   {
     if (plot)
-      box.plot(tempDataFrameOriginal, independent_variable,burdenValue, transformation, family_test)
+      box.plot(tempDataFrameOriginal, independent_variable,burdenValue, transformation_y, family_test, samples_sql_condition, key)
 
     result_w  <-stats::t.test(formula= sig.formula, data = as.data.frame(tempDataFrame), paired = T)
     res$pvalue <- result_w$p.value

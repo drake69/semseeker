@@ -6,15 +6,20 @@
 #' @param burdenValue burden colon name
 #' @param independent_variable independent variable for regressor
 #'
-test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation, plot , samples_sql_condition=samples_sql_condition, area, subarea, marker, figure)
+test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation_y, plot , samples_sql_condition=samples_sql_condition, key)
 {
+
+  area <- as.character(key$AREA)
+  subarea <- as.character(key$SUBAREA)
+  marker <- as.character(key$MARKER)
+  figure <- as.character(key$FIGURE)
 
   ssEnv <- get_session_info()
   res <- data.frame(pvalue=NA)
   if(family_test=="chisq.test")
   {
-    if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
+    # if (plot)
+    #   box.plot(tempDataFrame, independent_variable,burdenValue, transformation_y, family_test,samples_sql_condition, key)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -39,7 +44,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if(family_test=="bartlett.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation_y, family_test,samples_sql_condition, key)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -60,7 +65,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if (family_test=="fisher.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation_y, family_test,samples_sql_condition, key)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -80,7 +85,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if (family_test=="kruskal.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation_y, family_test, samples_sql_condition, key)
 
     tempDataFrame <- as.data.frame(tempDataFrame)
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")
@@ -114,8 +119,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     })
     kruska_wallis_summary <- kw_result$p.value
 
-    kw_pvalue_max <- 0
-    significative <- TRUE
     # for each group combination extract the p-value
     for (i in 1:nrow(kruska_wallis_summary)) {
       # i <-1
@@ -127,8 +130,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
         if(i!=j)
           next
         pval_name <- paste0("PVALUE_KW_",as.character(col),"_",as.character(row),sep="")
-        significative <- significative & (p_value < as.numeric(ssEnv$alpha))
-        kw_pvalue_max <- max(kw_pvalue_max, p_value,nan.rm = TRUE)
         p_value <- data.frame(p_value)
         colnames(p_value) <- pval_name
         if (exists("res"))
@@ -138,8 +139,6 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
       }
     }
 
-    res$significative <- significative
-    res$kw_pvalue_max <- kw_pvalue_max
     # remove rowname from res
     rownames(res) <- NULL
 
@@ -182,7 +181,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     }
 
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation_y, family_test,samples_sql_condition, key)
 
     result_w  <- suppressWarnings(stats::wilcox.test(formula= sig.formula, data = as.data.frame(tempDataFrame), exact=TRUE))
     res$pvalue <- result_w$p.value
@@ -229,7 +228,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
   if(family_test=="t.test")
   {
     if (plot)
-      box.plot(tempDataFrame, independent_variable,burdenValue, transformation, family_test,samples_sql_condition, area, subarea)
+      box.plot(tempDataFrame, independent_variable,burdenValue, transformation_y, family_test,samples_sql_condition, key)
 
     result_w  <-stats::t.test(formula= sig.formula, data = as.data.frame(tempDataFrame))
     res$pvalue <- result_w$p.value
@@ -256,7 +255,7 @@ test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,inde
     {
       chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("CORRELATION",name_cleaning(as.character(samples_sql_condition))))
       # plot a scatter plot of the burden value vs the independent variable and a linear regression line
-      filename  =  file_path_build(chartFolder,toupper(c(family_test,as.character(transformation), independent_variable,"Vs", burdenValue,area, subarea)),ssEnv$plot_format)
+      filename  =  file_path_build(chartFolder,toupper(c(family_test,as.character(transformation_y), independent_variable,"Vs", burdenValue,area, subarea)),ssEnv$plot_format)
       grDevices::png(filename, width = 9, height = 9, units="in", res = as.numeric(ssEnv$plot_resolution_ppi))
       plot(tempDataFrame[,burdenValue], tempDataFrame[,independent_variable], xlab = burdenValue, ylab = independent_variable, main = paste("Correlation between", burdenValue, "and", independent_variable), pch = 19)
       abline(lm(tempDataFrame[,independent_variable] ~ tempDataFrame[,burdenValue]), col = "blue")

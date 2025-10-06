@@ -18,7 +18,7 @@ cluster_analysis <- function(cluster_variables,ellipsis=TRUE, sql_sample_selecti
     progress_bar <- ""
 
 
-  for (i in 1:length(cluster_variables))
+  for (i in seq_along(cluster_variables))
   {
     cluster_variable_name <- cluster_variables[i]
     if (is.na(cluster_variable_name) || cluster_variable_name=="")
@@ -50,7 +50,6 @@ cluster_analysis <- function(cluster_variables,ellipsis=TRUE, sql_sample_selecti
       pivot_data <- arrow::read_parquet(pivot_filename)
       pivot_data <- pivot_data[, study_summary$Sample_ID]
       pivot_data[is.na(pivot_data)] <- 0
-
 
       tsne <- M3C::tsne(pivot_data,labels=as.factor( study_summary[, cluster_variable_name]))
       # get the plot

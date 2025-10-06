@@ -2,45 +2,28 @@ inference_file_name <- function(inference_detail, marker, folder,file_extension=
 {
   ssEnv <- get_session_info()
 
-  #
-  covariates <- inference_detail$covariates
-  covariates <- if(length(covariates) !=  0 && !is.null(covariates)) unlist(t(strsplit( gsub(" ","",covariates),split  =  "+", fixed  =  T)))
-  covariates_dummy <- inference_detail$covariates_dummy
-  covariates_dummy <- if(length(covariates_dummy) !=  0 && !is.null(covariates_dummy)) unlist(t(strsplit( gsub(" ","",covariates_dummy),split  =  "+", fixed  =  T)))
-  covariates_pca <- ifelse(is.null(inference_detail$covariates_pca),FALSE,inference_detail$covariates_pca)
-
-  family_test <- inference_detail$family_test
-  transformation <- inference_detail$transformation
-  independent_variable <- gsub(" ","", inference_detail$independent_variable)
-  depth_analysis <- inference_detail$depth_analysis
+  covariates <- split_and_clean(inference_detail$covariates, "\\+")
+  covariates_dummy <- split_and_clean(inference_detail$covariates_dummy, "\\+")
+  covariates_pca <- boolean_check(inference_detail$covariates_pca)
+  family_test <- split_and_clean(inference_detail$family_test)
+  transformation_y <- split_and_clean(inference_detail$transformation_y)
+  inference_detail$independent_variable <- as.character(inference_detail$independent_variable)
+  inference_detail$independent_variable <- as.character(gsub("_SCALED","",inference_detail$independent_variable))
+  if(inference_detail$transformation_x=="scale")
+    inference_detail$independent_variable <- paste0(inference_detail$independent_variable, "_SCALED")
+  independent_variable <- split_and_clean(inference_detail$independent_variable)
+  depth_analysis <- split_and_clean(inference_detail$depth_analysis)
 
   file_suffix <- ""
-  file_result_prefix <- paste(as.character(independent_variable),as.character(transformation),as.character(family_test),sep="_")
-  if(!is.null(covariates) & (length(covariates) !=0))
-  {
-    long_covariates <- length(covariates) > 2
-    # split each covariates by _
-    if (long_covariates)
-    {
-      covariates <- unlist(t(strsplit( gsub(" ","",covariates),split  =  "_", fixed  =  T)))
-      covariates <- unique(covariates)
-    }
+  file_result_prefix <- paste(as.character(independent_variable),as.character(transformation_y),as.character(family_test),sep="_")
+
+  if(length(covariates)>0)
     file_suffix <- paste(covariates, collapse = "_")
-  }
 
-  if (!is.null(covariates_dummy) && (length(covariates_dummy)  !=  0))
-  {
-    long_covariates <- length(covariates_dummy) > 2
-    # split each covariates_dummy by _
-    if (long_covariates)
-    {
-      covariates_dummy <- unlist(t(strsplit( gsub(" ","",covariates_dummy),split  =  "_", fixed  =  T)))
-      covariates_dummy <- unique(covariates_dummy)
-    }
+  if(length(covariates_dummy)>0)
     file_suffix <- c(file_suffix, paste(covariates_dummy, collapse = "_"))
-  }
 
-  if(length(covariates_dummy))
+  if(length(covariates_dummy)>0)
     file_suffix <- c(file_suffix, paste("dummy", sep = "_"))
 
   if(covariates_pca)

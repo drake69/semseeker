@@ -1,4 +1,4 @@
-source_data_get <- function(source_data){
+source_data_get <- function(source_data, check_is_numeric=FALSE){
 
   # check id source data is a path or a dataframe
   if (!is.character(source_data))
@@ -42,6 +42,13 @@ source_data_get <- function(source_data){
   if (!is.data.frame(source))
   {
     log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y") , " source_data ", source_data, " is missed !")
+    stop()
+  }
+
+  # check all values are numeric
+  if (check_is_numeric & !all(sapply(source, is.numeric)))
+  {
+    log_event("ERROR:", format(Sys.time(), "%a %b %d %X %Y") , " source_data ", source_data, " contains non-numeric values !")
     stop()
   }
 

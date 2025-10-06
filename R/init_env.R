@@ -97,7 +97,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"showprogress",FALSE)
   arguments <- set_env_variable(arguments,"signal_intrasample",FALSE)
   arguments <- set_env_variable(arguments,"openai_api_key","")
-  arguments <- set_env_variable(arguments,"multiple_test_adj","fdr", c("BY", "fdr","BH","bonferroni"))
+  arguments <- set_env_variable(arguments,"multiple_test_adj","q", c("BY", "fdr","BH","bonferroni","q"))
 
   if (!is.null(ssEnv$openai_api_key))
     Sys.setenv(OPENAI_API_KEY = ssEnv$openai_api_key)
@@ -186,7 +186,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   if(length(arguments)!=0)
   {
     temp <- arguments
-    for (i in 1:length(temp))
+    for (i in seq_along(temp))
     {
       if(is.null(temp[[i]]))
         v <- c(v,i)

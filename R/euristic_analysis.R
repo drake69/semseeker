@@ -9,7 +9,7 @@ euristic_analysis_phenolizer <- function(result_folder, rule, cutoff)
   # geneAnnotatedFile <-subset(geneAnnotatedFile,geneAnnotatedFile$POPULATION != "Reference")
 
   markers <- c("MUTATIONS","LESIONS")
-  for ( m in 1:length(markers))
+  for ( m in seq_along(markers))
   {
     marker <- markers[m]
     # marker <- "LESIONS"

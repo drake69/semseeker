@@ -173,7 +173,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
 
 
     markers <- unique(aggregated_study_results_table[, c("MARKER")])
-    # for (i in 1:length(markers))
+    # for (i in seq_along(markers))
     # {
     #   marker <- markers[i]
     #   filename <- inference_file_name(inference_detail, marker,ssEnv$result_folderInference,file_extension = "csv",suffix = "", prefix = "")
@@ -247,7 +247,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
           # Create a Venn diagram using ggvenn
           venn_plot <- ggvenn::ggvenn(
             data = SPLIT,
-            fill_color = color_palette[1:length(SPLIT)],
+            fill_color = color_palette[seq_along(SPLIT)],
             set_name_color = "white"
           )
 
@@ -261,14 +261,14 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
             ) +
             ggplot2::scale_fill_identity() +
             ggplot2::scale_fill_manual(
-              values = color_palette[1:length(SPLIT)],
+              values = color_palette[seq_along(SPLIT)],
               labels = categories
             ) +
             ggplot2::guides(fill = ggplot2::guide_legend(title = NULL, override.aes = list(color = NA)))
 
           # Create a Venn diagram using ggvenn
           # venn_plot <- ggvenn::ggvenn(SPLIT,
-          #   fill_color = color_palette[1:length(SPLIT)],
+          #   fill_color = color_palette[seq_along(SPLIT)],
           #   set_name_color = "white")
           #
           # # Customize the plot with ggplot2
@@ -292,7 +292,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
           # suppressMessages(
           #   VennDiagram::venn.diagram(
           #     x = SPLIT,
-          #     fill = color_palette[1:length(SPLIT)],
+          #     fill = color_palette[seq_along(SPLIT)],
           #     alpha = 0.5,
           #     category.names = categories,
           #     cat.col = rep("black", length(SPLIT)),
@@ -325,7 +325,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
     log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y"),"  job completed !")
     # remove all files ending with .log
     files <- list.files(ssEnv$result_folderInference, pattern = ".log")
-    for (f in 1:length(files))
+    for (f in seq_along(files))
     {
       file <- files[f]
       file.remove(paste(ssEnv$result_folderInference, "/", file, sep = ""))

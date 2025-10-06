@@ -1,6 +1,6 @@
 # extract quantgile regression metrics and plot the results of the quantile regression and the permutation vector histogram
 quantreg_metrics <- function(predicted_values, expected_values, tau, res, family_test,independent_variable,
-  transformation, dependent_variable, permutation_vector=c(), plot = FALSE ){
+  transformation_y, dependent_variable, permutation_vector=c(), plot = FALSE ){
 
   ###########
 
@@ -27,7 +27,7 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
   # if(plot & 1!=1)
   # {
   #   chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-  #   filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable),ssEnv$plot_format)
+  #   filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation_y), dependent_variable),ssEnv$plot_format)
   #
   #   # Save the plot
   #   # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = ssEnv$plot_resolution)
@@ -44,7 +44,7 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
   #   if (length(permutation_vector) > 0)
   #   {
   #     chartFolder <- dir_check_and_create(ssEnv$result_folderChart,c("FITTED_MODEL"))
-  #     filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation), dependent_variable, "HISTOGRAM"),ssEnv$plot_format)
+  #     filename  =  file_path_build(chartFolder,c(as.character(family_test), independent_variable,"Vs",as.character(transformation_y), dependent_variable, "HISTOGRAM"),ssEnv$plot_format)
   #
   #     # grDevices::png(file =  filename, width = 2480,height = 2480, pointsize  =  15, res = ssEnv$plot_resolution)
   #     if(ssEnv$plot_format == "png")
@@ -70,7 +70,7 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
       warning("No data available for plotting observed vs. predicted.")
     } else {
       chartFolder <- dir_check_and_create(ssEnv$result_folderChart, c("FITTED_MODEL"))
-      filename <- file_path_build(chartFolder, c(as.character(family_test), independent_variable, "Vs", as.character(transformation), dependent_variable), ssEnv$plot_format)
+      filename <- file_path_build(chartFolder, c(as.character(family_test), independent_variable, "Vs", as.character(transformation_y), dependent_variable), ssEnv$plot_format)
 
       # Observed vs. Predicted plot
       observed_predicted_plot <- ggplot2::ggplot(data = data.frame(expected_values, predicted_values), ggplot2::aes(x = expected_values, y = predicted_values)) +
@@ -87,7 +87,7 @@ quantreg_metrics <- function(predicted_values, expected_values, tau, res, family
       warning("No data available for plotting histogram of betas.")
     } else {
       chartFolder <- dir_check_and_create(ssEnv$result_folderChart, c("FITTED_MODEL"))
-      filename <- file_path_build(chartFolder, c(as.character(family_test), independent_variable, "Vs", as.character(transformation), dependent_variable, "HISTOGRAM"), ssEnv$plot_format)
+      filename <- file_path_build(chartFolder, c(as.character(family_test), independent_variable, "Vs", as.character(transformation_y), dependent_variable, "HISTOGRAM"), ssEnv$plot_format)
 
       betas_histogram <- ggplot2::ggplot(data = data.frame(permutation_vector), ggplot2::aes(x = permutation_vector)) +
         ggplot2::geom_histogram(fill = ssEnv$color_palette[1], color = "black", bins = 30) +

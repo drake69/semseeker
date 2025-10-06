@@ -22,7 +22,7 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
       for (pt in 1:nrow(key_enrichment_format))
       {
         column_of_id <- key_enrichment_format[pt,"column_of_id"]
-        column_of_pvalue <- key_enrichment_format[pt,"column_of_pvalue"]
+        column_of_adj_pvalue <- key_enrichment_format[pt,"column_of_adj_pvalue"]
         column_of_description <- key_enrichment_format[pt,"column_of_description"]
         column_of_enrichment <- key_enrichment_format[pt,"column_of_enrichment"]
 
@@ -37,11 +37,11 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
           aggregated_patwhay_result_total <- data.frame()
           missed_keys <- data.frame()
           family_test <- inference_detail$family_test
-          transformation <- as.character(inference_detail$transformation)
+          transformation_y <- as.character(inference_detail$transformation_y)
           independent_variable <- inference_detail$independent_variable
           covariates <- paste(inference_detail$covariates, collapse="_")
 
-          file_prfx <- paste(independent_variable, transformation,family_test,covariates, pvalue_column,keys[i,"MARKER"], sep="_")
+          file_prfx <- paste(independent_variable, transformation_y,family_test,covariates, pvalue_column,keys[i,"MARKER"], sep="_")
 
 
           for (a in alphas)
@@ -88,7 +88,7 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
             if(key_enrichment_format[pt,"label"]=="pathfindR")
               pathway_result$PVALUE_ADJ_ALL_FDR <-stats::p.adjust(pathway_result[,"highest_p"], method = "fdr")
 
-            cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_pvalue)
+            cols_to_check <- c(column_of_id,column_of_enrichment,column_of_description, column_of_adj_pvalue)
             # check column names contain the required columns
             if(!all(cols_to_check %in% colnames(pathway_result)))
             {
@@ -127,7 +127,7 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
             next
 
           # if(length(keywords)>0)
-          #   aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_pvalue] < pathway_alpha,]
+          #   aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total[,column_of_adj_pvalue] < pathway_alpha,]
 
           if(nrow(aggregated_patwhay_result_total) == 0)
             next
@@ -154,7 +154,7 @@ find_unique_gene_sets <- function(split_list) {
   unique_sets <- list()
   keys <- names(split_list)
 
-  for (k in 1:length(keys)) {
+  for (k in seq_along(keys)) {
 
     key <- keys[k]
     # Start with the current key's gene sets

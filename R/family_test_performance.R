@@ -2,7 +2,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
 {
   inference_details <- as.data.frame(inference_details)
   # all families must have the same scale
-  transformations <- unique(inference_details$transformation)
+  transformations <- unique(inference_details$transformation_y)
   depths <- unique(inference_details$depth_analysis)
   # ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE)
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
@@ -13,15 +13,15 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
   model_metrics <- sort(c(ssEnv$model_metrics, pvalue_column))
   selected_figures <- unique(ssEnv$keys_markers_figures$FIGURE)
 
-  for ( d in 1:length(depths))
+  for ( d in seq_along(depths))
   {
     depth <- depths[d]
-    for (i in 1:length(transformations))
+    for (i in seq_along(transformations))
     {
-      transformation <-transformations[i]
-      filtered_metrics <- metrics_filter(model_metrics, transformation)
+      transformation_y <-transformations[i]
+      filtered_metrics <- metrics_filter(model_metrics, transformation_y)
 
-      inference_details_selection <- inference_details[inference_details$transformation==transformation & inference_details$depth_analysis==depth,]
+      inference_details_selection <- inference_details[inference_details$transformation_y==transformation_y & inference_details$depth_analysis==depth,]
       # check different families.test
       families.test <- unique(inference_details_selection$family_test)
 
@@ -29,7 +29,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         stop("All families.test must be different.")
 
 
-      for (m in 1:length(markers))
+      for (m in seq_along(markers))
       {
         marker <- markers[m]
         # marker <- "DELTAQ"
@@ -83,7 +83,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         final$EFFECT_SIZE_MAGNITUDE <- as.numeric(final$EFFECT_SIZE_MAGNITUDE)
       }
 
-      for (m in 1:length(markers))
+      for (m in seq_along(markers))
       {
         marker <- markers[m]
         if (nrow(final[final$MARKER==marker,]) == 0)
@@ -95,7 +95,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
         # creat empty list to store plots
         plot_list <- list()
         # loop over metrics
-        for ( m in 1:length(filtered_metrics))
+        for ( m in seq_along(filtered_metrics))
         {
           filtered_metric <- filtered_metrics[m]
           # filtered_metric <- "MAE"
@@ -118,7 +118,7 @@ family_test_performance <- function(inference_details, result_folder, pvalue_col
 
         path <- dir_check_and_create(ssEnv$result_folderChart, "FAMILY.TEST_PERFORMANCE")
         # file_name <- inference_file_name(inference_detail, marker,path ,file_extension=ssEnv$plot_format, prefix = "", suffix="")
-        file_name <- file.path(path, paste0(transformation,"_", marker,"_",paste0(families.test, collapse="_"),"_FAMILY_TEST_PERFORMANCE.png"))
+        file_name <- file.path(path, paste0(transformation_y,"_", marker,"_",paste0(families.test, collapse="_"),"_FAMILY_TEST_PERFORMANCE.png"))
         # save the panel
         ggplot2::ggsave(file = file.path(file_name), gge, width = 2048, height = 1024, units = "px")
       }

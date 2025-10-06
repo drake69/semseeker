@@ -5,7 +5,7 @@
 #' @param family_test family of test to run
 #' @param covariates vector of covariates
 #' @param key key to identify file to elaborate
-#' @param transformation transformation to apply to covariates, burden and independent variable
+#' @param transformation_y transformation_y to apply to covariates, burden and independent variable
 #' @param dototal do a total per area
 #' @param session_folder where to save log file
 #' @param independent_variable independent variable name
@@ -16,16 +16,14 @@
 #' @importFrom doFuture %dofuture%
 #'
 #'
-apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation, dototal,
+apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = NULL, key, transformation_y, dototal,
   session_folder, independent_variable, depth_analysis=3,samples_sql_condition, ...)
 {
-  #
-
   ssEnv <- get_session_info()
   arguments <- list(...)
 
   g_end <- ncol(tempDataFrame)
-  prepared_data <- data_preparation(family_test,transformation,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis, key)
+  prepared_data <- data_preparation(family_test,transformation_y,tempDataFrame, independent_variable, g_start, g_end, FALSE, covariates, depth_analysis, key)
   # if(ncol(prepared_data$tempDataFrame) != ncol(tempDataFrame))
   #   return(NULL)
 
@@ -44,7 +42,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
   to_export <- c("cols", "family_test", "covariates", "independent_variable", "tempDataFrame",
     "independent_variable1stLevel", "independent_variable2ndLevel",
-    "key", "transformation","exact_pvalue","g_end",
+    "key", "transformation_y","exact_pvalue","g_end",
     "data_preparation","apply_stat_model_sig.formula","quantreg_permutation_model",
     "apply_stat_model_sig_formula", "data_distribution_info", "glm_model", "test_model", "test_model_paired", "Breusch_Pagan_pvalue",
     "progress_bar","progression_index", "progression", "progressor_uuid", "owner_session_uuid", "trace","signal_values","ssEnv","g_start",
@@ -71,17 +69,17 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
       #
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
       # browser()
-      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation, (g_end - g_start < 10), samples_sql_condition, as.character(key$AREA), as.character(key$SUBAREA))
+      model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation_y, (g_end - g_start < 10), samples_sql_condition, key)
 
       #
-      local_result <- data.frame("INDIPENDENT.VARIABLE" = independent_variable)
+      local_result <- data.frame("INDIPENDENT_VARIABLE" = independent_variable)
       local_result$MARKER <- as.character(key$MARKER)
       local_result$FIGURE <-  as.character(key$FIGURE)
       local_result$AREA <-  as.character(key$AREA)
       local_result$SUBAREA <-  as.character(key$SUBAREA)
       local_result$AREA_OF_TEST <- burdenValue
       local_result$FAMILY_TEST <- family_test
-      local_result$transformation <- transformation
+      local_result$transformation_y <- transformation_y
       local_result$COVARIATES <- ifelse(length(covariates)>0,paste0(covariates,collapse=" "),NA)
       # local_result$bartlett.pvalue <- data_distribution_info(family_test, tempDataFrame, burdenValue, independent_variable)
 
@@ -154,6 +152,7 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
         result_temp[selector,"PVALUE_ADJ"]  <- (stats::p.adjust(result_temp[selector,"PVALUE"]  ,method = "BH"))
       }
     }
+    colnames(result_temp) <- name_cleaning(colnames(result_temp))
     return(result_temp)
   }
   return(NULL)

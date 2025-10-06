@@ -71,13 +71,19 @@ validate_family_test <- function(family_test){
   if (grepl("quantreg", family_test))
     return(TRUE)
 
-  if(grepl("polynomial",family_test))
+  if(grepl("polynomial_",family_test))
     return(TRUE)
 
-  if (grepl("exp",family_test))
+  if (grepl("exp_",family_test))
     return(TRUE)
 
-  if (grepl("log",family_test))
+  if (grepl("log_",family_test))
+    return(TRUE)
+
+  if (grepl("log10_",family_test))
+    return(TRUE)
+
+  if (grepl("pow10_",family_test))
     return(TRUE)
 
   log_event("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), "family_test is not recognized: ", family_test)
