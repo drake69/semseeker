@@ -42,7 +42,6 @@ deltaX_get <- function()
 
     key <- keys[k,]
     source_marker <- key$SOURCE
-    figure <- key$FIGURE
     marker <- key$MARKER
 
     pivot_file_nameparquet_dest_hyper <- pivot_file_name_parquet(marker,"HYPER","POSITION","WHOLE")

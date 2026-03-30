@@ -34,7 +34,12 @@ test_that("annotations", {
   )
   semseeker:::create_position_pivots(mySampleSheet[mySampleSheet$Sample_Group == "Control",],keys)
 
-  mySampleSheet <- semseeker:::deltaX_get(mySampleSheet[mySampleSheet$Sample_Group!="Reference",])
+  # deltaX_get needs sample sheet CSV (normally written by analyze_batch)
+  ssEnv2 <- semseeker:::get_session_info()
+  sample_sheet_csv <- semseeker:::file_path_build(ssEnv2$result_folderData, "1_sample_sheet_original", "csv", FALSE)
+  utils::write.csv2(mySampleSheet, file=sample_sheet_csv)
+
+  semseeker:::deltaX_get()
 
   semseeker:::annotate_position_pivots()
 

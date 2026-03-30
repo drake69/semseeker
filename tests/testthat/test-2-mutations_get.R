@@ -13,11 +13,18 @@ test_that(" semseeker:::mutations_get",{
   }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 
+  # Build a bed-like data.frame matching the production code path (values read from bed file)
+  values_df <- data.frame(
+    CHR   = probe_features$CHR[match(rownames(signal_data), probe_features$PROBE)],
+    START = probe_features$START[match(rownames(signal_data), probe_features$PROBE)],
+    END   = probe_features$END[match(rownames(signal_data), probe_features$PROBE)],
+    VALUE = as.numeric(signal_data[, 1])
+  )
+
   mutations <-  semseeker:::mutations_get(
-               values = signal_data[,1],
+               values = values_df,
                figure = "HYPO",
-               thresholds = signal_thresholds$signal_inferior_thresholds,
-               probe_features = probe_features,
+               thresholds = signal_thresholds,
                sampleName = mySampleSheet[1,"Sample_ID"]
                )
 

@@ -5,6 +5,8 @@ analyze_batch <- function(signal_data, sample_sheet)
   batch_id <- ssEnv$running_batch_id
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " working on batch:", batch_id, " of ", nrow(signal_data), " rows and ", ncol(signal_data), " samples.")
   colnames(signal_data) <- name_cleaning(colnames(signal_data))
+  # Keep Sample_ID in sync with name_cleaning so sample_group_check passes
+  sample_sheet$Sample_ID <- name_cleaning(sample_sheet$Sample_ID)
   pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION","WHOLE")
   if(!file.exists(pivot_file_name))
   {

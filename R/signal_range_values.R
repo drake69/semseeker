@@ -25,7 +25,7 @@ signal_range_values <- function(populationMatrix, batch_id, probe_features) {
 
   # populationMatrix <- result
   # populationMatrixDim <- dim(populationMatrix)
-  populatioinMatrix <- as.data.frame(populationMatrix)
+  populationMatrix <- as.data.frame(populationMatrix)
   populationMatrix <- populationMatrix[, !(colnames(populationMatrix) %in% "PROBE")]
   # min_values <- apply(populationMatrix, 1, min, na.rm=TRUE)
   # max_values <- apply(populationMatrix, 1, max, na.rm=TRUE)
@@ -137,9 +137,10 @@ signal_range_values <- function(populationMatrix, batch_id, probe_features) {
   )
   result <- result$drop(c("PROBE_WHOLE"))
   result <- result$sort(c("CHR", "START","END"), descending = c(FALSE, FALSE,FALSE))
-  result$collect()$write_parquet(thresholds_file_name)
+  result <- result$collect()
+  result$write_parquet(thresholds_file_name)
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Thresholds defined for: ", nrow(result), " probe_features.")
   gc()
-  return(result)
+  return(result$to_data_frame())
 }

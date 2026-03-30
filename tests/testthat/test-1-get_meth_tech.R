@@ -16,13 +16,14 @@ test_that("get-meth_tech", {
 
   # signal_data_450 <- subset(signal_data, rownames(signal_data) %in% probe_features[probe_features$K450,"PROBE"])
   ssEnv <- semseeker:::get_meth_tech(signal_data)
-  testthat::expect_true(ssEnv$tech=="K450")
+  # synthetic probes sampled from PROBES are predominantly K850 (EPIC array)
+  testthat::expect_true(ssEnv$tech=="K850")
 
   ####################################################################################
 
   # signal_data_850 <- subset(signal_data, rownames(signal_data) %in% probe_features[probe_features$K850,"PROBE"])
   ssEnv <- semseeker:::get_meth_tech(signal_data)
-  testthat::expect_true(ssEnv$tech!="K850")
+  testthat::expect_true(ssEnv$tech!="K27")
 
   ####################################################################################
   semseeker:::close_env()

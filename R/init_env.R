@@ -39,9 +39,9 @@ init_env <- function(result_folder, maxResources = 90, ...)
   }
   else
   {
-    # remove all empty items from arguments
-    arguments <- lapply(arguments, function(x) gsub(" ", "", x))
-    arguments <- lapply(arguments, function(x) x[x!=""])
+    # remove all empty items from arguments (only apply gsub to character, preserve logical/numeric types)
+    arguments <- lapply(arguments, function(x) if(is.character(x)) gsub(" ", "", x) else x)
+    arguments <- lapply(arguments, function(x) if(is.character(x)) x[x!=""] else x)
     arguments <- arguments[sapply(arguments, function(x) length(x) > 0)]
     arguments <- arguments[sapply(arguments, function(x) !is.null(x))]
     # arguments <- arguments[sapply(arguments, function(x) !is.na(x))]
@@ -149,7 +149,7 @@ init_env <- function(result_folder, maxResources = 90, ...)
   ssEnv <- get_session_info()
 
   ssEnv$functionToExport <- c( "analyze_single_sample","deltar_single_sample",
-    " dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
+    "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
     "file_path_build","analyze_single_sample_both",
     "sort_by_chr_and_start", "test_match_order", "lesions_get",
     "mutations_get")

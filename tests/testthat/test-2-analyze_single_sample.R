@@ -16,12 +16,20 @@ test_that("analyze_single_sample",{
   }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
 
+  # Build a bed-like data.frame matching the production code path (values read from bed file)
+  values_df <- data.frame(
+    CHR   = probe_features$CHR[match(rownames(signal_data), probe_features$PROBE)],
+    START = probe_features$START[match(rownames(signal_data), probe_features$PROBE)],
+    END   = probe_features$END[match(rownames(signal_data), probe_features$PROBE)],
+    VALUE = as.numeric(signal_data[, 1])
+  )
+
   sp <- semseeker:::analyze_single_sample(
-    values = signal_data[,1],
-    thresholds = signal_thresholds$signal_inferior_thresholds,
+    values = values_df,
+    thresholds = signal_thresholds,
     figure = "HYPO",
-    sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")] ,
-    probe_features = probe_features)
+    sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")]
+  )
 
 
   outputFolder <- semseeker:::dir_check_and_create(ssEnv$result_folderData,c("Control","MUTATIONS_HYPO"))

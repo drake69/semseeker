@@ -17,10 +17,10 @@ sample_group_check <- function(sample_sheet, signal_data)
 
   result <- NULL
 
-  if((length(sample_sheet$Sample_Group=="Case")<=3)
-    || (length(sample_sheet$Sample_Group=="Control")<=3)
-    || (length(sample_sheet$Sample_Group=="Reference")<=3))
-    return("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Sample groups Case, Control and Reference must be present in the sample sheet, not enough samples each group. ")
+  if((sum(sample_sheet$Sample_Group=="Case", na.rm=TRUE)<=3)
+    || (sum(sample_sheet$Sample_Group=="Control", na.rm=TRUE)<=3)
+    || (sum(sample_sheet$Sample_Group=="Reference", na.rm=TRUE)<=3))
+    return(paste0("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Sample groups Case, Control and Reference must be present in the sample sheet, not enough samples each group. "))
 
     needColumns <- c("Sample_ID", "Sample_Group")
   missedColumns <- needColumns[!(needColumns %in% colnames(sample_sheet))]

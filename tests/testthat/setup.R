@@ -8,7 +8,8 @@ Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES')
 rm(list = ls())
 loadNamespace("future")
 loadNamespace("stats")
-if ( 1==2)
+use_synthetic_data <- TRUE
+if (use_synthetic_data)
 {
   nprobes <<- 6e4
   nsamples <<- 3e1
@@ -104,6 +105,11 @@ if ( 1==2)
 
   colnames(signal_thresholds) <- c("signal_median_values","signal_inferior_thresholds","signal_superior_thresholds","iqr","q1","q3")
 
+  # Add genomic coordinates so mutations_get / sort_by_chr_and_start can sort thresholds
+  signal_thresholds$CHR <- probe_features$CHR
+  signal_thresholds$START <- probe_features$START
+  signal_thresholds$END <- probe_features$END
+
   #####
   ### copy as global
   mySampleSheet <<- mySampleSheet
@@ -128,22 +134,24 @@ iqrTimes <<- 3
 parallel_strategy <<- "multicore"
 markers <<- c("MUTATIONS","DELTAQ","DELTARQ","DELTAP","DELTARP","LESIONS")
 
-signal_data <- readRDS("~/Documents/Dati_Lavoro/beckwith-wiedemann/raw/GSE95486/beta.rds")
-signal_data <- as.data.frame(signal_data)
-signal_data <- signal_data[1:1000,]
-# count rows with all missing values
-nrow_missed <- sum(apply(signal_data, 1, function(x) all(is.na(x))))
-probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
-probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")
-nprobes <<- nrow(signal_data) - nrow_missed
-nsamples <<- ncol(signal_data)
-mySampleSheet <- read.csv2("~/Documents/Dati_Lavoro/beckwith-wiedemann/raw/GSE95486/final_samplesheet.csv")
-mySampleSheet$Covariates1 <- stats::rnorm(nrow(mySampleSheet), mean= 567, sd= 1000)
-mySampleSheet$Covariates2 <- stats::rnorm(nrow(mySampleSheet), mean= 67, sd= 100)
-mySampleSheet$Phenotest <-  mySampleSheet[,3]
+if (!use_synthetic_data) {
+  signal_data <- readRDS("~/Documents/Dati_Lavoro/beckwith-wiedemann/raw/GSE95486/beta.rds")
+  signal_data <- as.data.frame(signal_data)
+  signal_data <- signal_data[1:1000,]
+  # count rows with all missing values
+  nrow_missed <- sum(apply(signal_data, 1, function(x) all(is.na(x))))
+  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
+  probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")
+  nprobes <<- nrow(signal_data) - nrow_missed
+  nsamples <<- ncol(signal_data)
+  mySampleSheet <- read.csv2("~/Documents/Dati_Lavoro/beckwith-wiedemann/raw/GSE95486/final_samplesheet.csv")
+  mySampleSheet$Covariates1 <- stats::rnorm(nrow(mySampleSheet), mean= 567, sd= 1000)
+  mySampleSheet$Covariates2 <- stats::rnorm(nrow(mySampleSheet), mean= 67, sd= 100)
+  mySampleSheet$Phenotest <-  mySampleSheet[,3]
 
-mySampleSheet_batch <<- list(mySampleSheet, mySampleSheet, mySampleSheet)
-signal_data_batch <<- list(signal_data, signal_data, signal_data)
+  mySampleSheet_batch <<- list(mySampleSheet, mySampleSheet, mySampleSheet)
+  signal_data_batch <<- list(signal_data, signal_data, signal_data)
+}
 
 # TODO
 # recover session stored

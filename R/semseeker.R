@@ -36,7 +36,7 @@ semseeker <- function(sample_sheet,
   # check if the input is a list of data frames
   if(!is.list(sample_sheet) | is.data.frame(sample_sheet))
     sample_sheet <- list(sample_sheet)
-  if(!is.list(signal_data))
+  if(!is.list(signal_data) | is.data.frame(signal_data))
     signal_data <- list(signal_data)
 
 

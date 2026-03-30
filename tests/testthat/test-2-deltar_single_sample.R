@@ -13,43 +13,48 @@ test_that("deltar_single_sample",{
     signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
   }
   probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
-  sample_group <- "Reference"
   ####################################################################################
   # for (s in 1:ncol(signal_data))
   {
     s <- 2
     message(s)
     sample_id <- colnames(signal_data)[s]
-    sample_detail <- mySampleSheet[ mySampleSheet$Sample_ID==sample_id & mySampleSheet$Sample_Group==sample_group ,c("Sample_ID","Sample_Group")]
+    # Look up the actual sample group (don't hardcode to "Reference" — sample 2 may not be Reference)
+    sample_detail <- mySampleSheet[mySampleSheet$Sample_ID == sample_id, c("Sample_ID","Sample_Group")]
+
+    # Build a bed-like data.frame matching the production code path (values read from bed file)
+    values_df <- data.frame(
+      CHR   = probe_features$CHR[match(rownames(signal_data), probe_features$PROBE)],
+      START = probe_features$START[match(rownames(signal_data), probe_features$PROBE)],
+      END   = probe_features$END[match(rownames(signal_data), probe_features$PROBE)],
+      VALUE = as.numeric(signal_data[, sample_id])
+    )
 
     dr1 <- semseeker:::deltar_single_sample(
-      values = signal_data[,sample_id],
-      high_thresholds = signal_thresholds$signal_superior_thresholds,
-      low_thresholds = signal_thresholds$signal_superior_thresholds,
-      sample_detail = sample_detail,
-      probe_features = probe_features
+      values = values_df,
+      thresholds = signal_thresholds,
+      sample_detail = sample_detail
     )
 
     ds1 <- semseeker:::delta_single_sample(
-      values = signal_data[,sample_id],
-      high_thresholds = signal_thresholds$signal_superior_thresholds,
-      low_thresholds = signal_thresholds$signal_superior_thresholds,
-      sample_detail = sample_detail,
-      probe_features = probe_features
+      values = values_df,
+      thresholds = signal_thresholds,
+      sample_detail = sample_detail
     )
 
-    ass <- semseeker:::analyze_single_sample( values = signal_data[,sample_id],
-      thresholds = signal_thresholds$signal_superior_thresholds ,
+    ass <- semseeker:::analyze_single_sample(
+      values = values_df,
+      thresholds = signal_thresholds,
       figure = "HYPER",
-      sample_detail = sample_detail ,
-      probe_features = probe_features)
+      sample_detail = sample_detail
+    )
 
-    semseeker:::analyze_single_sample( values = signal_data[,sample_id],
-
-      thresholds = signal_thresholds$signal_superior_thresholds ,
+    semseeker:::analyze_single_sample(
+      values = values_df,
+      thresholds = signal_thresholds,
       figure = "HYPO",
-      sample_detail = sample_detail ,
-      probe_features = probe_features)
+      sample_detail = sample_detail
+    )
 
     mb <- semseeker:::analyze_single_sample_both(sample_detail,"MUTATIONS")
 

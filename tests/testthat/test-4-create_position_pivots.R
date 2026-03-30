@@ -57,44 +57,44 @@ test_that("create_position_pivots", {
 
   # for (k in 1:nrow(keys))
   {
-    # k <- 1
+    k <- 1
     key <- keys[k,]
     marker <- as.character(key$MARKER)
     figure <- as.character(key$FIGURE)
 
     mutations_pivot_file_name <- semseeker:::pivot_file_name_parquet("MUTATIONS",figure,area,subarea)
     if(file.exists(mutations_pivot_file_name))
-      mutations_pivot <- polars::pl$read_parquet(mutations_pivot_file_name)$to_data_frame()
-    else
-      next
-
-    pivot_file_name <- semseeker:::pivot_file_name_parquet(marker,figure,area,subarea)
-    testthat::expect_true(file.exists(pivot_file_name))
-    if(file.exists(pivot_file_name))
-      pivot <- polars::pl$read_parquet(pivot_file_name)$to_data_frame()
-    else
-      pivot <- NULL
-
-    pivot <- pivot[,-c(1:3)]
-    mutations_pivot <- mutations_pivot[,-c(1:3)]
-    testthat::expect_true(nrow(pivot)<nprobes)
-    testthat::expect_true(nrow(pivot)>0)
-
-    if (marker!="LESIONS")
     {
-      testthat::expect_true(all(colnames(pivot) %in% (mySampleSheet$Sample_ID)))
-      testthat::expect_true(all(colnames(pivot) == colnames(mutations_pivot)))
+      mutations_pivot <- polars::pl$read_parquet(mutations_pivot_file_name)$to_data_frame()
 
-      testthat::expect_true(ncol(pivot)==ncol(mutations_pivot))
-      testthat::expect_true(nrow(pivot)==nrow(mutations_pivot))
+      pivot_file_name <- semseeker:::pivot_file_name_parquet(marker,figure,area,subarea)
+      testthat::expect_true(file.exists(pivot_file_name))
+      if(file.exists(pivot_file_name))
+        pivot <- polars::pl$read_parquet(pivot_file_name)$to_data_frame()
+      else
+        pivot <- NULL
 
-      pivot[is.na(pivot)] <- 0
-      mutations_pivot[is.na(mutations_pivot)] <- 0
+      pivot <- pivot[,-c(1:3)]
+      mutations_pivot <- mutations_pivot[,-c(1:3)]
+      testthat::expect_true(nrow(pivot)<nprobes)
+      testthat::expect_true(nrow(pivot)>0)
 
-      pivot[pivot > 0] <- 1
-      mutations_pivot[mutations_pivot > 0] <- 1
+      if (marker!="LESIONS")
+      {
+        testthat::expect_true(all(colnames(pivot) %in% (mySampleSheet$Sample_ID)))
+        testthat::expect_true(all(colnames(pivot) == colnames(mutations_pivot)))
 
-      testthat::expect_true(all(as.data.frame(pivot) == as.data.frame(mutations_pivot)))
+        testthat::expect_true(ncol(pivot)==ncol(mutations_pivot))
+        testthat::expect_true(nrow(pivot)==nrow(mutations_pivot))
+
+        pivot[is.na(pivot)] <- 0
+        mutations_pivot[is.na(mutations_pivot)] <- 0
+
+        pivot[pivot > 0] <- 1
+        mutations_pivot[mutations_pivot > 0] <- 1
+
+        testthat::expect_true(all(as.data.frame(pivot) == as.data.frame(mutations_pivot)))
+      }
     }
   }
 
