@@ -25,7 +25,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
       RENV_CONFIG_SANDBOX_ENABLED: false
       RENV_ACTIVATE_PROJECT: 0
-      # Required by polars installer
+      # Required by polars installer (not on CRAN)
       NOT_CRAN: "true"
 
     steps:
@@ -38,18 +38,25 @@ jobs:
           r-version: ${{ matrix.config.r }}
           use-public-rspm: true
 
-      # polars is not on CRAN — install from community r-multiverse before
-      # setup-r-dependencies runs, so pak can resolve the Imports entry.
-      - name: Install polars
+      # Use remotes instead of pak/setup-r-dependencies so that
+      # Additional_repositories (community.r-multiverse.org for polars) and
+      # Remotes (drake69/ctdR) in DESCRIPTION are honoured correctly.
+      # pak resolves deps before configuring extra repos, making polars unresolvable.
+      - name: Install R dependencies
         run: |
           Sys.setenv(NOT_CRAN = "true")
-          install.packages("polars", repos = "https://community.r-multiverse.org")
+          install.packages(
+            c("remotes", "rcmdcheck", "testthat", "devtools"),
+            repos = "https://packagemanager.posit.co/cran/latest"
+          )
+          remotes::install_deps(
+            dependencies = TRUE,
+            repos = c(
+              rpolars = "https://community.r-multiverse.org",
+              CRAN    = "https://packagemanager.posit.co/cran/latest"
+            )
+          )
         shell: Rscript {0}
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::rcmdcheck, any::testthat, any::devtools
-          needs: check
 
       - uses: r-lib/actions/check-r-package@v2
         with:
