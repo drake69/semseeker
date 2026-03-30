@@ -37,6 +37,12 @@ jobs:
           r-version: ${{ matrix.config.r }}
           use-public-rspm: true
 
+      # polars is not on CRAN; install pre-compiled binary from r-universe first
+      - name: Install polars from r-universe
+        run: |
+          install.packages("polars", repos = c("https://rpolars.r-universe.dev", getOption("repos")))
+        shell: Rscript {0}
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck, any::testthat, any::devtools

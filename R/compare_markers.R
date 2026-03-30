@@ -1,4 +1,4 @@
-compare_markers <- function(inference_detail){
+compare_markers <- function(inference_detail, result_folder, studies, adjust_per_area = FALSE, adjust_globally = FALSE, pvalue_column = "PVALUE_ADJ_ALL_BH", adjustment_method = "BH", ...){
 
   ssEnv <- init_env( result_folder =  result_folder, start_fresh = FALSE, ...)
   color_palette <- ssEnv$color_palette
@@ -13,7 +13,7 @@ compare_markers <- function(inference_detail){
     for (s in 1:nrow(studies))
     {
       # get the inference details for the study
-      temp_res <- association_results_get(inference_details = inference_detail, marker = MARKER, area= AREA,
+      temp_res <- association_results_get(inference_detail = inference_detail, marker = MARKER, area= AREA,
          adjust_per_area = adjust_per_area, adjust_globally = adjust_globally, pvalue_column= pvalue_column,
         adjustment_method = adjustment_method,significance = TRUE)
       if(nrow(temp_res) != 0)

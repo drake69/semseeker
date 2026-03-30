@@ -11,18 +11,20 @@ URL: https://github.com/drake69/semseeker
 BugReports: https://github.com/drake69/semseeker/issues
 Imports: dplyr, doFuture, doRNG, FactoMineR, factoextra, foreach, FSA,
         fst, future, future.apply, ggplot2, ggvenn, gridExtra, gtools, Hmisc,
-        lqmm, plyr, progressr, reshape, reshape2, R.utils, rlang,
+        lqmm, plyr, polars, progressr, reshape, reshape2, R.utils, rlang,
         stats, stringr, utils, withr, zoo, VennDiagram, effsize, pwr,
         combinat, philentropy, parallelly, knitr, lmtest, usethis,
-        glmnet, sqldf
+        glmnet, sqldf, ctdR
 RoxygenNote: 7.3.2
 Suggests: openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR
 Depends: R (>= 4.4.0)
+Remotes: drake69/ctdR
+Additional_repositories: https://rpolars.r-universe.dev
 LazyData: true
 LazyDataCompression: gzip
 SysDataCompression: bzip2
-Config/testthat/parallel: true
+Config/testthat/parallel: false
 Config/testthat/edition: 3
 NeedsCompilation: no
 Packaged: 2024-06-08 07:36:07 UTC; lcorsaro

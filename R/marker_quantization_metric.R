@@ -52,8 +52,7 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
 
       if(is.na(key$MARKER))
       {
-
-        next
+        return(NULL)
       }
 
       if(key$MARKER=="DELTARP" | key$MARKER=="DELTARQ")
@@ -69,7 +68,7 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
       if(!file.exists(fname))
       {
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
-        next
+        return(NULL)
       }
       original <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1))
 
@@ -79,7 +78,7 @@ marker_quantization_metric <- function(result_folder, maxResources = 90, paralle
       if(!file.exists(fname))
       {
         log_event("DEBUG:", format(Sys.time(), "%a %b %d %X %Y")," File not found: ", fname)
-        next
+        return(NULL)
       }
       quantized <- as.matrix(utils::read.csv2(fname, header = TRUE, row.names = 1, skip = 1))
 
