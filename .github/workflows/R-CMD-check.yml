@@ -23,9 +23,10 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      # Bypass renv sandboxing (tests use system library)
       RENV_CONFIG_SANDBOX_ENABLED: false
       RENV_ACTIVATE_PROJECT: 0
+      # Required by polars installer
+      NOT_CRAN: "true"
 
     steps:
       - uses: actions/checkout@v4
@@ -37,10 +38,12 @@ jobs:
           r-version: ${{ matrix.config.r }}
           use-public-rspm: true
 
-      # polars is not on CRAN; install pre-compiled binary from r-universe first
-      - name: Install polars from r-universe
+      # polars is not on CRAN — install from community r-multiverse before
+      # setup-r-dependencies runs, so pak can resolve the Imports entry.
+      - name: Install polars
         run: |
-          install.packages("polars", repos = c("https://rpolars.r-universe.dev", getOption("repos")))
+          Sys.setenv(NOT_CRAN = "true")
+          install.packages("polars", repos = "https://community.r-multiverse.org")
         shell: Rscript {0}
 
       - uses: r-lib/actions/setup-r-dependencies@v2
