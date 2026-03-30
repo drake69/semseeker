@@ -1,7 +1,7 @@
 # CI: R CMD check + testthat on Windows, macOS, Linux
 on:
   push:
-    branches: [main, master, develop]
+    branches-ignore: [main, master]   # direct push to main/master is blocked
   pull_request:
     branches: [main, master, develop]
 
