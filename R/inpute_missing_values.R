@@ -13,7 +13,7 @@ inpute_missing_values <- function(signal_data){
   n_missed_per_row <- rowSums(is.na(signal_data))
   if (any(n_missed_per_row > 0.1 * ncol(signal_data))) {
     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " There are rows with missing values more than 10%. I will remove them.")
-    log_evet ("JOURNAL: ", format(Sys.time(), "%a %b %d %X %Y"), " Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/(nrow(signal_data)*ncol(signal_data)), 2), " % of the data.")
+    log_event("JOURNAL: ", format(Sys.time(), "%a %b %d %X %Y"), " Imputing missing values using ", ssEnv$inpute , " method. Number of missing values: ", n_na, " corresponding to: ", round(n_na/(nrow(signal_data)*ncol(signal_data)), 2), " % of the data.")
     signal_data <- signal_data[n_missed_per_row  < 0.1 * ncol(signal_data), ]
   }
 

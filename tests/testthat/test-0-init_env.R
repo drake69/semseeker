@@ -10,8 +10,9 @@ test_that("test_init_env", {
   semseeker:::close_env()
 
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas = c("PROBE"), subareas= c(""), showprogress=TRUE, start_fresh=TRUE, maxResources = 10)
-  # test keys_areas_subareas_markers_figures has only PROBE
-  testthat::expect_true(nrow(subset(ssEnv$keys_areas_subareas_markers_figures,AREA!="PROBE"))==0)
+  # POSITION is always injected internally by keys_create() (needed for study_summary_total).
+  # So requesting areas=c("PROBE") yields keys containing PROBE + POSITION only.
+  testthat::expect_true(nrow(subset(ssEnv$keys_areas_subareas_markers_figures, !AREA %in% c("PROBE", "POSITION")))==0)
 
 
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas = c("GENE"), subareas= c("BODY"), showprogress=TRUE, start_fresh=TRUE, maxResources = 10)

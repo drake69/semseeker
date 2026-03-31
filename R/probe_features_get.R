@@ -7,8 +7,14 @@ probe_features_get <- function(area_subarea)
 
     # try to get from signal_data saved
     pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","WHOLE")
-    signal_data <- polars::pl$read_parquet(pivot_file_name)
-    ssEnv <- get_meth_tech(signal_data)
+    signal_data_pl <- polars::pl$read_parquet(pivot_file_name)
+    signal_data_r  <- signal_data_pl$to_data_frame()
+    # probe names are stored in the AREA column; restore them as rownames
+    if ("AREA" %in% colnames(signal_data_r)) {
+      rownames(signal_data_r) <- signal_data_r$AREA
+      signal_data_r$AREA <- NULL
+    }
+    ssEnv <- get_meth_tech(signal_data_r)
     log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"), " Probes get should be called once defined which tech is used.")
     if(is.null(ssEnv$tech) | ssEnv$tech=="")
     {
