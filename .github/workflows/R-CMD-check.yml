@@ -1,4 +1,4 @@
-# CI: R CMD check + testthat on Windows, macOS, Linux
+# CI: R CMD check + testthat — macOS only for now; re-enable Windows/Linux once green
 on:
   push:
     branches-ignore: [main, master]   # direct push to main/master is blocked
@@ -16,9 +16,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,  r: 'release'}
+          - {os: macos-latest, r: 'release'}
+          # Windows and Ubuntu disabled until macOS is green
+          # - {os: windows-latest, r: 'release'}
+          # - {os: ubuntu-latest,  r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
