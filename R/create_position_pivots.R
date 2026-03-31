@@ -127,7 +127,7 @@ create_position_pivots <- function(population, keys)
       {
         # browser()
         pivot <- pivot$collect()
-        pivot <- pivot$sort(c("CHR", "START"), descending = c(FALSE, FALSE))
+        pivot <- pivot$sort(c("CHR", "START"), descending = FALSE)
         pivot$write_parquet(pivot_filename)
         pivot <- pivot$lazy()
       }
@@ -136,7 +136,7 @@ create_position_pivots <- function(population, keys)
     if (!exists("pivot"))
       next
 
-    pivot <- pivot$sort(c("CHR", "START"), descending = c(FALSE, FALSE))
+    pivot <- pivot$sort(c("CHR", "START"), descending = FALSE)
     pivot <- pivot$collect()
     pivot$write_parquet(pivot_filename)
     rm(pivot)

@@ -32,7 +32,7 @@ signal_save <- function(signal_data, sample_sheet, batch_id )
     how = "inner"
   )
   signal_data <- signal_data$drop(c("PROBE","PROBE_WHOLE","AREA"))
-  signal_data <- signal_data$sort(c("CHR", "START","END"), descending = c(FALSE, FALSE,FALSE))
+  signal_data <- signal_data$sort(c("CHR", "START","END"), descending = FALSE)
   pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION","WHOLE")
 
   signal_data$collect()$write_parquet(pivot_file_name)

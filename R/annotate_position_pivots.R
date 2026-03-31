@@ -77,7 +77,7 @@ annotate_position_pivots <- function ()
         pivot <- pivot$drop(cols_to_remove)
         # drop row where AREA is NA
         pivot <- pivot$drop_nulls("AREA")
-        pivot <- pivot$sort(c("AREA"), descending = c(FALSE))$collect()
+        pivot <- pivot$sort(c("AREA"), descending = FALSE)$collect()
 
         if (localKeys[i, "DISCRETE"]) {
           pivot <- pivot$group_by("AREA", maintain_order=FALSE)$sum()

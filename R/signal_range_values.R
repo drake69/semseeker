@@ -136,7 +136,7 @@ signal_range_values <- function(populationMatrix, batch_id, probe_features) {
     how = "inner"
   )
   result <- result$drop(c("PROBE_WHOLE"))
-  result <- result$sort(c("CHR", "START","END"), descending = c(FALSE, FALSE,FALSE))
+  result <- result$sort(c("CHR", "START","END"), descending = FALSE)
   result <- result$collect()
   result$write_parquet(thresholds_file_name)
 

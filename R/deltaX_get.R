@@ -107,7 +107,7 @@ save_figure <- function(colname_pivot,dim_pivot,vector_figure,positions,sample_s
   vector_figure <- cbind(positions,vector_figure)
   pivot_file_nameparquet <- pivot_file_name_parquet(marker,figure,area,subarea)
   vector_figure <- polars::as_polars_df(as.data.frame(vector_figure))
-  vector_figure <- vector_figure$sort(c("CHR", "START"), descending = c(FALSE, FALSE))
+  vector_figure <- vector_figure$sort(c("CHR", "START"), descending = FALSE)
   vector_figure$write_parquet(pivot_file_nameparquet)
 
   vector_figure <- vector_figure$to_data_frame()
