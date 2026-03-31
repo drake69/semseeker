@@ -178,3 +178,8 @@ check_execution_context <- function() {
 
 check_execution_context()
 
+# TODO
+# recover session stored
+#
+tmp <- tempdir()
+tempFolders <<- paste(tmp,"/semseeker/",stringi::stri_rand_strings(50, 7, pattern = "[A-Za-z0-9]"),sep="")

@@ -75,5 +75,12 @@ sample_group_check <- function(sample_sheet, signal_data)
     ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Control","Case"))
   }
 
+  refence_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group=="Reference"]
+  other_group <- sample_sheet$Sample_ID[sample_sheet$Sample_Group!="Reference"]
+  if (sum(refence_group %in% other_group)==length(refence_group))
+  {
+    ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Control","Case"))
+  }
+
   return(result)
 }
