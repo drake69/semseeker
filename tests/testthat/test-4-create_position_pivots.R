@@ -65,12 +65,12 @@ test_that("create_position_pivots", {
     mutations_pivot_file_name <- semseeker:::pivot_file_name_parquet("MUTATIONS",figure,area,subarea)
     if(file.exists(mutations_pivot_file_name))
     {
-      mutations_pivot <- polars::pl$read_parquet(mutations_pivot_file_name)$to_data_frame()
+      mutations_pivot <- as.data.frame(polars::pl$read_parquet(mutations_pivot_file_name))
 
       pivot_file_name <- semseeker:::pivot_file_name_parquet(marker,figure,area,subarea)
       testthat::expect_true(file.exists(pivot_file_name))
       if(file.exists(pivot_file_name))
-        pivot <- polars::pl$read_parquet(pivot_file_name)$to_data_frame()
+        pivot <- as.data.frame(polars::pl$read_parquet(pivot_file_name))
       else
         pivot <- NULL
 

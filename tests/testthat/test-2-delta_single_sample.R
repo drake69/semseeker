@@ -21,7 +21,7 @@ test_that("delta_single_sample",{
   colnames(values) <- c("PROBE","CHR", "START", "END", "VALUE")
   values <- values[,c("CHR", "START", "END", "VALUE")]
 
-  dss <- delta_single_sample(
+  dss <- semseeker:::delta_single_sample(
     values = values,
     thresholds = signal_thresholds,
     sample_detail = mySampleSheet[1,c("Sample_ID","Sample_Group")]

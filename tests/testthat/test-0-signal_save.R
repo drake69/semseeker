@@ -10,10 +10,10 @@ test_that("signal-save",{
   semseeker:::signal_save(signal_data,mySampleSheet,batch_id )
 
   # signal_save writes the probe-level parquet with subarea "WHOLE"
-  signal_file <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE", "WHOLE")
+  signal_file <- semseeker:::pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE", "WHOLE")
   testthat::expect_true(file.exists(signal_file))
   # it also writes the position-level file
-  position_file <- pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION", "WHOLE")
+  position_file <- semseeker:::pivot_file_name_parquet("SIGNAL", "MEAN", "POSITION", "WHOLE")
   testthat::expect_true(file.exists(position_file))
 
 

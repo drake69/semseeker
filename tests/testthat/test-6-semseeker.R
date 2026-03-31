@@ -25,7 +25,7 @@ test_that("semeeker", {
 
     mutations_pivot_file_name <- semseeker:::pivot_file_name_parquet("MUTATIONS",figure,area,subarea)
     if(file.exists(mutations_pivot_file_name))
-      mutations_pivot <- polars::pl$read_parquet(mutations_pivot_file_name)$to_data_frame()
+      mutations_pivot <- as.data.frame(polars::pl$read_parquet(mutations_pivot_file_name))
     else
       next
 
@@ -33,7 +33,7 @@ test_that("semeeker", {
     # derived markers (LESIONS, DELTA*) may not exist when mutations are too sparse
     if(!file.exists(pivot_file_name))
       next
-    pivot <- polars::pl$read_parquet(pivot_file_name)$to_data_frame()
+    pivot <- as.data.frame(polars::pl$read_parquet(pivot_file_name))
 
     pivot <- pivot[,-c(1:3)]
     mutations_pivot <- mutations_pivot[,-c(1:3)]

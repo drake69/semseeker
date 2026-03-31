@@ -6,7 +6,7 @@ test_that("test_init_env", {
 
   # test minimum number of parameters
   ssEnv <- semseeker:::init_env(tempFolder)
-  testthat::expect_true(ssEnv$result_folderData == paste0(tempFolder,"/Data"))
+  testthat::expect_true(ssEnv$result_folderData == normalizePath(file.path(tempFolder, "Data"), mustWork = FALSE))
   semseeker:::close_env()
 
   ssEnv <- semseeker:::init_env(tempFolder, parallel_strategy = parallel_strategy, areas = c("PROBE"), subareas= c(""), showprogress=TRUE, start_fresh=TRUE, maxResources = 10)

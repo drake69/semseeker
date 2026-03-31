@@ -8,7 +8,7 @@ test_that("sort_by_chr_and_start", {
   #order not matching
   second <- semseeker:::sort_by_chr_and_start( probe_features[order(probe_features$START),])
 
-  testthat::expect_true( test_match_order( sort_by_chr_and_start(probe_features)$ABSOLUTE,second$ABSOLUTE))
+  testthat::expect_true( semseeker:::test_match_order( semseeker:::sort_by_chr_and_start(probe_features)$ABSOLUTE,second$ABSOLUTE))
 
   ####################################################################################
 

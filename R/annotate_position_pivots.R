@@ -60,10 +60,18 @@ annotate_position_pivots <- function ()
         probe_features <- polars::as_polars_df(probe_features)$lazy()
         probe_features <- probe_features$with_columns(polars::pl$col(area_subarea)$alias("AREA"))$drop(area_subarea)
         # colnames(probe_features)
-        probe_features <- probe_features$cast(list(START = polars::pl$Int32, END = polars::pl$Int32, CHR = polars::pl$String))
+        probe_features <- probe_features$with_columns(
+          polars::pl$col("START")$cast(polars::pl$Int32),
+          polars::pl$col("END")$cast(polars::pl$Int32),
+          polars::pl$col("CHR")$cast(polars::pl$String)
+        )
 
         pivot <- polars::pl$scan_parquet(source_pivot_filename)
-        pivot <- pivot$cast(list(START = polars::pl$Int32, END = polars::pl$Int32, CHR = polars::pl$String))
+        pivot <- pivot$with_columns(
+          polars::pl$col("START")$cast(polars::pl$Int32),
+          polars::pl$col("END")$cast(polars::pl$Int32),
+          polars::pl$col("CHR")$cast(polars::pl$String)
+        )
         # pivot <- polars::pl$read_parquet(source_pivot_filename)
         pivot <- probe_features$join(
           pivot,
