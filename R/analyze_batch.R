@@ -14,7 +14,7 @@ analyze_batch <- function(signal_data, sample_sheet)
     signal_data <- inpute_missing_values(signal_data)
   } else
   {
-    signal_data <- polars::pl$read_parquet(pivot_file_name)$to_data_frame()
+    signal_data <- as.data.frame(polars::pl$read_parquet(pivot_file_name))
     if("CHR" %in% colnames(signal_data))
       signal_data <- position_pivot_to_probe(signal_data)
   }

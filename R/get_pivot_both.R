@@ -55,5 +55,5 @@ get_pivot_both <- function(marker)
   #
   # count_m <- as.data.frame(count_m)
   # arrow::write_parquet(count_m, pivot_file_name_both)
-  return(pivot_both$to_data_frame())
+  return(as.data.frame(pivot_both))
 }

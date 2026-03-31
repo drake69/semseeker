@@ -13,7 +13,7 @@ signal_range_values <- function(populationMatrix, batch_id, probe_features) {
   thresholds_file_name <- file_path_build(ssEnv$result_folderData ,c(batch_id, "signal_thresholds"),"parquet")
   if(file.exists(thresholds_file_name))
   {
-    result <- polars::pl$read_parquet(thresholds_file_name)$to_data_frame()
+    result <- as.data.frame(polars::pl$read_parquet(thresholds_file_name))
     return(result)
   }
   if (sum(is.na(populationMatrix)) > 0)
@@ -142,5 +142,5 @@ signal_range_values <- function(populationMatrix, batch_id, probe_features) {
 
   log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Thresholds defined for: ", nrow(result), " probe_features.")
   gc()
-  return(result$to_data_frame())
+  return(as.data.frame(result))
 }

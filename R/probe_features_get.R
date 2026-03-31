@@ -8,7 +8,7 @@ probe_features_get <- function(area_subarea)
     # try to get from signal_data saved
     pivot_file_name <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","WHOLE")
     signal_data_pl <- polars::pl$read_parquet(pivot_file_name)
-    signal_data_r  <- signal_data_pl$to_data_frame()
+    signal_data_r  <- as.data.frame(signal_data_pl)
     # probe names are stored in the AREA column; restore them as rownames
     if ("AREA" %in% colnames(signal_data_r)) {
       rownames(signal_data_r) <- signal_data_r$AREA

@@ -150,10 +150,10 @@ manhattan_plot_marker_per_probe <- function(probe_name_max = "cg11680158", probe
   # remove SIGNAL from tempKeys
   tempKeys <- tempKeys[!grepl("SIGNAL", tempKeys)]
   fname <- pivot_file_name_parquet("SIGNAL", "MEAN", "PROBE","WHOLE")
-  signal_data <- polars::pl$read_parquet(fname)$to_data_frame()
+  signal_data <- as.data.frame(polars::pl$read_parquet(fname))
 
   # threshold_data <- fst::read_fst(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","fst"))
-  threshold_data <- polars::pl$read_parquet(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","parquet"))$to_data_frame()
+  threshold_data <- as.data.frame(polars::pl$read_parquet(file_path_build( ssEnv$result_folderData,"1_signal_thresholds","parquet")))
 
   colnames(signal_data) <- gsub("-","_", colnames(signal_data))
   if(max_sample!=0)

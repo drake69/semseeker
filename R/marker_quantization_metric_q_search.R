@@ -295,17 +295,17 @@ load_deltax <- function(source_marker){
 
   pivot_file_nameparquet <- pivot_file_name_parquet(source_marker,"HYPER",area_position,subarea_position)
   pivot_hyper <- polars::pl$scan_parquet(pivot_file_nameparquet)
-  positions_hyper <- pivot_hyper$select(c("CHR","START","END"))$collect()$to_data_frame()
+  positions_hyper <- as.data.frame(pivot_hyper$select(c("CHR","START","END"))$collect())
   pivot_hyper <- pivot_hyper$drop(c("CHR","START","END"))
-  vector_shaped_hyper <- as.vector(as.matrix(pivot_hyper$collect()$to_data_frame()))
+  vector_shaped_hyper <- as.vector(as.matrix(as.data.frame(pivot_hyper$collect())))
   rm(pivot_hyper)
   vector_shaped_hyper[vector_shaped_hyper==0] <- NA
 
   pivot_file_nameparquet <- pivot_file_name_parquet(source_marker,"HYPO",area_position,subarea_position)
   pivot_hypo <- polars::pl$scan_parquet(pivot_file_nameparquet)
-  positions_hypo <- pivot_hypo$select(c("CHR","START","END"))$collect()$to_data_frame()
+  positions_hypo <- as.data.frame(pivot_hypo$select(c("CHR","START","END"))$collect())
   pivot_hypo <- pivot_hypo$drop(c("CHR","START","END"))
-  vector_shaped_hypo <- as.vector(as.matrix(pivot_hypo$collect()$to_data_frame()))
+  vector_shaped_hypo <- as.vector(as.matrix(as.data.frame(pivot_hypo$collect())))
   rm(pivot_hypo)
   vector_shaped_hypo[vector_shaped_hypo==0] <- NA
 

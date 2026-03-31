@@ -39,7 +39,7 @@ create_position_pivots <- function(population, keys)
     temp_pop <- population
     if (file.exists(pivot_filename))
     {
-      temp <- polars::pl$scan_parquet(pivot_filename, n_rows=1)$collect()$to_data_frame()
+      temp <- as.data.frame(polars::pl$scan_parquet(pivot_filename, n_rows=1)$collect())
       samples <- colnames(temp)
       temp_pop <- temp_pop[!(temp_pop$Sample_ID %in% samples),]
     }
@@ -90,8 +90,13 @@ create_position_pivots <- function(population, keys)
         data <- polars::as_polars_df(data)
         data <- data$lazy()
 
-        # 4 columns → Rename normally
-        data <- data$rename(list(X1 = "CHR", X2 = "START", X3 = "END", X4 = sample_id))
+        # 4 columns → Rename normally (use select+alias for cross-version polars compatibility)
+        data <- data$select(
+          polars::pl$col("X1")$alias("CHR"),
+          polars::pl$col("X2")$alias("START"),
+          polars::pl$col("X3")$alias("END"),
+          polars::pl$col("X4")$alias(sample_id)
+        )
 
         # Apply filters
         data <- data$filter(

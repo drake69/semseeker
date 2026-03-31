@@ -30,7 +30,7 @@ study_summary_total <- function()
     else
       pivot <- pivot$mean()$with_columns(polars::pl$col("*"))
 
-    pivot <- as.data.frame(t(pivot$collect()$to_data_frame()))
+    pivot <- as.data.frame(t(as.data.frame(pivot$collect())))
     combined_key <- paste0(marker,"_",figure)
     colnames(pivot) <- combined_key
     pivot$Sample_ID <- row.names(pivot)

@@ -72,11 +72,11 @@ marker_quantization_chart <- function(result_folder, maxResources = 90, parallel
 
     # remove zeros from original and quantized
     # remove first 3 columns and transform as vector
-    quantized <- as.vector(as.matrix(quantized$drop("CHR","START","END")$to_data_frame()))
+    quantized <- as.vector(as.matrix(as.data.frame(quantized$drop("CHR","START","END"))))
     # remove na
     quantized <- quantized[!is.na(quantized)]
 
-    original <- as.vector(as.matrix(original$drop("CHR","START","END")$to_data_frame()))
+    original <- as.vector(as.matrix(as.data.frame(original$drop("CHR","START","END"))))
     original <- original[!is.na(original)]
 
     if (key$MARKER=="MUTATIONS")

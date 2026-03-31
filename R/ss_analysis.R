@@ -81,7 +81,7 @@ ss_analysis <-
             #     AREA = readr::col_character(),
             #   ),
             #   show_col_types=FALSE, progress=FALSE)
-            tempDataFrame <- polars::pl$read_parquet(fname)$to_data_frame()
+            tempDataFrame <- as.data.frame(polars::pl$read_parquet(fname))
             row.names(tempDataFrame) <- tempDataFrame$AREA
             if (length(areas_selection) > 0)
               tempDataFrame <-tempDataFrame[tempDataFrame[, 1] %in% areas_selection,]
