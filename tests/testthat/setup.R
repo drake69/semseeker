@@ -131,6 +131,9 @@ sliding_window_size <<- 11
 bonferroni_threshold <<- 0.1
 batch_id <<- 1
 iqrTimes <<- 3
+# "multicore" is the only strategy compatible with devtools::load_all()
+# (multisession workers can't find package functions unless the package is installed).
+# Switch to "multisession" after devtools::install() or in R CMD check / CI.
 parallel_strategy <<- "multicore"
 markers <<- c("MUTATIONS","DELTAQ","DELTARQ","DELTAP","DELTARP","LESIONS")
 
