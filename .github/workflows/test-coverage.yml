@@ -4,6 +4,7 @@ on:
     branches-ignore: [main, master]
   pull_request:
     branches: [main, master, develop]
+  workflow_dispatch:   # allow manual trigger: gh workflow run test-coverage.yml
 
 name: test-coverage
 
