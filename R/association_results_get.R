@@ -105,7 +105,6 @@ association_results_get <- function (inference_detail, marker, adjust_per_area =
   if ((length(entrez_ids_not_na) != length(results_inference$AREA_OF_TEST)))
   {
     lost_gene <- unique(results_inference$AREA_OF_TEST[is.na(entrez_ids)])
-    # browser()
   }
 
   results_inference <- filter_sql(inference_details$association_results_sql_condition, results_inference)

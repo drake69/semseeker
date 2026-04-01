@@ -70,7 +70,7 @@ which statistical results to use as the gene list for enrichment.
 Each pathway function requires a separate optional package. Install only what
 you need:
 
-```{r install}
+```{r install, eval=FALSE}
 # WebGestaltR — ORA / GSEA
 install.packages("WebGestaltR")
 
@@ -81,8 +81,6 @@ BiocManager::install("STRINGdb")
 
 # pathfindR — active subnetwork enrichment
 install.packages("pathfindR")
-# Or via pak:
-# pak::pkg_install("pathfindR")
 
 # ctdR — chemical-disease associations (GitHub)
 remotes::install_github("drake69/ctdR")
@@ -271,7 +269,7 @@ pathway_pathfindR(
 
 pathfindR requires `ggkegg` (Bioconductor). Install the full chain:
 
-```{r pathfindr_install}
+```{r pathfindr_install, eval=FALSE}
 BiocManager::install("ggkegg")
 install.packages("pathfindR")
 ```

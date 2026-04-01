@@ -67,7 +67,6 @@ enrichment_analysy_add_category <- function(source, data)
     # fdr
     column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_adj_pvalue"]
     if(!any(column_to_rank %in% colnames(to_rank)))
-      browser()
     # message(column_to_rank)
     if(max(to_rank[,column_to_rank], na.rm=T) == min(to_rank[,column_to_rank], na.rm=T))
       to_rank$SS_RANK_FDR <- 1
@@ -84,7 +83,6 @@ enrichment_analysy_add_category <- function(source, data)
 
     column_to_rank <- key_enrichment_format[key_enrichment_format$label==source,"column_of_enrichment"]
     if(!any(column_to_rank %in% colnames(to_rank)))
-      browser()
     # message(column_to_rank)
     if(max(to_rank[,column_to_rank], na.rm=T) == min(to_rank[,column_to_rank], na.rm=T))
       to_rank$SS_RANK_ENRICHMENT <- 1

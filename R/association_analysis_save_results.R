@@ -87,5 +87,4 @@ association_analysis_save_results <- function(results=NULL,fileNameResults, fami
     utils::write.csv2(results,fileNameResults , row.names  =  FALSE)
   }
   else
-    browser()
 }

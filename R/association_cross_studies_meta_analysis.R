@@ -2,8 +2,10 @@ association_cross_studies_meta_analysis <- function(inference_details,statistic_
   studies_base_folder, result_folder)
 {
 
-  library(meta)
-  library(tidyverse)
+  if (!requireNamespace("meta", quietly = TRUE))
+    stop("Package 'meta' is required for cross-study meta-analysis. Install it with install.packages('meta').")
+  if (!requireNamespace("tidyverse", quietly = TRUE))
+    stop("Package 'tidyverse' is required for cross-study meta-analysis. Install it with install.packages('tidyverse').")
   keys <- na.omit(unique(results_inference[,c("FIGURE","SUBAREA")]))
   for (k in 1:nrow(keys))
   {

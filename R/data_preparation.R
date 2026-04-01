@@ -12,7 +12,6 @@
 data_preparation <- function(family_test,transformation_y,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis, key)
 {
 
-  # browser()
   ssEnv <- get_session_info()
 
   transformation_y <- as.character(transformation_y)
@@ -71,7 +70,6 @@ data_preparation <- function(family_test,transformation_y,tempDataFrame, indepen
 
   if(grepl("log",transformation_y))
   {
-    # browser()
     burden_values <- burden_values + min(burden_values[burden_values>0])
   }
   transformation_y <- as.character(transformation_y)

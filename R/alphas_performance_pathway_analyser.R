@@ -119,7 +119,6 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
           # TO DO: manage comparison of pathways by FIGURE
           aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, aggregated_patwhay_result_total$FIGURE =="HYPER_HYPO")
 
-          # browser()
           # keep only first top taxonomies
           aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, aggregated_patwhay_result_total[,column_sorting] <= top)
 
@@ -132,7 +131,6 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
           if(nrow(aggregated_patwhay_result_total) == 0)
             next
 
-          # browser()
           # if(any(aggregated_patwhay_result_total$by_keyword == TRUE))
           #   aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, by_keyword == TRUE)
 

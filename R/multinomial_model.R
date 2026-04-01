@@ -6,7 +6,6 @@ multinomial_model <- function (family_test, tempDataFrame, sig.formula , transfo
   marker <- as.character(key$MARKER)
   figure <- as.character(key$FIGURE)
 
-  browser()
   ssEnv <- get_session_info()
 
   # multinomial_degree_partition-partition_percentage
@@ -61,14 +60,11 @@ multinomial_model <- function (family_test, tempDataFrame, sig.formula , transfo
 
 
   res$pvalue <- 0
-  # browser()
   # for each degree extract the p-value
   for (i in 1:(nrow(coefficients))) {
     # i <- 1
-    # browser()
     p_value <- coefficients[i,4]
     row_name <- rownames(coefficients)[i]
-    # browser()
     pval_name <- name_cleaning(paste0("pvalue_",row_name))
     pval_name <- name_cleaning(gsub("_STATS_POLY_EVAL_PARSE_TEXT_EQ","",pval_name))
     pval_name <- name_cleaning(gsub("_RAW_EQ_TRUE","",pval_name))
@@ -117,7 +113,6 @@ multinomial_model <- function (family_test, tempDataFrame, sig.formula , transfo
         ggplot2::xlab(independent_variable) +
         ggplot2::ylab(dependent_variable) +
         ggplot2::ggtitle("")
-      # browser()
       # formula_string <- paste0(dependent_variable, " ~ poly(", independent_variable, ", ", degree, ", raw = TRUE)",
       #   ifelse(length(covariates) > 0, paste0(" + ", paste(covariates, collapse = " + ")), ""))
       #

@@ -130,7 +130,6 @@ create_position_pivots <- function(population, keys)
       # message(pivot$columns)
       if ( s %% 100 == 0 )
       {
-        # browser()
         pivot <- pivot$collect()
         pivot <- pivot$sort(c("CHR", "START"), descending = FALSE)
         pivot$write_parquet(pivot_filename)

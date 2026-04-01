@@ -99,8 +99,8 @@ init_env <- function(result_folder, maxResources = 90, ...)
   arguments <- set_env_variable(arguments,"openai_api_key","")
   arguments <- set_env_variable(arguments,"multiple_test_adj","q", c("BY", "fdr","BH","bonferroni","q"))
 
-  if (!is.null(ssEnv$openai_api_key))
-    Sys.setenv(OPENAI_API_KEY = ssEnv$openai_api_key)
+  if (!is.null(ssEnv$openai_api_key) && nzchar(ssEnv$openai_api_key))
+    message("SEMseeker: set OPENAI_API_KEY in your environment to enable OpenAI features.")
 
   original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8', '#ffefb6', '#cfebb6','#b9ef92')
   original_colors <- rep(original_colors, 2)

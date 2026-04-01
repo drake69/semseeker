@@ -52,7 +52,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " Starting foreach with: ", g_end - g_start, " items")
 
   log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " I'll perform:",g_end - g_start," tests." )
-  # browser()
   result_temp <- data.frame()
   result_temp <- foreach::foreach(g = g_start:g_end, .combine =  plyr::rbind.fill, .export = to_export) %dorng%
   # for(g in g_start:g_end)
@@ -68,7 +67,6 @@ apply_stat_model <- function(tempDataFrame, g_start, family_test, covariates = N
 
       #
       sig.formula <- apply_stat_model_sig_formula(family_test, burdenValue, independent_variable, covariates)
-      # browser()
       model_result <- execute_model(family_test, tempDataFrame, sig.formula, burdenValue, independent_variable, transformation_y, (g_end - g_start < 10), samples_sql_condition, key)
 
       #

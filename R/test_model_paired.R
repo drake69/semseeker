@@ -3,7 +3,6 @@ test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenVal
   ssEnv <- get_session_info()
   res <- data.frame(pvalue=NA)
 
-  # browser()
   tempDataFrameOriginal <- tempDataFrame
   to_split <- family_test
   family_test <- strsplit(to_split, "@")[[1]][1]

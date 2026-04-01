@@ -50,7 +50,6 @@ association_model_polynomial <- function (family_test, tempDataFrame, sig.formul
   train.data  <- tempDataFrame[training.samples, ]
   test.data <- tempDataFrame[-training.samples, ]
 
-  # browser()
   # Build the formula for the model
   if(length(covariates)>0)
   {
@@ -106,14 +105,12 @@ association_model_polynomial <- function (family_test, tempDataFrame, sig.formul
   coefficients <- coef(summary(polynomial_model_result))
   # conf_int <- confint(polynomial_model_result)
 
-  # browser()
   # for each degree extract the p-value
   for (i in 1:(nrow(coefficients))) {
     # i <- 1
     p_value <- coefficients[i,4]
 
     row_name <- rownames(coefficients)[i]
-    # browser()
     pval_name <- name_cleaning(paste0(row_name,"_pvalue"))
     pval_name <- name_cleaning(gsub("_STATS_POLY_EVAL_PARSE_TEXT_EQ","",pval_name))
     pval_name <- name_cleaning(gsub("_RAW_EQ_TRUE","",pval_name))

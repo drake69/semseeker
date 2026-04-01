@@ -171,7 +171,6 @@ ss_analysis <-
 
                 # check if conf matrix as 2x2 shape
                 if (nrow(conf_matrix) != 2 | ncol(conf_matrix) != 2)
-                  browser()
                 # Calculate sensitivity and specificity
                 sensitivity <- conf_matrix["TRUE","TRUE"] / sum(conf_matrix["TRUE", ])
                 specificity <- conf_matrix["FALSE", "FALSE"] / sum(conf_matrix["FALSE", ])

@@ -113,7 +113,6 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
           aggregated_patwhay_result_total <- plyr::rbind.fill(aggregated_patwhay_result_total, pathway_result)
         }
 
-        # browser()
 
         if(nrow(aggregated_patwhay_result_total)==0)
           next
@@ -124,7 +123,6 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
 
 
 
-        # browser()
         # keep only first top taxonomies
         if(key_enrichment_format[pt,"label"]!="phenolyzer")
           aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, SS_RANK <= top)
@@ -139,7 +137,6 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
         if(key_enrichment_format[pt,"label"]=="pathfindR")
           aggregated_patwhay_result_total <- aggregated_patwhay_result_total[aggregated_patwhay_result_total$support > 0.5,]
 
-        # browser()
         # if(any(aggregated_patwhay_result_total$by_keyword == TRUE))
         #   aggregated_patwhay_result_total <- subset(aggregated_patwhay_result_total, by_keyword == TRUE)
 

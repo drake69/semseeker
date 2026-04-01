@@ -46,7 +46,6 @@ semseeker <- function(sample_sheet,
 
   for(batch_id in seq_along(sample_sheet))
   {
-    # browser()
     start_time <- Sys.time()
     ssEnv$running_batch_id <- batch_id
     ssEnv <- update_session_info(ssEnv)
