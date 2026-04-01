@@ -34,6 +34,7 @@ parallel_session <- function()
     # use all cores in devtools::test()
     nCore <- future::availableCores() - 1
     nCore <- if(floor(future::availableCores() * ssEnv$maxResources/100 ) > nCore ) nCore else floor(future::availableCores() * ssEnv$maxResources/100 )
+    nCore <- max(1L, nCore)  # guarantee at least 1 worker (e.g. covr subprocess with 1 core)
   }
   # permutation cluster
   outFile <- file.path(ssEnv$session_folder, "cluster_r.out")
