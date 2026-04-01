@@ -1,7 +1,7 @@
 #' @export
 gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_globally_s, pvalue_columns, adjustment_methods,alphas,
   study, significance,statistic_parameter, path_dbs, phenolyzer_folder_bin,disease,
-  phenolyser=F, WebGestalt=F, pathfindr=F,STRINGdb=F,Phenolyzer_STRINGdb=F,Phenolyzer_WebGestalt=F,ctdR=F,
+  phenolyser=FALSE, WebGestalt=FALSE, pathfindr=FALSE,STRINGdb=FALSE,Phenolyzer_STRINGdb=FALSE,Phenolyzer_WebGestalt=FALSE,ctdR=FALSE,
   result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {
   start_fresh <- FALSE

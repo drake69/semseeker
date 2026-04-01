@@ -45,7 +45,7 @@ test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenVal
     if (plot)
       box.plot(tempDataFrameOriginal, independent_variable,burdenValue, transformation_y, family_test, samples_sql_condition, key)
 
-    result_w  <- suppressWarnings(stats::wilcox.test(tempDataFrame[,first_category], tempDataFrame[,second_category], exact=TRUE, paired = T))
+    result_w  <- suppressWarnings(stats::wilcox.test(tempDataFrame[,first_category], tempDataFrame[,second_category], exact=TRUE, paired = TRUE))
     res$pvalue <- result_w$p.value
 
     #
@@ -92,7 +92,7 @@ test_model_paired <- function (family_test, tempDataFrame, sig.formula,burdenVal
     if (plot)
       box.plot(tempDataFrameOriginal, independent_variable,burdenValue, transformation_y, family_test, samples_sql_condition, key)
 
-    result_w  <-stats::t.test(formula= sig.formula, data = as.data.frame(tempDataFrame), paired = T)
+    result_w  <-stats::t.test(formula= sig.formula, data = as.data.frame(tempDataFrame), paired = TRUE)
     res$pvalue <- result_w$p.value
     res$r_model <- "stats_t.test"
     dep_var <- strsplit(gsub("\ ","",as.character(sig.formula)),"~")

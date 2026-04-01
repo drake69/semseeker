@@ -1,6 +1,6 @@
 pathway_WebGestalt <- function(study,
   types=c("BP","MF"),  enrich_methods = c("ORA"),
-  adjust_per_area = F, adjust_globally = F,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
+  adjust_per_area = FALSE, adjust_globally = FALSE,adjustment_method = "BH", pvalue_column="PVALUE_ADJ_ALL_BH",
   inference_detail,significance)
 {
 

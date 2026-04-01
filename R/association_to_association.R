@@ -17,7 +17,7 @@ association_to_association <- function(inference_details_origin, inference_detai
     if(file.exists(inference_filename))
       next
 
-    inference_source <- association_results_get(inference_details_origin, marker, adjust_per_area = F, adjust_globally = F,
+    inference_source <- association_results_get(inference_details_origin, marker, adjust_per_area = FALSE, adjust_globally = FALSE,
       pvalue_column="PVALUE_ADJ_ALL_FDR",adjustment_method = "BH", area ="GENE",
       omit_na = TRUE, significance = TRUE)
 

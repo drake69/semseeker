@@ -141,7 +141,7 @@ association_model_polynomial <- function (family_test, tempDataFrame, sig.formul
       # split each covariates by _
       if (long_covariates)
       {
-        covariates <- unlist(t(strsplit( gsub(" ","",covariates),split  =  "_", fixed  =  T)))
+        covariates <- unlist(t(strsplit( gsub(" ","",covariates),split  =  "_", fixed  =  TRUE)))
         covariates <- unique(covariates)
       }
       covariates <- paste(covariates, collapse = "_")

@@ -41,7 +41,7 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   marker <- as.character(key$MARKER)
   figure <- as.character(key$FIGURE)
 
-  lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = F )
+  lqm_control <- list(loop_tol_ll = 1e-5, loop_max_iter = 10000, verbose = FALSE )
   quantreg_params <- unlist(strsplit(as.character(family_test),"_"))
 
   # do permutations
@@ -79,7 +79,7 @@ quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, 
   res$pvalue <- summary_qr[2,"Pr(>|t|)"]
   res$conf.level <- conf.level
 
-  perms <- sort(unique(c(n_permutations, n_permutations_test)), decreasing = F)
+  perms <- sort(unique(c(n_permutations, n_permutations_test)), decreasing = FALSE)
 
   for(p in seq_along(perms))
   {

@@ -56,7 +56,7 @@ marker_fit_to_theoretical_distribution <- function()
         pivot_subfolder <- dir_check_and_create(result_folderPivot, key$MARKER)
         fname <- file_path_build( pivot_subfolder ,c(key$MARKER, key$FIGURE, key$AREA,key$SUBAREA),"csv", add_gz=TRUE)
 
-        data <- utils::read.csv2(gzfile(fname), header  =  T)
+        data <- utils::read.csv2(gzfile(fname), header  =  TRUE)
         data <- data[-1, -1]
         data <- as.numeric(as.vector(as.matrix(data)))
         if(remove_zeros[rz])

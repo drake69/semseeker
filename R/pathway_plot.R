@@ -1,10 +1,6 @@
 pathway_lollipop_plot <- function(data, rules, file_prfx,path, disease,  top=50, column_sorting="SS_RANK")
 {
   ssEnv <- get_session_info()
-  # Load necessary libraries
-  library(ggplot2)
-  library(dplyr)
-  library(ggstance) # for position_dodgev
 
   column_of_id <- rules["column_of_id"]
   column_of_adj_pvalue <- rules["column_of_adj_pvalue"]
@@ -77,8 +73,6 @@ pathway_lollipop_plot <- function(data, rules, file_prfx,path, disease,  top=50,
     # Define your custom colors
     custom_colors <- ssEnv$color_palette
 
-    library(ggplot2)
-    library(ggstance)  # Assuming position_dodgev is from ggstance
 
     # get for each Description the mean of log_fdr
     data_to_plot <- data_to_plot %>%

@@ -1,4 +1,4 @@
-association_results_get <- function (inference_detail, marker, adjust_per_area = F, adjust_globally = F,
+association_results_get <- function (inference_detail, marker, adjust_per_area = FALSE, adjust_globally = FALSE,
   pvalue_column="PVALUE_ADJ_ALL_BH",adjustment_method = "BH", area ="GENE",
   omit_na = TRUE, significance = NULL)
 {

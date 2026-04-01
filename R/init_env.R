@@ -73,7 +73,6 @@ init_env <- function(result_folder, maxResources = 90, ...)
   # utils::data("PROBES")
   # utils::data("PROBES_CHR_CHR")
   ssEnv$seed <- 7658776
-  set.seed(ssEnv$seed)
 
 
   arguments <- set_env_variable(arguments,"verbosity",1)

@@ -50,7 +50,7 @@ ss_analysis <-
       # clean keys from already done analysis
       if (file.exists(fileNameResults))
       {
-        results <- utils::read.csv2(fileNameResults, header  =  T, sep=";")
+        results <- utils::read.csv2(fileNameResults, header  =  TRUE, sep=";")
         keys_markers_figures_areas_done <- unlist(apply(unique(results [, c("MARKER", "FIGURE", "AREA", "SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
         keys_to_be_done <-
           unlist(apply(keys[, c("MARKER", "FIGURE", "AREA", "SUBAREA")], 1, function(x)

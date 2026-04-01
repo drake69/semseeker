@@ -170,7 +170,6 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), result
     # save scores
     aggregate_pivot <- plyr::rbind.fill(aggregate_pivot, scores)
   }
-  library(dplyr)
   filename  =  file_path_build(dest_folder,c("Q_SEARCH_DISTRIBUTION", "ANALYSIS","SCORE"),"csv")
   # sum the score over Q and marker
   result <- aggregate_pivot %>%

@@ -206,7 +206,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
               # clean keys from already done association
               if(file_good)
               {
-                old_results <- unique(utils::read.csv2(fileNameResults, header  =  T))
+                old_results <- unique(utils::read.csv2(fileNameResults, header  =  TRUE))
                 old_results_filtered <- old_results[old_results$DEPTH == 1,]
                 keys_markers_figures_areas_done <- unlist(apply(unique(old_results_filtered [, c("MARKER","FIGURE","AREA","SUBAREA")]), 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
                 keys_to_be_done <- unlist(apply(keys[, c("MARKER","FIGURE","AREA","SUBAREA")], 1, function(x) paste(x, collapse  =  "_", sep  =  "")))
@@ -285,7 +285,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
 
                     if(file.exists(fileNameResults) && file.info(fileNameResults)$size  >10)
                     {
-                      old_results <- unique(utils::read.csv2(fileNameResults, header  =  T))
+                      old_results <- unique(utils::read.csv2(fileNameResults, header  =  TRUE))
                       area_to_remove <- old_results[old_results$MARKER==key$MARKER & old_results$FIGURE==key$FIGURE
                         & old_results$SUBAREA==key$SUBAREA & old_results$AREA==key$AREA,"AREA_OF_TEST"]
                       tempDataFrame <- tempDataFrame[!(tempDataFrame$AREA %in% area_to_remove),]
