@@ -1,8 +1,12 @@
 ---
-title: "Association analysis — correlation and Wilcoxon test"
-output: rmarkdown::html_vignette
+title: "Association analysis — statistical models, correlation and group tests"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+bibliography: association-analysis.bib
 vignette: >
-  %\VignetteIndexEntry{Association analysis — correlation and Wilcoxon test}
+  %\VignetteIndexEntry{Association analysis — statistical models, correlation and group tests}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,152 +21,418 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-Once semseeker has produced delta metrics (ΔRP, ΔBeta, …) and mutation counts,
-you can test whether those values are associated with clinical or phenotypic
-variables using `association_analysis()`.
+`association_analysis()` is the downstream statistical engine of semseeker.
+After `semseeker()` has computed epimutation counts, lesion counts and delta
+metrics (ΔBeta, ΔRP, ΔIV, ΔEV, ΔRV), this function tests whether any of those
+values are associated with phenotypic or clinical variables.
 
-The function supports:
+The function supports **three broad families** of models, all run per genomic
+region in parallel using `future` [@future]:
 
-- **Correlation tests**: Pearson, Spearman, Kendall
-- **Group comparison tests**: Wilcoxon rank-sum, Student's t-test
-- **Regression models**: Gaussian, Poisson, Binomial, Quantile regression
+| Family | Methods |
+|---|---|
+| **Correlation** | Pearson, Spearman, Kendall, permuted Spearman, Jensen–Shannon divergence |
+| **Group tests** | Wilcoxon (Mann-Whitney), paired Wilcoxon, Student's t-test, paired t-test, Kruskal-Wallis, chi-squared, Fisher's exact, Bartlett, mean permutation |
+| **Regression** | Gaussian/Poisson/Binomial GLM, quantile regression (standard and permuted), polynomial, multinomial, nonlinear (log₁₀, pow₁₀, log, exp), mediation (quantreg, ridge, linear) |
 
-All tests are run per genomic region in parallel and results are adjusted for
-multiple comparisons (FDR by default).
+Multiple comparisons are adjusted with the Benjamini-Hochberg FDR procedure
+[@BH1995]. All analyses are run across every combination of genomic area, marker
+and sample group defined during the `semseeker()` call.
 
 ---
 
 ## Prerequisites
 
 You need a completed semseeker run (see the
-[Getting started vignette](getting-started.html)) and a sample sheet with the
-clinical variable(s) you want to test.
+[Getting started vignette](getting-started.html)).
+The sample sheet used in the original `semseeker()` call must already contain
+the clinical variable(s) you want to test:
 
-```{r sample_sheet_with_clin}
-# Sample sheet must contain Sample_ID, Sample_Group AND the clinical variable
+```{r sample_sheet}
 sample_sheet <- read.csv2("sample_sheet.csv")
 
-# Example columns: Sample_ID, Sample_Group, age, bmi, case_control_binary
+# Required: Sample_ID, Sample_Group
+# Plus any clinical covariates you plan to test:
+# age, bmi, treatment, exposure_level, ...
 head(sample_sheet)
 ```
 
 ---
 
-## Example 1 — Spearman correlation with a continuous variable
+## The `inference_details` data frame
 
-Test whether ΔRP per gene correlates with patient age:
+Every analysis is specified through an `inference_details` data frame.
+Each row is one analysis to run. The columns are:
 
-```{r spearman}
+| Column | Required | Description |
+|---|---|---|
+| `formula` | ✅ | R-style formula string: `"DELTARP ~ age"` or `"MUTATIONS_HYPO ~ age + sex"` |
+| `family` | ✅ | Model/test type (see full table below) |
+| `transformation_y` | ✅ | Pre-transformation on the dependent variable |
+| `depth_analysis` | ✅ | Granularity of results (1–3, see below) |
+| `filter_p_value` | ✅ | `TRUE` = keep only FDR-significant results |
+| `samples_sql_condition` | ⬜ | SQL WHERE fragment to subset samples (e.g. `"Sample_Group = 'Case'"`) |
+| `covariates` | ⬜ | Comma-separated string of covariate column names |
+| `covariates_dummy` | ⬜ | Covariates to one-hot encode before modelling |
+| `collinearity_check` | ⬜ | `TRUE` = remove collinear covariates automatically |
+| `covariates_pca` | ⬜ | `TRUE` = replace covariates with their first PCs |
+
+---
+
+## Dependent variable: what can be tested
+
+Any semseeker output metric can be the dependent variable in `formula`:
+
+| Metric | Description |
+|---|---|
+| `MUTATIONS_HYPO` | Count of hypomethylated mutations per region |
+| `MUTATIONS_HYPER` | Count of hypermethylated mutations per region |
+| `LESIONS_HYPO` | Count of hypomethylated lesions per region |
+| `LESIONS_HYPER` | Count of hypermethylated lesions per region |
+| `DELTARP` | Delta Ranked Product — combined sensitivity score |
+| `DELTARQ` | Delta Ranked Product (quantile variant) |
+| `DELTAQ` | Delta quantile |
+| `DELTAS` | Delta signal |
+| `DELTAR` | Delta rank |
+| `DELTAP` | Delta proportion |
+| `MEAN` | Mean methylation signal |
+
+---
+
+## All supported model types (`family`)
+
+### Correlation
+
+```{r correlation_examples}
 library(semseeker)
 
-inference_details <- data.frame(
-  formula          = "DELTARP ~ age",         # dependent ~ independent
-  family           = "spearman",              # correlation type
-  transformation_y = "none",                  # no transformation of ΔRP
-  depth            = 3,                       # 3 = gene-level breakdown
-  filter_p_value   = TRUE                     # keep only significant results
-)
+# Spearman rank correlation (recommended for non-normal SEM metrics)
+inf <- data.frame(formula="DELTARP ~ age", family="spearman",
+                  transformation_y="none", depth_analysis=3,
+                  filter_p_value=TRUE)
 
-association_analysis(
-  inference_details = inference_details,
-  result_folder     = "~/semseeker_results/",
-  parallel_strategy = "multicore",
-  maxResources      = 80
-)
+# Pearson linear correlation
+inf <- data.frame(formula="DELTARP ~ bmi", family="pearson",
+                  transformation_y="log", depth_analysis=3,
+                  filter_p_value=FALSE)
+
+# Kendall's tau (more robust with tied ranks)
+inf <- data.frame(formula="MUTATIONS_HYPO ~ age", family="kendall",
+                  transformation_y="none", depth_analysis=2,
+                  filter_p_value=TRUE)
+
+# Spearman with permutation-based p-values (more accurate for small N)
+# Syntax: "spearman-permutation_<n_permutations>"
+inf <- data.frame(formula="DELTARP ~ age", family="spearman-permutation_1000",
+                  transformation_y="none", depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Jensen-Shannon divergence (compares distributions)
+inf <- data.frame(formula="DELTARP ~ Sample_Group", family="jsd",
+                  transformation_y="none", depth_analysis=2,
+                  filter_p_value=TRUE)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
 ```
 
-Results are written to `result_folder/Inference/`. The CSV file contains:
+Spearman [@spearman1904] is the default recommendation for SEM metrics because
+they are often skewed and non-normally distributed. Pearson assumes bivariate
+normality. Kendall's tau [@kendall1938] is preferable when there are many tied
+values.
 
-| Column | Description |
-|---|---|
-| `CHR`, `START`, `END` | Genomic coordinates |
-| `AREA` | Aggregation level (GENE, ISLAND, …) |
-| `rho` | Spearman correlation coefficient |
-| `P_Value` | Nominal p-value |
-| `Q` | FDR-adjusted p-value |
-| `SIGNIFICATIVE_ADJ` | `TRUE` if Q < 0.05 |
+---
 
-```{r read_spearman}
-library(polars)
+### Group comparison tests
 
-results <- read.csv(
-  list.files("~/semseeker_results/Inference", pattern = "spearman.*\\.csv$",
-             full.names = TRUE)[1]
-)
+```{r group_tests}
+# Wilcoxon rank-sum / Mann-Whitney (two independent groups)
+inf <- data.frame(formula="MUTATIONS_HYPO ~ Sample_Group", family="wilcoxon",
+                  transformation_y="none", depth_analysis=2,
+                  filter_p_value=TRUE)
 
-# Top correlated genes
-head(results[order(results$Q), c("AREA", "rho", "P_Value", "Q")], 10)
+# Paired Wilcoxon (repeated measures / matched samples)
+inf <- data.frame(formula="DELTARP ~ timepoint", family="wilcoxon.paired_timepoint",
+                  transformation_y="none", depth_analysis=2,
+                  filter_p_value=TRUE)
+
+# Student's t-test
+inf <- data.frame(formula="DELTARP ~ Sample_Group", family="t.test",
+                  transformation_y="scale", depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Paired t-test
+inf <- data.frame(formula="DELTARP ~ timepoint", family="t.test.paired_timepoint",
+                  transformation_y="none", depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Kruskal-Wallis (> 2 groups, non-parametric ANOVA)
+inf <- data.frame(formula="MUTATIONS_HYPO ~ disease_stage", family="kruskal.test",
+                  transformation_y="none", depth_analysis=2,
+                  filter_p_value=TRUE)
+
+# Chi-squared test (categorical dependent variable)
+inf <- data.frame(formula="MUTATIONS_HYPO ~ exposure", family="chisq.test",
+                  transformation_y="none", depth_analysis=1,
+                  filter_p_value=TRUE)
+
+# Fisher's exact test (small samples, 2×2 tables)
+inf <- data.frame(formula="MUTATIONS_HYPO ~ binary_exposure", family="fisher.test",
+                  transformation_y="none", depth_analysis=1,
+                  filter_p_value=TRUE)
+
+# Bartlett's test for equality of variances
+inf <- data.frame(formula="DELTARP ~ Sample_Group", family="bartlett.test",
+                  transformation_y="none", depth_analysis=2,
+                  filter_p_value=TRUE)
+
+# Mean permutation test (non-parametric, permutation-based)
+# Syntax: "mean-permutation_<n_permutations>"
+inf <- data.frame(formula="DELTARP ~ Sample_Group", family="mean-permutation_1000",
+                  transformation_y="none", depth_analysis=3,
+                  filter_p_value=TRUE)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
+```
+
+The Wilcoxon rank-sum test [@wilcoxon1945] is the recommended non-parametric
+alternative to the t-test when the normality assumption cannot be verified, which
+is common for mutation count data.
+
+---
+
+### Regression models (GLM)
+
+```{r glm}
+# Gaussian linear regression (continuous outcome)
+# Formula can include multiple predictors
+inf <- data.frame(formula="DELTARP ~ age + sex + bmi",
+                  family="gaussian",
+                  transformation_y="log",
+                  depth_analysis=3,
+                  filter_p_value=TRUE,
+                  covariates="sex,bmi")   # declare covariates explicitly
+
+# Poisson regression (count data — mutations, lesions)
+inf <- data.frame(formula="MUTATIONS_HYPO ~ exposure_level",
+                  family="poisson",
+                  transformation_y="none",
+                  depth_analysis=2,
+                  filter_p_value=TRUE)
+
+# Binomial / logistic regression (binary outcome)
+inf <- data.frame(formula="case_control ~ DELTARP",
+                  family="binomial",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Multinomial regression (> 2 categories)
+inf <- data.frame(formula="disease_stage ~ DELTARP",
+                  family="multinomial",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
+```
+
+GLMs [@glm-nelder] are appropriate when the relationship between the SEM metric
+and the clinical variable is expected to be linear (Gaussian), when the
+outcome is a count (Poisson), or when predicting a binary endpoint from SEM
+scores (Binomial).
+
+---
+
+### Quantile regression
+
+```{r quantreg}
+# Standard quantile regression at quantile τ
+# Syntax: "quantreg_<tau>"
+inf <- data.frame(formula="DELTARP ~ age",
+                  family="quantreg_0.5",       # median regression
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Quantile regression with permutation-based inference
+# Syntax: "quantreg-permutation_<tau>_<n_permutations>"
+inf <- data.frame(formula="DELTARP ~ age",
+                  family="quantreg-permutation_0.5_1000",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Quantile permutation model
+# Syntax: "quantile-permutation_<n_permutations>"
+inf <- data.frame(formula="DELTARP ~ Sample_Group",
+                  family="quantile-permutation_1000",
+                  transformation_y="none",
+                  depth_analysis=2,
+                  filter_p_value=TRUE)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
+```
+
+Quantile regression [@quantreg-koenker; @lqmm] is particularly useful for SEM
+metrics: unlike mean regression it is robust to outliers and captures the full
+conditional distribution, which matters when only high-quantile epigenetic
+variability is biologically relevant.
+
+---
+
+### Nonlinear regression (NLS)
+
+```{r nls}
+# Log₁₀ dose-response model
+# Syntax: "log10_<scale_factor>"
+inf <- data.frame(formula="DELTARP ~ dose",
+                  family="log10_1",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Power of 10 model
+inf <- data.frame(formula="DELTARP ~ dose",
+                  family="pow10_1",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Natural log model
+inf <- data.frame(formula="DELTARP ~ concentration",
+                  family="log_1",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
 ```
 
 ---
 
-## Example 2 — Wilcoxon test (Case vs Control)
+### Polynomial regression
 
-Test whether mutation burden (MUTATIONS_HYPO) differs between cases and
-controls at gene level:
+```{r polynomial}
+# Syntax: "polynomial_<degree>"
+inf <- data.frame(formula="DELTARP ~ age",
+                  family="polynomial_2",       # quadratic
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
 
-```{r wilcoxon}
-inference_details <- data.frame(
-  formula          = "MUTATIONS_HYPO ~ Sample_Group",
-  family           = "wilcoxon",
-  transformation_y = "none",
-  depth            = 2,
-  filter_p_value   = TRUE
-)
-
-association_analysis(
-  inference_details = inference_details,
-  result_folder     = "~/semseeker_results/",
-  parallel_strategy = "multicore"
-)
-```
-
-> **Note:** `Sample_Group` must be a binary factor (`"Case"` / `"Control"`) in
-> the sample sheet passed to the original `semseeker()` call.
-
-The output CSV adds:
-
-| Column | Description |
-|---|---|
-| `W` | Wilcoxon W statistic |
-| `P_Value` | Nominal p-value (two-sided) |
-| `Q` | BH-adjusted p-value |
-| `SIGNIFICATIVE_ADJ` | `TRUE` if Q < 0.05 |
-
----
-
-## Example 3 — Pearson correlation with ΔRP
-
-```{r pearson}
-inference_details <- data.frame(
-  formula          = "DELTARP ~ bmi",
-  family           = "pearson",
-  transformation_y = "log",          # log-transform ΔRP before testing
-  depth            = 3,
-  filter_p_value   = FALSE           # keep all regions
-)
-
-association_analysis(
-  inference_details = inference_details,
-  result_folder     = "~/semseeker_results/"
-)
+association_analysis(inf, result_folder="~/semseeker_results/")
 ```
 
 ---
 
-## Example 4 — Multiple tests in a single call
+### Mediation analysis
 
-`inference_details` can be a list of data frames or a multi-row data frame to
-run several analyses in one go:
+Mediation models test whether a third variable (mediator) explains the
+relationship between the SEM metric and an outcome:
 
-```{r multiple}
+```{r mediation}
+# Mediation via quantile regression
+inf <- data.frame(formula="DELTARP ~ exposure + mediator",
+                  family="mediation-quantreg_0.5",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Mediation via ridge regression (regularised, handles multicollinearity)
+inf <- data.frame(formula="DELTARP ~ exposure + mediator",
+                  family="mediation-ridge",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+# Mediation via linear model
+inf <- data.frame(formula="DELTARP ~ exposure + mediator",
+                  family="mediation-linear",
+                  transformation_y="none",
+                  depth_analysis=3,
+                  filter_p_value=TRUE)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
+```
+
+---
+
+## Covariates and confounders
+
+Include covariates directly in the formula and declare them in the `covariates`
+column so semseeker correctly separates the independent variable of interest
+from confounders:
+
+```{r covariates}
+inf <- data.frame(
+  formula          = "DELTARP ~ tcdd_exposure + age + sex + bmi",
+  family           = "gaussian",
+  transformation_y = "log",
+  depth_analysis   = 3,
+  filter_p_value   = TRUE,
+  covariates       = "age,sex,bmi",        # confounders to adjust for
+  collinearity_check = TRUE,               # auto-remove collinear covariates
+  covariates_pca   = FALSE                 # TRUE = replace with PCs
+)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
+```
+
+When `collinearity_check = TRUE`, semseeker automatically detects and removes
+collinear covariates using VIF before fitting the model. When `covariates_pca = TRUE`,
+covariates are replaced by their principal components before fitting.
+
+---
+
+## Filtering by sample subset (`samples_sql_condition`)
+
+Run the analysis on a subset of samples using a SQL WHERE clause:
+
+```{r sql_filter}
+# Only Case samples
+inf <- data.frame(
+  formula               = "DELTARP ~ age",
+  family                = "spearman",
+  transformation_y      = "none",
+  depth_analysis        = 3,
+  filter_p_value        = TRUE,
+  samples_sql_condition = "Sample_Group = 'Case'"
+)
+
+# Only samples with age > 40
+inf <- data.frame(
+  formula               = "DELTARP ~ bmi",
+  family                = "pearson",
+  transformation_y      = "none",
+  depth_analysis        = 3,
+  filter_p_value        = TRUE,
+  samples_sql_condition = "age > 40"
+)
+
+association_analysis(inf, result_folder="~/semseeker_results/")
+```
+
+---
+
+## Running multiple analyses at once
+
+Combine multiple rows in `inference_details` to run all analyses in a single call:
+
+```{r multi}
 inference_details <- rbind(
-  data.frame(formula="DELTARP ~ age",          family="spearman",
-             transformation_y="none", depth=3, filter_p_value=TRUE),
+  data.frame(formula="DELTARP ~ age",             family="spearman",
+             transformation_y="none",             depth_analysis=3,
+             filter_p_value=TRUE,                 stringsAsFactors=FALSE),
   data.frame(formula="MUTATIONS_HYPO ~ Sample_Group", family="wilcoxon",
-             transformation_y="none", depth=2, filter_p_value=TRUE),
-  data.frame(formula="LESIONS_HYPO ~ bmi",     family="pearson",
-             transformation_y="log",  depth=3, filter_p_value=TRUE)
+             transformation_y="none",             depth_analysis=2,
+             filter_p_value=TRUE,                 stringsAsFactors=FALSE),
+  data.frame(formula="DELTARP ~ bmi",             family="quantreg_0.5",
+             transformation_y="log",              depth_analysis=3,
+             filter_p_value=TRUE,                 stringsAsFactors=FALSE),
+  data.frame(formula="MUTATIONS_HYPO ~ exposure + age + sex", family="poisson",
+             transformation_y="none",             depth_analysis=3,
+             filter_p_value=TRUE,                 covariates="age,sex",
+             stringsAsFactors=FALSE)
 )
 
 association_analysis(
@@ -175,61 +445,157 @@ association_analysis(
 
 ---
 
-## Supported families / test types
+## Transformation options (`transformation_y`)
 
-| `family` value | Test | Dependent variable type |
+Pre-transformations are applied to the SEM metric before testing:
+
+| Value | Transformation | When to use |
 |---|---|---|
-| `"pearson"` | Pearson correlation | Continuous |
-| `"spearman"` | Spearman rank correlation | Continuous / ordinal |
-| `"kendall"` | Kendall's tau | Continuous / ordinal |
-| `"wilcoxon"` | Wilcoxon rank-sum (Mann-Whitney) | Continuous, groups = 2 |
-| `"stats::t.test"` | Student's t-test | Continuous, groups = 2 |
-| `"gaussian"` | Linear regression (GLM) | Continuous |
-| `"poisson"` | Poisson regression | Count data |
-| `"binomial"` | Logistic regression | Binary outcome |
-| `"quantreg_0.5_1000"` | Quantile regression (τ=0.5, 1000 perms) | Continuous |
+| `"none"` | No transformation | Metric already approximately normal |
+| `"log"` | Natural log: ln(y + ε) | Right-skewed counts |
+| `"log2"` | Log₂ | Fold-change interpretation |
+| `"log10"` | Log₁₀ | Wide dynamic range |
+| `"scale"` | Z-score: (y − μ) / σ | Comparing coefficients across regions |
+| `"exp"` | Exponential: e^y | Log-scale input |
+| `"quantile_3"` | Quantile normalisation, 3 bins | Non-parametric normalisation |
 
 ---
 
-## Depth levels
+## Depth levels (`depth_analysis`)
 
-The `depth` parameter controls how granularly results are broken down:
+| Value | Breakdown | Use case |
+|---|---|---|
+| `1` | Sample-level aggregate only | Quick per-sample overview |
+| `2` | Per marker type (MUTATIONS, LESIONS, DELTARP, …) | Identify which metric drives the association |
+| `3` | Per genomic area (GENE body, TSS200, TSS1500, island, …) | Fine-grained genomic localisation |
 
-| `depth` | Output includes |
-|---|---|
-| `1` | Per-sample aggregate only |
-| `2` | Per marker type (MUTATIONS, LESIONS, DELTARP, …) |
-| `3` | Per genomic area (GENE body, TSS200, TSS1500, …) |
-
----
-
-## Transformation options
-
-Use `transformation_y` to pre-transform the SEM metric before testing:
-
-| Value | Transformation |
-|---|---|
-| `"none"` | No transformation |
-| `"log"` | Natural log |
-| `"log2"` | Log base 2 |
-| `"log10"` | Log base 10 |
-| `"scale"` | Z-score standardisation |
-| `"exp"` | Exponential |
-| `"quantile_3"` | Quantile normalisation with 3 bins |
+Higher depth levels include all lower levels.
 
 ---
 
-## Output location
+## Output files
 
-All results land in `result_folder/Inference/` with filenames encoding the
-test parameters, e.g.:
+Results are written to `result_folder/Inference/`. File names encode the full
+analysis specification:
 
 ```
 Inference/
 ├── DELTARP_GENE_spearman_age_depth3.csv
 ├── MUTATIONS_HYPO_GENE_wilcoxon_Sample_Group_depth2.csv
+├── DELTARP_GENE_gaussian_tcdd_exposure_depth3.csv
 └── ...
 ```
 
-Each file is a CSV sorted by adjusted p-value (`Q`) with only significant
-hits when `filter_p_value = TRUE`.
+Each CSV contains:
+
+| Column | Description |
+|---|---|
+| `CHR`, `START`, `END` | Genomic coordinates |
+| `AREA`, `SUBAREA` | Aggregation level and sub-region |
+| `MARKER` | SEM metric tested |
+| `SCORE` | Test statistic (ρ, W, t, β, …) |
+| `P_Value` | Nominal p-value |
+| `Q` / `PVALUE_ADJ_ALL_BH` | FDR-adjusted p-value (Benjamini-Hochberg) |
+| `SIGNIFICATIVE_ADJ` | `TRUE` if Q < α (default 0.05) |
+| `FAMILY_TEST` | Model used |
+| `SAMPLE_GROUP` | Sample subset tested |
+
+---
+
+## Reading and exploring results
+
+```{r read_results}
+# Read a Spearman result file
+results <- read.csv(
+  list.files("~/semseeker_results/Inference",
+             pattern = "spearman.*age.*depth3\\.csv$",
+             full.names = TRUE)[1]
+)
+
+# Top significant genes by adjusted p-value
+sig <- subset(results, SIGNIFICATIVE_ADJ == TRUE)
+head(sig[order(sig$Q), c("CHR","START","END","AREA","SCORE","P_Value","Q")], 20)
+
+# Volcano-style: effect size vs -log10(Q)
+plot(-log10(results$Q), results$SCORE,
+     xlab = "-log10(Q)", ylab = "Spearman rho",
+     col  = ifelse(results$SIGNIFICATIVE_ADJ, "red", "grey"),
+     pch  = 16, main = "Spearman rho vs FDR")
+abline(h = 0, lty = 2)
+```
+
+---
+
+## Cross-study and cross-subsample analyses
+
+After running `association_analysis()` on two or more independent cohorts stored
+in separate `result_folder`s, semseeker provides functions to compare and
+meta-analyse results across studies:
+
+```{r cross_study}
+# Overlap significant hits across two studies
+association_cross_studies_overlaps(
+  studies       = list("~/study_A/", "~/study_B/"),
+  result_folder = "~/meta_results/",
+  pvalue_column = "PVALUE_ADJ_ALL_BH"
+)
+
+# Meta-analysis (combines p-values / effect sizes)
+association_cross_studies_meta_analysis(
+  studies       = list("~/study_A/", "~/study_B/"),
+  result_folder = "~/meta_results/"
+)
+
+# Subsample stability analysis (bootstrap cohort sub-sampling)
+association_cross_subsamples_overlaps(
+  result_folder = "~/semseeker_results/",
+  n_subsamples  = 100,
+  fraction      = 0.8
+)
+```
+
+---
+
+## Downstream: pathway and enrichment analysis
+
+Significant genomic regions from `association_analysis()` can be fed directly
+into pathway enrichment tools:
+
+```{r pathway_next, eval=FALSE}
+# WebGestaltR — ORA or GSEA
+pathway_WebGestalt(
+  study            = "my_study",
+  types            = c("BP", "MF"),
+  enrich_methods   = c("ORA"),
+  inference_detail = inf,
+  significance     = TRUE
+)
+
+# STRINGdb — protein network analysis
+pathway_STRINGdb(
+  study            = "my_study",
+  inference_detail = inf,
+  significance     = TRUE
+)
+
+# pathfindR — active subnetwork enrichment
+pathway_pathfindR(
+  study            = "my_study",
+  inference_detail = inf
+)
+```
+
+See the [Pathway and enrichment analysis vignette](pathway-analysis.html) for
+full details.
+
+---
+
+## R packages used
+
+Statistical models are implemented using R [@R-base] base `stats` functions,
+with parallelisation via `future` [@future] and `doFuture`. Quantile regression
+uses `lqmm` [@lqmm] and the `quantreg` package [@quantreg-koenker].
+
+---
+
+## References

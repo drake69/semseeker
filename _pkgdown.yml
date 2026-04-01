@@ -23,7 +23,7 @@ navbar:
       menu:
         - text: "Getting started — epimutations & delta metrics"
           href: articles/getting-started.html
-        - text: "Association analysis — correlation & Wilcoxon"
+        - text: "Association analysis — all statistical models"
           href: articles/association-analysis.html
     reference:
       text: "Reference"
