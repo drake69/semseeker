@@ -2,7 +2,9 @@
 # ─── Run CI check locally in Docker ──────────────────────────────────────────
 # Usage:
 #   ./ci-local.sh               → full R CMD check, output to stdout
-#   ./ci-local.sh logs          → same, but also saves Rcheck dir + log file
+#   ./ci-local.sh check         → same as above
+#   ./ci-local.sh coverage      → run covr::package_coverage() (mirrors test-coverage CI)
+#   ./ci-local.sh logs          → R CMD check + saves .Rcheck dir to ./ci-check-output/
 #   ./ci-local.sh shell         → interactive container for debugging
 #   ./ci-local.sh build         → (re)build image only, keep cache
 #   ./ci-local.sh rebuild       → force full rebuild (no cache)
@@ -14,6 +16,8 @@
 #       00check.log        → full R CMD check output
 #       00install.out      → package installation log
 #       semseeker/tests/testthat.Rout → all test output (every test_that block)
+#   - Coverage:       ./ci-local.sh coverage
+#     On failure prints the full .Rout.fail content so you can see which test failed.
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
@@ -83,6 +87,54 @@ REOF
     echo "      $OUTDIR/semseeker.Rcheck/00check.log"
     echo "      $OUTDIR/semseeker.Rcheck/00install.out"
     echo "      $OUTDIR/semseeker.Rcheck/semseeker/tests/testthat.Rout"
+    exit $EXIT_CODE
+    ;;
+
+  coverage)
+    echo "==> Building $IMAGE (if needed) ..."
+    _build -q
+    echo ""
+    echo "==> Running covr::package_coverage() (mirrors test-coverage CI) ..."
+    echo ""
+
+    RSCRIPT_TMP="/tmp/ci-coverage-$$.R"
+    cat > "$RSCRIPT_TMP" <<'REOF'
+Sys.setenv(NOT_CRAN = "true", RENV_CONFIG_SANDBOX_ENABLED = "false")
+if (!requireNamespace("covr", quietly = TRUE))
+  install.packages("covr", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
+install_path <- "/tmp/covr-pkg"
+tryCatch({
+  cov <- covr::package_coverage(
+    path        = "/pkg",
+    quiet       = FALSE,
+    clean       = FALSE,
+    install_path = install_path
+  )
+  cat("\n=== COVERAGE SUMMARY ===\n")
+  print(cov)
+}, error = function(e) {
+  cat("\n=== COVERAGE FAILED ===\n", conditionMessage(e), "\n")
+  # Print .Rout.fail if present
+  fail_files <- list.files(install_path, pattern = "\\.Rout\\.fail$",
+                           recursive = TRUE, full.names = TRUE)
+  for (f in fail_files) {
+    cat("\n=== FAIL FILE:", f, "===\n")
+    cat(readLines(f), sep = "\n")
+  }
+  quit(status = 1)
+})
+REOF
+
+    docker run --rm \
+      -v "$RSCRIPT_TMP":/tmp/ci-coverage.R:ro \
+      -e NOT_CRAN=true \
+      -e RENV_CONFIG_SANDBOX_ENABLED=false \
+      -e RENV_ACTIVATE_PROJECT=0 \
+      "$IMAGE" \
+      Rscript /tmp/ci-coverage.R
+
+    EXIT_CODE=$?
+    rm -f "$RSCRIPT_TMP"
     exit $EXIT_CODE
     ;;
 
