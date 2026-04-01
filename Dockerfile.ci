@@ -1,19 +1,19 @@
-# ─── Local CI container ────────────────────────────────────────────────────────
-# Mirrors .github/workflows/R-CMD-check.yml but on Debian/Ubuntu instead of
-# macOS. Uses community.r-multiverse.org so polars version matches CI exactly.
+# ─── Local CI container (optimised) ───────────────────────────────────────────
+# Uses Posit Package Manager (P3M) pre-built Linux binaries → no compilation,
+# first build ~5 min instead of ~47 min. Subsequent runs use cached layers.
 #
-# Build:  docker build -f Dockerfile.ci -t semseeker-ci .
-# Check:  docker run --rm semseeker-ci
-# Interactive: docker run --rm -it semseeker-ci bash
+# Build:       docker build -f Dockerfile.ci -t semseeker-ci .
+# Check:       ./ci-local.sh
+# With logs:   ./ci-local.sh logs
+# Debug shell: ./ci-local.sh shell
 # ───────────────────────────────────────────────────────────────────────────────
 
 FROM rocker/r-ver:4.5
 
-# ── System libraries (Linux equivalents of: brew install cairo fontconfig pkg-config)
+# ── System libraries (minimal — only what binary R packages still need at runtime)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcairo2-dev \
     libfontconfig1-dev \
-    pkg-config \
     libssl-dev \
     libxml2-dev \
     libcurl4-openssl-dev \
@@ -25,55 +25,47 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev \
     libgit2-dev \
     libsodium-dev \
+    pkg-config \
     pandoc \
     && rm -rf /var/lib/apt/lists/*
 
-# ── R repos: community.r-multiverse.org first (same as CI) so we get latest polars
-RUN Rscript -e "\
-  options(repos = c(\
-    multiverse = 'https://community.r-multiverse.org',\
-    CRAN       = 'https://cloud.r-project.org'\
-  ));\
-  install.packages(c('pak', 'rcmdcheck', 'remotes'))"
+# ── R repository configuration
+#    P3M Ubuntu noble binaries → no compilation for CRAN packages
+#    community.r-multiverse.org → polars (also ships Linux binaries)
+#    Write to Rprofile.site so every Rscript invocation picks it up
+RUN echo 'options(repos = c(\n\
+  multiverse = "https://community.r-multiverse.org",\n\
+  CRAN       = "https://packagemanager.posit.co/cran/__linux__/noble/latest"\n\
+))' >> /usr/local/lib/R/etc/Rprofile.site
 
-# ── Install package dependencies (DESCRIPTION only, no source yet)
-#    Copy just DESCRIPTION first so this layer is cached when only R code changes
+# ── Bootstrap tooling (pak for parallel installs, rcmdcheck for the check step)
+RUN Rscript -e "install.packages(c('pak', 'rcmdcheck'))"
+
+# ── Install package dependencies
+#    Layer is cached as long as DESCRIPTION doesn't change.
+#    Only Imports/Depends/LinkingTo — Suggests are not needed for R CMD check
+#    and pulling them (GEOquery, pathfindR, etc.) was the main source of slowness.
 WORKDIR /pkg
 COPY DESCRIPTION .
 
+ENV NOT_CRAN=true
 RUN Rscript -e "\
-  options(repos = c(\
-    multiverse = 'https://community.r-multiverse.org',\
-    CRAN       = 'https://cloud.r-project.org'\
-  ));\
-  pkgs <- unique(c(\
-    pak::pkg_deps('local::.')[[' pkg']] |> tryCatch(error=function(e) character(0)),\
-    desc::desc_get_deps()[,'package']\
-  ));\
-  pkgs <- pkgs[pkgs != 'R'];\
-  pak::pak(pkgs, ask = FALSE)" \
-  || Rscript -e "\
-  options(repos = c(\
-    multiverse = 'https://community.r-multiverse.org',\
-    CRAN       = 'https://cloud.r-project.org'\
-  ));\
-  deps <- read.dcf('DESCRIPTION', fields = c('Imports','Suggests','Depends'));\
-  pkgs <- unlist(strsplit(paste(deps, collapse = ','), '[,\n]+'));\
-  pkgs <- trimws(gsub('\\\\(.*\\\\)', '', pkgs));\
-  pkgs <- pkgs[pkgs != '' & pkgs != 'R'];\
-  install.packages(pkgs[pkgs != 'R'], dependencies = TRUE)"
+  pak::pak(\
+    c('local::.',\
+      'remotes', 'devtools', 'testthat'\
+    ),\
+    dependencies = c('Imports', 'Depends', 'LinkingTo'),\
+    ask = FALSE\
+  )"
 
-# ── Copy the full package source
+# ── Copy full package source (only invalidates the layer above when R code changes)
 COPY . .
 
-# ── Run R CMD check (same flags as CI)
+# ── Run R CMD check (same flags as GitHub CI)
+ENV NOT_CRAN=true
 CMD ["Rscript", "-e", "\
-  options(repos = c(\
-    multiverse = 'https://community.r-multiverse.org',\
-    CRAN       = 'https://cloud.r-project.org'\
-  ));\
   rcmdcheck::rcmdcheck(\
-    args     = c('--no-manual', '--as-cran'),\
+    args       = c('--no-manual', '--as-cran'),\
     build_args = '--no-manual',\
-    error_on = 'error'\
+    error_on   = 'error'\
   )"]

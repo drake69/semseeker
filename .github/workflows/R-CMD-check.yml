@@ -42,21 +42,36 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
-          use-public-rspm: true
+          use-public-rspm: true   # enables P3M binary packages (no compilation)
+
+      # Cache the R package library keyed on DESCRIPTION hash.
+      # Cache hit = 0 installs; only misses when dependencies change.
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ matrix.config.r }}-${{ hashFiles('DESCRIPTION') }}
+          restore-keys: ${{ runner.os }}-r-${{ matrix.config.r }}-
 
       # Use remotes instead of pak/setup-r-dependencies so that
       # Additional_repositories (community.r-multiverse.org for polars) and
       # Remotes (drake69/ctdR) in DESCRIPTION are honoured correctly.
       # pak resolves deps before configuring extra repos, making polars unresolvable.
+      #
+      # dependencies = NA  →  only Imports/Depends/LinkingTo (skip Suggests).
+      # Suggests (pathfindR, GEOquery, caret, …) include heavy Bioconductor packages
+      # that are not needed for R CMD check and were the main source of install time.
       - name: Install R dependencies
         run: |
           Sys.setenv(NOT_CRAN = "true")
           install.packages(
             c("remotes", "rcmdcheck", "testthat", "devtools"),
-            repos = "https://packagemanager.posit.co/cran/latest"
+            repos = c(
+              CRAN = "https://packagemanager.posit.co/cran/latest"
+            )
           )
           remotes::install_deps(
-            dependencies = TRUE,
+            dependencies = NA,
             repos = c(
               rpolars = "https://community.r-multiverse.org",
               CRAN    = "https://packagemanager.posit.co/cran/latest"
