@@ -20,6 +20,20 @@
 #' @param ... other options to filter elaborations
 #'
 #' @importFrom doRNG %dorng%
+#' @examples
+#' \dontrun{
+#' association_analysis(
+#'   inference_details = data.frame(
+#'     independent_variable = "Sample_Group",
+#'     family_test          = "wilcoxon",
+#'     transformation_y     = "none",
+#'     marker               = "DELTARP",
+#'     areas                = "GENE"
+#'   ),
+#'   result_folder     = "~/semseeker_results/",
+#'   multiple_test_adj = "BH"
+#' )
+#' }
 #' @export
 association_analysis <- function(inference_details,result_folder, maxResources = 90,
   parallel_strategy  = "multicore",start_fresh = FALSE, ...)

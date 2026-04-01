@@ -1,4 +1,4 @@
-#' @export
+# NOTE: currently internal — could be re-exported once @examples are added
 alphas_performance_pathway_analyser <- function(inference_details, result_folder, pvalue_column="PVALUE_ADJ_ALL_BH",
   significance = TRUE,disease_hpo, disease_description,keywords,stop_keywords,alphas,top=50,pathway_alpha=0.05, ...)
 {

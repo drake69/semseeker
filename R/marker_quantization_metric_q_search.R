@@ -1,7 +1,7 @@
 #' calculate scores for a study across all the used quantile/bin number with result saved into a base folder
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
-#' @export
+# NOTE: currently internal — could be re-exported once @examples are added
 marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), result_folder,
   maxResources =  maxResources, parallel_strategy  =  parallel_strategy, start_fresh = FALSE, ...)
 {

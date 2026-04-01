@@ -1,3 +1,10 @@
+#' @examples
+#' \dontrun{
+#' covarage_analysis_report(
+#'   signal_data   = "~/semseeker_results/Data/SIGNAL_MEAN_PROBE_WHOLE.parquet",
+#'   result_folder = "~/semseeker_results/"
+#' )
+#' }
 #' @export
 covarage_analysis_report <- function (signal_data, result_folder, maxResources = 90, parallel_strategy  = "multicore", ...)
 {

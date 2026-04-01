@@ -1,4 +1,12 @@
 # get result data of an association analyisis and repeat over significant areas
+#' @examples
+#' \dontrun{
+#' association_to_association(
+#'   inference_details_origin = inference_study1,
+#'   inference_details        = inference_study2,
+#'   result_folder            = "~/semseeker_comparison/"
+#' )
+#' }
 #' @export
 association_to_association <- function(inference_details_origin, inference_details,result_folder,
   maxResources = 90, parallel_strategy  = "multicore",start_fresh = FALSE, ...)

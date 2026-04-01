@@ -6,6 +6,13 @@
 #' @param ... other options to filter elaborations
 #'
 #' @importFrom doRNG %dorng%
+#' @examples
+#' \dontrun{
+#' bayes_analysis(
+#'   result_folder        = "~/semseeker_results/",
+#'   independent_variable = "Sample_Group"
+#' )
+#' }
 #' @export
 bayes_analysis <-
   function(result_folder,

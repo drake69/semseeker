@@ -1,7 +1,7 @@
 #' calculate scores for th e same dataset at changing of quantile/bins
-#' @export
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
+# NOTE: currently internal — could be re-exported once @examples are added
 markers_performance_association_q_search <- function(inference_details, result_folder,dest_folder,folder_key, pvalue_column="PVALUE_ADJ_ALL_BH",
   aggr_fun ="mean",significance = TRUE,sql_conditions=c(),study, qs=c(2,4,8,16,32), ...)
 {

@@ -1,3 +1,16 @@
+#' @examples
+#' \dontrun{
+#' gene_impact_analysis(
+#'   inference_details  = inference_df,
+#'   adjust_per_area_s  = TRUE,
+#'   adjust_globally_s  = FALSE,
+#'   pvalue_columns     = "PVALUE_ADJ_ALL_BH",
+#'   adjustment_methods = "BH",
+#'   alphas             = 0.05,
+#'   result_folder      = "~/semseeker_results/",
+#'   WebGestalt         = TRUE
+#' )
+#' }
 #' @export
 gene_impact_analysis <- function(inference_details, adjust_per_area_s, adjust_globally_s, pvalue_columns, adjustment_methods,alphas,
   study, significance,statistic_parameter, path_dbs, phenolyzer_folder_bin,disease,

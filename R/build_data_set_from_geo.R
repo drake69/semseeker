@@ -6,6 +6,14 @@
 #'  different than zero means how many download
 #'
 #' @return samplesheet, and sample's file saved and samplesheet csv
+#' @examples
+#' \dontrun{
+#' build_data_set_from_geo(
+#'   GEOgse        = "GSE55763",
+#'   downloadFiles = 1,
+#'   result_folder = tempdir()
+#' )
+#' }
 #' @export
 build_data_set_from_geo <-  function(GEOgse, downloadFiles = 0,result_folder, ...) {
 

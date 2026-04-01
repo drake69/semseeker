@@ -6,6 +6,14 @@
 #' @param ... other options to filter elaborations
 #'
 #' @importFrom doRNG %dorng%
+#' @examples
+#' \dontrun{
+#' ss_analysis(
+#'   combinations         = list(c("CASE_A", "CASE_B")),
+#'   result_folder        = "~/semseeker_results/",
+#'   independent_variable = "Sample_Group"
+#' )
+#' }
 #' @export
 ss_analysis <-
   function(samples_sql_selection="",combinations,result_folder,independent_variable = "Sample_Group",maxResources = 90,parallel_strategy  = "multicore",...)

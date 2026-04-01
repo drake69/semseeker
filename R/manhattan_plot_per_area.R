@@ -9,6 +9,18 @@
 #' @param phenotype variable to select from the sample_sheet to use for coloring point
 #' @param only_significant_areas TRUE if filter for pvalue < 0.05
 #'
+#' @examples
+#' \dontrun{
+#' manhattan_plot_per_area(
+#'   marker        = "DELTARP",
+#'   figure        = "HYPO",
+#'   area          = "GENE",
+#'   subarea       = "WHOLE",
+#'   family        = "wilcoxon",
+#'   adjust_method = "BH",
+#'   phenotype     = "Sample_Group"
+#' )
+#' }
 #' @export
 #'
 manhattan_plot_per_area <- function(marker,figure,area,subarea,family, adjust_method,phenotype, only_significant_areas=FALSE){

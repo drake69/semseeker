@@ -14,6 +14,15 @@
 #' @param values_mapping rules to recode values and remove samples (source missed leave blank in the mapping file)
 #'
 #' @returns reports of the exploratory analysis and sample sheet, signal data cleaned
+#' @examples
+#' \dontrun{
+#' exploratory_analysis(
+#'   categorical_variables = c("Sample_Group", "Sex"),
+#'   numerical_variables   = c("Age"),
+#'   sample_sheet          = sample_sheet,
+#'   signal_data           = beta_matrix
+#' )
+#' }
 #' @export
 #'
 exploratory_analysis <- function(categorical_variables,numerical_variables, sample_sheet,signal_data, max_missed_sample_sheet = 0.3,
