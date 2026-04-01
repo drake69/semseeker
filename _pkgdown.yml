@@ -25,6 +25,8 @@ navbar:
           href: articles/getting-started.html
         - text: "Association analysis — all statistical models"
           href: articles/association-analysis.html
+        - text: "Pathway and enrichment analysis"
+          href: articles/pathway-analysis.html
     reference:
       text: "Reference"
       href: reference/index.html
