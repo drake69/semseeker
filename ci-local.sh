@@ -60,7 +60,7 @@ case "$MODE" in
       Rscript -e "
         options(repos = c(
           multiverse = 'https://community.r-multiverse.org',
-          CRAN       = 'https://cloud.r-project.org'
+          CRAN       = 'https://packagemanager.posit.co/cran/latest'
         ))
         res <- rcmdcheck::rcmdcheck(
           args       = c('--no-manual', '--as-cran'),
