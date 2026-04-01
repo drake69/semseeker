@@ -30,7 +30,6 @@ VignetteBuilder: knitr
 Suggests: ctdR, openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR, rmarkdown, pkgdown
 Depends: R (>= 4.5.0)
-Remotes: drake69/ctdR
 Additional_repositories: https://community.r-multiverse.org
 LazyData: false
 SysDataCompression: bzip2
