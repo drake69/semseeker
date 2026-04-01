@@ -11,9 +11,9 @@
 #   - Plain stdout:   ./ci-local.sh 2>&1 | tee ci-local.log
 #   - Full Rcheck:    ./ci-local.sh logs   → writes ./ci-check-output/
 #     The directory contains semseeker.Rcheck/ with all log files:
-#       00check.log   → full R CMD check output
-#       00install.out → package installation log
-#       testthat.Rout → all test output (stdout of every test_that block)
+#       00check.log        → full R CMD check output
+#       00install.out      → package installation log
+#       semseeker/tests/testthat.Rout → all test output (every test_that block)
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
@@ -53,32 +53,37 @@ case "$MODE" in
     echo ""
     echo "==> Running R CMD check, collecting artefacts in $OUTDIR ..."
     mkdir -p "$OUTDIR"
-    # Mount output dir; override CMD to write check dir to the mount
+
+    # Write the R script to a temp file to avoid shell-escaping issues
+    RSCRIPT_TMP="$(mktemp /tmp/ci-check-XXXXXX.R)"
+    cat > "$RSCRIPT_TMP" <<'REOF'
+res <- rcmdcheck::rcmdcheck(
+  args       = c("--no-manual", "--as-cran"),
+  build_args = "--no-manual",
+  error_on   = "never",
+  check_dir  = "/check-output"
+)
+cat("\n=== SUMMARY ===\n")
+print(res)
+if (length(res$errors) > 0) quit(status = 1)
+REOF
+
     docker run --rm \
       -v "$OUTDIR":/check-output \
+      -v "$RSCRIPT_TMP":/tmp/ci-check.R:ro \
       "$IMAGE" \
-      Rscript -e "
-        options(repos = c(
-          multiverse = 'https://community.r-multiverse.org',
-          CRAN       = 'https://packagemanager.posit.co/cran/latest'
-        ))
-        res <- rcmdcheck::rcmdcheck(
-          args       = c('--no-manual', '--as-cran'),
-          build_args = '--no-manual',
-          error_on   = 'never',       # collect everything, exit code separately
-          check_dir  = '/check-output'
-        )
-        cat('\n=== SUMMARY ===\n')
-        print(res)
-        # exit non-zero if there were errors
-        if (length(res\$errors) > 0) quit(status = 1)
-      "
+      Rscript /tmp/ci-check.R
+
+    EXIT_CODE=$?
+    rm -f "$RSCRIPT_TMP"
+
     echo ""
     echo "==> Artefacts saved to: $OUTDIR"
     echo "    Key files:"
-    echo "      $OUTDIR/semseeker.Rcheck/00check.log     — full check log"
-    echo "      $OUTDIR/semseeker.Rcheck/00install.out   — install log"
-    echo "      $OUTDIR/semseeker.Rcheck/semseeker/tests/testthat.Rout — test output"
+    echo "      $OUTDIR/semseeker.Rcheck/00check.log"
+    echo "      $OUTDIR/semseeker.Rcheck/00install.out"
+    echo "      $OUTDIR/semseeker.Rcheck/semseeker/tests/testthat.Rout"
+    exit $EXIT_CODE
     ;;
 
   check|*)

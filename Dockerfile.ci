@@ -1,6 +1,6 @@
 # ─── Local CI container (optimised) ───────────────────────────────────────────
 # Uses Posit Package Manager (P3M) pre-built Linux binaries → no compilation,
-# first build ~5 min instead of ~47 min. Subsequent runs use cached layers.
+# first build ~7 min instead of ~47 min. Subsequent runs use cached layers.
 #
 # Build:       docker build -f Dockerfile.ci -t semseeker-ci .
 # Check:       ./ci-local.sh
@@ -9,6 +9,15 @@
 # ───────────────────────────────────────────────────────────────────────────────
 
 FROM rocker/r-ver:4.5
+
+# ── Disable renv for all R processes in this container.
+#    Without these, renv/activate.R (copied with the source) would intercept
+#    every R startup, lock the library, and hide rcmdcheck / installed packages.
+ENV RENV_CONFIG_SANDBOX_ENABLED=false
+ENV RENV_ACTIVATE_PROJECT=0
+
+# ── Required by polars installer
+ENV NOT_CRAN=true
 
 # ── System libraries (minimal — only what binary R packages still need at runtime)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -48,7 +57,6 @@ RUN Rscript -e "install.packages(c('pak', 'rcmdcheck'))"
 WORKDIR /pkg
 COPY DESCRIPTION .
 
-ENV NOT_CRAN=true
 RUN Rscript -e "\
   pak::pak(\
     c('local::.',\
@@ -62,7 +70,6 @@ RUN Rscript -e "\
 COPY . .
 
 # ── Run R CMD check (same flags as GitHub CI)
-ENV NOT_CRAN=true
 CMD ["Rscript", "-e", "\
   rcmdcheck::rcmdcheck(\
     args       = c('--no-manual', '--as-cran'),\
