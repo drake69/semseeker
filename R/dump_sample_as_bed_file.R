@@ -9,8 +9,8 @@
 dump_sample_as_bed_file <- function(data_to_dump, fileName) {
 
   ssEnv <- get_session_info()
-  # message("dump_sample_as_bed_file ssEnv:", length(ssEnv))
-  # message("dump_sample_as_bed_file:", ssEnv$result_folderData)
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " dump_sample_as_bed_file ssEnv:", length(ssEnv))
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " dump_sample_as_bed_file:", ssEnv$result_folderData)
 
   if (!plyr::empty(data_to_dump) && !startsWith(x = toupper(as.character(data_to_dump[1, "CHR"])), prefix = "CHR")) {
     chr <- rep(x = "chr", dim(data_to_dump)[1])
@@ -21,12 +21,19 @@ dump_sample_as_bed_file <- function(data_to_dump, fileName) {
   # bed coordinate must start from zero!
   data_to_dump$START <- as.numeric(data_to_dump$START)
   data_to_dump$END <- as.numeric(data_to_dump$END)
+
+  data_to_dump <- data_to_dump[!is.na(data_to_dump$START),]
+
+  # sort by CHR START and END
+  data_to_dump <- data_to_dump[order(data_to_dump$CHR, data_to_dump$START, data_to_dump$END),]
+
   if (!plyr::empty(data_to_dump)) {
 
-    # message("trying to save: ", fileName)
+    log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " trying to save: ", fileName)
 
     # save file bed per sample
-    utils::write.table(data_to_dump, file = fileName, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+    # utils::write.table(data_to_dump, file = gzfile(fileName), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+    readr::write_tsv(data_to_dump, fileName, col_names = FALSE, na = "NA", progress = FALSE)
 
     # save file bed per sample temporary to reuse for aggregated bed file
     # filePath <- paste(fileName,"",".temp")
@@ -36,7 +43,7 @@ dump_sample_as_bed_file <- function(data_to_dump, fileName) {
     #
     # utils::write.table(data_to_dump, file = filePath, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
   }
-  # message("dump_sample_as_bed_file: ", fileName)
+  log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"),  " dump_sample_as_bed_file: ", fileName)
 }
 
 

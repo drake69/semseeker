@@ -10,11 +10,12 @@ apply_stat_model(
   family_test,
   covariates = NULL,
   key,
-  transformation,
+  transformation_y,
   dototal,
   session_folder,
   independent_variable,
   depth_analysis = 3,
+  samples_sql_condition,
   ...
 )
 }
@@ -29,7 +30,7 @@ apply_stat_model(
 
 \item{key}{key to identify file to elaborate}
 
-\item{transformation}{transformation to apply to covariates, burden and independent variable}
+\item{transformation_y}{transformation_y to apply to covariates, burden and independent variable}
 
 \item{dototal}{do a total per area}
 

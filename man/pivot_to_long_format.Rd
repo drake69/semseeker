@@ -7,8 +7,8 @@
 pivot_to_long_format(
   marker,
   figure,
-  group,
-  subgroup,
+  area,
+  subarea,
   phenotype_column,
   sample_sheet,
   areas_selection = NULL
@@ -19,9 +19,9 @@ pivot_to_long_format(
 
 \item{figure}{DELTAS, DELTAQ,DELTAR, MUTATIONS}
 
-\item{group}{GENE, DMR ...}
+\item{area}{GENE, DMR ...}
 
-\item{subgroup}{TSS1500 ...}
+\item{subarea}{TSS1500 ...}
 
 \item{phenotype_column}{column from the sample sheet to pair to each sample}
 

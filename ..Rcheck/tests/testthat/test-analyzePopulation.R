@@ -2,10 +2,10 @@
 
   init_env(tempFolder, parallel_strategy = "sequential")
 
-  sp <- analyze_population(methylation_data=methylation_data,
+  sp <- analyze_population(signal_data=signal_data,
                     sliding_window_size = 11,
                     sliding_window_size = sliding_window_size,
-                    beta_thresholds = beta_thresholds,
+                    signal_thresholds = signal_thresholds,
                     sample_sheet = mySampleSheet,
                     bonferroni_threshold = bonferroni_threshold,
                     probe_features = probe_features,

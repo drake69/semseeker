@@ -6,245 +6,215 @@
 #' @param ... other options to filter elaborations
 #'
 #' @return the working ssEnvonment
-init_env <- function(result_folder, maxResources = 90, parallel_strategy = "multicore", ...)
+init_env <- function(result_folder, maxResources = 90, ...)
 {
+
+  gc()
+  tryCatch(
+    {
+      test_it <- list(...)
+    },
+    error = function(cond)  {
+      log_event ("ERROR: ", format(Sys.time(), "%a %b %d %X %Y"), " Function's arguments must be passed explicitily !")
+      log_event(cond)
+      stop("Function's arguments must be passed explicitily !")
+    }
+  )
+
+  # set digits to 22
+  withr::local_options(list(digits = 22))
+
+  # suppress warnings messages of packages
+  PKGs<- c("future","doRNG","doParallel","progressr","data.table","ggplot2","dplyr",
+    "readr","readxl","stringr","tidyr","tibble","purrr","ggpubr","ggrepel","ggsci","foreach","VennDiagram")
+  tt <- lapply(PKGs, suppressWarnings(suppressMessages))
+  tt <- lapply(PKGs, suppressPackageStartupMessages)
+
+
+  arguments <- list(...)
+  # check if optional arguments are passed
+  if(length(arguments) == 0)
+  {
+    arguments <- list()
+  }
+  else
+  {
+    # remove all empty items from arguments (only apply gsub to character, preserve logical/numeric types)
+    arguments <- lapply(arguments, function(x) if(is.character(x)) gsub(" ", "", x) else x)
+    arguments <- lapply(arguments, function(x) if(is.character(x)) x[x!=""] else x)
+    arguments <- arguments[sapply(arguments, function(x) length(x) > 0)]
+    arguments <- arguments[sapply(arguments, function(x) !is.null(x))]
+    # arguments <- arguments[sapply(arguments, function(x) !is.na(x))]
+  }
+
+  arguments[["areas_selection"]] <- NULL
+
+
+  start_fresh <- TRUE
+  if(!is.null(arguments[["start_fresh"]]))
+    start_fresh <- arguments$start_fresh
+  arguments[["start_fresh"]] <- NULL
+
+  if(start_fresh)
+  {
+    unlink(result_folder, recursive = TRUE, force = TRUE)
+    ssEnv <- list()
+  }
+  else
+    ssEnv <- get_session_info(result_folder)
+
+  if(is.null(ssEnv$session_id))
+    ssEnv$session_id <- 0
+  else
+    ssEnv$session_id <- ssEnv$session_id + 1
+  ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
+  update_session_info(ssEnv)
 
   # utils::data("PROBES")
   # utils::data("PROBES_CHR_CHR")
-  set.seed(7658776)
+  ssEnv$seed <- 7658776
+  set.seed(ssEnv$seed)
 
-  #allow export of object of 32gb with future
-  options(future.globals.maxSize= 32 * 1024^3)
 
-  ssEnv <- get_session_info(result_folder)
-  ssEnv$parallel_strategy <- parallel_strategy
+  arguments <- set_env_variable(arguments,"verbosity",1)
+  arguments <- set_env_variable(arguments,"q_b_param",data.frame("DELTAP_B"=4,"DELTARP_B"=4,"DELTAQ_Q"=4,"DELTARQ_Q"=4))
+  arguments <- set_env_variable(arguments,"DELTAP_B",4)
+  arguments <- set_env_variable(arguments,"DELTARP_B",4)
+  arguments <- set_env_variable(arguments,"DELTAQ_Q",4)
+  arguments <- set_env_variable(arguments,"DELTARQ_Q",4)
+
+  arguments <- set_env_variable(arguments,"inpute","none")
+  arguments <- set_env_variable(arguments,"plot_format","png")
+  arguments <- set_env_variable(arguments,"plot_resolution","print")
+  arguments <- set_env_variable(arguments,"plot_resolution_ppi",600)
+  arguments <- set_env_variable(arguments,"alpha",0.05)
+  arguments <- set_env_variable(arguments,"sex_chromosome_remove",FALSE)
+  arguments <- set_env_variable(arguments,"opencl",FALSE)
+  arguments <- set_env_variable(arguments,"bonferroni_threshold",0.05)
+  arguments <- set_env_variable(arguments,"iqrTimes",3)
+  arguments <- set_env_variable(arguments,"sliding_window_size",11)
+  arguments <- set_env_variable(arguments,"tech","")
+  arguments <- set_env_variable(arguments,"showprogress",FALSE)
+  arguments <- set_env_variable(arguments,"signal_intrasample",FALSE)
+  arguments <- set_env_variable(arguments,"openai_api_key","")
+  arguments <- set_env_variable(arguments,"multiple_test_adj","q", c("BY", "fdr","BH","bonferroni","q"))
+
+  if (!is.null(ssEnv$openai_api_key))
+    Sys.setenv(OPENAI_API_KEY = ssEnv$openai_api_key)
+
+  original_colors <- c('#b9e192', '#b3c7f7', '#f8b8d0','#f194b8', '#ffefb6', '#cfebb6','#b9ef92')
+  original_colors <- rep(original_colors, 2)
+  # original_colors <- khroma::color("bright", n = 20)
+  arguments <- set_env_variable(arguments,"color_palette",original_colors)
+  darker_colors <- grDevices::adjustcolor(original_colors, alpha.f = 0.5)
+  darker_colors <- c("blue","red","purple","green","yellow","orange","brown")
+  arguments <- set_env_variable(arguments,"color_palette_darker",darker_colors)
+  arguments <- set_env_variable(arguments,"cluster_workers",NULL)
+
+  model_metrics <- toupper(as.vector(semseeker::metrics_properties$Metric))
+  arguments <- set_env_variable(arguments,"model_metrics",model_metrics)
+
+  # get ssEnv
+  ssEnv <- get_session_info()
+
+  dry_run <- FALSE
+  if(!is.null(arguments[["dry_run"]]))
+    dry_run <- arguments$dry_run
+  arguments[["dry_run"]] <- NULL
+  if(dry_run)
+    ssEnv$verbosity <- 4
 
   tmp <- tempdir()
+  log_event("INFO: ",format(Sys.time(), "%a %b %d %X %Y")," data will saved in this folder:", result_folder)
   ssEnv$temp_folder <-  paste(tmp,"/semseeker/",stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),sep="")
+  ssEnv$result_folder <-  result_folder
   ssEnv$result_folderData <-  dir_check_and_create(result_folder, "Data")
   ssEnv$result_folderChart <-    dir_check_and_create(result_folder, "Chart")
   ssEnv$result_folderInference <-    dir_check_and_create(result_folder, "Inference")
+  ssEnv$result_folderPathway <-    dir_check_and_create(result_folder, "Pathway")
+  ssEnv$result_folderPhenotype <-    dir_check_and_create(result_folder, "Phenotype")
   ssEnv$result_folderEuristic <-  dir_check_and_create(result_folder,"Euristic")
   ssEnv$session_folder <-  dir_check_and_create(result_folder,c("Log"))
   random_file_name <- paste(stringi::stri_rand_strings(1, 7, pattern = "[A-Za-z0-9]"),".log", sep="")
 
   if (sink.number() != 0)
     sink(NULL)
-  sink(file.path(ssEnv$session_folder,"session_output.log"), split = TRUE)
+  file_name <- paste(as.character(Sys.info()["nodename"]),"_session_output.log", sep="")
+  sink(file.path(ssEnv$session_folder,file_name), split = TRUE, append = TRUE)
 
   foreachIndex <- 0
 
-  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-
-  if (nzchar(chk) && chk == "TRUE") {
-    # use 2 cores in CRAN/Travis/AppVeyor
-    nCore <- 2L
-  } else {
-    # use all cores in devtools::test()
-    nCore <- future::availableCores() - 1
-    nCore <- if(floor(future::availableCores() * maxResources/100 ) > nCore ) nCore else floor(future::availableCores() * maxResources/100 )
-  }
-  # bootstrap cluster
-  outFile <- file.path(ssEnv$session_folder, "cluster_r.out")
-
-  options(doFuture.foreach.export = ".export-and-automatic-with-warning")
-  doFuture::registerDoFuture()
-
-
-  tryCatch(
-    {
-      test_it <- list(...)
-    },
-    error = function(cond)  {
-      message ("ERROR: ", Sys.time(), " Function's arguments must be passed explicitily !")
-      message(cond)
-      stop()
-    }
-  )
-  arguments <- list(...)
-
-  ssEnv$showprogress <- FALSE
-  if(!is.null(arguments[["showprogress"]]))
-  {
-    ssEnv$showprogress <- if(is.null(arguments[["showprogress"]])) keys_figures_default[,1] else arguments$showprogress
-  }
-
-  # TODO: improve planning parallel management using also cluster
-  if(parallel_strategy=="multisession")
-  {
-    future::plan( future::multisession, workers = nCore)
-    message("INFO: ", Sys.time(), " I will work in multisession with:", nCore, " Cores")
-  }
-  if(parallel_strategy=="multicore")
-  {
-    future::plan( future::multicore, workers = nCore)
-    message("INFO: ", Sys.time(), " I will work in muticore with:", nCore," Cores")
-  }
-  if(parallel_strategy=="cluster")
-  {
-    message ("ERROR: ", Sys.time(), " Cluster feature not implemented!")
-    stop("I'm STOPPING HERE!")
-    future::plan( future::cluster, workers = nCore)
-  }
-  if(parallel_strategy!="multisession" & parallel_strategy!="multicore"
-     & parallel_strategy!="cluster")
-  {
-    future::plan( future::sequential)
-    message("INFO: ", Sys.time(), " I will work in sequential mode")
-  }
-
-  ssEnvTemp <- get_session_info(result_folder)
-  if (!is.null(ssEnvTemp) & !length(ssEnvTemp)<2)
-  {
-    # we had to return aold session info this init could be calles by other than semseeker function, it means
-    # we don't know which marker or figure were calculated
-    message("Reusing old session info !")
-    message("INFO: ", Sys.time(), " I will focus on: ", paste(unique(ssEnvTemp$keys_markers_figures[,"MARKER"]), collapse = " ", sep =" "), " due to ",
-      paste(unique(ssEnvTemp$keys_markers_figures[,"FIGURE"]), collapse = " ", sep =" "),
-      " of ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"AREA"]), collapse = " ", sep =" "),
-      " for ",  paste(unique(ssEnvTemp$keys_areas_subareas[,"SUBAREA"]), collapse = " ", sep =" "))
-    if(dir.exists(ssEnv$session_folder))
-    {
-      update_session_info(ssEnvTemp)
-      return(ssEnvTemp)
-    }
-  }
-
-  # set default values
-  keys_figures_default <-  data.frame("FIGURE"=c("HYPO", "HYPER", "BOTH"))
-  keys_markers_default <-  data.frame("MARKER"=c("MUTATIONS","LESIONS","DELTAS","DELTAQ","DELTAR","DELTARQ","BETA"))
-  keys_markers_default$EXT <-  c("bed","bed","bedgraph","bed","bedgraph","bed","bedgraph")
-  keys_areas_default <- data.frame("areas"=c("GENE","ISLAND","DMR","CHR","PROBE"))
-  keys_gene_subareas_default <- data.frame("subarea"=c("BODY","TSS1500","TSS200","1STEXON","3UTR","5UTR","EXONBND","WHOLE"))
-  keys_island_subareas_default <- data.frame("subarea"=c("N_SHORE","S_SHORE","N_SHELF","S_SHELF", "WHOLE"))
-  ssEnv$keys_sample_groups <-  data.frame("SAMPLE_GROUP"=c("Reference","Control","Case"))
-
-  # filter selected figures, anoamlies and areas passed by user
-  figures <- if(is.null(arguments[["figures"]])) keys_figures_default[,1] else arguments$figures
-  markers <- if(is.null(arguments[["markers"]]))  keys_markers_default[,1] else arguments$markers
-
-  areas <- if(is.null(arguments[["areas"]]))  keys_areas_default[,1] else arguments$areas
-
-  # check parameters passed by user left areas, figures and anomnalies to work on
-  if(sum(figures %in% keys_figures_default[,1])==0)
-  {
-    message("INFO: ", Sys.time(), " The only allowed figures values are:", keys_figures_default)
-    stop("I'm STOPPING HERE!")
-  }
-  if(sum(markers %in% keys_markers_default[,1])==0)
-  {
-    message("INFO: ", Sys.time(), " The only allowed markers values are:", keys_markers_default)
-    stop("I'm STOPPING HERE!")
-  }
-  if(sum(areas %in% keys_areas_default[,1])==0)
-  {
-    message("INFO: ", Sys.time(), " The only allowed areas values are:", keys_areas_default)
-    stop("I'm STOPPING HERE!")
-  }
-
-  message("INFO: ", Sys.time(), " I will focus on:", paste(markers, collapse = " ", sep =" "), " due to ",  paste(figures, collapse = " ", sep =" "), " of ",  paste(areas, collapse = " ", sep =" "))
-
-  if(!is.null(arguments[["subareas"]]))
-  {
-    keys_gene_subareas_default <- as.data.frame(keys_gene_subareas_default[keys_gene_subareas_default[,"subarea"]  %in% arguments$subareas,])
-    keys_island_subareas_default <- as.data.frame(keys_island_subareas_default[keys_island_subareas_default[,"subarea"] %in% arguments$subareas,])
-    if(sum(arguments$subareas %in% c(keys_gene_subareas_default[,1],keys_island_subareas_default))==0)
-    {
-      message("INFO: ", Sys.time(), " The only allowed areas values are:", keys_areas_default)
-      stop("I'm STOPPING HERE!")
-    }
-  }
-
-  # set working on figures, marker, areas and subareas
-  keys_figures <-  data.frame("FIGURE"=figures)
-  keys_markers <-  data.frame("MARKER"=markers)
-  keys_markers_figures <-  expand.grid("MARKER"=keys_markers[,1],"FIGURE"=keys_figures[,1])
-
-  # create markers figures to work on, cleaning also for BETA only MEAN
-  ssEnv$keys_markers_figures <- keys_markers_figures
-  levels(ssEnv$keys_markers_figures$FIGURE) <- c(levels(ssEnv$keys_markers_figures$FIGURE),"MEAN")
-  ssEnv$keys_markers_figures[ssEnv$keys_markers_figures$MARKER=="BETA","FIGURE"] <- "MEAN"
-  ssEnv$keys_markers_figures <- unique(ssEnv$keys_markers_figures)
-  ssEnv$keys_markers_figures$COMBINED <- paste0(c(ssEnv$keys_markers_figures$MARKER,ssEnv$keys_markers_figures$FIGURE), collapse ="_")
-
-  keys_areas <- data.frame("AREA"=areas)
-
-  keys_areas_subareas <- data.frame("AREA"="","SUBAREA"="","COMBINED"="")
-  keys_areas_subareas <- keys_areas_subareas[-1,]
-  ssEnv$keys_areas_subareas_markers_figures <- data.frame("AREA"="","SUBAREA"="","MARKER"="","FIGURE"="")
-  ssEnv$keys_areas_subareas_markers_figures <- ssEnv$keys_areas_subareas_markers_figures[-1,]
-
-  if("ISLAND" %in% areas)
-  {
-    keys_areas_subareas <-  rbind(keys_areas_subareas,expand.grid("AREA"="ISLAND","SUBAREA"=keys_island_subareas_default[,1], "COMBINED"=""))
-    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="ISLAND","SUBAREA"= keys_island_subareas_default[,1],"MARKER"=markers,"FIGURE"=figures))
-    message("INFO: ", Sys.time(), " These island's areas will be investigated:", paste(keys_island_subareas_default[,1], collapse = " ", sep=" "))
-  }
-
-  if("GENE" %in% areas)
-  {
-    keys_areas_subareas <- rbind(keys_areas_subareas,expand.grid("AREA"="GENE","SUBAREA"=keys_gene_subareas_default[,1], "COMBINED"=""))
-    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="GENE","SUBAREA"= keys_gene_subareas_default[,1],"MARKER"=markers,"FIGURE"=figures))
-    message("INFO: ", Sys.time(), " These gene's areas will be investigated:", paste(keys_gene_subareas_default[,1], collapse = " ", sep=" "))
-  }
-
-  if ("DMR" %in% areas)
-  {
-    keys_areas_subareas <- rbind( data.frame("AREA"="DMR","SUBAREA"="WHOLE", "COMBINED"="DMR_WHOLE"), keys_areas_subareas)
-    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="DMR","SUBAREA"="WHOLE","MARKER"=markers,"FIGURE"=figures))
-  }
-
-  if ("CHR" %in% areas)
-  {
-    keys_areas_subareas <- rbind( data.frame("AREA"="CHR","SUBAREA"="WHOLE", "COMBINED"="CHR_WHOLE"), keys_areas_subareas)
-    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="CHR","SUBAREA"="WHOLE" ,"MARKER"=markers,"FIGURE"=figures))
-  }
-
-  if("PROBE" %in% areas)
-  {
-    keys_areas_subareas <- rbind( data.frame("AREA"="PROBE","SUBAREA"="WHOLE", "COMBINED"="PROBE_WHOLE"), keys_areas_subareas)
-    ssEnv$keys_areas_subareas_markers_figures <- rbind(ssEnv$keys_areas_subareas_markers_figures,expand.grid("AREA"="PROBE","SUBAREA"="WHOLE" ,"MARKER"=markers,"FIGURE"=figures))
-  }
-
-  combine_not_empty <- function(x)
-  {
-    paste0(x[x!=""], collapse = "_")
-  }
-
-  # force the only FIGURE of BETA as MEAN
-  levels(ssEnv$keys_areas_subareas_markers_figures$FIGURE) <- c( levels(ssEnv$keys_areas_subareas_markers_figures$FIGURE),"MEAN")
-  ssEnv$keys_areas_subareas_markers_figures$FIGURE[ssEnv$keys_areas_subareas_markers_figures$MARKER=="BETA"] <-"MEAN"
-  ssEnv$keys_areas_subareas_markers_figures <- unique(ssEnv$keys_areas_subareas_markers_figures)
-  ssEnv$keys_areas_subareas_markers_figures$COMBINED <- apply(ssEnv$keys_areas_subareas_markers_figures[,c("MARKER","FIGURE","AREA","SUBAREA")], 1, combine_not_empty )
-
-  ssEnv$keys_areas_subareas <- keys_areas_subareas
-  ssEnv$keys_areas_subareas$COMBINED <- apply(ssEnv$keys_areas_subareas[,c("AREA","SUBAREA")], 1, combine_not_empty )
-
-  # force the only FIGURE of BETA as MEAN
-  ssEnv$keys_markers_figures <- keys_markers_figures
-  ssEnv$keys_markers_figures <- merge(ssEnv$keys_markers_figures,keys_markers_default, by="MARKER")
-  levels(ssEnv$keys_markers_figures$FIGURE) <- c( levels(ssEnv$keys_markers_figures$FIGURE),"MEAN")
-  ssEnv$keys_markers_figures[ssEnv$keys_markers_figures$MARKER=="BETA","FIGURE"] <- "MEAN"
-  ssEnv$keys_markers_figures$COMBINED <- apply(ssEnv$keys_markers_figures[,c("MARKER","FIGURE")], 1, combine_not_empty )
-
-  ssEnv$keys_areas <- unique(ssEnv$keys_areas_subareas_markers_figures[,"AREA"])
+  # check if the arguments are valid
+  arguments <- keys_create(ssEnv, arguments)
+  ssEnv <- get_session_info()
 
   ssEnv$functionToExport <- c( "analyze_single_sample","deltar_single_sample",
-                               "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
-                               "file_path_build","analyze_single_sample_both",
-                               "sort_by_chr_and_start", "test_match_order", "lesions_get",
-                               "mutations_get")
+    "dump_sample_as_bed_file", "delta_single_sample","dir_check_and_create",
+    "file_path_build","analyze_single_sample_both",
+    "sort_by_chr_and_start", "test_match_order", "lesions_get",
+    "mutations_get")
 
 
   # to manage progress bar
   if(ssEnv$showprogress)
   {
     handler_settings <- progressr::handlers()
-    if ((exists("progress", mode = "function", inherits = TRUE)))
+    if (!(exists("cli", mode = "function", inherits = TRUE)))
     {
-      progressr::handlers(global = TRUE)
-      progressr::handlers("progress")
+      # check if handler is already registered
+      if (!testthat::is_testing())
+        # if (length(handler_settings$handler) == 0)
+        if(!("cli" %in% handler_settings$handler))
+        {
+          progressr::handlers(global = TRUE)
+          progressr::handlers("cli")
+        }
     }
+  }
+
+  arguments <- set_env_variable(arguments,"maxResources",maxResources)
+  arguments <- set_env_variable(arguments,"parallel_strategy","sequential")
+  parallel_session()
+  ssEnv <- get_session_info()
+
+  log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " I will focus on:", paste(unique(ssEnv$keys_markers_figures$MARKER), collapse = " ", sep =" "),
+    " due to ",  paste(unique(ssEnv$keys_markers_figures$FIGURE), collapse = " ", sep =" "),
+    " of ",  paste( unique(ssEnv$keys_areas_subareas_markers_figures$AREA) , collapse = " ", sep =" "))
+
+  # remove empty arguments
+  v <- c()
+  if(length(arguments)!=0)
+  {
+    temp <- arguments
+    for (i in seq_along(temp))
+    {
+      if(is.null(temp[[i]]))
+        v <- c(v,i)
+      if(identical(temp[[i]],character(0)))
+        v <- c(v,i)
+    }
+    # remove items with index in v
+    if(length(v)!=0)
+      arguments <- temp[-v]
+    else
+      arguments <- temp
+  }
+  # check length of arguments
+  if(length(arguments)!=0)
+  {
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
+    # throw error
+    stop("ERROR: This options are not recognized: ", paste(arguments, collapse = " ", sep =" "))
+  }
+
+
+  if(dry_run)
+  {
+    # out at console as pretty table
+
+    knitr::kable(as.data.frame(ssEnv$keys_areas_subareas_markers_figures), format = "pipe", caption = "Selection:")
+    message(ssEnv$keys_areas_subareas_markers_figures)
+    stop("INFO: Dry run is requested. Exiting now.")
   }
 
   update_session_info(ssEnv)

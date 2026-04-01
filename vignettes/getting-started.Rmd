@@ -1,0 +1,236 @@
+---
+title: "Getting started — epimutations and delta metrics"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started — epimutations and delta metrics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  eval      = FALSE   # code is illustrative; not run during R CMD check
+)
+```
+
+## What is semseeker?
+
+**semseeker** is an R package for detecting **Stochastic Epigenetic Mutations
+(SEMs)** — aberrant, sample-specific changes in DNA methylation that deviate
+from the expected population signal.
+
+Starting from a normalised beta-value (or M-value) matrix, semseeker:
+
+1. Identifies **hypomethylated** and **hypermethylated** mutations at
+   single-probe resolution.
+2. Aggregates adjacent mutations into **lesions** (genomic clusters of
+   co-occurring mutations).
+3. Computes population-level **delta metrics** (ΔBeta, ΔIV, ΔEV, ΔRV, ΔRP)
+   that summarise stochastic epigenetic variability per genomic region.
+
+Supported input platforms: Illumina EPIC (850k), 450k, and 27k arrays
+(detected automatically from probe IDs).
+
+---
+
+## Installation
+
+```{r install}
+# Install remotes if needed
+install.packages("remotes")
+
+# Install semseeker from GitHub
+remotes::install_github("drake69/semseeker")
+```
+
+> **Note:** semseeker requires the `polars` package from R-multiverse.
+> It is installed automatically as a dependency. If you get an installation
+> error, try:
+> ```r
+> Sys.setenv(NOT_CRAN = "true")
+> install.packages("polars", repos = "https://community.r-multiverse.org")
+> ```
+
+---
+
+## Step 1 — Prepare your data
+
+### Beta-value matrix
+
+semseeker expects a **probe × sample** matrix of beta values (0–1) or M-values.
+Probe IDs must be Illumina CpG identifiers (e.g. `cg00000029`).
+
+```{r beta_matrix}
+# Example: load a pre-normalised matrix (rows = probes, columns = samples)
+beta_matrix <- readRDS("normalised_beta.rds")
+
+dim(beta_matrix)       # e.g. 866895 × 50
+beta_matrix[1:3, 1:3]
+```
+
+If you are starting from raw IDAT files, normalise first with
+[ChAMP](https://bioconductor.org/packages/ChAMP/):
+
+```{r chamap_normalise}
+library(ChAMP)
+
+myLoad <- champ.load(
+  directory  = "path/to/idat/",
+  arraytype  = "EPIC"
+)
+
+myNorm <- champ.norm(
+  beta      = myLoad$beta,
+  rgSet     = myLoad$rgSet,
+  mset      = myLoad$mset,
+  method    = "SWAN",
+  arraytype = "EPIC"
+)
+
+beta_matrix <- myNorm
+```
+
+### Sample sheet
+
+A data frame with at minimum:
+
+| Column | Description |
+|---|---|
+| `Sample_ID` | Unique sample identifier — must match column names of the beta matrix |
+| `Sample_Name` | Human-readable label |
+| `Sample_Group` | One of `"Case"`, `"Control"`, `"Reference"` |
+
+```{r sample_sheet}
+sample_sheet <- read.csv2("sample_sheet.csv")
+
+# Minimal required columns
+head(sample_sheet[, c("Sample_ID", "Sample_Name", "Sample_Group")])
+```
+
+> **Tip:** If you have no independent reference population, duplicate the
+> Control rows and set `Sample_Group = "Reference"` for the duplicates.
+
+---
+
+## Step 2 — Detect epimutations
+
+The main entry point is `semseeker()`. A single call runs the full pipeline:
+normalisation → mutation calling → lesion aggregation → delta metric computation.
+
+```{r run_semseeker}
+library(semseeker)
+
+semseeker(
+  sample_sheet  = sample_sheet,
+  signal_data   = beta_matrix,
+  result_folder = "~/semseeker_results/"
+)
+```
+
+### Key parameters
+
+| Parameter | Default | Description |
+|---|---|---|
+| `parallel_strategy` | `"multicore"` | Parallelisation backend (`"sequential"`, `"multicore"`, `"multisession"`) |
+| `maxResources` | `90` | % of CPU cores to use |
+| `iqrTimes` | `3` | IQR multiplier for aberration threshold |
+| `alpha` | `0.05` | Significance threshold |
+| `areas` | `c("GENE","CHR","ISLAND","PROBE")` | Genomic aggregation levels |
+| `marker` | `c("MUTATIONS","LESIONS","DELTARQ",...)` | Which markers to compute |
+| `sex_chromosome_remove` | `TRUE` | Remove sex chromosomes from analysis |
+
+Example — run only probe-level mutations, sequential mode, 2 cores:
+
+```{r run_minimal}
+semseeker(
+  sample_sheet      = sample_sheet,
+  signal_data       = beta_matrix,
+  result_folder     = "~/semseeker_results/",
+  parallel_strategy = "sequential",
+  areas             = c("PROBE"),
+  marker            = c("MUTATIONS", "LESIONS")
+)
+```
+
+---
+
+## Step 3 — Understand the output
+
+Results are written under `result_folder/Data/`. Each sample produces:
+
+```
+Data/
+├── SAMPLEID_MUTATIONS_HYPO.bed       ← probe-level hypomethylated mutations
+├── SAMPLEID_MUTATIONS_HYPER.bed      ← probe-level hypermethylated mutations
+├── SAMPLEID_LESIONS_HYPO.bed         ← genomic lesion clusters (hypo)
+├── SAMPLEID_LESIONS_HYPER.bed        ← genomic lesion clusters (hyper)
+├── SAMPLEID_SIGNAL_MEAN.PROBE.bedgraph
+└── ...
+```
+
+Population-level pivot tables aggregate all samples per marker:
+
+```
+Data/
+├── SIGNAL_MEAN_PROBE_WHOLE.parquet   ← mean signal per probe, all samples
+├── MUTATIONS_HYPO_PROBE_WHOLE.parquet
+├── DELTARP_GENE_WHOLE.parquet        ← ΔRP per gene, all samples
+└── ...
+```
+
+### Reading results
+
+```{r read_results}
+library(polars)
+
+# Read the DELTARP pivot table
+deltarp <- as.data.frame(
+  pl$read_parquet("~/semseeker_results/Data/DELTARP_GENE_WHOLE.parquet")
+)
+
+head(deltarp[, 1:6])
+```
+
+---
+
+## Step 4 — Delta metrics explained
+
+semseeker computes five delta metrics per genomic region, each capturing a
+different aspect of epigenetic variability:
+
+| Metric | Full name | Captures |
+|---|---|---|
+| **ΔBeta** | Delta Beta | Mean methylation shift vs reference |
+| **ΔIV** | Delta Intra-sample Variability | Within-sample probe dispersion |
+| **ΔEV** | Delta Extra-sample Variability | Between-sample variance |
+| **ΔRV** | Delta Relative Variability | Normalised inter-sample spread |
+| **ΔRP** | Delta Ranked Product | Combined ranked signal — most sensitive |
+
+**ΔRP** (Delta Ranked Product) is the recommended metric for downstream
+analysis: it combines mutation burden, lesion frequency and signal variability
+into a single ranked score per region, making it robust to outliers and
+suitable for association testing.
+
+```{r deltarp_example}
+# Load ΔRP at gene level
+deltarp_gene <- as.data.frame(
+  pl$read_parquet("~/semseeker_results/Data/DELTARP_GENE_WHOLE.parquet")
+)
+
+# Top regions by mean ΔRP across cases
+case_cols  <- grep("^CASE", names(deltarp_gene), value = TRUE)
+deltarp_gene$mean_deltarp <- rowMeans(deltarp_gene[, case_cols], na.rm = TRUE)
+
+head(deltarp_gene[order(-deltarp_gene$mean_deltarp),
+                  c("CHR", "START", "END", "mean_deltarp")], 10)
+```
+
+---
+
+## Next steps
+
+- **Association analysis** (correlation, Wilcoxon test): see the
+  [Association analysis vignette](association-analysis.html).
+- **Full function reference**: see the [Reference](../reference/index.html) page.

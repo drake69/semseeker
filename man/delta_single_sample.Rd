@@ -4,25 +4,18 @@
 \alias{delta_single_sample}
 \title{delta_single_sample}
 \usage{
-delta_single_sample(
-  values,
-  high_thresholds,
-  low_thresholds,
-  sample_detail,
-  beta_medians,
-  probe_features
-)
+delta_single_sample(values, thresholds, sample_detail)
 }
 \arguments{
 \item{values}{values of methylation}
+
+\item{sample_detail}{details of sample to analyze}
 
 \item{high_thresholds}{highest threshold to use for comparison}
 
 \item{low_thresholds}{lowest threshold to use for comparison}
 
-\item{sample_detail}{details of sample to analyze}
-
-\item{beta_medians}{median to use for calculation}
+\item{signal_medians}{median to use for calculation}
 
 \item{probe_features}{genomic position of probe_features}
 }

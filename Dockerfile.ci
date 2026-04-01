@@ -1,0 +1,87 @@
+# ─── Local CI container (optimised) ───────────────────────────────────────────
+# Uses Posit Package Manager (P3M) pre-built Linux binaries → no compilation,
+# first build ~7 min instead of ~47 min. Subsequent runs use cached layers.
+#
+# Build:       docker build -f Dockerfile.ci -t semseeker-ci .
+# Check:       ./ci-local.sh
+# With logs:   ./ci-local.sh logs
+# Debug shell: ./ci-local.sh shell
+# ───────────────────────────────────────────────────────────────────────────────
+
+FROM rocker/r-ver:4.5
+
+# ── Disable renv for all R processes in this container.
+#    Without these, renv/activate.R (copied with the source) would intercept
+#    every R startup, lock the library, and hide rcmdcheck / installed packages.
+ENV RENV_CONFIG_SANDBOX_ENABLED=false
+ENV RENV_ACTIVATE_PROJECT=0
+
+# ── Required by polars installer
+ENV NOT_CRAN=true
+
+# ── R CMD check flags (mirrors what r-lib/actions/check-r-package sets in CI)
+#    _R_CHECK_FORCE_SUGGESTS_=false  → don't error when Suggests are unavailable
+#      (Bioconductor Suggests like pathfindR/GEOquery are not in CRAN/P3M)
+#    _R_CHECK_CRAN_INCOMING_=false   → skip CRAN submission feasibility check
+#      (this is an internal package, not being submitted to CRAN)
+ENV _R_CHECK_FORCE_SUGGESTS_=false
+ENV _R_CHECK_CRAN_INCOMING_=false
+
+# ── System libraries (minimal — only what binary R packages still need at runtime)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcairo2-dev \
+    libfontconfig1-dev \
+    libssl-dev \
+    libxml2-dev \
+    libcurl4-openssl-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    libgit2-dev \
+    libsodium-dev \
+    pkg-config \
+    pandoc \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── R repository configuration
+#    P3M Ubuntu noble binaries → no compilation for CRAN packages
+#    community.r-multiverse.org → polars (also ships Linux binaries)
+#    Write to Rprofile.site so every Rscript invocation picks it up
+RUN echo 'options(repos = c(\n\
+  multiverse = "https://community.r-multiverse.org",\n\
+  P3M        = "https://packagemanager.posit.co/cran/__linux__/noble/latest",\n\
+  CRAN       = "https://cloud.r-project.org"\n\
+))' >> /usr/local/lib/R/etc/Rprofile.site
+
+# ── Bootstrap tooling (pak for parallel installs, rcmdcheck for the check step)
+RUN Rscript -e "install.packages(c('pak', 'rcmdcheck'))"
+
+# ── Install package dependencies
+#    Layer is cached as long as DESCRIPTION doesn't change.
+#    Only Imports/Depends/LinkingTo — Suggests are not needed for R CMD check
+#    and pulling them (GEOquery, pathfindR, etc.) was the main source of slowness.
+WORKDIR /pkg
+COPY DESCRIPTION .
+
+RUN Rscript -e "\
+  pak::pak(\
+    c('local::.',\
+      'remotes', 'devtools', 'testthat'\
+    ),\
+    dependencies = c('Imports', 'Depends', 'LinkingTo'),\
+    ask = FALSE\
+  )"
+
+# ── Copy full package source (only invalidates the layer above when R code changes)
+COPY . .
+
+# ── Run R CMD check (same flags as GitHub CI)
+CMD ["Rscript", "-e", "\
+  rcmdcheck::rcmdcheck(\
+    args       = c('--no-manual', '--as-cran'),\
+    build_args = '--no-manual',\
+    error_on   = 'error'\
+  )"]

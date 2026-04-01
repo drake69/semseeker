@@ -9,8 +9,10 @@ quantreg_model(
   sig.formula,
   tempDataFrame,
   independent_variable,
-  boot_success,
-  tests_count
+  transformation_y,
+  plot,
+  samples_sql_condition = samples_sql_condition,
+  key
 )
 }
 \arguments{
@@ -22,7 +24,7 @@ quantreg_model(
 
 \item{independent_variable}{name of regressor}
 
-\item{boot_success}{number of success tests to calculate corrected confidence interval}
+\item{permutation_success}{number of success tests to calculate corrected confidence interval}
 
 \item{tests_count}{count of total executed tests}
 }

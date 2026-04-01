@@ -7,7 +7,7 @@ result_folder <- file.path(getwd(),"/tmp/GSE186766")
 
 # MUTATIONS_* ~ tcdd_mother + exam_age
 
-# transformation to dependent variable: mutations and lesions: scale, log, log2, log10, exp, none, , quantile_n eg: quantile_4
+# transformation_y to dependent variable: mutations and lesions: scale, log, log2, log10, exp, none, , quantile_n eg: quantile_4
 # depth analysis
 # 1: sample level
 # 2: type level (gene, DMR, cpgisland) (includes 1)
@@ -19,7 +19,7 @@ result_folder <- file.path(getwd(),"/tmp/GSE186766")
 inference_details <- expand.grid("independent_variable"= c("tcdd_mother"),
                                 "covariates"=c("exam_age+tcdd_father","breast_feeding"),
                                 "family_test"=c("gaussian","wilcoxon"),
-                                "transformation"="scale",
+                                "transformation_y"="scale",
                                 "depth_analysis"=1,
                                 "filter_p_value" = FALSE)
 

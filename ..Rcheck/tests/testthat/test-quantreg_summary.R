@@ -18,11 +18,11 @@ test_that("quantreg_summary", {
 
   model.x <-  suppressMessages(lqmm::lqm(sig.formula, tau=tau,  data=as.data.frame(tempDataFrame) , na.action = stats::na.omit, control = lqm_control))
   model.x.boot <- suppressMessages(lqmm::boot(model.x, R = n_permutations_test))
-  beta_full <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
+  signal_full <- suppressMessages(summary(model.x.boot)[independent_variable,"Value"])
   tt <- as.data.frame((as.matrix.data.frame(model.x.boot)))
   colnames(tt) <- colnames(model.x.boot)
   boot_vector <- stats::na.omit(tt[,independent_variable])
-  boot.bca <- quantreg_summary(boot_vector, beta_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
+  boot.bca <- quantreg_summary(boot_vector, signal_full, as.data.frame(tempDataFrame), sig.formula, tau, independent_variable, lqm_control = lqm_control)
 
   testthat::expect_true(sum(is.null(boot.bca))==0)
 

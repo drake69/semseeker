@@ -5,7 +5,7 @@ test_that("semeeker", {
   ###############################################################################################
   ###############################################################################################
 
-  semseeker( sample_sheet =  mySampleSheet,methylation_data =  methylation_data, result_folder = tempFolder,
+  semseeker( sample_sheet =  mySampleSheet,signal_data =  signal_data, result_folder = tempFolder,
              parallel_strategy = "sequential", markers="DELTAQ", areas="GENE", figures="BOTH")
 
   # batch_correlation_check(ssEnv)

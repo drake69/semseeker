@@ -1,0 +1,95 @@
+# CI: R CMD check + testthat — macOS only for now; re-enable Windows/Linux once green
+on:
+  push:
+    branches-ignore: [main, master]   # direct push to main/master is blocked
+  pull_request:
+    branches: [main, master, develop]
+
+name: R-CMD-check
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,  r: 'release'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      RENV_CONFIG_SANDBOX_ENABLED: false
+      RENV_ACTIVATE_PROJECT: 0
+      # Required by polars installer (not on CRAN)
+      NOT_CRAN: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      # gdtools (transitive dep via ctdR → clusterProfiler) requires cairo + fontconfig
+      - name: Install system libraries (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cairo fontconfig pkg-config
+
+      - name: Install system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libcurl4-openssl-dev libssl-dev libxml2-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev \
+            libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
+            libcairo2-dev libgit2-dev libsodium-dev
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          use-public-rspm: true   # enables P3M binary packages (no compilation)
+
+      # Cache the R package library keyed on DESCRIPTION hash.
+      # Cache hit = 0 installs; only misses when dependencies change.
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ matrix.config.r }}-${{ hashFiles('DESCRIPTION') }}
+          restore-keys: ${{ runner.os }}-r-${{ matrix.config.r }}-
+
+      # Use remotes instead of pak/setup-r-dependencies so that
+      # Additional_repositories (community.r-multiverse.org for polars) and
+      # Remotes (drake69/ctdR) in DESCRIPTION are honoured correctly.
+      # pak resolves deps before configuring extra repos, making polars unresolvable.
+      #
+      # dependencies = NA  →  only Imports/Depends/LinkingTo (skip Suggests).
+      # Suggests (pathfindR, GEOquery, caret, …) include heavy Bioconductor packages
+      # that are not needed for R CMD check and were the main source of install time.
+      - name: Install R dependencies
+        run: |
+          Sys.setenv(NOT_CRAN = "true")
+          install.packages(
+            c("remotes", "rcmdcheck", "testthat", "devtools"),
+            repos = c(
+              CRAN = "https://packagemanager.posit.co/cran/latest"
+            )
+          )
+          remotes::install_deps(
+            dependencies = NA,
+            repos = c(
+              rpolars = "https://community.r-multiverse.org",
+              CRAN    = "https://packagemanager.posit.co/cran/latest"
+            )
+          )
+        shell: Rscript {0}
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          args: 'c("--no-manual", "--as-cran")'
+          error-on: '"error"'

@@ -9,7 +9,7 @@ create_heatmap <- function() {
   sample_group_comb <- utils::combn(ssEnv$keys_sample_groups, 2)
   for (g in 1:sample_group_comb)
   {
-    localKeys <- reshape::expand.grid.df(ssEnv$keys_areas_subareas_markers_figures, sample_group_comb )
+    localKeys <- reshape::expand.grid.df(as.data.frame(ssEnv$keys_areas_subareas_markers_figures), sample_group_comb )
     variables_to_export <- c("markers", "annotatedData", "sample_group_comb", "chartFolder", "figures",
       "%dorng%", "j", "iter", "RNGseed", "checkRNGversion", "getRNG", "%||%", ".getDoParName",
       "getDoParName", "getDoBackend", "setDoBackend", "RNGtype", "showRNG", "doRNGversion",
@@ -57,27 +57,46 @@ create_heatmap <- function() {
             mainTitle <- paste0( mainTitle," (first 1000)",  sep="")
           }
 
-          # col<- colorRampPalette(c("violet","white","blue"))(1024)
+          # col<- colorRampPalette(c("violet","white",ssEnv$color_palette[1]))(1024)
           # skip heatmap if no enough data are available
           tt <- as.data.frame(annotatedData[,3:ncol(annotatedData)])
           if (!plyr::empty(tt))
             if(nrow(tt) > 2 & ncol(tt) > 2)
             {
-              filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".png",sep="")
-              grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = 144)
-              stats::heatmap(as.matrix(annotatedData[,3:ncol(annotatedData)]),
-                col = grDevices::cm.colors(256),
-                scale = "column",
-                RowSideColors =as.vector(annotatedData$SAMPLE_GROUP),
-                margins = c(25, 25),
-                main = mainTitle
-              )
-              grDevices::dev.off()
+
+              # Prepare the filename
+              filename <- paste0(chartFolder, "/", paste0(sample_group_comb, collapse = "_Vs_"), "_", marker, "_", figure, ".",ssEnv$plot_format)
+
+              # Convert the data to a long format for ggplot2
+              heatmap_data <- reshape2::melt(annotatedData, id.vars = "SAMPLE_GROUP")
+
+              # Create the ggplot heatmap
+              p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = variable, y = SAMPLE_GROUP, fill = value)) +
+                ggplot2::geom_tile() +
+                ggplot2::scale_fill_gradientn(colours = grDevices::cm.colors(256)) +
+                ggplot2::theme_minimal(base_size = 15) +
+                ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1), plot.margin = unit(c(2.5, 2.5, 2.5, 2.5), "cm")) +
+                ggplot2::labs(title = mainTitle, x = "", y = "")
+
+              # Save the plot
+              ggplot2::ggsave(filename = filename, plot = p, width = 2480/ssEnv$plot_resolution, height = 2480/ssEnv$plot_resolution, dpi = as.numeric(ssEnv$plot_resolution_ppi))
+
+
+              # filename = paste0( chartFolder,"/",paste0( sample_group_comb, collapse ="_Vs_"),"_",marker,"_",figure, ".",ssEnv$plot_format,sep="")
+              # grDevices::png(file= filename, width=2480, height = 2480, pointsize = 15, res = ssEnv$plot_resolution)
+              # stats::heatmap(as.matrix(annotatedData[,3:ncol(annotatedData)]),
+              #   col = grDevices::cm.colors(256),
+              #   scale = "column",
+              #   RowSideColors =as.vector(annotatedData$SAMPLE_GROUP),
+              #   margins = c(25, 25),
+              #   main = mainTitle
+              # )
+              # grDevices::dev.off()
             }
 
       }
   }
-    message("INFO: ", Sys.time(), " Heatmap created." )
+    log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " Heatmap created." )
 
   }
 }

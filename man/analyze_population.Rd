@@ -6,27 +6,19 @@
 report of pivot}
 \usage{
 analyze_population(
-  methylation_data,
-  sliding_window_size,
+  signal_data,
   sample_sheet,
-  beta_thresholds,
-  bonferroni_threshold = 0.05,
+  signal_thresholds,
   probe_features
 )
 }
 \arguments{
-\item{methylation_data}{whole matrix of data to analyze.}
-
-\item{sliding_window_size}{size of the sliding widows to compute epilesions
-default 11 probe_features.}
+\item{signal_data}{whole matrix of data to analyze.}
 
 \item{sample_sheet}{name of samplesheet's column to use as control population
 selector followed by selection value,}
 
-\item{beta_thresholds}{thresholds defined to calculate epimutations
-lesions definition}
-
-\item{bonferroni_threshold}{threshold to define which pValue accept for}
+\item{signal_thresholds}{thresholds defined to calculate epimutations}
 
 \item{probe_features}{probe_features detail from 27 to EPIC illumina dataset}
 }

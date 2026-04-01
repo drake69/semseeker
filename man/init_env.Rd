@@ -4,21 +4,16 @@
 \alias{init_env}
 \title{init ssEnvonment}
 \usage{
-init_env(
-  result_folder,
-  maxResources = 90,
-  parallel_strategy = "multicore",
-  ...
-)
+init_env(result_folder, maxResources = 90, ...)
 }
 \arguments{
 \item{result_folder}{where result of semseeker will bestored}
 
 \item{maxResources}{percentage of how many available cores will be used default 90 percent, rounded to the lowest integer}
 
-\item{parallel_strategy}{which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster}
-
 \item{...}{other options to filter elaborations}
+
+\item{parallel_strategy}{which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster}
 }
 \value{
 the working ssEnvonment

@@ -1,18 +1,25 @@
-#' Quantile regression result value, confidence interval and pvalue
+#' Quantile regression result value, confidence interval and p.value
 #'
-#' @param boot_vector vector of boot statistc beta regression
-#' @param estimate beta regression
+#' @param permutation_vector vector of permutation statistc signal regression
+#' @param statistic_parameter signal regression
 #' @param conf.level confidence intervals alpha level
-#' @param boot_success number of success respecting the null hypothesis
-#' @param tests_count how many tests were done
 #'
-#' @return ci and pvalue with BCA method
+#' @return ci and p.value and pvalue_limit
 #' @importFrom doRNG %dorng%
-quantreg_summary <-function(boot_vector, estimate, conf.level , boot_success = 0, tests_count=1 ){
+exact_pvalue <-function(permutation_vector, statistic_parameter, conf.level){
 
-  conf.level = 1 - (1 - boot_success/tests_count) * (1 - conf.level)
-  Bca <- coxed::bca(boot_vector, conf.level = conf.level)
-  p.value <- mean(abs(boot_vector) >= abs(estimate))
+  pvalue_limit <- 1 - conf.level
+  pvalue_limit_inf <- (pvalue_limit/2)
+  pvalue_limit_sup <- 1 - (pvalue_limit/2)
 
-  return(c(Bca, p.value))
+  ci <- stats::quantile(permutation_vector, probs = c(pvalue_limit_inf, 0.5, pvalue_limit_sup))
+  ci.lower <- ci[1]
+  ci.median <- ci[2]
+  ci.upper <- ci[3]
+  if (statistic_parameter>ci.median)
+    p.value <- mean(permutation_vector>statistic_parameter)
+  else
+    p.value <- mean(permutation_vector<statistic_parameter)
+
+  return(c(ci.lower,ci.upper, p.value, pvalue_limit))
 }

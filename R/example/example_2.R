@@ -48,7 +48,7 @@
 #                       arraytype="450K")
 #
 # # normalize with ChAMP
-# normalizedData<-champ.norm(beta=myLoadN$beta,
+# normalizedData<-champ.norm(signal=myLoadN$signal,
 #                            rgSet=myLoadN$rgSet,
 #                            mset=myLoadN$mset,
 #                            resultsDir= result_folder,
@@ -58,7 +58,7 @@
 #                            cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
 # )
 #
-# sample_sheet <- read.csv("~/Downloads/GSE139307/final_samplesheet.csv")
+# sample_sheet <- utils::read.csv2("~/Downloads/GSE139307/final_samplesheet.csv")
 # normalizedData <- readRDS("~/Downloads/GSE139307/normalizeddata.rds")
 #
 #
@@ -75,5 +75,5 @@
 #
 #
 # semseeker (sample_sheet = sample_sheet,
-#            methylation_data = normalizedData,
+#            signal_data = normalizedData,
 #            result_folder = file.path(workingFolder,"/semseeker_result/"))

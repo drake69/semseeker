@@ -5,92 +5,170 @@
 
 <!-- badges: start -->
 
-
-[![](https://img.shields.io/badge/devel%20version-0.8.6-blue.svg)](https://github.com/drake69/semseeker)
+[![](https://img.shields.io/badge/devel%20version-0.11.0-blue.svg)](https://github.com/drake69/semseeker)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://codecov.io/gh/drake69/semseeker/branch/main/graph/badge.svg)](https://codecov.io/gh/drake69/semseeker)
 [![](https://img.shields.io/github/last-commit/drake69/semseeker.svg)](https://github.com/drake69/semseeker/commits/main)
-[![R build
-status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
-[![Project Status: Active - The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![R build status](https://github.com/drake69/semseeker/workflows/R-CMD-check/badge.svg)](https://github.com/drake69/semseeker/actions)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
-Semseeker aims to identify all variants that are enriched and localized
-in methylation.
+<!-- badges: end -->
+
+**semseeker** detects **Stochastic Epigenetic Mutations (SEMs)** — aberrant,
+sample-specific methylation changes that deviate from the expected population
+signal. Starting from a normalised beta-value (or M-value) matrix, semseeker
+identifies hypomethylated and hypermethylated mutations at single-probe
+resolution, aggregates them into lesions (genomic clusters of co-occurring
+mutations), and computes population-level delta metrics (ΔBeta, ΔIV, ΔEV, ΔRV)
+that summarise stochastic epigenetic variability per region.
+
+Supported input technologies:
+
+- **Illumina microarrays**: EPIC (850k), 450k, 27k — detected automatically
+- **Bisulfite sequencing (WGBS / RRBS)** and **long-read sequencing (ONT / PacBio)**: planned (see [documents/requirements.md](documents/requirements.md))
+
+---
 
 ## Installation
 
-To install semseeker, you can use devtools; upcoming releases will be
-accessible via CRAN.
+Install from GitHub using devtools:
 
-Install the latest release:
+```r
+install.packages("devtools")
+library(devtools)
+install_github("drake69/semseeker")
+```
 
-    install.packages("devtools")
-    library("devtools")
-    install_github("drake69/semseeker")
+### Dependencies
+
+semseeker relies on several CRAN packages. Install them before the first use:
+
+```r
+install.packages(c(
+  "doFuture", "FactoMineR", "factoextra", "FSA", "fst",
+  "future", "future.apply", "ggplot2", "gridExtra", "gtools",
+  "Hmisc", "lqmm", "progressr", "reshape2", "zoo",
+  "VennDiagram", "effsize", "pwr", "combinat", "philentropy",
+  "parallelly", "knitr", "lmtest", "usethis", "wordcloud",
+  "WebGestaltR", "sqldf", "caret", "openai", "glmnet"
+))
+```
+
+---
 
 ## Quick Example
 
-This basic example demonstrates the process of creating a methylation
-matrix for beta values that can be utilized in calculations using ChAMP:
+### Step 1 — Load and normalise IDAT files with ChAMP
 
-    library(ChAMP)
-    idat_folder <- "~/source_idat/"
-    result_folder = "~/result/"
-    myLoadN <- champ.load(directory = idat_folder,
-                          method = "minfi",
-                          methValue="B",
-                          autoimpute=TRUE,
-                          filterDetP=TRUE,
-                          ProbeCutoff=0,
-                          SampleCutoff=0.1,
-                          detPcut=0.01,
-                          filterBeads=TRUE,
-                          beadCutoff=0.05,
-                          filterNoCG=TRUE,
-                          filterSNPs=TRUE,
-                          population=NULL,
-                          filterMultiHit=TRUE,
-                          filterXY=TRUE,
-                          force=FALSE,
-                          arraytype="450K")
+```r
+library(ChAMP)
 
-    # normalize with ChAMP
-    myNormN<-champ.norm(beta=myLoadN$beta,
-                        rgSet=myLoadN$rgSet,
-                        mset=myLoadN$mset,
-                        resultsDir= result_folder,
-                        method="SWAN",
-                        plotBMIQ=FALSE,
-                        arraytype="450K",
-                        cores= detectCores(all.tests = FALSE, logical = TRUE) - 1
-                        )
+idat_folder  <- "~/source_idat/"
+result_folder <- "~/result/"
 
-    saveRDS(myNormN,"~/normalizedData.rds")
+myLoad <- champ.load(
+  directory      = idat_folder,
+  method         = "minfi",
+  methValue      = "B",
+  autoimpute     = TRUE,
+  filterDetP     = TRUE,
+  ProbeCutoff    = 0,
+  SampleCutoff   = 0.1,
+  detPcut        = 0.01,
+  filterBeads    = TRUE,
+  beadCutoff     = 0.05,
+  filterNoCG     = TRUE,
+  filterSNPs     = TRUE,
+  filterMultiHit = TRUE,
+  filterXY       = TRUE,
+  arraytype      = "EPIC"   # or "450K"
+)
 
-Here’s how you can obtain the analyzed data:
+myNorm <- champ.norm(
+  beta       = myLoad$beta,
+  rgSet      = myLoad$rgSet,
+  mset       = myLoad$mset,
+  resultsDir = result_folder,
+  method     = "SWAN",
+  arraytype  = "EPIC",
+  cores      = parallel::detectCores() - 1
+)
 
-    library(semseeker)
+saveRDS(myNorm, "~/normalizedData.rds")
+```
 
-    normalizedData <- readRDS("~/normalizedData.rds")
+### Step 2 — Run semseeker
 
-    sample_sheet <- read.csv2("~/sample_sheet.csv")
+```r
+library(semseeker)
 
-    semseeker (sample_sheet = sample_sheet, 
-            methylation_data = normalizedData,
-            result_folder = "~/semseeker_result/")
+normalizedData <- readRDS("~/normalizedData.rds")
+sample_sheet   <- read.csv2("~/sample_sheet.csv")
 
-# Complete Example
+semseeker(
+  sample_sheet  = sample_sheet,
+  signal_data   = normalizedData,
+  result_folder = "~/semseeker_result/"
+)
+```
 
-You can find a complete and functional example, which includes data from
-Gene Expression Omnibus (GEO), by examining the repository’s “example”
-folder.
+Results (BED files, pivot tables, delta-metric summaries) are written to
+`result_folder`.
 
-# Input requirements
+---
 
-- The “samplesheet” dataframe must include a column named “Sample_Group”
-  with the following accepted values: “Case”, “Control”, and
-  “Reference”. If you do not have a Reference population, you may
-  duplicate the Control population rows and use “Reference” in the
-  “Sample_Group” column.
+## Complete Example
+
+A fully worked example using public data from Gene Expression Omnibus (GEO) is
+available in the repository's `example/` folder.
+
+---
+
+## Input Requirements
+
+### Beta-value matrix
+
+- Rows = probes (Illumina probe IDs, e.g. `cg...`)
+- Columns = samples
+- Values = beta values in [0, 1] or M-values (detected automatically)
+
+### Sample sheet
+
+A data frame (or CSV readable with `read.csv2`) with **at minimum** these columns:
+
+| Column | Description |
+|---|---|
+| `Sample_ID` | Unique sample identifier (must match matrix column names) |
+| `Sample_Name` | Human-readable label |
+| `Sample_Group` | Must be one of `"Case"`, `"Control"`, `"Reference"` |
+
+> **Note:** If no Reference population is available, duplicate the Control
+> rows and assign `Sample_Group = "Reference"` to the duplicates.
+
+> **Note:** `Sample_ID` values are uppercased internally by semseeker
+> (`name_cleaning()`); output file names and pivot column headers reflect the
+> uppercased form.
+
+---
+
+## Output
+
+For each sample semseeker writes to `result_folder/Data/`:
+
+- `*_MUTATIONS_HYPO.bed` / `*_MUTATIONS_HYPER.bed` — probe-level mutations
+- `*_LESIONS_HYPO.bed` / `*_LESIONS_HYPER.bed` — genomic lesion clusters
+- `*_DELTA*.bed` — ΔBeta, ΔIV, ΔEV, ΔRV per region
+- Pivot tables aggregating all samples per marker
+
+---
+
+## Citation
+
+If you use semseeker in published work, please cite the package:
+
+```r
+citation("semseeker")
+```
+
+A Zenodo DOI will be registered for each release tag (see
+[documents/requirements.md](documents/requirements.md)).

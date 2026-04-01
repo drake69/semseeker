@@ -13,13 +13,13 @@ test_that("analize_batch", {
   nitem <- min(nitem, nrow(probe_features))
   probe_features <- probe_features[probe_features$PROBE %in% sample(x=probe_features[,"PROBE"] , size=nitem),]
 
-  methylation_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
-  methylation_data <- as.data.frame(matrix(methylation_data,nitem,nsamples))
+  signal_data <- rnorm(nitem*nsamples,mean = 0.5, sd = 0.7)
+  signal_data <- as.data.frame(matrix(signal_data,nitem,nsamples))
 
-  row.names(methylation_data) <- probe_features$PROBE
+  row.names(signal_data) <- probe_features$PROBE
 
   Sample_ID <- stri_rand_strings(nsamples, 15, pattern = "[A-Za-z]")
-  colnames(methylation_data) <- Sample_ID
+  colnames(signal_data) <- Sample_ID
   Sample_Group <- c(rep("Control",nsamples/3),rep("Case",nsamples/3),rep("Reference",nsamples/3))
   sample_sheet <- data.frame(Sample_Group, Sample_ID)
 
@@ -28,7 +28,7 @@ test_that("analize_batch", {
   batch_id <- 1
   iqrTimes <- 3
 
-  sp <- analyze_batch( methylation_data =  methylation_data,
+  sp <- analyze_batch( signal_data =  signal_data,
                         sample_sheet =  sample_sheet,
                         sliding_window_size = sliding_window_size,
                         bonferroni_threshold =  bonferroni_threshold,

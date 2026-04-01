@@ -7,24 +7,38 @@
 #'
 dir_check_and_create <- function  (baseFolder, subFolders)
 {
+
+
   folderSep <- as.character(.Platform$file.sep)
   parts <- unlist(strsplit(as.character(baseFolder), folderSep))
-  # do.call(file.path, as.list(c(parts[1:length(parts) - 1], subFolders)))
+  # do.call(file.path, as.list(c(parts[seq_along(parts) - 1], subFolders)))
   subFolders <- as.vector(sapply(subFolders, as.character))
-  subFolders <-c(parts[1:length(parts)], subFolders)
+  subFolders <-c(parts[seq_along(parts)], subFolders)
 
-  for( y in 1:length(subFolders))
+  for( y in seq_along(subFolders))
   {
+
     subFolder <- subFolders[y]
-    browser
+
+    # if(subFolder=="c(\"Reference\", \"Control\", \"Case\")")
+    #   #
+
+    # # browser
     if(!exists("subF"))
       subF <- file.path(subFolder)
     else
     {
       subF <- file.path(subF, subFolder)
       if(!dir.exists(subF))
-        dir.create(subF)
+        dir.create(subF, recursive = FALSE)
     }
   }
-  return(file.path(as.character(subF)))
+
+
+  res <- file.path(as.character(subF))
+
+  # transform to absolute path
+  res <- file.path(normalizePath(res))
+
+  return(res)
 }

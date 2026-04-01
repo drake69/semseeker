@@ -8,7 +8,8 @@ association_analysis(
   inference_details,
   result_folder,
   maxResources = 90,
-  parallel_strategy = "multisession",
+  parallel_strategy = "multicore",
+  start_fresh = FALSE,
   ...
 )
 }
@@ -19,9 +20,9 @@ tipo di regressioni: gaussian, poisson, binomial,quantreg_tau_runs(both as numbe
 tipi di test: wilcoxon, stats::t.test,
 tipi di correlazioni: pearson, kendall, spearman
 MUTATIONS_* ~ tcdd_mother + exam_age
-transformation to be applied to dependent variable
+transformation_y to be applied to dependent variable
 (mutations and lesions): scale, log, log2, log10, exp, none, quantile_quantiles(as number) eg quantile_3
-depth analysis:
+DEPTH analysis:
 1: sample level
 2: type level (gene, DMR, cpgisland) (includes 1)
 3: genomic area: gene, body, gene tss1550, gene whole, gene tss200,  (includes 1 and 2)
@@ -31,7 +32,7 @@ filter_p_value report after adjusting saves only significant nominal p-value}
 
 \item{maxResources}{percentage of max system's resource to use}
 
-\item{parallel_strategy}{which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster}
+\item{parallel_strategy}{which strategy to use for parallel execution see future vignette: possible values, none, multisession,sequential, multicore, cluster}
 
 \item{...}{other options to filter elaborations}
 }

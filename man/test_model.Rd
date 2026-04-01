@@ -9,7 +9,11 @@ test_model(
   tempDataFrame,
   sig.formula,
   burdenValue,
-  independent_variable
+  independent_variable,
+  transformation_y,
+  plot,
+  samples_sql_condition = samples_sql_condition,
+  key
 )
 }
 \arguments{

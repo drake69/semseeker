@@ -6,19 +6,21 @@
 \usage{
 data_preparation(
   family_test,
-  transformation,
+  transformation_y,
   tempDataFrame,
   independent_variable,
   g_start,
+  g_end,
   dototal,
   covariates,
-  depth_analysis
+  depth_analysis,
+  key
 )
 }
 \arguments{
 \item{family_test}{test or regression to apply}
 
-\item{transformation}{transformation to apply to data}
+\item{transformation_y}{transformation_y to apply to data}
 
 \item{tempDataFrame}{data frame to use for test/regression}
 

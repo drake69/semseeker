@@ -1,29 +1,29 @@
 #' @importFrom doRNG %dorng%
-violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, marker,metaarea, subgroup, independent_variable, transformation)
+violin_plot_only_significative_areas <- function(fileNameResults, inference_detail, figure, marker,area, subarea, independent_variable, transformation_y)
 {
   inference_inference_file <- ""
-  group <- ""
+  area <- ""
   s <- ""
 
   ssEnv <- get_session_info()
-  inference_file_name <- inference_inference_file(inference_detail)
+  inference_file_name <- inference_inference_file(inference_detail, ssEnv$result_folderInference)
 
   # violin plot only significative areas
 
-  areas <- utils::read.csv2(file.path(ssEnv$result_folderData, "/Pivots/", figure,"/", paste(figure,"_",marker,"_",metaarea,"_",subgroup, ".csv", sep="")))
+  areas <- utils::read.csv2(file.path(ssEnv$result_folderData, "/Pivots/", figure,"/", paste(figure,"_",marker,"_",area,"_",subarea, ".csv", sep="")))
   results_inference <- utils::read.csv2(file.path(ssEnv$result_folderInference,inference_file_name))
-  results_inference <- subset(results_inference, "MARKER"==marker & "FIGURE"==figure & "AREA" == group & "SUBAREA" == subgroup
-    & "INDIPENDENT.VARIABLE"==independent_variable)
+  results_inference <- subset(results_inference, "MARKER"==marker & "FIGURE"==figure & "AREA" == area & "SUBAREA" == subarea
+    & "INDIPENDENT_VARIABLE"==independent_variable)
 
   #pivot hase SAMPLEID over the genomic area of interest
-  areas <- areas[areas$SAMPLEID %in% results_inference[results_inference$PVALUEADJ_ALL_BH<0.05, "AREA_OF_TEST"], ]
+  areas <- areas[areas$SAMPLEID %in% results_inference[results_inference$PVALUE_ADJ_ALL_BH< as.numeric(ssEnv$alpha), "AREA_OF_TEST"], ]
 
   sample_name <- colnames(areas)
   colnames(areas) <- areas[1,]
 
   areas <- areas[-1,]
 
-  sample_sheet <- utils::read.csv2( file.path(ssEnv$result_folderData,"/sample_sheet_result.csv"), sep=";", dec=",")
+  sample_sheet <- study_summary_get()
   metaareas_f <- foreach::foreach(s = 2: ncol(areas), .combine = rbind) %dorng%
   # for( s in 2: ncol(areas) )
   {
@@ -39,11 +39,11 @@ violin_plot_only_significative_areas <- function(fileNameResults, inference_deta
     #   metaareas_f <- temp
   }
   metaareas_f$SAMPLE_GROUP <- sprintf("%02d",metaareas_f[,"SAMPLE_GROUP"])
-  if(transformation=="log10")
+  if(transformation_y=="log10")
     metaareas_f$VALUE <- log10(metaareas_f$VALUE)
-  if (transformation=="scale")
+  if (transformation_y=="scale")
     metaareas_f$VALUE <- scale(metaareas_f$VALUE)
-  if (transformation=="none")
+  if (transformation_y=="none")
     metaareas_f$VALUE <- metaareas_f$VALUE
 
   p1 <- ggplot2::ggplot(metaareas_f, ggplot2::aes(x="SAMPLE_GROUP", y="VALUE")) + ggplot2::geom_violin()

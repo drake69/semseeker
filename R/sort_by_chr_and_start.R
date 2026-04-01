@@ -8,6 +8,10 @@
 #'
 sort_by_chr_and_start <- function(dataframe) {
 
+  if (nrow(dataframe) == 0) {
+    return(dataframe)
+  }
+
   # TODO: verify CHR and START are column of the data frame
   dataframe$CHR <- as.factor(dataframe$CHR)
   dataframe$CHR <- droplevels(dataframe$CHR)

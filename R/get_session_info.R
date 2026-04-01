@@ -1,15 +1,22 @@
 get_session_info <- function(result_folder=NULL)
 {
+
+  # try from environment
   ssEnv <- .pkgglobalenv$ssEnv
-  if(is.null(.pkgglobalenv) | is.null(ssEnv)){
-    if(is.null(result_folder))
-      stop("ERROR: get_session_info called without result folder!")
-    session_folder <- dir_check_and_create(result_folder,"Log")
-    ssEnv <- list()
-    if(file.exists(file.path(session_folder,"session_info.rds")))
-      ssEnv <- readRDS( file.path(session_folder,"session_info.rds"))
-    ssEnv$session_folder <- session_folder
-    assign("ssEnv", ssEnv, envir=.pkgglobalenv)
-  }
+
+  session_folder <- file.path(result_folder,"/Log/session_info.rds")
+  # try from file
+  if (is.null(ssEnv) | length(ssEnv)==0)
+    if((!is.null(result_folder) & file.exists(session_folder)))
+      ssEnv <- readRDS( file.path(session_folder))
+
+  # try from doFuture
+  # if (is.null(ssEnv) | length(ssEnv)==0)
+  #   ssEnv <- getOption("ssEnv")
+
+  if (is.null(ssEnv) | length(ssEnv)==0)
+    stop("ERROR: get_session_info called without result folder!")
+
   return(ssEnv)
+
 }
