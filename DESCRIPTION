@@ -17,7 +17,7 @@ Imports: dplyr, doFuture, doRNG, FactoMineR, factoextra, foreach, FSA,
         glmnet, sqldf, ctdR
 RoxygenNote: 7.3.2
 Suggests: openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
-        stringi, testthat, WebGestaltR
+        stringi, testthat, WebGestaltR, rmarkdown, pkgdown
 Depends: R (>= 4.4.0)
 Remotes: drake69/ctdR
 Additional_repositories: https://community.r-multiverse.org

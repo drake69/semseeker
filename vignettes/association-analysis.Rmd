@@ -1,0 +1,235 @@
+---
+title: "Association analysis — correlation and Wilcoxon test"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Association analysis — correlation and Wilcoxon test}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  eval     = FALSE
+)
+```
+
+## Overview
+
+Once semseeker has produced delta metrics (ΔRP, ΔBeta, …) and mutation counts,
+you can test whether those values are associated with clinical or phenotypic
+variables using `association_analysis()`.
+
+The function supports:
+
+- **Correlation tests**: Pearson, Spearman, Kendall
+- **Group comparison tests**: Wilcoxon rank-sum, Student's t-test
+- **Regression models**: Gaussian, Poisson, Binomial, Quantile regression
+
+All tests are run per genomic region in parallel and results are adjusted for
+multiple comparisons (FDR by default).
+
+---
+
+## Prerequisites
+
+You need a completed semseeker run (see the
+[Getting started vignette](getting-started.html)) and a sample sheet with the
+clinical variable(s) you want to test.
+
+```{r sample_sheet_with_clin}
+# Sample sheet must contain Sample_ID, Sample_Group AND the clinical variable
+sample_sheet <- read.csv2("sample_sheet.csv")
+
+# Example columns: Sample_ID, Sample_Group, age, bmi, case_control_binary
+head(sample_sheet)
+```
+
+---
+
+## Example 1 — Spearman correlation with a continuous variable
+
+Test whether ΔRP per gene correlates with patient age:
+
+```{r spearman}
+library(semseeker)
+
+inference_details <- data.frame(
+  formula          = "DELTARP ~ age",         # dependent ~ independent
+  family           = "spearman",              # correlation type
+  transformation_y = "none",                  # no transformation of ΔRP
+  depth            = 3,                       # 3 = gene-level breakdown
+  filter_p_value   = TRUE                     # keep only significant results
+)
+
+association_analysis(
+  inference_details = inference_details,
+  result_folder     = "~/semseeker_results/",
+  parallel_strategy = "multicore",
+  maxResources      = 80
+)
+```
+
+Results are written to `result_folder/Inference/`. The CSV file contains:
+
+| Column | Description |
+|---|---|
+| `CHR`, `START`, `END` | Genomic coordinates |
+| `AREA` | Aggregation level (GENE, ISLAND, …) |
+| `rho` | Spearman correlation coefficient |
+| `P_Value` | Nominal p-value |
+| `Q` | FDR-adjusted p-value |
+| `SIGNIFICATIVE_ADJ` | `TRUE` if Q < 0.05 |
+
+```{r read_spearman}
+library(polars)
+
+results <- read.csv(
+  list.files("~/semseeker_results/Inference", pattern = "spearman.*\\.csv$",
+             full.names = TRUE)[1]
+)
+
+# Top correlated genes
+head(results[order(results$Q), c("AREA", "rho", "P_Value", "Q")], 10)
+```
+
+---
+
+## Example 2 — Wilcoxon test (Case vs Control)
+
+Test whether mutation burden (MUTATIONS_HYPO) differs between cases and
+controls at gene level:
+
+```{r wilcoxon}
+inference_details <- data.frame(
+  formula          = "MUTATIONS_HYPO ~ Sample_Group",
+  family           = "wilcoxon",
+  transformation_y = "none",
+  depth            = 2,
+  filter_p_value   = TRUE
+)
+
+association_analysis(
+  inference_details = inference_details,
+  result_folder     = "~/semseeker_results/",
+  parallel_strategy = "multicore"
+)
+```
+
+> **Note:** `Sample_Group` must be a binary factor (`"Case"` / `"Control"`) in
+> the sample sheet passed to the original `semseeker()` call.
+
+The output CSV adds:
+
+| Column | Description |
+|---|---|
+| `W` | Wilcoxon W statistic |
+| `P_Value` | Nominal p-value (two-sided) |
+| `Q` | BH-adjusted p-value |
+| `SIGNIFICATIVE_ADJ` | `TRUE` if Q < 0.05 |
+
+---
+
+## Example 3 — Pearson correlation with ΔRP
+
+```{r pearson}
+inference_details <- data.frame(
+  formula          = "DELTARP ~ bmi",
+  family           = "pearson",
+  transformation_y = "log",          # log-transform ΔRP before testing
+  depth            = 3,
+  filter_p_value   = FALSE           # keep all regions
+)
+
+association_analysis(
+  inference_details = inference_details,
+  result_folder     = "~/semseeker_results/"
+)
+```
+
+---
+
+## Example 4 — Multiple tests in a single call
+
+`inference_details` can be a list of data frames or a multi-row data frame to
+run several analyses in one go:
+
+```{r multiple}
+inference_details <- rbind(
+  data.frame(formula="DELTARP ~ age",          family="spearman",
+             transformation_y="none", depth=3, filter_p_value=TRUE),
+  data.frame(formula="MUTATIONS_HYPO ~ Sample_Group", family="wilcoxon",
+             transformation_y="none", depth=2, filter_p_value=TRUE),
+  data.frame(formula="LESIONS_HYPO ~ bmi",     family="pearson",
+             transformation_y="log",  depth=3, filter_p_value=TRUE)
+)
+
+association_analysis(
+  inference_details = inference_details,
+  result_folder     = "~/semseeker_results/",
+  parallel_strategy = "multicore",
+  maxResources      = 90
+)
+```
+
+---
+
+## Supported families / test types
+
+| `family` value | Test | Dependent variable type |
+|---|---|---|
+| `"pearson"` | Pearson correlation | Continuous |
+| `"spearman"` | Spearman rank correlation | Continuous / ordinal |
+| `"kendall"` | Kendall's tau | Continuous / ordinal |
+| `"wilcoxon"` | Wilcoxon rank-sum (Mann-Whitney) | Continuous, groups = 2 |
+| `"stats::t.test"` | Student's t-test | Continuous, groups = 2 |
+| `"gaussian"` | Linear regression (GLM) | Continuous |
+| `"poisson"` | Poisson regression | Count data |
+| `"binomial"` | Logistic regression | Binary outcome |
+| `"quantreg_0.5_1000"` | Quantile regression (τ=0.5, 1000 perms) | Continuous |
+
+---
+
+## Depth levels
+
+The `depth` parameter controls how granularly results are broken down:
+
+| `depth` | Output includes |
+|---|---|
+| `1` | Per-sample aggregate only |
+| `2` | Per marker type (MUTATIONS, LESIONS, DELTARP, …) |
+| `3` | Per genomic area (GENE body, TSS200, TSS1500, …) |
+
+---
+
+## Transformation options
+
+Use `transformation_y` to pre-transform the SEM metric before testing:
+
+| Value | Transformation |
+|---|---|
+| `"none"` | No transformation |
+| `"log"` | Natural log |
+| `"log2"` | Log base 2 |
+| `"log10"` | Log base 10 |
+| `"scale"` | Z-score standardisation |
+| `"exp"` | Exponential |
+| `"quantile_3"` | Quantile normalisation with 3 bins |
+
+---
+
+## Output location
+
+All results land in `result_folder/Inference/` with filenames encoding the
+test parameters, e.g.:
+
+```
+Inference/
+├── DELTARP_GENE_spearman_age_depth3.csv
+├── MUTATIONS_HYPO_GENE_wilcoxon_Sample_Group_depth2.csv
+└── ...
+```
+
+Each file is a CSV sorted by adjusted p-value (`Q`) with only significant
+hits when `filter_p_value = TRUE`.
