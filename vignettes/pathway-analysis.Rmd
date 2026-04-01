@@ -44,7 +44,7 @@ All functions are **session-aware**: they read the active semseeker session
 passing `result_folder` again — they pick it up automatically via
 `get_session_info()`.
 
----
+<hr>
 
 ## Workflow
 
@@ -63,7 +63,7 @@ The `inference_details` object passed to the pathway functions is the **same**
 data frame used in `association_analysis()`. It tells the pathway functions
 which statistical results to use as the gene list for enrichment.
 
----
+<hr>
 
 ## Installing optional backends
 
@@ -92,7 +92,7 @@ remotes::install_github("drake69/ctdR")
 > Each function checks for its backend with `requireNamespace()` and logs
 > an informative ERROR if it is missing.
 
----
+<hr>
 
 ## 1. `pathway_WebGestalt()` — Gene Ontology ORA and GSEA
 
@@ -168,7 +168,7 @@ result has a unified `SS_CATEGORY` column:
 | `GO-CC` | Gene Ontology Cellular Component |
 | `KEGG-ORA` | KEGG via ORA |
 
----
+<hr>
 
 ## 2. `pathway_STRINGdb()` — Protein-protein interaction network
 
@@ -225,7 +225,7 @@ pathway_STRINGdb(
 | `GO-CC` | GO Cellular Component |
 | `KEGG-ORA` | KEGG pathway enrichment |
 
----
+<hr>
 
 ## 3. `pathway_pathfindR()` — Active subnetwork enrichment
 
@@ -276,7 +276,7 @@ BiocManager::install("ggkegg")
 install.packages("pathfindR")
 ```
 
----
+<hr>
 
 ## 4. `pathway_ctdR()` — Chemical-gene-disease associations
 
@@ -310,7 +310,7 @@ pathway_ctdR(
 Results are normalised to `SS_CATEGORY = "CHEMICAL"`, linking significant
 epigenetic regions to chemical exposures and associated diseases.
 
----
+<hr>
 
 ## 5 & 6. Phenolyzer variants — disease-prioritised enrichment
 
@@ -351,7 +351,7 @@ pathway_Phenolyzer_STRINGdb(
 |---|---|
 | `disease` | Free-text disease name passed to Phenolyzer for gene prioritisation (e.g. `"lung cancer"`, `"Alzheimer"`, `"TCDD exposure"`) |
 
----
+<hr>
 
 ## Running all backends in one script
 
@@ -395,7 +395,7 @@ pathway_ctdR(
   pvalue_column="PVALUE_ADJ_ALL_BH", significance=TRUE)
 ```
 
----
+<hr>
 
 ## Output structure
 
@@ -436,7 +436,7 @@ Each CSV is processed by `enrichment_analysy_add_category()` which:
 | `PHENOTYPE` | `TRUE` if term description matches study label |
 | `SS_RANK` | Rank within `SS_CATEGORY` |
 
----
+<hr>
 
 ## Cross-study and cross-subsample comparison
 
@@ -471,7 +471,7 @@ pathway_cross_subsamples_overlaps(
 )
 ```
 
----
+<hr>
 
 ## Choosing the right backend
 
@@ -487,6 +487,6 @@ pathway_cross_subsamples_overlaps(
 | Replication across cohorts | `pathway_cross_studies_compare()` |
 | Bootstrap stability check | `pathway_cross_subsamples_overlaps()` |
 
----
+<hr>
 
 ## References

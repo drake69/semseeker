@@ -61,7 +61,7 @@ Starting from a normalised beta-value (or M-value) matrix, semseeker:
 Supported input platforms: Illumina EPIC (850k), 450k, and 27k arrays
 (detected automatically from probe IDs).
 
----
+<hr>
 
 ## Installation
 
@@ -81,7 +81,7 @@ remotes::install_github("drake69/semseeker")
 > install.packages("polars", repos = "https://community.r-multiverse.org")
 > ```
 
----
+<hr>
 
 ## Step 1 — Prepare your data
 
@@ -140,7 +140,7 @@ head(sample_sheet[, c("Sample_ID", "Sample_Name", "Sample_Group")])
 > **Tip:** If you have no independent reference population, duplicate the
 > Control rows and set `Sample_Group = "Reference"` for the duplicates.
 
----
+<hr>
 
 ## Step 2 — Detect epimutations
 
@@ -182,7 +182,7 @@ semseeker(
 )
 ```
 
----
+<hr>
 
 ## Step 3 — Understand the output
 
@@ -221,7 +221,7 @@ deltarp <- as.data.frame(
 head(deltarp[, 1:6])
 ```
 
----
+<hr>
 
 ## Step 4 — Delta metrics explained
 
@@ -255,9 +255,9 @@ head(deltarp_gene[order(-deltarp_gene$mean_deltarp),
                   c("CHR", "START", "END", "mean_deltarp")], 10)
 ```
 
----
+<hr>
 
----
+<hr>
 
 ## Step 5 — Differential signal analysis
 
@@ -297,13 +297,13 @@ This is particularly useful when you want to detect **differential methylation**
 at the region level (classic EWAS-style analysis) alongside the epimutation
 burden analysis, using a single unified framework.
 
----
+<hr>
 
 ## References
 
 <!-- automatically generated from getting-started.bib -->
 
----
+<hr>
 
 ## Next steps
 

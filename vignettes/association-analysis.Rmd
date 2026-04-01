@@ -39,7 +39,7 @@ Multiple comparisons are adjusted with the Benjamini-Hochberg FDR procedure
 [@BH1995]. All analyses are run across every combination of genomic area, marker
 and sample group defined during the `semseeker()` call.
 
----
+<hr>
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ sample_sheet <- read.csv2("sample_sheet.csv")
 head(sample_sheet)
 ```
 
----
+<hr>
 
 ## The `inference_details` data frame
 
@@ -77,7 +77,7 @@ Each row is one analysis to run. The columns are:
 | `collinearity_check` | ⬜ | `TRUE` = remove collinear covariates automatically |
 | `covariates_pca` | ⬜ | `TRUE` = replace covariates with their first PCs |
 
----
+<hr>
 
 ## Dependent variable: what can be tested
 
@@ -97,7 +97,7 @@ Any semseeker output metric can be the dependent variable in `formula`:
 | `DELTAP` | Delta proportion |
 | `MEAN` | Mean methylation signal |
 
----
+<hr>
 
 ## All supported model types (`family`)
 
@@ -140,7 +140,7 @@ they are often skewed and non-normally distributed. Pearson assumes bivariate
 normality. Kendall's tau [@kendall1938] is preferable when there are many tied
 values.
 
----
+<hr>
 
 ### Group comparison tests
 
@@ -198,7 +198,7 @@ The Wilcoxon rank-sum test [@wilcoxon1945] is the recommended non-parametric
 alternative to the t-test when the normality assumption cannot be verified, which
 is common for mutation count data.
 
----
+<hr>
 
 ### Regression models (GLM)
 
@@ -241,7 +241,7 @@ and the clinical variable is expected to be linear (Gaussian), when the
 outcome is a count (Poisson), or when predicting a binary endpoint from SEM
 scores (Binomial).
 
----
+<hr>
 
 ### Quantile regression
 
@@ -278,7 +278,7 @@ metrics: unlike mean regression it is robust to outliers and captures the full
 conditional distribution, which matters when only high-quantile epigenetic
 variability is biologically relevant.
 
----
+<hr>
 
 ### Nonlinear regression (NLS)
 
@@ -308,7 +308,7 @@ inf <- data.frame(formula="DELTARP ~ concentration",
 association_analysis(inf, result_folder="~/semseeker_results/")
 ```
 
----
+<hr>
 
 ### Polynomial regression
 
@@ -323,7 +323,7 @@ inf <- data.frame(formula="DELTARP ~ age",
 association_analysis(inf, result_folder="~/semseeker_results/")
 ```
 
----
+<hr>
 
 ### Mediation analysis
 
@@ -355,7 +355,7 @@ inf <- data.frame(formula="DELTARP ~ exposure + mediator",
 association_analysis(inf, result_folder="~/semseeker_results/")
 ```
 
----
+<hr>
 
 ## Covariates and confounders
 
@@ -382,7 +382,7 @@ When `collinearity_check = TRUE`, semseeker automatically detects and removes
 collinear covariates using VIF before fitting the model. When `covariates_pca = TRUE`,
 covariates are replaced by their principal components before fitting.
 
----
+<hr>
 
 ## Filtering by sample subset (`samples_sql_condition`)
 
@@ -412,7 +412,7 @@ inf <- data.frame(
 association_analysis(inf, result_folder="~/semseeker_results/")
 ```
 
----
+<hr>
 
 ## Running multiple analyses at once
 
@@ -443,7 +443,7 @@ association_analysis(
 )
 ```
 
----
+<hr>
 
 ## Transformation options (`transformation_y`)
 
@@ -459,7 +459,7 @@ Pre-transformations are applied to the SEM metric before testing:
 | `"exp"` | Exponential: e^y | Log-scale input |
 | `"quantile_3"` | Quantile normalisation, 3 bins | Non-parametric normalisation |
 
----
+<hr>
 
 ## Depth levels (`depth_analysis`)
 
@@ -471,7 +471,7 @@ Pre-transformations are applied to the SEM metric before testing:
 
 Higher depth levels include all lower levels.
 
----
+<hr>
 
 ## Output files
 
@@ -500,7 +500,7 @@ Each CSV contains:
 | `FAMILY_TEST` | Model used |
 | `SAMPLE_GROUP` | Sample subset tested |
 
----
+<hr>
 
 ## Reading and exploring results
 
@@ -524,7 +524,7 @@ plot(-log10(results$Q), results$SCORE,
 abline(h = 0, lty = 2)
 ```
 
----
+<hr>
 
 ## Cross-study and cross-subsample analyses
 
@@ -554,7 +554,7 @@ association_cross_subsamples_overlaps(
 )
 ```
 
----
+<hr>
 
 ## Downstream: pathway and enrichment analysis
 
@@ -588,7 +588,7 @@ pathway_pathfindR(
 See the [Pathway and enrichment analysis vignette](pathway-analysis.html) for
 full details.
 
----
+<hr>
 
 ## R packages used
 
@@ -596,6 +596,6 @@ Statistical models are implemented using R [@R-base] base `stats` functions,
 with parallelisation via `future` [@future] and `doFuture`. Quantile regression
 uses `lqmm` [@lqmm] and the `quantreg` package [@quantreg-koenker].
 
----
+<hr>
 
 ## References
