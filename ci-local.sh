@@ -55,7 +55,7 @@ case "$MODE" in
     mkdir -p "$OUTDIR"
 
     # Write the R script to a temp file to avoid shell-escaping issues
-    RSCRIPT_TMP="$(mktemp /tmp/ci-check-XXXXXX.R)"
+    RSCRIPT_TMP="/tmp/ci-check-$$.R"
     cat > "$RSCRIPT_TMP" <<'REOF'
 res <- rcmdcheck::rcmdcheck(
   args       = c("--no-manual", "--as-cran"),

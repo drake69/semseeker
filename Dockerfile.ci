@@ -19,6 +19,14 @@ ENV RENV_ACTIVATE_PROJECT=0
 # ── Required by polars installer
 ENV NOT_CRAN=true
 
+# ── R CMD check flags (mirrors what r-lib/actions/check-r-package sets in CI)
+#    _R_CHECK_FORCE_SUGGESTS_=false  → don't error when Suggests are unavailable
+#      (Bioconductor Suggests like pathfindR/GEOquery are not in CRAN/P3M)
+#    _R_CHECK_CRAN_INCOMING_=false   → skip CRAN submission feasibility check
+#      (this is an internal package, not being submitted to CRAN)
+ENV _R_CHECK_FORCE_SUGGESTS_=false
+ENV _R_CHECK_CRAN_INCOMING_=false
+
 # ── System libraries (minimal — only what binary R packages still need at runtime)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcairo2-dev \
@@ -44,7 +52,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #    Write to Rprofile.site so every Rscript invocation picks it up
 RUN echo 'options(repos = c(\n\
   multiverse = "https://community.r-multiverse.org",\n\
-  CRAN       = "https://packagemanager.posit.co/cran/__linux__/noble/latest"\n\
+  P3M        = "https://packagemanager.posit.co/cran/__linux__/noble/latest",\n\
+  CRAN       = "https://cloud.r-project.org"\n\
 ))' >> /usr/local/lib/R/etc/Rprofile.site
 
 # ── Bootstrap tooling (pak for parallel installs, rcmdcheck for the check step)
