@@ -37,8 +37,8 @@ jobs:
             repos = "https://packagemanager.posit.co/cran/latest"
           )
           remotes::install_deps(
-            dependencies = TRUE,
-            repos = c(
+            dependencies = NA,   # Imports/Depends/LinkingTo only; skip Suggests
+            repos = c(           # (pathfindR → ggkegg Bioconductor chain not resolvable from CRAN)
               rpolars = "https://community.r-multiverse.org",
               CRAN    = "https://packagemanager.posit.co/cran/latest"
             )
