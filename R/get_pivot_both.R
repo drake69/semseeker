@@ -8,7 +8,7 @@ get_pivot_both <- function(marker)
 
   pivot_file_name_both <- pivot_file_name_parquet(marker,"BOTH","PROBE","WHOLE")
   if(file.exists(pivot_file_name_both))
-    return(arrow::read_parquet(pivot_file_name_both))
+    return(as.data.frame(polars::pl$read_parquet(pivot_file_name_both)))
 
   pivot_file_name_hyper <- pivot_file_name_parquet(marker,"HYPER","PROBE","WHOLE")
   pivot_file_name_hypo <- pivot_file_name_parquet(marker,"HYPO","PROBE","WHOLE")
@@ -20,7 +20,7 @@ get_pivot_both <- function(marker)
 
   # Union (concatenate) the two DataFrames
   pivot_both <- polars::pl$concat(list(pivot_hyper, pivot_hypo))$collect()
-  pivot_both <- pivot_both$group_by("AREA", maintain_order=FALSE)$sum()
+  pivot_both <- pivot_both$group_by("AREA", .maintain_order=FALSE)$sum()
 
   pivot_both$write_parquet(pivot_file_name_both)
 

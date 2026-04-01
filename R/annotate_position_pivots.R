@@ -88,9 +88,9 @@ annotate_position_pivots <- function ()
         pivot <- pivot$sort(c("AREA"), descending = FALSE)$collect()
 
         if (localKeys[i, "DISCRETE"]) {
-          pivot <- pivot$group_by("AREA", maintain_order=FALSE)$sum()
+          pivot <- pivot$group_by("AREA", .maintain_order=FALSE)$sum()
         } else {
-          pivot <- pivot$group_by("AREA", maintain_order=FALSE)$mean()
+          pivot <- pivot$group_by("AREA", .maintain_order=FALSE)$mean()
         }
 
         pivot$write_parquet(dest_pivot_filename)

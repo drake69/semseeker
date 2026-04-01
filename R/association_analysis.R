@@ -281,7 +281,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
                   {
                     areas_selection_temp <- areas_selection
                     log_event("DEBUG: ", format(Sys.time(), "%a %b %d %X %Y"), " Starting to read pivot:", pivot_filename,".")
-                    tempDataFrame <- arrow::read_parquet(pivot_filename)
+                    tempDataFrame <- as.data.frame(polars::pl$read_parquet(pivot_filename))
 
                     if(file.exists(fileNameResults) && file.info(fileNameResults)$size  >10)
                     {

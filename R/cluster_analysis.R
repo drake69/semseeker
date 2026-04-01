@@ -47,7 +47,7 @@ cluster_analysis <- function(cluster_variables,ellipsis=TRUE, sql_sample_selecti
       pivot_filename <- pivot_file_name_parquet(key$MARKER, key$FIGURE, key$AREA, key$SUBAREA)
       if (!file.exists(pivot_filename))
         next
-      pivot_data <- arrow::read_parquet(pivot_filename)
+      pivot_data <- as.data.frame(polars::pl$read_parquet(pivot_filename))
       pivot_data <- pivot_data[, study_summary$Sample_ID]
       pivot_data[is.na(pivot_data)] <- 0
 

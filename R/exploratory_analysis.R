@@ -377,7 +377,7 @@ exploratory_analysis <- function(categorical_variables,numerical_variables, samp
   signal_data <- signal_data[,c("PROBE",colnames(signal_data)[1:(ncol(signal_data)-1)])]
   # save cleaned signal data
   file_path <- file_path_build(folder_path, c(step,"cleaned_signal_data"),"parquet")
-  arrow::write_parquet(signal_data, file_path)
+  polars::as_polars_df(as.data.frame(signal_data))$write_parquet(file_path)
 
   # save cleaned sample_sheet
   sample_sheet <- sample_sheet[sample_sheet[,sample_id_column] %in% colnames(signal_data),]
