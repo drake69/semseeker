@@ -27,6 +27,9 @@ spearman_permutation(
 
 \item{tests_count}{count of total executed tests}
 }
+\value{
+A numeric p-value from the permutation-based Spearman correlation test.
+}
 \description{
 Title
 }

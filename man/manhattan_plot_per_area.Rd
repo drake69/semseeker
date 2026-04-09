@@ -32,6 +32,24 @@ manhattan_plot_per_area(
 
 \item{only_significant_areas}{TRUE if filter for pvalue < 0.05}
 }
+\value{
+Invisibly \code{NULL}. A Manhattan plot PNG is saved under
+  \code{Charts/MARKER_PER_AREA/} in the active result folder.
+}
 \description{
 Title
+}
+\examples{
+result_dir <- tempdir()
+\donttest{
+manhattan_plot_per_area(
+  marker        = "DELTARP",
+  figure        = "HYPO",
+  area          = "GENE",
+  subarea       = "WHOLE",
+  family        = "wilcoxon",
+  adjust_method = "BH",
+  phenotype     = "Sample_Group"
+)
+}
 }

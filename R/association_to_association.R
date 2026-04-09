@@ -1,6 +1,24 @@
-# get result data of an association analyisis and repeat over significant areas
+#' @title Cross-study association comparison
+#' @description Re-run association analysis focusing on genomic regions that are
+#'   statistically significant in a reference study, then merge results across
+#'   two datasets for comparative inference.
+#' @param inference_details_origin data.frame. Inference parameters for the
+#'   reference (origin) study whose significant regions define the search space.
+#' @param inference_details data.frame. Inference parameters for the target
+#'   study on which the focused association analysis is performed.
+#' @param result_folder character. Path to the SEMseeker result folder.
+#' @param maxResources numeric. Maximum percentage of CPU cores to use (default 90).
+#' @param parallel_strategy character. Parallelisation backend passed to
+#'   \code{future}; e.g. \code{"multicore"}, \code{"multisession"},
+#'   \code{"sequential"} (default \code{"multicore"}).
+#' @param start_fresh logical. If \code{TRUE}, delete previous results before
+#'   running (default \code{FALSE}).
+#' @param ... Additional named arguments passed to \code{init_env()}.
+#' @return Invisibly \code{NULL}. Results are written to the inference
+#'   sub-folder of \code{result_folder}.
 #' @examples
-#' \dontrun{
+#' result_dir <- tempdir()
+#' \donttest{
 #' association_to_association(
 #'   inference_details_origin = inference_study1,
 #'   inference_details        = inference_study2,

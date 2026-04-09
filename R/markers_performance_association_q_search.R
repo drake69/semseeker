@@ -1,4 +1,8 @@
 #' calculate scores for th e same dataset at changing of quantile/bins
+#'
+#' @return A data.frame of performance metrics aggregated per marker and
+#'   quantile/bin number; results are also written to CSV files on disk.
+#'
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
 # NOTE: currently internal — could be re-exported once @examples are added

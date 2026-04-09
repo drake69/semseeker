@@ -28,6 +28,11 @@ quantreg_model(
 
 \item{tests_count}{count of total executed tests}
 }
+\value{
+A list (as a data.frame row) with quantile regression model results
+  including tau, p-value, standard error, regression coefficient, confidence
+  interval bounds, and model performance metrics.
+}
 \description{
 Title
 }

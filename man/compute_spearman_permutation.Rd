@@ -15,6 +15,10 @@ compute_spearman_permutation(sig.formula, df, shuffle = FALSE)
 
 \item{lqm_control}{specification of the lqmm package}
 }
+\value{
+A numeric scalar: the Spearman correlation coefficient between the
+  burden and the independent variable (used as the permutation test statistic).
+}
 \description{
 Title
 }

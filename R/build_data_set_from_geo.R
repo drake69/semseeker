@@ -7,7 +7,8 @@
 #'
 #' @return samplesheet, and sample's file saved and samplesheet csv
 #' @examples
-#' \dontrun{
+#' result_dir <- tempdir()
+#' \donttest{
 #' build_data_set_from_geo(
 #'   GEOgse        = "GSE55763",
 #'   downloadFiles = 1,

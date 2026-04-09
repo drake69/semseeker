@@ -14,8 +14,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment  = "#>",
-  eval     = FALSE
+  comment  = "#>"
 )
 ```
 
@@ -99,7 +98,7 @@ Analysis (ORA) [@ORA-review] or Gene Set Enrichment Analysis (GSEA)
 [@GSEA2005] against Gene Ontology [@GO2000], KEGG [@KEGG2000], Reactome
 [@Reactome2020], and other databases.
 
-```{r webgestalt}
+```{r webgestalt, eval=FALSE}
 library(semseeker)
 
 # Run after association_analysis() — session is already active
@@ -174,7 +173,7 @@ STRINGdb [@STRINGdb2019; @STRINGdb2023] maps the significant genes onto the
 STRING protein-protein interaction network and identifies enriched functional
 categories, GO terms, KEGG pathways and tissue expressions.
 
-```{r stringdb}
+```{r stringdb, eval=FALSE}
 pathway_STRINGdb(
   study              = "my_study",
   inference_details  = inference_details,
@@ -202,7 +201,7 @@ pathway_STRINGdb(
 The default score threshold is **200** (medium confidence). Increase to 400
 or 700 for higher confidence interactions:
 
-```{r stringdb_score}
+```{r stringdb_score, eval=FALSE}
 # Higher confidence network (score >= 700)
 # Modify via the STRINGdb$new() call inside the function — currently fixed at 200
 # Use statistic_parameter to weight genes by their association score:
@@ -232,7 +231,7 @@ pathfindR [@pathfindR2019] identifies enriched pathways by searching for
 simple gene list overlap. This approach captures pathway activity even when
 only a subset of pathway genes pass the significance threshold.
 
-```{r pathfindr}
+```{r pathfindr, eval=FALSE}
 pathway_pathfindR(
   study              = "my_study",
   path_dbs           = c("KEGG", "Reactome", "GO-BP", "GO-MF", "GO-CC"),
@@ -283,7 +282,7 @@ install.packages("pathfindR")
 associated with the significant genes. This is particularly useful for
 epigenetic studies involving environmental exposures.
 
-```{r ctdr}
+```{r ctdr, eval=FALSE}
 pathway_ctdR(
   study              = "my_study",
   inference_details  = inference_details,
@@ -320,7 +319,7 @@ prioritised list.
 Use these when you have a specific disease hypothesis and want to focus the
 enrichment on genes already known to be relevant to that disease:
 
-```{r phenolyzer}
+```{r phenolyzer, eval=FALSE}
 # Phenolyzer + WebGestalt
 pathway_Phenolyzer_WebGestalt(
   study            = "my_study",
@@ -353,7 +352,7 @@ pathway_Phenolyzer_STRINGdb(
 
 ## Running all backends in one script
 
-```{r all_backends}
+```{r all_backends, eval=FALSE}
 library(semseeker)
 
 result_folder <- "~/semseeker_results/"
@@ -443,7 +442,7 @@ Each CSV is processed by `enrichment_analysy_add_category()` which:
 Compares enriched pathways across two or more independent cohorts and produces
 Venn diagrams [@VennDiagram] of overlapping terms:
 
-```{r cross_studies}
+```{r cross_studies, eval=FALSE}
 pathway_cross_studies_compare(
   result_folder = "~/meta_results/",
   # studies A and B must already have Pathway/ results
@@ -456,7 +455,7 @@ Tests the **stability** of pathway enrichment under random subsampling of the
 cohort. Run this to assess how robust the enriched pathways are to sample
 variability:
 
-```{r cross_subsamples}
+```{r cross_subsamples, eval=FALSE}
 pathway_cross_subsamples_overlaps(
   inference_details  = inference_details,
   result_folder      = "~/semseeker_results/",
@@ -484,6 +483,12 @@ pathway_cross_subsamples_overlaps(
 | Known disease hypothesis | `pathway_Phenolyzer_WebGestalt()` or `pathway_Phenolyzer_STRINGdb()` |
 | Replication across cohorts | `pathway_cross_studies_compare()` |
 | Bootstrap stability check | `pathway_cross_subsamples_overlaps()` |
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```
 
 <hr>
 

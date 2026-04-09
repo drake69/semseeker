@@ -28,6 +28,9 @@ quantreg_permutation_model(
 
 \item{tests_count}{count of total executed tests}
 }
+\value{
+A numeric p-value from the permutation-based quantile regression test.
+}
 \description{
 Title
 }

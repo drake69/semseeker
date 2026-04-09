@@ -1,4 +1,8 @@
 #' calculate scores for a study across all the used quantile/bin number with result saved into a base folder
+#'
+#' @return A data.frame of quantization metrics (scores per marker and
+#'   quantile/bin number); results are also written to CSV files on disk.
+#'
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
 # NOTE: currently internal — could be re-exported once @examples are added

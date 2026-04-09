@@ -23,6 +23,20 @@ ss_analysis(
 
 \item{...}{other options to filter elaborations}
 }
+\value{
+Invisibly \code{NULL}. Sensitivity / specificity tables are written
+  to the \code{Euristic/} sub-folder of \code{result_folder}.
+}
 \description{
 sensitivity and sensibility analysis of SEMseeker's mutations and lesions
+}
+\examples{
+result_dir <- tempdir()
+\donttest{
+ss_analysis(
+  combinations         = list(c("CASE_A", "CASE_B")),
+  result_folder        = "~/semseeker_results/",
+  independent_variable = "Sample_Group"
+)
+}
 }

@@ -27,6 +27,11 @@ test_model(
 
 \item{independent_variable}{independent variable for regressor}
 }
+\value{
+A list (as a data.frame row) with test results including the p-value,
+  test statistic, effect size, power, and model identifier; the exact fields
+  depend on the chosen \code{family_test}.
+}
 \description{
 Title
 }

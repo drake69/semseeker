@@ -14,8 +14,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment  = "#>",
-  eval     = FALSE
+  comment  = "#>"
 )
 ```
 
@@ -48,7 +47,7 @@ You need a completed semseeker run (see the
 The sample sheet used in the original `semseeker()` call must already contain
 the clinical variable(s) you want to test:
 
-```{r sample_sheet}
+```{r sample_sheet, eval=FALSE}
 sample_sheet <- read.csv2("sample_sheet.csv")
 
 # Required: Sample_ID, Sample_Group
@@ -103,7 +102,7 @@ Any semseeker output metric can be the dependent variable in `formula`:
 
 ### Correlation
 
-```{r correlation_examples}
+```{r correlation_examples, eval=FALSE}
 library(semseeker)
 
 # Spearman rank correlation (recommended for non-normal SEM metrics)
@@ -144,7 +143,7 @@ values.
 
 ### Group comparison tests
 
-```{r group_tests}
+```{r group_tests, eval=FALSE}
 # Wilcoxon rank-sum / Mann-Whitney (two independent groups)
 inf <- data.frame(formula="MUTATIONS_HYPO ~ Sample_Group", family="wilcoxon",
                   transformation_y="none", depth_analysis=2,
@@ -202,7 +201,7 @@ is common for mutation count data.
 
 ### Regression models (GLM)
 
-```{r glm}
+```{r glm, eval=FALSE}
 # Gaussian linear regression (continuous outcome)
 # Formula can include multiple predictors
 inf <- data.frame(formula="DELTARP ~ age + sex + bmi",
@@ -245,7 +244,7 @@ scores (Binomial).
 
 ### Quantile regression
 
-```{r quantreg}
+```{r quantreg, eval=FALSE}
 # Standard quantile regression at quantile τ
 # Syntax: "quantreg_<tau>"
 inf <- data.frame(formula="DELTARP ~ age",
@@ -282,7 +281,7 @@ variability is biologically relevant.
 
 ### Nonlinear regression (NLS)
 
-```{r nls}
+```{r nls, eval=FALSE}
 # Log₁₀ dose-response model
 # Syntax: "log10_<scale_factor>"
 inf <- data.frame(formula="DELTARP ~ dose",
@@ -312,7 +311,7 @@ association_analysis(inf, result_folder="~/semseeker_results/")
 
 ### Polynomial regression
 
-```{r polynomial}
+```{r polynomial, eval=FALSE}
 # Syntax: "polynomial_<degree>"
 inf <- data.frame(formula="DELTARP ~ age",
                   family="polynomial_2",       # quadratic
@@ -330,7 +329,7 @@ association_analysis(inf, result_folder="~/semseeker_results/")
 Mediation models test whether a third variable (mediator) explains the
 relationship between the SEM metric and an outcome:
 
-```{r mediation}
+```{r mediation, eval=FALSE}
 # Mediation via quantile regression
 inf <- data.frame(formula="DELTARP ~ exposure + mediator",
                   family="mediation-quantreg_0.5",
@@ -363,7 +362,7 @@ Include covariates directly in the formula and declare them in the `covariates`
 column so semseeker correctly separates the independent variable of interest
 from confounders:
 
-```{r covariates}
+```{r covariates, eval=FALSE}
 inf <- data.frame(
   formula          = "DELTARP ~ tcdd_exposure + age + sex + bmi",
   family           = "gaussian",
@@ -388,7 +387,7 @@ covariates are replaced by their principal components before fitting.
 
 Run the analysis on a subset of samples using a SQL WHERE clause:
 
-```{r sql_filter}
+```{r sql_filter, eval=FALSE}
 # Only Case samples
 inf <- data.frame(
   formula               = "DELTARP ~ age",
@@ -418,7 +417,7 @@ association_analysis(inf, result_folder="~/semseeker_results/")
 
 Combine multiple rows in `inference_details` to run all analyses in a single call:
 
-```{r multi}
+```{r multi, eval=FALSE}
 inference_details <- rbind(
   data.frame(formula="DELTARP ~ age",             family="spearman",
              transformation_y="none",             depth_analysis=3,
@@ -504,7 +503,7 @@ Each CSV contains:
 
 ## Reading and exploring results
 
-```{r read_results}
+```{r read_results, eval=FALSE}
 # Read a Spearman result file
 results <- read.csv(
   list.files("~/semseeker_results/Inference",
@@ -532,7 +531,7 @@ After running `association_analysis()` on two or more independent cohorts stored
 in separate `result_folder`s, semseeker provides functions to compare and
 meta-analyse results across studies:
 
-```{r cross_study}
+```{r cross_study, eval=FALSE}
 # Overlap significant hits across two studies
 association_cross_studies_overlaps(
   studies       = list("~/study_A/", "~/study_B/"),
@@ -595,6 +594,12 @@ full details.
 Statistical models are implemented using R [@R-base] base `stats` functions,
 with parallelisation via `future` [@future] and `doFuture`. Quantile regression
 uses `lqmm` [@lqmm] and the `quantreg` package [@quantreg-koenker].
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```
 
 <hr>
 

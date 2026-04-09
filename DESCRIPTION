@@ -1,7 +1,7 @@
 Package: SEMseeker
 Type: Package
 Title: Stochastic Epigenetic Mutations SEM Seeker
-Version: 0.11.0
+Version: 0.99.0
 Authors@R: person("Luigi", "Corsaro",
     email = "lcorsaro69@gmail.com",
     role  = c("aut", "cre"),
@@ -25,7 +25,7 @@ Imports: dplyr, doFuture, doRNG, FactoMineR, factoextra, foreach, FSA,
         stats, stringr, utils, withr, zoo, VennDiagram, effsize, pwr,
         combinat, philentropy, parallelly, knitr, lmtest, usethis,
         glmnet, sqldf
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Suggests: ctdR, openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR, rmarkdown, pkgdown

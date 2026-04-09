@@ -8,9 +8,12 @@
 #' @param adjust_method colnames of the pvalue adjusted to use
 #' @param phenotype variable to select from the sample_sheet to use for coloring point
 #' @param only_significant_areas TRUE if filter for pvalue < 0.05
+#' @return Invisibly \code{NULL}. A Manhattan plot PNG is saved under
+#'   \code{Charts/MARKER_PER_AREA/} in the active result folder.
 #'
 #' @examples
-#' \dontrun{
+#' result_dir <- tempdir()
+#' \donttest{
 #' manhattan_plot_per_area(
 #'   marker        = "DELTARP",
 #'   figure        = "HYPO",

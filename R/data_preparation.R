@@ -9,6 +9,11 @@
 #' @param covariates vector of covariates to be found in the sample sheet
 #' @param depth_analysis 1 only sample, 2 chr, 3 alle genomic areas
 #'
+#' @return A named list with two elements: \code{tempDataFrame} (the prepared
+#'   and optionally transformed data.frame) and \code{independent_variableLevels}
+#'   (the factor levels of the independent variable, or \code{NULL} for continuous
+#'   outcomes).
+#'
 data_preparation <- function(family_test,transformation_y,tempDataFrame, independent_variable, g_start, g_end, dototal, covariates, depth_analysis, key)
 {
 

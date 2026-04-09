@@ -5,9 +5,12 @@
 #' @param parallel_strategy which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster
 #' @param ... other options to filter elaborations
 #'
+#' @return Invisibly \code{NULL}. Sensitivity / specificity tables are written
+#'   to the \code{Euristic/} sub-folder of \code{result_folder}.
 #' @importFrom doRNG %dorng%
 #' @examples
-#' \dontrun{
+#' result_dir <- tempdir()
+#' \donttest{
 #' ss_analysis(
 #'   combinations         = list(c("CASE_A", "CASE_B")),
 #'   result_folder        = "~/semseeker_results/",

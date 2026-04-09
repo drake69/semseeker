@@ -19,9 +19,13 @@
 #' @param parallel_strategy which strategy to use for parallel execution see future vignette: possible values, none, multisession,sequential, multicore, cluster
 #' @param ... other options to filter elaborations
 #'
+#' @return Invisibly \code{NULL}. Inference result CSV files are written to
+#'   the \code{Inference/} sub-folder of \code{result_folder}, one file per
+#'   marker/area/family combination defined in \code{inference_details}.
 #' @importFrom doRNG %dorng%
 #' @examples
-#' \dontrun{
+#' result_dir <- tempdir()
+#' \donttest{
 #' association_analysis(
 #'   inference_details = data.frame(
 #'     independent_variable = "Sample_Group",

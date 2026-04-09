@@ -4,6 +4,10 @@
 #' @param tempDataFrame data frame to use for the model
 #' @param sig.formula formula to apply the model
 #'
+#' @return A list (as a data.frame row) with GLM fit results including AIC,
+#'   per-coefficient p-values and estimates, model performance metrics, and
+#'   optionally residual diagnostics.
+#'
 glm_model <- function(family_test, tempDataFrame, sig.formula, transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {
 

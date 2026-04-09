@@ -44,9 +44,9 @@ alphas_performance_pathway_analyser <- function(inference_details, result_folder
           file_prfx <- paste(independent_variable, transformation_y,family_test,covariates, pvalue_column,keys[i,"MARKER"], sep="_")
 
 
-          for (a in alphas)
+          for (alpha in alphas)
           {
-            ssEnv$alpha <- a
+            ssEnv$alpha <- alpha
             update_session_info(ssEnv)
             file_name <- phenotype_analysis_name(inference_detail = inference_detail,key = keys[i,], prefix="",
               suffix="",

@@ -36,6 +36,27 @@ filter_p_value report after adjusting saves only significant nominal p-value}
 
 \item{...}{other options to filter elaborations}
 }
+\value{
+Invisibly \code{NULL}. Inference result CSV files are written to
+  the \code{Inference/} sub-folder of \code{result_folder}, one file per
+  marker/area/family combination defined in \code{inference_details}.
+}
 \description{
 Association analysis of SEMseeker's results
+}
+\examples{
+result_dir <- tempdir()
+\donttest{
+association_analysis(
+  inference_details = data.frame(
+    independent_variable = "Sample_Group",
+    family_test          = "wilcoxon",
+    transformation_y     = "none",
+    marker               = "DELTARP",
+    areas                = "GENE"
+  ),
+  result_folder     = "~/semseeker_results/",
+  multiple_test_adj = "BH"
+)
+}
 }

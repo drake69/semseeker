@@ -5,6 +5,9 @@
 #' @param tau tau at which apply the quantile regression
 #' @param lqm_control specification of the lqmm package
 #'
+#' @return A numeric scalar: the observed quantile difference between groups
+#'   (used as the test statistic in the permutation test).
+#'
 compute_quantile_delta_permutation <- function(sig.formula,df, shuffle = FALSE, quantile = 0.5)
 {
   # #
@@ -33,6 +36,8 @@ compute_quantile_delta_permutation <- function(sig.formula,df, shuffle = FALSE, 
 #' @param independent_variable name of regressor
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
+#'
+#' @return A numeric p-value from the permutation-based quantile-difference test.
 #'
 quantile_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation_y, plot =plot, samples_sql_condition=samples_sql_condition, key)
 {

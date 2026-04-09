@@ -42,6 +42,11 @@ apply_stat_model(
 
 \item{...}{extra parameters}
 }
+\value{
+A data.frame with one row per tested genomic area, including columns
+  for p-value, adjusted p-value, test statistic, AIC, residuals, and model
+  metadata; returns \code{NULL} if no results could be computed.
+}
 \description{
 Title
 }

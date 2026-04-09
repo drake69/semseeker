@@ -5,6 +5,9 @@
 #' @param tau tau at which apply the quantile regression
 #' @param lqm_control specification of the lqmm package
 #'
+#' @return A numeric scalar: the Spearman correlation coefficient between the
+#'   burden and the independent variable (used as the permutation test statistic).
+#'
 compute_spearman_permutation <- function(sig.formula,df, shuffle = FALSE)
 {
   cols <- colnames(df)
@@ -35,6 +38,8 @@ compute_spearman_permutation <- function(sig.formula,df, shuffle = FALSE)
 #' @param independent_variable name of regressor
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
+#'
+#' @return A numeric p-value from the permutation-based Spearman correlation test.
 #'
 spearman_permutation <- function(family_test, sig.formula, tempDataFrame, independent_variable,plot, samples_sql_condition=samples_sql_condition, key)
 {

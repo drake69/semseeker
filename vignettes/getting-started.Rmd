@@ -14,8 +14,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse  = TRUE,
-  comment   = "#>",
-  eval      = FALSE   # code is illustrative; not run during R CMD check
+  comment   = "#>"
 )
 ```
 
@@ -90,7 +89,7 @@ remotes::install_github("drake69/SEMseeker")
 semseeker expects a **probe × sample** matrix of beta values (0–1) or M-values.
 Probe IDs must be Illumina CpG identifiers (e.g. `cg00000029`).
 
-```{r beta_matrix}
+```{r beta_matrix, eval=FALSE}
 # Example: load a pre-normalised matrix (rows = probes, columns = samples)
 beta_matrix <- readRDS("normalised_beta.rds")
 
@@ -101,7 +100,7 @@ beta_matrix[1:3, 1:3]
 If you are starting from raw IDAT files, normalise first with
 [ChAMP](https://bioconductor.org/packages/ChAMP/):
 
-```{r chamap_normalise}
+```{r chamap_normalise, eval=FALSE}
 library(ChAMP)
 
 myLoad <- champ.load(
@@ -130,7 +129,7 @@ A data frame with at minimum:
 | `Sample_Name` | Human-readable label |
 | `Sample_Group` | One of `"Case"`, `"Control"`, `"Reference"` |
 
-```{r sample_sheet}
+```{r sample_sheet, eval=FALSE}
 sample_sheet <- read.csv2("sample_sheet.csv")
 
 # Minimal required columns
@@ -147,7 +146,7 @@ head(sample_sheet[, c("Sample_ID", "Sample_Name", "Sample_Group")])
 The main entry point is `semseeker()`. A single call runs the full pipeline:
 normalisation → mutation calling → lesion aggregation → delta metric computation.
 
-```{r run_semseeker}
+```{r run_semseeker, eval=FALSE}
 library(semseeker)
 
 semseeker(
@@ -171,7 +170,7 @@ semseeker(
 
 Example — run only probe-level mutations, sequential mode, 2 cores:
 
-```{r run_minimal}
+```{r run_minimal, eval=FALSE}
 semseeker(
   sample_sheet      = sample_sheet,
   signal_data       = beta_matrix,
@@ -210,7 +209,7 @@ Data/
 
 ### Reading results
 
-```{r read_results}
+```{r read_results, eval=FALSE}
 library(polars)
 
 # Read the DELTARP pivot table
@@ -241,7 +240,7 @@ analysis: it combines mutation burden, lesion frequency and signal variability
 into a single ranked score per region, making it robust to outliers and
 suitable for association testing.
 
-```{r deltarp_example}
+```{r deltarp_example, eval=FALSE}
 # Load ΔRP at gene level
 deltarp_gene <- as.data.frame(
   pl$read_parquet("~/semseeker_results/Data/DELTARP_GENE_WHOLE.parquet")
@@ -274,7 +273,7 @@ and can be passed directly to `association_analysis()` — allowing you to test
 whether mean methylation (or intra-region spread) differs by phenotype, without
 any mutation-calling step.
 
-```{r signal_analysis}
+```{r signal_analysis, eval=FALSE}
 library(polars)
 
 # Read mean-signal pivot at gene level
@@ -312,3 +311,11 @@ burden analysis, using a single unified framework.
 - **Pathway and enrichment analysis**: see the
   [Pathway analysis vignette](pathway-analysis.html).
 - **Full function reference**: see the [Reference](../reference/index.html) page.
+
+<hr>
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```

@@ -34,6 +34,12 @@ data_preparation(
 
 \item{depth_analysis}{1 only sample, 2 chr, 3 alle genomic areas}
 }
+\value{
+A named list with two elements: \code{tempDataFrame} (the prepared
+  and optionally transformed data.frame) and \code{independent_variableLevels}
+  (the factor levels of the independent variable, or \code{NULL} for continuous
+  outcomes).
+}
 \description{
 Title
 }

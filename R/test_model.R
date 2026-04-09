@@ -6,6 +6,10 @@
 #' @param burdenValue burden colon name
 #' @param independent_variable independent variable for regressor
 #'
+#' @return A list (as a data.frame row) with test results including the p-value,
+#'   test statistic, effect size, power, and model identifier; the exact fields
+#'   depend on the chosen \code{family_test}.
+#'
 test_model <- function (family_test, tempDataFrame, sig.formula,burdenValue,independent_variable , transformation_y, plot , samples_sql_condition=samples_sql_condition, key)
 {
 

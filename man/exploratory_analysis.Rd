@@ -54,3 +54,14 @@ reports of the exploratory analysis and sample sheet, signal data cleaned
 \description{
 Preliminary exploratory analysys of the data
 }
+\examples{
+result_dir <- tempdir()
+\donttest{
+exploratory_analysis(
+  categorical_variables = c("Sample_Group", "Sex"),
+  numerical_variables   = c("Age"),
+  sample_sheet          = sample_sheet,
+  signal_data           = beta_matrix
+)
+}
+}

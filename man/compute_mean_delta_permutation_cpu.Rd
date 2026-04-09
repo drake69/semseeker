@@ -15,6 +15,10 @@ compute_mean_delta_permutation_cpu(sig.formula, df, shuffle = FALSE)
 
 \item{lqm_control}{specification of the lqmm package}
 }
+\value{
+A numeric scalar: the observed mean difference between the two groups
+  (used as the test statistic in the permutation test).
+}
 \description{
 Title
 }

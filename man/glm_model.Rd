@@ -21,6 +21,11 @@ glm_model(
 
 \item{sig.formula}{formula to apply the model}
 }
+\value{
+A list (as a data.frame row) with GLM fit results including AIC,
+  per-coefficient p-values and estimates, model performance metrics, and
+  optionally residual diagnostics.
+}
 \description{
 Title
 }

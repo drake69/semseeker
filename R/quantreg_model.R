@@ -7,6 +7,10 @@
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
 #'
+#' @return A list (as a data.frame row) with quantile regression model results
+#'   including tau, p-value, standard error, regression coefficient, confidence
+#'   interval bounds, and model performance metrics.
+#'
 quantreg_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation_y, plot,
   samples_sql_condition=samples_sql_condition, key)
 {

@@ -20,6 +20,10 @@ compute_quantile_delta_permutation(
 
 \item{lqm_control}{specification of the lqmm package}
 }
+\value{
+A numeric scalar: the observed quantile difference between groups
+  (used as the test statistic in the permutation test).
+}
 \description{
 Title
 }

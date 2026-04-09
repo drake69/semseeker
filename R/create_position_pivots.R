@@ -3,6 +3,10 @@
 #' @param population population data frame to use for creating pivot
 #' @param keys markers and figure to create pivot of
 #'
+#' @return A data.frame of genomic position pivots with chromosomal coordinates
+#'   and per-sample signal values; results are also written to parquet files on
+#'   disk. Returns invisibly.
+#'
 #' @importFrom doRNG %dorng%
 create_position_pivots <- function(population, keys)
 {

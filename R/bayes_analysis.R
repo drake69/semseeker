@@ -5,9 +5,13 @@
 #' @param parallel_strategy which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster
 #' @param ... other options to filter elaborations
 #'
+#' @return Invisibly \code{NULL}. Bayesian posterior probability tables
+#'   (\code{bayes_analisys_*.csv}) are written to the \code{Euristic/}
+#'   sub-folder of \code{result_folder}.
 #' @importFrom doRNG %dorng%
 #' @examples
-#' \dontrun{
+#' result_dir <- tempdir()
+#' \donttest{
 #' bayes_analysis(
 #'   result_folder        = "~/semseeker_results/",
 #'   independent_variable = "Sample_Group"

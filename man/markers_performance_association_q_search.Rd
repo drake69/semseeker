@@ -18,6 +18,10 @@ markers_performance_association_q_search(
   ...
 )
 }
+\value{
+A data.frame of performance metrics aggregated per marker and
+  quantile/bin number; results are also written to CSV files on disk.
+}
 \description{
 calculate scores for th e same dataset at changing of quantile/bins
 }

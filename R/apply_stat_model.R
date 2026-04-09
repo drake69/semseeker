@@ -12,6 +12,10 @@
 #' @param depth_analysis depth's analysis
 #' @param ... extra parameters
 #'
+#' @return A data.frame with one row per tested genomic area, including columns
+#'   for p-value, adjusted p-value, test statistic, AIC, residuals, and model
+#'   metadata; returns \code{NULL} if no results could be computed.
+#'
 #' @importFrom doRNG %dorng%
 #' @importFrom doFuture %dofuture%
 #'

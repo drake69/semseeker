@@ -5,6 +5,9 @@
 #' @param tau tau at which apply the wuantile regression
 #' @param lqm_control specification of the lqmm package
 #'
+#' @return A numeric scalar: the permuted quantile regression coefficient
+#'   (used as a single draw in the permutation distribution).
+#'
 compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
 {
   # #
@@ -31,6 +34,8 @@ compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
 #' @param independent_variable name of regressor
 #' @param permutation_success number of success tests to calculate corrected confidence interval
 #' @param tests_count count of total executed tests
+#'
+#' @return A numeric p-value from the permutation-based quantile regression test.
 #'
 quantreg_permutation_model <- function(family_test, sig.formula, tempDataFrame, independent_variable, transformation_y, plot, samples_sql_condition=samples_sql_condition, key)
 {

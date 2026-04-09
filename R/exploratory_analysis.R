@@ -15,7 +15,8 @@
 #'
 #' @returns reports of the exploratory analysis and sample sheet, signal data cleaned
 #' @examples
-#' \dontrun{
+#' result_dir <- tempdir()
+#' \donttest{
 #' exploratory_analysis(
 #'   categorical_variables = c("Sample_Group", "Sex"),
 #'   numerical_variables   = c("Age"),

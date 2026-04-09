@@ -28,6 +28,9 @@ quantile_permutation_model(
 
 \item{tests_count}{count of total executed tests}
 }
+\value{
+A numeric p-value from the permutation-based quantile-difference test.
+}
 \description{
 quantile_permutation_model calculate differences between the same quantile of two distribution
 }
