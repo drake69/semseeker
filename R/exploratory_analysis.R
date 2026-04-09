@@ -13,7 +13,17 @@
 #' @param sample_sheet_mapping rules to rename and remove columns
 #' @param values_mapping rules to recode values and remove samples (source missed leave blank in the mapping file)
 #'
-#' @returns reports of the exploratory analysis and sample sheet, signal data cleaned
+#' @param delete_keyword character. Value in \code{values_mapping} that marks
+#'   samples for removal (default \code{"REMOVE"}).
+#' @param mapping_folder character. Optional path to folder containing mapping
+#'   files; overrides \code{sample_sheet_mapping} / \code{values_mapping} if
+#'   provided (default \code{NULL}).
+#' @param removal_folder character. Optional path to folder containing removal
+#'   rule files (default \code{NULL}).
+#' @param removal_rules character vector. Inline removal rules applied before
+#'   mapping (default \code{c()}).
+#' @return Invisibly \code{NULL}. Cleaned sample sheet and signal data are
+#'   written to the result folder together with exploratory summary reports.
 #' @examples
 #' result_dir <- tempdir()
 #' \dontrun{

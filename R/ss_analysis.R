@@ -1,9 +1,18 @@
-#' sensitivity and sensibility analysis of SEMseeker's mutations and lesions
+#' Sensitivity and specificity analysis of SEMseeker mutations and lesions
 #'
-#' @param result_folder where semseeker's results are stored, the root folder
-#' @param maxResources percentage of max system's resource to use
-#' @param parallel_strategy which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster
-#' @param ... other options to filter elaborations
+#' @param samples_sql_selection character. SQL-style filter expression to
+#'   restrict which samples are included (default \code{""}, all samples).
+#' @param combinations list of character vectors. Each element is a vector of
+#'   sample group labels to compare (e.g. \code{list(c("CASE_A", "CASE_B"))}).
+#' @param result_folder character. Path to the SEMseeker result folder.
+#' @param independent_variable character. Sample sheet column defining the
+#'   grouping variable (default \code{"Sample_Group"}).
+#' @param maxResources numeric. Maximum percentage of CPU cores to use
+#'   (default 90).
+#' @param parallel_strategy character. Parallelisation backend; possible
+#'   values: \code{"none"}, \code{"multisession"}, \code{"sequential"},
+#'   \code{"multicore"}, \code{"cluster"} (default \code{"multicore"}).
+#' @param ... Additional arguments passed to \code{init_env()}.
 #'
 #' @return Invisibly \code{NULL}. Sensitivity / specificity tables are written
 #'   to the \code{Euristic/} sub-folder of \code{result_folder}.

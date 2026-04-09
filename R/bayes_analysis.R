@@ -1,9 +1,18 @@
-#' P_to_be_Case_cond_to_be_Epimutated and sensibility analysis of SEMseeker's mutations and lesions
+#' Bayesian posterior probability analysis of SEMseeker mutations and lesions
 #'
-#' @param result_folder where semseeker's results are stored, the root folder
-#' @param maxResources percentage of max system's resource to use
-#' @param parallel_strategy which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster
-#' @param ... other options to filter elaborations
+#' Computes P(case | epimutated) via empirical Bayes for each marker and
+#' genomic area, providing a probabilistic complement to the frequentist
+#' association analysis.
+#'
+#' @param result_folder character. Path to the SEMseeker result folder.
+#' @param independent_variable character. Sample sheet column defining the
+#'   case/control grouping variable (default \code{"Sample_Group"}).
+#' @param maxResources numeric. Maximum percentage of CPU cores to use
+#'   (default 90).
+#' @param parallel_strategy character. Parallelisation backend; possible
+#'   values: \code{"none"}, \code{"multisession"}, \code{"sequential"},
+#'   \code{"multicore"}, \code{"cluster"} (default \code{"multicore"}).
+#' @param ... Additional arguments passed to \code{init_env()}.
 #'
 #' @return Invisibly \code{NULL}. Bayesian posterior probability tables
 #'   (\code{bayes_analisys_*.csv}) are written to the \code{Euristic/}

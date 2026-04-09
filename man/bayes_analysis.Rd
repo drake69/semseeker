@@ -2,7 +2,7 @@
 % Please edit documentation in R/bayes_analysis.R
 \name{bayes_analysis}
 \alias{bayes_analysis}
-\title{P_to_be_Case_cond_to_be_Epimutated and sensibility analysis of SEMseeker's mutations and lesions}
+\title{Bayesian posterior probability analysis of SEMseeker mutations and lesions}
 \usage{
 bayes_analysis(
   result_folder,
@@ -13,13 +13,19 @@ bayes_analysis(
 )
 }
 \arguments{
-\item{result_folder}{where semseeker's results are stored, the root folder}
+\item{result_folder}{character. Path to the SEMseeker result folder.}
 
-\item{maxResources}{percentage of max system's resource to use}
+\item{independent_variable}{character. Sample sheet column defining the
+case/control grouping variable (default \code{"Sample_Group"}).}
 
-\item{parallel_strategy}{which strategy to use for parallel execution see future vignete: possible values, none, multisession,sequential, multicore, cluster}
+\item{maxResources}{numeric. Maximum percentage of CPU cores to use
+(default 90).}
 
-\item{...}{other options to filter elaborations}
+\item{parallel_strategy}{character. Parallelisation backend; possible
+values: \code{"none"}, \code{"multisession"}, \code{"sequential"},
+\code{"multicore"}, \code{"cluster"} (default \code{"multicore"}).}
+
+\item{...}{Additional arguments passed to \code{init_env()}.}
 }
 \value{
 Invisibly \code{NULL}. Bayesian posterior probability tables
@@ -27,7 +33,9 @@ Invisibly \code{NULL}. Bayesian posterior probability tables
   sub-folder of \code{result_folder}.
 }
 \description{
-P_to_be_Case_cond_to_be_Epimutated and sensibility analysis of SEMseeker's mutations and lesions
+Computes P(case | epimutated) via empirical Bayes for each marker and
+genomic area, providing a probabilistic complement to the frequentist
+association analysis.
 }
 \examples{
 result_dir <- tempdir()
