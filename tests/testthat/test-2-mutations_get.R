@@ -2,13 +2,13 @@ test_that("mutations_get", {
 
   tempFolder <- tempFolders[1]
   tempFolders <- tempFolders[-1]
-  ssEnv <- semseeker:::init_env(result_folder = tempFolder, inpute = "median")
+  ssEnv <- SEMseeker:::init_env(result_folder = tempFolder, inpute = "median")
 
   if (!exists("signal_thresholds")) {
-    signal_data <- semseeker:::inpute_missing_values(signal_data)
-    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
+    signal_data <- SEMseeker:::inpute_missing_values(signal_data)
+    signal_thresholds <<- SEMseeker:::signal_range_values(signal_data, batch_id)
   }
-  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data), ]
+  probe_features <<- SEMseeker::PROBES[SEMseeker::PROBES$PROBE %in% rownames(signal_data), ]
 
   values_df <- data.frame(
     CHR   = probe_features$CHR[match(rownames(signal_data), probe_features$PROBE)],
@@ -18,7 +18,7 @@ test_that("mutations_get", {
   )
 
   # ── HYPO: basic existence ──────────────────────────────────────────────────
-  mutations_hypo <- semseeker:::mutations_get(
+  mutations_hypo <- SEMseeker:::mutations_get(
     values     = values_df,
     figure     = "HYPO",
     thresholds = signal_thresholds,
@@ -38,7 +38,7 @@ test_that("mutations_get", {
   testthat::expect_true(nrow(mutations_hypo) > 0)
 
   # ── HYPER: symmetric test ──────────────────────────────────────────────────
-  mutations_hyper <- semseeker:::mutations_get(
+  mutations_hyper <- SEMseeker:::mutations_get(
     values     = values_df,
     figure     = "HYPER",
     thresholds = signal_thresholds,
@@ -54,7 +54,7 @@ test_that("mutations_get", {
   # ── Boundary: threshold = -Inf  →  zero HYPO mutations ────────────────────
   thresholds_zero <- signal_thresholds
   thresholds_zero$signal_inferior_thresholds <- -Inf
-  mutations_none <- semseeker:::mutations_get(
+  mutations_none <- SEMseeker:::mutations_get(
     values     = values_df,
     figure     = "HYPO",
     thresholds = thresholds_zero,
@@ -65,7 +65,7 @@ test_that("mutations_get", {
   # ── Boundary: threshold = +Inf  →  all HYPO mutations ─────────────────────
   thresholds_all <- signal_thresholds
   thresholds_all$signal_inferior_thresholds <- Inf
-  mutations_all <- semseeker:::mutations_get(
+  mutations_all <- SEMseeker:::mutations_get(
     values     = values_df,
     figure     = "HYPO",
     thresholds = thresholds_all,
@@ -73,6 +73,6 @@ test_that("mutations_get", {
   )
   testthat::expect_equal(sum(mutations_all$MUTATIONS), nrow(mutations_all))
 
-  semseeker:::close_env()
+  SEMseeker:::close_env()
   unlink(tempFolder, recursive = TRUE)
 })

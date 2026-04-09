@@ -4,7 +4,7 @@ test_that("lesions_get", {
   tempFolders <- tempFolders[-1]
   Sample_ID <- mySampleSheet[1, "Sample_ID"]
 
-  semseeker:::init_env(
+  SEMseeker:::init_env(
     result_folder       = tempFolder,
     parallel_strategy   = parallel_strategy,
     maxResources        = 90,
@@ -16,10 +16,10 @@ test_that("lesions_get", {
   )
 
   if (!exists("signal_thresholds")) {
-    signal_data <- semseeker:::inpute_missing_values(signal_data)
-    signal_thresholds <<- semseeker:::signal_range_values(signal_data, batch_id)
+    signal_data <- SEMseeker:::inpute_missing_values(signal_data)
+    signal_thresholds <<- SEMseeker:::signal_range_values(signal_data, batch_id)
   }
-  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data), ]
+  probe_features <<- SEMseeker::PROBES[SEMseeker::PROBES$PROBE %in% rownames(signal_data), ]
 
   values_df <- data.frame(
     CHR   = probe_features$CHR[match(rownames(signal_data), probe_features$PROBE)],
@@ -28,7 +28,7 @@ test_that("lesions_get", {
     VALUE = as.numeric(signal_data[, 1])
   )
 
-  mutations <- semseeker:::mutations_get(
+  mutations <- SEMseeker:::mutations_get(
     values     = values_df,
     figure     = "HYPO",
     thresholds = signal_thresholds,
@@ -36,7 +36,7 @@ test_that("lesions_get", {
   )
 
   # ── HYPO lesions: valid data.frame returned ────────────────────────────────
-  lesions_hypo <- semseeker:::lesions_get(
+  lesions_hypo <- SEMseeker:::lesions_get(
     mutation_annotated_sorted = mutations,
     grouping_column           = "CHR"
   )
@@ -50,14 +50,14 @@ test_that("lesions_get", {
   testthat::expect_true(nrow(lesions_hypo) <= nrow(mutations))
 
   # ── HYPER lesions ──────────────────────────────────────────────────────────
-  mutations_hyper <- semseeker:::mutations_get(
+  mutations_hyper <- SEMseeker:::mutations_get(
     values     = values_df,
     figure     = "HYPER",
     thresholds = signal_thresholds,
     sampleName = Sample_ID
   )
 
-  lesions_hyper <- semseeker:::lesions_get(
+  lesions_hyper <- SEMseeker:::lesions_get(
     mutation_annotated_sorted = mutations_hyper,
     grouping_column           = "CHR"
   )
@@ -65,14 +65,14 @@ test_that("lesions_get", {
   testthat::expect_s3_class(lesions_hyper, "data.frame")
 
   # ── Edge case: NULL input returns NULL ─────────────────────────────────────
-  lesions_null <- semseeker:::lesions_get(
+  lesions_null <- SEMseeker:::lesions_get(
     mutation_annotated_sorted = NULL,
     grouping_column           = "CHR"
   )
   testthat::expect_null(lesions_null)
 
   # ── Edge case: empty data.frame returns 0-row result ──────────────────────
-  lesions_empty <- semseeker:::lesions_get(
+  lesions_empty <- SEMseeker:::lesions_get(
     mutation_annotated_sorted = mutations[0, ],
     grouping_column           = "CHR"
   )
@@ -81,12 +81,12 @@ test_that("lesions_get", {
   # ── Alternative grouping: PROBE column ────────────────────────────────────
   mutations_with_probe <- mutations
   mutations_with_probe$PROBE <- paste0("cg", formatC(seq_len(nrow(mutations)), width = 7, flag = "0"))
-  lesions_probe <- semseeker:::lesions_get(
+  lesions_probe <- SEMseeker:::lesions_get(
     mutation_annotated_sorted = mutations_with_probe,
     grouping_column           = "PROBE"
   )
   testthat::expect_s3_class(lesions_probe, "data.frame")
 
-  semseeker:::close_env()
+  SEMseeker:::close_env()
   unlink(tempFolder, recursive = TRUE)
 })

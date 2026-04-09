@@ -19,7 +19,7 @@ if (use_synthetic_data)
   # perc_epimutation <- 0.05
 
   Sys.setenv(OBJC_DISABLE_INITIALIZE_FORK_SAFETY='YES')
-  probe_features <- semseeker::PROBES
+  probe_features <- SEMseeker::PROBES
   probe_features <- probe_features[!is.na(probe_features$START),c("CHR","START","PROBE")]
   probe_features <- unique(probe_features)
   probe_features$END <- probe_features$START
@@ -143,7 +143,7 @@ if (!use_synthetic_data) {
   signal_data <- signal_data[1:1000,]
   # count rows with all missing values
   nrow_missed <- sum(apply(signal_data, 1, function(x) all(is.na(x))))
-  probe_features <<- semseeker::PROBES[semseeker::PROBES$PROBE %in% rownames(signal_data),]
+  probe_features <<- SEMseeker::PROBES[SEMseeker::PROBES$PROBE %in% rownames(signal_data),]
   probe_features$ABSOLUTE <- paste(probe_features$CHR, probe_features$START, sep="_")
   nprobes <<- nrow(signal_data) - nrow_missed
   nsamples <<- ncol(signal_data)
