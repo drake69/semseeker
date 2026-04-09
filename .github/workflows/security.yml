@@ -68,7 +68,7 @@ jobs:
 
       - name: Audit dependencies
         run: |
-          audit <- oysteR::audit_packages()
+          audit <- oysteR::audit_installed_r_pkgs()
           vulns <- oysteR::get_vulnerabilities(audit)
           if (nrow(vulns) > 0) {
             print(vulns)

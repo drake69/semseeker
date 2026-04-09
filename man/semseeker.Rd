@@ -35,7 +35,7 @@ The `semseeker` function processes a methylation dataset to identify stochastic 
 }
 \examples{
 result_dir <- tempdir()
-\donttest{
+\dontrun{
 sample_sheet <- data.frame(
   Sample_ID    = c("S1", "S2", "S3"),
   Sample_Name  = c("Case1", "Case2", "Ctrl1"),

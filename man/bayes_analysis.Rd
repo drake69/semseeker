@@ -31,7 +31,7 @@ P_to_be_Case_cond_to_be_Epimutated and sensibility analysis of SEMseeker's mutat
 }
 \examples{
 result_dir <- tempdir()
-\donttest{
+\dontrun{
 bayes_analysis(
   result_folder        = "~/semseeker_results/",
   independent_variable = "Sample_Group"

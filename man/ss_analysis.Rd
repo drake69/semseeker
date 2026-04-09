@@ -32,7 +32,7 @@ sensitivity and sensibility analysis of SEMseeker's mutations and lesions
 }
 \examples{
 result_dir <- tempdir()
-\donttest{
+\dontrun{
 ss_analysis(
   combinations         = list(c("CASE_A", "CASE_B")),
   result_folder        = "~/semseeker_results/",

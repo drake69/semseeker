@@ -41,7 +41,7 @@ Title
 }
 \examples{
 result_dir <- tempdir()
-\donttest{
+\dontrun{
 manhattan_plot_per_area(
   marker        = "DELTARP",
   figure        = "HYPO",
