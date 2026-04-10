@@ -5,15 +5,14 @@
 \alias{PROBES_CHR_CHR}
 \title{PROBES_CHR_CHR}
 \format{
-A data frame with five variables: \code{year}, \code{sex},
-  \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-  of applicants in that year, which means proportions are of people of
-  that sex with that name born in that year).
+A data frame with columns for probe ID, chromosome, start/end
+  position, and chromosome-level annotation features.
 }
 \usage{
 PROBES_CHR_CHR
 }
 \description{
-Full data set probe_features as defined by Illumina
+Probe-to-chromosome mapping table for Illumina methylation arrays.
+Maps each CpG probe to its chromosome-level annotation.
 }
 \keyword{datasets}

@@ -26,14 +26,16 @@ compute_quantreg_permutation <- function(sig.formula,df, tau, lqm_control)
   return(not_permutated_regression_coefficient)
 }
 
-#' Title
+#' Quantile regression permutation model
 #'
-#' @param family_test family lqmm, quantreg
+#' @param family_test family test string encoding model type, quantile and permutation counts
 #' @param sig.formula formula of the model
 #' @param tempDataFrame data
 #' @param independent_variable name of regressor
-#' @param permutation_success number of success tests to calculate corrected confidence interval
-#' @param tests_count count of total executed tests
+#' @param transformation_y transformation applied to the dependent variable (for labelling plots)
+#' @param plot logical; if TRUE, generate diagnostic plots
+#' @param samples_sql_condition SQL condition string used to filter samples (used for plot file naming)
+#' @param key named list with AREA, SUBAREA, MARKER and FIGURE identifiers for this test
 #'
 #' @return A numeric p-value from the permutation-based quantile regression test.
 #'

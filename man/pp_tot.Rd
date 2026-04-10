@@ -3,17 +3,20 @@
 \docType{data}
 \name{pp_tot}
 \alias{pp_tot}
-\title{PROBES_CHR_CHR}
+\title{pp_tot}
 \format{
-A data frame with five variables: \code{year}, \code{sex},
-  \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-  of applicants in that year, which means proportions are of people of
-  that sex with that name born in that year).
+A data frame with approximately 800,000 rows (one per CpG probe) and
+  columns including \code{PROBE}, \code{CHR}, \code{START}, \code{END},
+  \code{K27}, \code{K450}, \code{K850} (array technology flags), gene body
+  feature columns (\code{GENE_BODY}, \code{GENE_TSS200}, etc.), and CpG
+  island context columns (\code{ISLAND_N_SHORE}, \code{ISLAND_S_SHORE}, etc.).
 }
 \usage{
 pp_tot
 }
 \description{
-Full data set probe_features as defined by Illumina
+Full probe annotation table for Illumina methylation arrays (27k, 450k, EPIC 850k).
+Used internally by \code{probe_features_get()} to look up genomic coordinates
+and feature annotations for each CpG probe.
 }
 \keyword{datasets}

@@ -10,6 +10,7 @@
 #' @param session_folder where to save log file
 #' @param independent_variable independent variable name
 #' @param depth_analysis depth's analysis
+#' @param samples_sql_condition SQL condition string to filter samples
 #' @param ... extra parameters
 #'
 #' @return A data.frame with one row per tested genomic area, including columns

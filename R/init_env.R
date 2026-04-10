@@ -1,9 +1,10 @@
 #' init ssEnvonment
 #'
 #' @param result_folder where result of semseeker will bestored
-#' @param parallel_strategy which strategy to use for parallel executio see future vignete: possibile values, none, multisession,sequential, multicore, cluster
 #' @param maxResources percentage of how many available cores will be used default 90 percent, rounded to the lowest integer
-#' @param ... other options to filter elaborations
+#' @param ... other options to filter elaborations, including \code{parallel_strategy}
+#'   (parallelisation strategy for \pkg{future}: "sequential", "multisession",
+#'   "multicore", "cluster"; default "sequential")
 #'
 #' @return the working ssEnvonment
 init_env <- function(result_folder, maxResources = 90, ...)

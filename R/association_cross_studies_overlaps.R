@@ -56,15 +56,15 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
     # write a file for each marker
     for (m in unique(aggregated_study_results$MARKER))
     {
-      tt <- subset(aggregated_study_results, MARKER == m)
-      tt <- subset(tt, DEPTH == 3 )
+      tt <- aggregated_study_results[aggregated_study_results$MARKER == m, ]
+      tt <- tt[tt$DEPTH == 3, ]
 
       tt$KEY <- paste0(tt$AREA,"_",tt$SUBAREA,"_",tt$MARKER,"_",tt$FIGURE,"_",tt$AREA_OF_TEST)
       SPLIT <- split(tt$KEY, tt$STUDY)
       # get the common keys
       common_keys <- Reduce(intersect, SPLIT)
       # get the common keys
-      tt <- subset(tt, KEY %in% common_keys)
+      tt <- tt[tt$KEY %in% common_keys, ]
       # remove KEY column
       tt$KEY <- NULL
 
@@ -73,7 +73,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
         tt <- tt[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","DEPTH",statistic_parameter, pvalue_column)]
         # get only "AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","DEPTH" common to STUDY
         tt <- tt %>%
-          dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE, AREA_OF_TEST,DEPTH) %>%
+          dplyr::group_by(.data$AREA, .data$SUBAREA, .data$MARKER, .data$FIGURE, .data$AREA_OF_TEST, .data$DEPTH) %>%
           dplyr::summarise(
             alpha = max(get(pvalue_column), na.rm = TRUE),
             statistic_parameter = mean(get(statistic_parameter), na.rm = TRUE)
@@ -86,7 +86,7 @@ association_cross_studies_overlaps <- function(inference_detail, studies,alpha =
         tt <- tt[,c("AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST","DEPTH",pvalue_column)]
         # summarise grouping by "AREA","SUBAREA","MARKER","FIGURE","AREA_OF_TEST" and calculate the max of the pvalues
         tt <- tt %>%
-          dplyr::group_by(AREA, SUBAREA, MARKER, FIGURE, AREA_OF_TEST,DEPTH) %>%
+          dplyr::group_by(.data$AREA, .data$SUBAREA, .data$MARKER, .data$FIGURE, .data$AREA_OF_TEST, .data$DEPTH) %>%
           dplyr::summarise(
             alpha = max(get(pvalue_column), na.rm = TRUE)
           ) %>%

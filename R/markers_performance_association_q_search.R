@@ -1,4 +1,17 @@
-#' calculate scores for th e same dataset at changing of quantile/bins
+#' calculate scores for the same dataset at changing of quantile/bins
+#'
+#' @param inference_details data.frame where each row describes one inference run
+#'   (columns: depth_analysis, family_test, transformation_y, covariates, independent_variable)
+#' @param result_folder character string path to the root result folder
+#' @param dest_folder character string path to the destination folder for aggregated output
+#' @param folder_key character suffix appended to the study name to build per-q sub-folder names
+#' @param pvalue_column name of the adjusted p-value column to use for significance ranking; default "PVALUE_ADJ_ALL_BH"
+#' @param aggr_fun aggregation function name (as a string) used to summarise metrics across areas; default "mean"
+#' @param significance logical; if TRUE, restrict comparison to significant results only
+#' @param sql_conditions character vector of SQL condition strings used to subset samples
+#' @param study character string identifying the study
+#' @param qs integer vector of quantile/bin counts to evaluate; default c(2,4,8,16,32)
+#' @param ... additional arguments passed to \code{init_env}
 #'
 #' @return A data.frame of performance metrics aggregated per marker and
 #'   quantile/bin number; results are also written to CSV files on disk.

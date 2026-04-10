@@ -23,18 +23,19 @@ Imports: dplyr, doFuture, doRNG, FactoMineR, factoextra, foreach, FSA,
         fst, future, future.apply, ggplot2, ggvenn, gridExtra, gtools, Hmisc,
         lqmm, plyr, polars, progressr, reshape, reshape2, R.utils, rlang,
         stats, stringr, utils, withr, zoo, VennDiagram, effsize, pwr,
-        combinat, philentropy, parallelly, knitr, lmtest, usethis,
+        combinat, philentropy, parallelly, knitr, lmtest,
         glmnet, sqldf, readr, tidyr, readxl, xtable
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Suggests: ctdR, openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR, rmarkdown, pkgdown, STRINGdb,
         AnnotationDbi, KMEANS.KNN, M3C, UpSetR, boot, car, circlize,
-        fastDummies, fitdistrplus, ggpubr, mediation, nnet, org.Hs.eg.db,
-        quantreg, qvalue
+        fastDummies, fitdistrplus, ggpubr, mediation, meta, nnet, org.Hs.eg.db,
+        quantreg, qvalue, tidyverse
 Depends: R (>= 4.5.0)
 Additional_repositories: https://community.r-multiverse.org
 LazyData: true
+LazyDataCompression: xz
 SysDataCompression: bzip2
 Config/testthat/parallel: false
 Config/testthat/edition: 3

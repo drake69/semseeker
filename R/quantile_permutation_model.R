@@ -1,9 +1,9 @@
-#' Title
+#' Compute quantile delta permutation (CPU)
 #'
 #' @param sig.formula formula to apply
 #' @param df dataframe to use
-#' @param tau tau at which apply the quantile regression
-#' @param lqm_control specification of the lqmm package
+#' @param shuffle logical; if TRUE, permute the independent variable before fitting
+#' @param quantile quantile level (0–1) at which to compute the group difference; default 0.5 (median)
 #'
 #' @return A numeric scalar: the observed quantile difference between groups
 #'   (used as the test statistic in the permutation test).
@@ -34,8 +34,10 @@ compute_quantile_delta_permutation <- function(sig.formula,df, shuffle = FALSE, 
 #' @param sig.formula formula of the model
 #' @param tempDataFrame data
 #' @param independent_variable name of regressor
-#' @param permutation_success number of success tests to calculate corrected confidence interval
-#' @param tests_count count of total executed tests
+#' @param transformation_y transformation to apply to the dependent variable
+#' @param plot logical; if TRUE, generate diagnostic plots
+#' @param samples_sql_condition SQL condition string used to filter samples (used for plot file naming)
+#' @param key named list with AREA, SUBAREA, MARKER and FIGURE identifiers for this test
 #'
 #' @return A numeric p-value from the permutation-based quantile-difference test.
 #'

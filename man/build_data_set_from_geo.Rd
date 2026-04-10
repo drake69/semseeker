@@ -9,10 +9,12 @@ build_data_set_from_geo(GEOgse, downloadFiles = 0, result_folder, ...)
 \arguments{
 \item{GEOgse}{geo accession dataset identification}
 
-\item{downloadFiles}{0 means download all files from Gene Expression Ombibus (GEO),
-different than zero means how many download}
+\item{downloadFiles}{0 means download all files from Gene Expression Omnibus (GEO),
+different than zero means how many to download}
 
 \item{result_folder}{where sample sheet and files will be saved}
+
+\item{...}{additional arguments passed to internal helpers}
 }
 \value{
 samplesheet, and sample's file saved and samplesheet csv

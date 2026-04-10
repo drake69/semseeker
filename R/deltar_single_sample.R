@@ -1,12 +1,10 @@
-#' delta_single_sample
+#' deltar_single_sample
 #'
-#' @param values values of methylation
-#' @param high_thresholds highest threshold to use for comparison
-#' @param low_thresholds lowest threshold to use for comparison
-#' @param sample_detail details of sample to analyze
-#' @param signal_medians median to use for calculation
-#' @param probe_features genomic position of probe_features
-#' @return summary detail about the analysis
+#' @param values data.frame of methylation values with columns CHR, START, END and signal value in column 4
+#' @param thresholds data.frame of signal thresholds (from signal_range_values) with columns CHR, START, END,
+#'   signal_superior_thresholds, signal_inferior_thresholds, signal_median_values
+#' @param sample_detail named list/row with at least Sample_ID and Sample_Group fields
+#' @return invisibly NULL; relative-delta results are written as bedgraph.gz files under the session data folder
 #'
 deltar_single_sample <- function ( values, thresholds, sample_detail) {
 

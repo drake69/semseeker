@@ -1,8 +1,11 @@
-#' Title
+#' Retrieve delta (epimutation) signal for all markers and areas
 #'
-#' @param sample_sheet
+#' Loads per-sample delta values (DELTAS / DELTAR) for each marker–figure
+#' combination defined in the current session environment.  The sample sheet
+#' is fetched internally via \code{study_summary_get()}.
 #'
-#' @returns summary of sample sheet
+#' @return A named list of data.frames, one per marker–figure combination,
+#'   each containing columns CHR, START, END and per-sample delta values.
 #'
 #' @importFrom doRNG %dorng%
 #'

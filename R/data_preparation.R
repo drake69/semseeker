@@ -4,10 +4,12 @@
 #' @param transformation_y transformation_y to apply to data
 #' @param tempDataFrame data frame to use for test/regression
 #' @param independent_variable regressor
-#' @param g_start starting column of the dataframe
-#' @param dototal boolean to calculate the total burden test/regression
+#' @param g_start index of the first burden column in tempDataFrame
+#' @param g_end index of the last burden column in tempDataFrame
+#' @param dototal logical; if TRUE, append a column with the total (row-sum) burden
 #' @param covariates vector of covariates to be found in the sample sheet
 #' @param depth_analysis 1 only sample, 2 chr, 3 alle genomic areas
+#' @param key named list with AREA, SUBAREA, MARKER and FIGURE identifiers (used to name TOTAL columns)
 #'
 #' @return A named list with two elements: \code{tempDataFrame} (the prepared
 #'   and optionally transformed data.frame) and \code{independent_variableLevels}

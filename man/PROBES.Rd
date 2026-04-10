@@ -3,17 +3,18 @@
 \docType{data}
 \name{PROBES}
 \alias{PROBES}
-\title{PROBES_CHR_CHR}
+\title{PROBES}
 \format{
-A data frame with five variables: \code{year}, \code{sex},
-  \code{name}, \code{n} and \code{prop} (\code{n} divided by total number
-  of applicants in that year, which means proportions are of people of
-  that sex with that name born in that year).
+A data frame with columns including \code{PROBE} (probe identifier),
+  \code{CHR} (chromosome), \code{START} (genomic position), \code{END},
+  \code{K27}, \code{K450}, \code{K850} (array technology flags), and
+  additional gene/island annotation columns.
 }
 \usage{
 PROBES
 }
 \description{
-Full data set probe_features as defined by Illumina
+Subset of probe annotations for Illumina methylation arrays (450k/EPIC).
+Contains genomic coordinates and feature annotations for each CpG probe.
 }
 \keyword{datasets}

@@ -40,6 +40,8 @@ apply_stat_model(
 
 \item{depth_analysis}{depth's analysis}
 
+\item{samples_sql_condition}{SQL condition string to filter samples}
+
 \item{...}{extra parameters}
 }
 \value{

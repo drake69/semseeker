@@ -1,5 +1,13 @@
 #' calculate scores for a study across all the used quantile/bin number with result saved into a base folder
 #'
+#' @param study character string identifying the study (used to build folder paths)
+#' @param qs integer vector of quantile/bin counts to evaluate; default c(2,4,8,16,32)
+#' @param result_folder character string path to the root result folder for the study
+#' @param maxResources maximum number of parallel workers to use
+#' @param parallel_strategy parallelisation strategy passed to \code{init_env} (e.g. "multisession", "sequential")
+#' @param start_fresh logical; if TRUE, ignore previously cached results and recompute from scratch
+#' @param ... additional arguments passed to \code{init_env}
+#'
 #' @return A data.frame of quantization metrics (scores per marker and
 #'   quantile/bin number); results are also written to CSV files on disk.
 #'
@@ -81,7 +89,7 @@ marker_quantization_metric_q_search <- function(study, qs=c(2,4,8,16,32), result
 
         # skip already processed
         if(nrow(result_temp)>0)
-          it_exists <- nrow(subset(result_temp,(MARKER == res_temp$MARKER) & (Q == q))) > 0
+          it_exists <- nrow(result_temp[(result_temp$MARKER == res_temp$MARKER) & (result_temp$Q == q), ]) > 0
         else
           it_exists <- FALSE
         if(it_exists)
