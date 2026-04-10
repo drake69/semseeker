@@ -1,7 +1,7 @@
 
 position_pivot_to_probe <- function(signal_data)
 {
-  probe_features <- semseeker::pp_tot[,c("PROBE","CHR","START","END","K27","K450","K850")]
+  probe_features <- SEMseeker::pp_tot[,c("PROBE","CHR","START","END","K27","K450","K850")]
   # transform signal_data into parquet
   signal_data_temp <- polars::as_polars_df(signal_data)
   signal_data_temp <- signal_data_temp$lazy()

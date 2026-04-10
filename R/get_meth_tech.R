@@ -21,7 +21,7 @@ get_meth_tech <- function(signal_data)
     log_event("INFO: ", format(Sys.time(), "%a %b %d %X %Y"), " seems a WGBS dataset.")
 
 
-  probe_features <- semseeker::pp_tot[,c("PROBE","CHR","K27","K450","K850")]
+  probe_features <- SEMseeker::pp_tot[,c("PROBE","CHR","K27","K450","K850")]
   # if doesn't exist column PROBE
   if(!"PROBE" %in% colnames(signal_data))
     signal_data_probe <- rownames(signal_data)
