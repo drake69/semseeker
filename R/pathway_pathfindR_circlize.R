@@ -83,7 +83,7 @@ pathway_pathfindR_circlize <- function(
         results$GENE <- official_symbols
 
         results$PATHWAY_CHR <- "pathway"
-        genes_impacted_cytoband <- unique(semseeker::pp_tot[semseeker::pp_tot$GENE_WHOLE %in% results$GENE,c("CHR","START","END","CHR_CYTOBAND","GENE_WHOLE")])
+        genes_impacted_cytoband <- unique(SEMseeker::pp_tot[SEMseeker::pp_tot$GENE_WHOLE %in% results$GENE,c("CHR","START","END","CHR_CYTOBAND","GENE_WHOLE")])
 
         results <- merge(results,genes_impacted_cytoband, by.x="GENE", by.y="GENE_WHOLE")
         #reduce gene getting the start as min of start and end as max of end

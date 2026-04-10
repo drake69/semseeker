@@ -309,7 +309,7 @@ exploratory_analysis <- function(categorical_variables,numerical_variables, samp
         next
       }
       # calculate mean and standard deviation
-      mean <- paste(round(mean(sample_sheet[,variable], na.rm = TRUE),2) ," ±",round(sd(sample_sheet[,variable], na.rm = TRUE),2))
+      mean <- paste(round(mean(sample_sheet[,variable], na.rm = TRUE),2) ," \u00b1",round(sd(sample_sheet[,variable], na.rm = TRUE),2))
       # calculate median
       median <- round(median(sample_sheet[,variable], na.rm = TRUE))
       # calculate min and max
@@ -320,7 +320,7 @@ exploratory_analysis <- function(categorical_variables,numerical_variables, samp
       # calculate number of missing values
       missing_values <- paste(round(sum(is.na(sample_sheet[,variable]))/length(sample_sheet[,variable])*100,2),"%")
       # build a table with the descriptive statistics
-      res_data <- data.frame(Statistic=c("Mean ± Std","Median","Min","Max","1st Quartile","2nd Quartile","3rd Quartile","Missing Values"),
+      res_data <- data.frame(Statistic=c("Mean \u00b1 Std","Median","Min","Max","1st Quartile","2nd Quartile","3rd Quartile","Missing Values"),
         Value=c(mean,median,min,max,quantiles,missing_values))
       res_data <- as.data.frame(t(res_data))
       colnames(res_data) <- res_data[1,]

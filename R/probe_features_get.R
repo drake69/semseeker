@@ -27,7 +27,7 @@ probe_features_get <- function(area_subarea)
   if(!grepl("_",area_subarea))
     area_subarea <- paste(area_subarea,"_","WHOLE",sep="")
 
-  probe_features <- semseeker::pp_tot
+  probe_features <- SEMseeker::pp_tot
   probe_features <- probe_features[ probe_features[,ssEnv$tech], ]
   probe_features$END <- probe_features$START
 
