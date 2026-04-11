@@ -53,14 +53,14 @@ association_cross_studies_meta_analysis <- function(inference_details,statistic_
       if(studies_count<2)
         next
       meta_model <- metagen(
-        TE = results_inference_subset[,statistic_parameter],   # l'effetto di ogni studio
-        seTE = results_inference_subset$STD.ERROR,  # lo standard error dell'effetto di ogni studio
-        studlab = results_inference_subset$STUDY,  # il nome di ogni studio
-        data = results_inference_subset,  # il dataframe che contiene tutti i dati
-        comb.fixed = FALSE, # utilizza il modello a effetti casuali
-        hakn = FALSE, # non applica la correzione di Hartung-Knapp
-        TE.targ = 1, # specifica che la stima dell'effetto è il coefficiente di regressione
-        pval = results_inference_subset[,pvalue_column],  # specifica la colonna del p-value nel dataframe
+        TE = results_inference_subset[,statistic_parameter],   # effect size for each study
+        seTE = results_inference_subset$STD.ERROR,  # standard error of the effect size for each study
+        studlab = results_inference_subset$STUDY,  # study label
+        data = results_inference_subset,  # data frame containing all data
+        comb.fixed = FALSE, # use random-effects model
+        hakn = FALSE, # do not apply Hartung-Knapp correction
+        TE.targ = 1, # target effect size is the regression coefficient
+        pval = results_inference_subset[,pvalue_column],  # p-value column in the data frame
         ncpus = 9
       )
       meta_analysis_results <- summary(meta_model)
@@ -75,7 +75,7 @@ association_cross_studies_meta_analysis <- function(inference_details,statistic_
       random.ci.upper <- meta_analysis_results$random$upper
       random.pval <- meta_analysis_results$pval.random
 
-      #test of heteroareaity
+      # test of heterogeneity
       pval.Q <- meta_analysis_results$pval.Q
       pval.fixed <- meta_analysis_results$pval.fixed
       k.study <- meta_analysis_results$k.study

@@ -224,7 +224,7 @@ association_analysis <- function(inference_details,result_folder, maxResources =
             log_event("JOURNAL:","Result saved into file:", fileNameResults, ".")
             if (sum(cols %in% colnames(study_summary))!=0)
             {
-              # temporaneamente filtriamo per le colonne esistenti
+              # temporarily filter to existing columns only
               cols <- cols[cols %in% colnames(study_summary)]
               keys$AREA  =  "SAMPLE_GROUP"
               keys$SUBAREA  =  "SAMPLE"

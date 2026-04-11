@@ -5,7 +5,7 @@ variation_of_information <- function(original, quantized) {
   quantized <- as.vector(quantized)
 
   entropy <- function(p) {
-    p <- p[p > 0]  # Rimuovi zeri per evitare log(0)
+    p <- p[p > 0]  # Remove zeros to avoid log(0)
     -sum(p * log2(p))
   }
 

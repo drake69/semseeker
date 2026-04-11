@@ -39,15 +39,15 @@ multinomial_model <- function (family_test, tempDataFrame, sig.formula , transfo
   # Coefficients and Confidence Intervals
   coefficients <- coef(multinomial_model_result)
 
-  # Ottieni i coefficienti e gli errori standard
+  # Extract coefficients and standard errors
   coefficients <- model_summary$coefficients
   std_errors <- model_summary$standard.errors
 
-  # Calcola z-score e p-value
+  # Compute z-scores and p-values
   z_scores <- coefficients / std_errors
   p_values <- 2 * (1 - pnorm(abs(z_scores)))
 
-  # Ricostruisci il data frame in formato lungo (long format)
+  # Reshape to long format
   results_df <- data.frame(
     classe = rep(rownames(coefficients), times = ncol(coefficients)),
     variabile = rep(colnames(coefficients), each = nrow(coefficients)),
