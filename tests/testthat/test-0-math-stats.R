@@ -191,38 +191,38 @@ test_that("metrics_filter: non-'none' transformations return a sorted unique res
 # substitute_infinite  (calls log_event — uses global tempFolders from setup.R)
 # -----------------------------------------------------------------------
 test_that("substitute_infinite: no Inf values returns unchanged data frame", {
-  init_env(result_folder = tempFolders[1], start_fresh = TRUE)
+  SEMseeker:::init_env(result_folder = tempFolders[1], start_fresh = TRUE)
   df <- data.frame(x = c(1, 2, 3), y = c(4, 5, 6))
   result <- SEMseeker:::substitute_infinite(df)
   expect_equal(as.numeric(result$x), c(1, 2, 3))
   expect_equal(as.numeric(result$y), c(4, 5, 6))
-  close_env()
+  SEMseeker:::close_env()
 })
 
 test_that("substitute_infinite: +Inf replaced by max finite value", {
-  init_env(result_folder = tempFolders[2], start_fresh = TRUE)
+  SEMseeker:::init_env(result_folder = tempFolders[2], start_fresh = TRUE)
   df <- data.frame(x = c(1, Inf, 3))
   result <- SEMseeker:::substitute_infinite(df)
   expect_false(any(is.infinite(as.numeric(result$x))))
   expect_equal(as.numeric(result$x[2]), 3)  # max finite = 3, sign(+Inf)=+1
-  close_env()
+  SEMseeker:::close_env()
 })
 
 test_that("substitute_infinite: -Inf replaced by negative max finite value", {
-  init_env(result_folder = tempFolders[3], start_fresh = TRUE)
+  SEMseeker:::init_env(result_folder = tempFolders[3], start_fresh = TRUE)
   df <- data.frame(x = c(1, -Inf, 3))
   result <- SEMseeker:::substitute_infinite(df)
   expect_false(any(is.infinite(as.numeric(result$x))))
   expect_equal(as.numeric(result$x[2]), -3)  # max finite = 3, sign(-Inf)=-1
-  close_env()
+  SEMseeker:::close_env()
 })
 
 test_that("substitute_infinite: returns a data.frame", {
-  init_env(result_folder = tempFolders[4], start_fresh = TRUE)
+  SEMseeker:::init_env(result_folder = tempFolders[4], start_fresh = TRUE)
   df <- data.frame(x = c(1, Inf, 2), y = c(-Inf, 3, 4))
   result <- SEMseeker:::substitute_infinite(df)
   expect_s3_class(result, "data.frame")
-  close_env()
+  SEMseeker:::close_env()
 })
 
 # -----------------------------------------------------------------------
@@ -230,7 +230,7 @@ test_that("substitute_infinite: returns a data.frame", {
 # -----------------------------------------------------------------------
 test_that("calculate_collinearity_score: uncorrelated variables → no removal", {
   set.seed(42)
-  init_env(result_folder = tempFolders[5], start_fresh = TRUE)
+  SEMseeker:::init_env(result_folder = tempFolders[5], start_fresh = TRUE)
   df <- data.frame(
     a = stats::rnorm(50),
     b = stats::rnorm(50),
@@ -238,12 +238,12 @@ test_that("calculate_collinearity_score: uncorrelated variables → no removal",
   )
   result <- SEMseeker:::calculate_collinearity_score(df)
   expect_equal(length(result), 0)
-  close_env()
+  SEMseeker:::close_env()
 })
 
 test_that("calculate_collinearity_score: highly correlated variables flagged for removal", {
   set.seed(42)
-  init_env(result_folder = tempFolders[6], start_fresh = TRUE)
+  SEMseeker:::init_env(result_folder = tempFolders[6], start_fresh = TRUE)
   base <- stats::rnorm(50)
   df <- data.frame(
     a = base,
@@ -252,15 +252,15 @@ test_that("calculate_collinearity_score: highly correlated variables flagged for
   )
   result <- SEMseeker:::calculate_collinearity_score(df)
   expect_true(length(result) > 0)
-  close_env()
+  SEMseeker:::close_env()
 })
 
 test_that("calculate_collinearity_score: returns empty vector when no collinearity", {
   set.seed(1)
-  init_env(result_folder = tempFolders[7], start_fresh = TRUE)
+  SEMseeker:::init_env(result_folder = tempFolders[7], start_fresh = TRUE)
   df <- data.frame(x = stats::rnorm(30), y = stats::rnorm(30))
   result <- SEMseeker:::calculate_collinearity_score(df)
   # No collinearity → returns c() (zero-length vector)
   expect_equal(length(result), 0)
-  close_env()
+  SEMseeker:::close_env()
 })
