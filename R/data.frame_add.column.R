@@ -4,9 +4,7 @@ data.frame_add.column <- function(df,col_name, value)
     df[,col_name] <- value
   else
   {
-    tmp <- data.frame("TMP"="")
-    tmp$TMP <- value
-    colnames(tmp) <- col_name
+    tmp <- setNames(data.frame(value, stringsAsFactors = FALSE), col_name)
     if (nrow(df)==0)
       df <- tmp
     else
