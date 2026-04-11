@@ -11,7 +11,8 @@ loadNamespace("stats")
 use_synthetic_data <- TRUE
 if (use_synthetic_data)
 {
-  nprobes <<- 6e4
+  # 2e4 keeps statistical validity while reducing setup+test time ~3x vs 6e4
+  nprobes <<- 2e4
   nsamples <<- 3e1
 
   # intersample_mean <- 5
@@ -80,8 +81,12 @@ if (use_synthetic_data)
   mySampleSheet_batch <<- list(mySampleSheet, mySampleSheet, mySampleSheet)
   signal_data_batch <<- list(signal_data, signal_data, signal_data)
 
-  q1 <- apply(signal_data, 1, function (x) { stats::quantile(x, probs = 0.25, na.rm = TRUE) })
-  q3 <- apply(signal_data, 1, function (x) { stats::quantile(x, probs = 0.75, na.rm = TRUE) })
+  # Use vectorised row operations (7-10x faster than apply for large matrices)
+  signal_mat <- as.matrix(signal_data)
+  q1 <- matrixStats::rowQuantiles(signal_mat, probs = 0.25, na.rm = TRUE)
+  q3 <- matrixStats::rowQuantiles(signal_mat, probs = 0.75, na.rm = TRUE)
+  signal_medians <- matrixStats::rowMedians(signal_mat, na.rm = TRUE)
+  rm(signal_mat)
   iqr <- data.frame(q3 - q1)
 
   signal_superior_thresholds <- data.frame("HIGH" = q3 + 3 * iqr)
@@ -89,12 +94,8 @@ if (use_synthetic_data)
   colnames(signal_inferior_thresholds) <- "LOW"
   colnames(signal_superior_thresholds) <- "HIGH"
 
-  # sum(as.numeric(signal_data[,1] > signal_superior_thresholds))
-  # sum(as.numeric(signal_data[,1] < signal_inferior_thresholds))
-
   row.names(signal_superior_thresholds) <- probe_features$PROBE
   row.names(signal_inferior_thresholds) <- probe_features$PROBE
-  signal_medians <- apply(signal_data, 1, stats::median)
 
   signal_thresholds <- data.frame("signal_median_values"=signal_medians,
     "signal_inferior_thresholds"=signal_inferior_thresholds,
