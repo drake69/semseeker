@@ -22,7 +22,7 @@ compute_quantile_delta_permutation <- function(sig.formula,df, shuffle = FALSE, 
   tempDataFrame <- as.data.frame(tempDataFrame)
   colnames(tempDataFrame) <- cols
   # calculate quantile difference based on indepVar
-  quantile_difference <- tapply(tempDataFrame[,burden], tempDataFrame[,indepVar], quantile(probs=quantile))
+  quantile_difference <- tapply(tempDataFrame[,burden], tempDataFrame[,indepVar], function(x) stats::quantile(x, probs=quantile))
   statistic_parameter <- diff(quantile_difference)
   statistic_parameter <- as.numeric(statistic_parameter[[1]])
   return(statistic_parameter)
