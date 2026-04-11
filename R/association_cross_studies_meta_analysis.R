@@ -1,3 +1,30 @@
+#' Cross-study meta-analysis of association results
+#'
+#' Combines inference results from multiple studies using a random-effects
+#' meta-analysis model (\code{\link[meta]{metagen}}).  For each unique
+#' combination of FIGURE, SUBAREA and AREA_OF_TEST, the function pools
+#' effect sizes (BETA) and standard errors across studies and reports
+#' fixed-effect and random-effect estimates with heterogeneity statistics.
+#'
+#' Requires at least two studies per stratum; strata with fewer studies are
+#' silently skipped.
+#'
+#' @param inference_details \code{data.frame} describing the inference
+#'   configuration (same format as used by \code{association_analysis}).
+#' @param statistic_parameter Character scalar: column name of the effect
+#'   size estimate in the inference results (default \code{"BETA"}).
+#' @param pvalue_column Character scalar: column name of the adjusted p-value
+#'   (default \code{"PVALUE_ADJ_ALL_BH"}).
+#' @param studies Character vector: study identifiers to include.
+#' @param studies_base_folder Character scalar: base directory containing
+#'   per-study result folders.
+#' @param result_folder Character scalar: output directory for the
+#'   meta-analysis results.
+#'
+#' @return Invisibly returns a \code{data.frame} with one row per stratum
+#'   containing pooled effect estimates, confidence intervals, p-values, and
+#'   heterogeneity statistics (\eqn{\tau^2}, Q-test p-value).
+#'
 association_cross_studies_meta_analysis <- function(inference_details,statistic_parameter="BETA", pvalue_column="PVALUE_ADJ_ALL_BH",studies,
   studies_base_folder, result_folder)
 {

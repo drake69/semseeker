@@ -419,34 +419,3 @@ markers_performance_pathway_analyser <- function(inference_details, result_folde
   }
 }
 
-# Function to find unique gene sets for each key
-find_unique_gene_sets <- function(split_list) {
-  unique_sets <- list()
-  keys <- names(split_list)
-
-  for (k in seq_along(keys)) {
-
-    key <- keys[k]
-    # Start with the current key's gene sets
-    current_sets <- split_list[[key]]
-
-    # Get all other keys
-    other_keys <- setdiff(keys, key)
-
-    # Combine gene sets from all other keys
-    other_sets <- unlist(split_list[other_keys], use.names = FALSE)
-
-    # Find gene sets unique to the current key
-    unique_to_current <- setdiff(current_sets, other_sets)
-
-    # Store the unique gene sets with the key as the name
-    unique_sets[[key]] <- unique_to_current
-  }
-
-  # remove empty sets
-  unique_sets <- unique_sets[sapply(unique_sets, length) > 0]
-
-  return(unique_sets)
-}
-
-

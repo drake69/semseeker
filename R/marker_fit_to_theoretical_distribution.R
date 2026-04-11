@@ -199,6 +199,23 @@ add_density_curve <- function(fit, dist_name, col) {
   graphics::curve(do.call(paste0("d", dist_name), c(list(x = x), as.list(fit$estimate))),col = col, lwd = 2, add = TRUE)
 }
 
+#' Fit a parametric distribution to data
+#'
+#' Wrapper around \code{\link[fitdistrplus]{fitdist}} that silently returns
+#' \code{NULL} on failure instead of stopping.  Used internally to try
+#' multiple candidate distributions and keep only the ones that converge.
+#'
+#' @param dist_name Character scalar: distribution name as accepted by
+#'   \code{fitdistrplus::fitdist} (e.g. \code{"norm"}, \code{"beta"},
+#'   \code{"gamma"}).
+#' @param data Numeric vector of observations to fit.
+#' @param start Named list of initial parameter values passed to
+#'   \code{fitdistrplus::fitdist}.  \code{NULL} lets the function choose
+#'   defaults.
+#'
+#' @return A \code{fitdist} object on success, or \code{NULL} if fitting
+#'   fails.
+#'
 # Funzione per il fitting di una distribuzione con gestione delle eccezioni
 fit_distribution <- function(dist_name, data, start = NULL) {
   tryCatch({
