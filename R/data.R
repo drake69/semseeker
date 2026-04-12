@@ -1,37 +1,21 @@
-#' PROBES_CHR_CHR
+#' dmr_annotation
 #'
-#' Probe-to-chromosome mapping table for Illumina methylation arrays.
-#' Maps each CpG probe to its chromosome-level annotation.
+#' Differentially methylated region (DMR) annotations for CpG probes on
+#' Illumina methylation arrays.  Contains only probes that overlap at least one
+#' known imprinted or disease-associated DMR.  This lightweight table
+#' (~1,600 rows) supplements the Bioconductor array annotation packages used by
+#' \code{\link{probe_annotation_build}}, which do not carry DMR-level
+#' annotations.
 #'
-#' @format A data frame with columns for probe ID, chromosome, start/end
-#'   position, and chromosome-level annotation features.
-"PROBES_CHR_CHR"
-
-
-#' PROBES
-#'
-#' Subset of probe annotations for Illumina methylation arrays (450k/EPIC).
-#' Contains genomic coordinates and feature annotations for each CpG probe.
-#'
-#' @format A data frame with columns including \code{PROBE} (probe identifier),
-#'   \code{CHR} (chromosome), \code{START} (genomic position), \code{END},
-#'   \code{K27}, \code{K450}, \code{K850} (array technology flags), and
-#'   additional gene/island annotation columns.
-"PROBES"
-
-
-#' pp_tot
-#'
-#' Full probe annotation table for Illumina methylation arrays (27k, 450k, EPIC 850k).
-#' Used internally by \code{probe_features_get()} to look up genomic coordinates
-#' and feature annotations for each CpG probe.
-#'
-#' @format A data frame with approximately 800,000 rows (one per CpG probe) and
-#'   columns including \code{PROBE}, \code{CHR}, \code{START}, \code{END},
-#'   \code{K27}, \code{K450}, \code{K850} (array technology flags), gene body
-#'   feature columns (\code{GENE_BODY}, \code{GENE_TSS200}, etc.), and CpG
-#'   island context columns (\code{ISLAND_N_SHORE}, \code{ISLAND_S_SHORE}, etc.).
-"pp_tot"
+#' @format A data frame with three columns:
+#' \describe{
+#'   \item{PROBE}{Illumina probe identifier (e.g. \code{"cg00000924"}).}
+#'   \item{DMR_WHOLE}{Genomic region label of the enclosing DMR
+#'     (e.g. \code{"KCNQ1OT1:TSS-DMR"}).}
+#'   \item{DMR_DMR}{Fine-grained DMR label, identical to \code{DMR_WHOLE} for
+#'     most probes.}
+#' }
+"dmr_annotation"
 
 
 #' metrics_properties
