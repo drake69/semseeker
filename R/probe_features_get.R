@@ -40,13 +40,14 @@ probe_features_get <- function(area_subarea) {
     }
   }
 
-  # Legacy pp_tot fallback: used when Bioconductor packages are not available
-  if (requireNamespace("minfi", quietly = TRUE) &&
-      .bioc_anno_available(ssEnv$tech)) {
+  # Use Bioconductor annotation package when available; fall back to pp_tot
+  # during the transition period before the large .rda files are removed.
+  pkg <- .ANNO_PKGS[[ssEnv$tech]]
+  if (!is.null(pkg) && requireNamespace(pkg, quietly = TRUE)) {
     probe_features <- probe_annotation_build(ssEnv$tech)
   } else {
-    log_event("WARNING: Bioconductor annotation packages not available; ",
-              "falling back to bundled pp_tot.")
+    log_event("WARNING: annotation package '", pkg,
+              "' not installed; falling back to bundled pp_tot.")
     probe_features <- SEMseeker::pp_tot
   }
 
@@ -85,16 +86,4 @@ probe_features_get <- function(area_subarea) {
       !(probe_features$CHR %in% c("X", "Y")), ]
 
   return(probe_features)
-}
-
-# Internal helper: check whether the Bioconductor annotation package for
-# the given technology is installed.
-.bioc_anno_available <- function(tech) {
-  pkg <- switch(tech,
-    K850 = "IlluminaHumanMethylationEPICanno.ilm10b4.hg19",
-    K450 = "IlluminaHumanMethylation450kanno.ilmn12.hg19",
-    K27  = "IlluminaHumanMethylation27kanno.ilmn12.hg19",
-    return(FALSE)
-  )
-  requireNamespace(pkg, quietly = TRUE)
 }
