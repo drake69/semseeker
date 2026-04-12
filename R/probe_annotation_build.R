@@ -2,8 +2,8 @@
 #'
 #' Constructs a \code{data.frame} equivalent to the legacy \code{pp_tot} object
 #' by reading coordinates and feature annotations directly from the S4 data
-#' slots of the installed Illumina annotation package.  \pkg{minfi} is \emph{not}
-#' required at runtime; the annotation packages are accessed without it.
+#' slots of the installed Illumina annotation package.  The annotation packages
+#' are accessed directly via their S4 data slots.
 #' The result is cached inside the session environment
 #' (\code{ssEnv$probe_annotation}) so the package is parsed only once per
 #' R session.
@@ -51,7 +51,7 @@ probe_annotation_build <- function(tech, force = FALSE) {
 
   log_event("INFO: building probe annotation from '", pkg, "'...")
 
-  # ---- Read raw data from S4 slots (no minfi required) ----
+  # ---- Read raw data from annotation package S4 slots ----
   anno_df <- .anno_pkg_to_df(pkg)
 
   # ---- PROBE, CHR, START, END ----

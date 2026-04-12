@@ -1,5 +1,4 @@
-# Internal utilities for accessing Illumina methylation annotation packages
-# without requiring minfi as a hard dependency.
+# Internal utilities for accessing Illumina methylation annotation packages.
 #
 # The three IlluminaHumanMethylation*anno packages store their data as S4
 # objects of class "IlluminaHumanMethylationAnnotation" (defined in minfi).
@@ -8,8 +7,7 @@
 #   - Islands.UCSC : Islands_Name, Relation_to_Island
 #   - Other        : UCSC_RefGene_Name, UCSC_RefGene_Group, ...
 #
-# We access these slots directly so that minfi is NOT required at runtime.
-# minfi remains in Suggests for users who want the full methylation workflow.
+# SEMseeker accesses these slots directly — minfi is not a dependency.
 
 # Map from SEMseeker technology key to Bioconductor annotation package name
 .ANNO_PKGS <- c(
@@ -21,7 +19,7 @@
 #' Get probe IDs from an Illumina annotation package
 #'
 #' Extracts the complete vector of probe identifiers (e.g. \code{cg00000029})
-#' from an annotation package without loading minfi.
+#' from an annotation package.
 #'
 #' @param pkg Character scalar: annotation package name.
 #' @return Character vector of probe IDs (rownames of the Locations table).

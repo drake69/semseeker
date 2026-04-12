@@ -33,7 +33,7 @@ VignetteBuilder: knitr
 Suggests: ctdR, openai, caret, pathfindR, wordcloud, GEOquery, OpenCL,
         stringi, testthat, WebGestaltR, rmarkdown, pkgdown, STRINGdb,
         AnnotationDbi, KMEANS.KNN, M3C, UpSetR, boot, car, circlize,
-        fastDummies, fitdistrplus, ggpubr, mediation, meta, minfi, nnet,
+        fastDummies, fitdistrplus, ggpubr, mediation, meta, nnet,
         org.Hs.eg.db, quantreg, qvalue, tidyverse, matrixStats
 Depends: R (>= 4.5.0)
 Additional_repositories: https://community.r-multiverse.org
