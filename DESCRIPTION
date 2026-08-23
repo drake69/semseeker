@@ -23,27 +23,23 @@ BugReports: https://github.com/corsaro-lab/SEMseeker/issues
 biocViews: Epigenetics, DNAMethylation, MethylationArray, DifferentialMethylation,
         GeneExpression, Pathways, MultipleComparison, Normalization,
         StatisticalMethod, Software, Coverage, Sequencing
-Imports: caret, dplyr, doFuture, doRNG, fastDummies, foreach, FSA,
-        fst, future, future.apply, GenomicRanges, ggplot2, ggvenn,
-        graphics, grDevices, gridExtra, gtools, jsonlite, lqmm,
-        matrixStats, plyr, polars, progressr, reshape, reshape2,
-        R.utils, rlang, stats, stringr, tools, utils, withr, zoo,
+Imports: caret, dplyr, doFuture, doRNG, fastDummies, foreach, future,
+        GenomicRanges, ggplot2, ggvenn, graphics, grDevices, gtools,
+        jsonlite, lqmm, matrixStats, plyr, polars, progressr, reshape,
+        reshape2, R.utils, rlang, stats, stringr, tools, utils, withr,
         VennDiagram, effsize, pwr, combinat, philentropy, parallelly,
         knitr, lmtest, glmnet, sqldf, readr, tidyr, readxl, xtable
 VignetteBuilder: knitr
-Suggests: ctdR, openai, pathfindR, wordcloud, GEOquery, OpenCL,
-        stringi, testthat, WebGestaltR, rmarkdown, pkgdown, STRINGdb,
-        AnnotationDbi, KMEANS.KNN, M3C, UpSetR, boot, car, circlize,
-        fitdistrplus, ggpubr, mediation, meta, nnet,
+Suggests: ctdR, pathfindR, GEOquery, OpenCL, stringi, testthat,
+        WebGestaltR, rmarkdown, STRINGdb, AnnotationDbi, KMEANS.KNN,
+        M3C, UpSetR, boot, car, circlize, ggpubr, mediation, meta, nnet,
         org.Hs.eg.db, quantreg, qvalue, tidyverse, Rfast,
         IlluminaHumanMethylationEPICanno.ilm10b4.hg19,
         IlluminaHumanMethylation450kanno.ilmn12.hg19,
-        IlluminaHumanMethylation27kanno.ilmn12.hg19,
-        IRanges, S4Vectors, GenomicFeatures, GenomeInfoDb,
-        AnnotationHub,
+        IlluminaHumanMethylation27kanno.ilmn12.hg19, IRanges, S4Vectors,
+        GenomicFeatures, GenomeInfoDb, AnnotationHub,
         TxDb.Hsapiens.UCSC.hg19.knownGene,
-        TxDb.Hsapiens.UCSC.hg38.knownGene,
-        limma
+        TxDb.Hsapiens.UCSC.hg38.knownGene, limma, ggrepel, memuse
 Depends: R (>= 4.6.0)
 SystemRequirements: libuv (>= 1) for the 'fs' package build on Linux
         when not using bundled libuv (set USE_BUNDLED_LIBUV=1 to skip),
