@@ -108,6 +108,23 @@ test_that("the scope is returned in canonical spelling", {
   expect_equal(kept$scope, "INSTANCE")
 })
 
+test_that("a request whose model cannot be fitted stops the run", {
+  # AI-309: the row used to be dropped and the run continued, so the result file
+  # was indistinguishable from one where every requested test had been fitted.
+  # A reader cannot tell a model that found nothing from a model never run.
+  expect_error(SEMseeker:::assoc_validate_family(.scope_details("SAMPLE", family_test = NA)),
+               "'family_test' is required")
+  expect_error(SEMseeker:::assoc_validate_family(.scope_details("SAMPLE", family_test = "")),
+               "'family_test' is required")
+  expect_error(SEMseeker:::assoc_validate_family(.scope_details("SAMPLE", family_test = "not_a_test")),
+               "not a model this package can fit")
+  # the row number travels with the refusal, so a batch says which request failed
+  batch <- rbind(.scope_details("SAMPLE"), .scope_details("SAMPLE", family_test = "nope"))
+  expect_error(SEMseeker:::assoc_validate_family(batch), "row 2")
+  # and a legal one passes without noise
+  expect_silent(SEMseeker:::assoc_validate_family(.scope_details("INSTANCE")))
+})
+
 # ---------------------------------------------------------------------------
 # the two branches, on a real run
 # ---------------------------------------------------------------------------

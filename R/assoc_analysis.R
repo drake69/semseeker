@@ -138,6 +138,10 @@ association_analysis <- function(inference_details, result_folder, maxResources 
   # already under way.
   inference_details <- assoc_validate_scope(inference_details)
   inference_details <- assoc_validate_aggregation(inference_details)
+  # AI-309: and the model. A family test that is absent or unknown used to make
+  # the row vanish from the loop below, leaving a result file indistinguishable
+  # from one where the test had run.
+  inference_details <- assoc_validate_family(inference_details)
 
   for (z in seq_len(nrow(inference_details))) {
     start_time <- Sys.time()
@@ -147,8 +151,10 @@ association_analysis <- function(inference_details, result_folder, maxResources 
 
     core_log_inference_header(inference_detail)
 
+    # AI-309: validated at the door, so there is nothing to check and nothing to
+    # skip here. The `next` this replaces is the reason a malformed request
+    # could produce a complete-looking file.
     family_test <- util_split_and_clean(inference_detail$family_test)
-    if (!assoc_validate_family_test(family_test)) next
 
     # AI-255: the models read artefacts, not columns — assoc_run_marker() opens
     # the pivot for every key, collapsed or not. So what this needs from the
