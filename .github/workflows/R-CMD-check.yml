@@ -167,7 +167,23 @@ jobs:
           # technology heuristic and broke. A warm dependency cache hid this for
           # months; moving the repository to an organisation reset the cache and
           # exposed it.
-          BiocManager::install("limma", ask = FALSE, update = FALSE)
+          #
+          # KEGGREST joins limma in that first call, and for the same reason one
+          # layer deeper. It is nobody's direct dependency here: bumphunter
+          # loads it, and so does AnnotationDbi, and both are loaded by the
+          # packages of the vector below while they are being load-tested. Asked
+          # for as part of that vector, KEGGREST was built LAST - after every
+          # package that needs it - so the three Illumina annotation packages
+          # and TxDb.Hsapiens.UCSC.hg19.knownGene all failed with "there is no
+          # package called 'KEGGREST'" and were removed from the library. The
+          # suite then failed at the first call that needs an annotation, which
+          # reads as a defect of the package and is not one.
+          #
+          # options(Ncpus = 1L) above does not prevent this. Serialising the
+          # installs stopped one package from being load-tested before another
+          # was built, but it does not make BiocManager order a vector
+          # topologically: the order asked for is the order used.
+          BiocManager::install(c("limma", "KEGGREST"), ask = FALSE, update = FALSE)
           BiocManager::install(
             c(
               "IlluminaHumanMethylationEPICanno.ilm10b4.hg19",
