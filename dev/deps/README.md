@@ -1,11 +1,11 @@
-# dev/deps — dependency analysis pipeline
+# dev/deps: dependency analysis pipeline
 
 Measures two graphs and joins them:
 
-1. **External** — what SEMseeker declares, where each package comes from
+1. **External**: what SEMseeker declares, where each package comes from
    (CRAN / Bioconductor / elsewhere), how large an install each one drags in,
    and whether it is used at all.
-2. **Internal** — which function calls which, lifted to file and domain level,
+2. **Internal**: which function calls which, lifted to file and domain level,
    plus reachability from the three public endpoints.
 
 The join answers the only question that matters for a submission: *which
@@ -50,7 +50,7 @@ A package can be reached in four ways, and they are not equally good evidence:
 | `ns` | `pkg::fn()` | proof |
 | `import` | a symbol brought in by `importFrom()` | proof |
 | `loader` | `requireNamespace("pkg")` with a literal | proof of an optional path |
-| `string` | the name only ever appears as a string constant | **weak** — may be dynamic dispatch, may be dead |
+| `string` | the name only ever appears as a string constant | **weak**: may be dynamic dispatch, may be dead |
 
 The `evidence` column carries this. Anything resting on `string` alone needs a
 human to look before it is called used or unused.
@@ -59,7 +59,7 @@ human to look before it is called used or unused.
 
 Static analysis, so: dispatch through a variable, `do.call()` on a computed
 name, and `get()` are invisible. Two forms that *would* have been invisible are
-recovered explicitly, because this package leans on both — `SEMseeker:::fn()`
+recovered explicitly, because this package leans on both: `SEMseeker:::fn()`
 self-qualified calls, and function names handed to parallel workers as strings
 in `.export =` lists. Everything unreachable is therefore a **candidate**, not a
 proof; every candidate in the analysis document was checked by hand before being

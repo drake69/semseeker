@@ -1,4 +1,4 @@
-# 01_external_deps.R — the external dependency graph.
+# 01_external_deps.R: the external dependency graph.
 #
 # Answers, for every declared dependency: where does it come from (CRAN / Bioc /
 # neither), how many packages does it drag in transitively, and is it actually
@@ -26,7 +26,7 @@ deps_available_db <- function(paths, refresh = FALSE) {
     error = function(e) NULL, warning = function(w) NULL
   )
   if (is.null(db) || !nrow(db)) {
-    deps_msg("  repository db: OFFLINE — falling back to the installed library")
+    deps_msg("  repository db: OFFLINE, falling back to the installed library")
     db <- utils::installed.packages()
     attr(db, "source") <- "installed"
   } else {
@@ -145,7 +145,7 @@ run_external_deps <- function(pkg_root = ".", refresh = FALSE) {
   # how we know a package is used, in decreasing order of strength:
   # ns (pkg::fn) > import (importFrom symbol) > loader (requireNamespace("x"))
   # > string (the name appears only as a string constant). A package whose only
-  # evidence is "string" may well be dead — the reader has to look.
+  # evidence is "string" may well be dead: the reader has to look.
   evidence <- function(u, pkg) {
     k <- unique(u$qualified$kind[u$qualified$package == pkg])
     if (!length(k)) "" else paste(sort(k), collapse = "+")

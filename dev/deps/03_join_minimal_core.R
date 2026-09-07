@@ -1,10 +1,10 @@
-# 03_join_minimal_core.R — where the two graphs meet.
+# 03_join_minimal_core.R: where the two graphs meet.
 #
 # Every external dependency is kept alive by a set of internal functions. Cross
 # that set with the reachability computed in 02 and each dependency lands in one
 # of five buckets:
 #
-#   blocking   not installable from CRAN or Bioconductor — submission stopper
+#   blocking   not installable from CRAN or Bioconductor: submission stopper
 #   core       reached by all three endpoints, or by the SEM layer alone
 #   layer      reached by one downstream layer only (assoc or enrich)
 #   periphery  used only by code no exported function can reach
@@ -146,7 +146,7 @@ deps_render_domain_dot <- function(domain_matrix, path) {
   deps_msg("  wrote %s", basename(path))
 }
 
-# Mermaid version of the same graph, for pasting into the analysis document —
+# Mermaid version of the same graph, for pasting into the analysis document.
 # graphviz is not installed everywhere and mermaid renders in Markdown.
 deps_render_domain_mermaid <- function(domain_matrix, feedback_arcs, path,
                                        min_weight = 3) {

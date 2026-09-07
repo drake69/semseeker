@@ -7,7 +7,7 @@ Authors@R: person("Luigi", "Corsaro",
     role  = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-1218-230X"))
 Description: Detection, quantification and association analysis of Stochastic
-    Epigenetic Mutations (SEMs) from DNA methylation data of any source —
+    Epigenetic Mutations (SEMs) from DNA methylation data of any source:
     Illumina methylation arrays (EPIC 850k, 450k, 27k), whole-genome
     bisulfite sequencing (WGBS / RRBS), and long-read sequencing
     (Oxford Nanopore, PacBio) consumed either as bedmethyl files or as
@@ -45,7 +45,7 @@ SystemRequirements: libuv (>= 1) for the 'fs' package build on Linux
         when not using bundled libuv (set USE_BUNDLED_LIBUV=1 to skip),
         and XQuartz on macOS to provide the libX11 implementation
         against which R's base tcltk package is linked at install time
-        (without XQuartz, loading tcltk segfaults on macOS arm64 — see
+        (without XQuartz, loading tcltk segfaults on macOS arm64, see
         'brew install --cask xquartz').
 Additional_repositories: https://community.r-multiverse.org
 LazyData: true

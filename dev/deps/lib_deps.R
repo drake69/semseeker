@@ -1,4 +1,4 @@
-# lib_deps.R — shared helpers for the dependency analysis pipeline.
+# lib_deps.R: shared helpers for the dependency analysis pipeline.
 #
 # Development tooling only: `dev/` is listed in .Rbuildignore, so nothing here
 # ships with the package. Pure base R + igraph; no package loading, no
@@ -246,7 +246,7 @@ deps_import_symbol_calls <- function(path, symbol_to_pkg) {
 
 # String constants naming a function of this package. The parallel workers are
 # handed their environment through `.export = c("fn", ...)` lists, and the
-# dispatchers self-qualify as `SEMseeker:::fn` — both are real calls that no
+# dispatchers self-qualify as `SEMseeker:::fn`. Both are real calls that no
 # AST walk over the enclosing function body can see.
 deps_string_function_refs <- function(path, own_funs) {
   if (!length(own_funs)) return(NULL)
@@ -262,7 +262,7 @@ deps_string_function_refs <- function(path, own_funs) {
              stringsAsFactors = FALSE)
 }
 
-# Package names that appear only as string constants — the annotation layer
+# Package names that appear only as string constants: the annotation layer
 # dispatches on lookup tables of package names and then calls
 # requireNamespace(pkg) on the variable, which no call-site scan can resolve.
 # Restricted to names that are actually declared, so ordinary strings do not

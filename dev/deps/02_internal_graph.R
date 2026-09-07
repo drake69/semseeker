@@ -1,4 +1,4 @@
-# 02_internal_graph.R — the internal call graph.
+# 02_internal_graph.R: the internal call graph.
 #
 # Builds a function-level directed graph of R/ (who calls whom), lifts it to the
 # file and domain levels, and computes reachability from the three public
@@ -6,7 +6,7 @@
 # from: everything the endpoints cannot reach is, by construction, outside it.
 #
 # Static analysis only. Dispatch through variables, do.call() with a computed
-# name, and get() are invisible to it — the reachable set is therefore a lower
+# name, and get() are invisible to it: the reachable set is therefore a lower
 # bound and the unreachable set must be read as "candidates", not as proof.
 
 ENDPOINTS <- c("semseeker", "association_analysis", "enrichment_analysis")

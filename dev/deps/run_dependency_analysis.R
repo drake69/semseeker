@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# run_dependency_analysis.R — orchestrator.
+# run_dependency_analysis.R: orchestrator.
 #
 #   Rscript dev/deps/run_dependency_analysis.R [--refresh] [--root <pkg-root>]
 #
