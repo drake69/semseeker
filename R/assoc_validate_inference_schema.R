@@ -79,7 +79,7 @@ assoc_validate_inference_schema <- function(inference_details, strict = TRUE) {
       "removed. It named the region classes a second time, and they are ",
       "already the (AREA, SUBAREA) pairs of the run: declare them with ",
       "association_analysis(areas =, subareas =) and they are built at ",
-      "runtime. What the request names now is `scope` — SAMPLE or INSTANCE, ",
+      "runtime. What the request names now is `scope`: SAMPLE or INSTANCE, ",
       "which of the two aggregation branches to run. The two are mutually ",
       "exclusive: a request that wants both writes two rows"))
   hit <- intersect(names(retired), unknown_cols)

@@ -2,7 +2,7 @@
 #'
 #' AI-308. `SCOPE` is the coordinate that says over what extent one number is
 #' valid: `SAMPLE` reduces the positions of a region class to one number per
-#' sample, `INSTANCE` to one number per instance of that class — one per gene,
+#' sample, `INSTANCE` to one number per instance of that class: one per gene,
 #' island, cytoband or probe. They are **two branches of aggregation**, and
 #' [io_pivot_build()] has always kept them apart; what was missing upstream was
 #' anyone choosing between them, so every request produced both and the two were
@@ -15,7 +15,7 @@
 #'
 #' **Why `scope` is required and has no default.** It is the same argument that
 #' made `aggregation` required in AI-248. Any default would silently give a
-#' request half of what the previous release gave it — an inference CSV that
+#' request half of what the previous release gave it: an inference CSV that
 #' looks complete and simply never tested one of the two branches. A missing
 #' coordinate is a request that does not identify what it wants.
 #'
@@ -47,7 +47,7 @@ assoc_validate_scope <- function(inference_details) {
       stop("inference_details row ", z, ": 'scope' is required. Name which of ",
            "the two aggregations to run: \"SAMPLE\" (one number per sample, ",
            "over the positions of each region class of the run) or ",
-           "\"INSTANCE\" (one number per instance of the class — per gene, ",
+           "\"INSTANCE\" (one number per instance of the class: per gene, ",
            "per island, per probe). They are alternatives, not addends: a ",
            "request that wants both writes two rows.", call. = FALSE)
 

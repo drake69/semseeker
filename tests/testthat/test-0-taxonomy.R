@@ -254,7 +254,7 @@ test_that("every coordinate of the key is required", {
 }
 
 test_that("a request that names no aggregation is refused, in either scope", {
-  # AI-308: the loop used to run over depth 1, 2, 3 — three values of a column
+  # AI-308: the loop used to run over depth 1, 2, 3: three values of a column
   # that had already been retired, so it ran the same assertion three times. The
   # axis that does vary is the scope, and it varies in two.
   keys <- .tax_keys(MARKER = "MUTATIONS", FIGURE = "HYPER", DISCRETE = TRUE)

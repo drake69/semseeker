@@ -1,4 +1,4 @@
-## AI-308 — SCOPE picks one branch of aggregation, and that branch restricts.
+## AI-308: SCOPE picks one branch of aggregation, and that branch restricts.
 ##
 ## Two properties, both of which fail *silently*: a result file is produced
 ## either way, and it looks complete either way.
@@ -12,7 +12,7 @@
 ##      positions of GENE_TSS1500 and no others. It was not: on the Illumina path
 ##      anno_probe_features_get() hands back the whole annotation table with NA
 ##      in the column of the class asked for, and the SAMPLE branch selected its
-##      coordinates without dropping those rows — so the mask was the entire
+##      coordinates without dropping those rows, so the mask was the entire
 ##      array whatever the class, and every "restricted" burden came out equal to
 ##      the burden of the whole sample.
 ##
@@ -32,7 +32,7 @@
 
 # The region classes of the run, and what each of them is expected to cover.
 # PROBE_WHOLE is the whole sample (no mask), GENE_WHOLE the probes annotated to
-# any gene, GENE_TSS1500 the promoter windows only — a strict chain of subsets,
+# any gene, GENE_TSS1500 the promoter windows only: a strict chain of subsets,
 # which is what makes the restriction testable without trusting a single number.
 .scope_areas    <- c("GENE", "PROBE")
 .scope_subareas <- c("WHOLE", "TSS1500")
@@ -94,7 +94,7 @@ test_that("a batch family cannot be fitted on a collapsed artefact", {
   # limma/voom estimate a prior variance across the instances they are handed;
   # a SCOPE = SAMPLE artefact holds one row. While the two branches were
   # additive this could be an INFO that skipped the collapsed keys and carried
-  # on with the per-instance ones — with one branch per request there is nothing
+  # on with the per-instance ones: with one branch per request there is nothing
   # left to carry on with, so it is an error and not an empty file.
   expect_error(
     SEMseeker:::assoc_validate_scope(.scope_details("SAMPLE", family_test = "limma_trend")),
@@ -163,7 +163,7 @@ test_that("scope = SAMPLE tests the collapsed artefacts and leaves the instances
   expect_equal(unique(rows$SCOPE), "SAMPLE")
 
   # the classes of the run, all of them, and the single-position one normalised
-  # to the technology's own — the run declared POSITION implicitly and PROBE
+  # to the technology's own: the run declared POSITION implicitly and PROBE
   # explicitly, and collapsed they are the same number
   expect_setequal(unique(paste(rows$AREA, rows$SUBAREA, sep = "_")),
                   c("GENE_WHOLE", "GENE_TSS1500", "PROBE_WHOLE"))
@@ -188,7 +188,7 @@ test_that("the collapsed burden is restricted to its own region class", {
                             showprogress = showprogress, verbosity = verbosity)
 
   # The mask itself: how many positions each class contributes. This is the
-  # measurement that was wrong — it returned the whole array for every class —
+  # measurement that was wrong, it returned the whole array for every class,
   # and it is deterministic, so it can be asserted strictly.
   mask_size <- function(area, subarea) {
     m <- SEMseeker:::.io_pivot_masked_lazy("MUTATIONS", "HYPER", "SAMPLE", area, subarea)
@@ -250,7 +250,7 @@ test_that("scope = INSTANCE tests the per-instance artefacts and nothing else", 
   rows <- .scope_inference_rows(tempFolder)
   expect_gt(nrow(rows), 0)
   expect_equal(unique(rows$SCOPE), "INSTANCE")
-  # one row per instance, so the same class carries many AREA_OF_TEST values —
+  # one row per instance, so the same class carries many AREA_OF_TEST values,
   # which is exactly what a collapsed row does not have
   gene_rows <- rows[which(rows$AREA == "GENE" & rows$SUBAREA == "WHOLE"), , drop = FALSE]
   expect_gt(length(unique(gene_rows$AREA_OF_TEST)), 1)
@@ -278,7 +278,7 @@ test_that("a request that wants both branches writes two rows, and gets both", {
 
   rows <- .scope_inference_rows(tempFolder)
   # the file name carries neither the scope nor the aggregation, so both rows
-  # land in the same CSV — and the coordinates are what tells them apart
+  # land in the same CSV, and the coordinates are what tells them apart
   expect_setequal(unique(rows$SCOPE), c("SAMPLE", "INSTANCE"))
   sample_rows   <- rows[which(rows$SCOPE == "SAMPLE"), , drop = FALSE]
   instance_rows <- rows[which(rows$SCOPE == "INSTANCE"), , drop = FALSE]

@@ -31,7 +31,7 @@ association_analysis(
     \item{scope}{Required. Which of the two aggregations to run, over the
       region classes of the call (\code{areas}, \code{subareas}).
       \code{"SAMPLE"} reduces the positions of each class to one number per
-      sample — the burden, or its density, or a descriptor of the signal.
+      sample: the burden, or its density, or a descriptor of the signal.
       \code{"INSTANCE"} reduces them to one number per instance of the class:
       one row per gene, per island, per cytoband, per probe.
 
@@ -73,9 +73,9 @@ association_analysis(
   previous run foresaw costs one scan of the position pivot rather than a
   rerun.
 
-  Result rows carry the coordinates as columns — \code{MARKER},
+  Result rows carry the coordinates as columns: \code{MARKER},
   \code{FIGURE}, \code{SCOPE}, \code{AREA}, \code{SUBAREA},
-  \code{AGGREGATION} — never a class name squashed into one of them.}
+  \code{AGGREGATION}, never a class name squashed into one of them.}
 
 \item{result_folder}{character. Path to the SEMseeker result folder.}
 

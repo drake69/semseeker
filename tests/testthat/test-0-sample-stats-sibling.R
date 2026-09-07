@@ -233,7 +233,7 @@ test_that("a region scope reaches the sibling and the depth=1 inference", {
   pf <- SEMseeker:::anno_probe_features_get("GENE_TSS1500")
   # AI-308: keep only the probes that ARE annotated to the class. On the Illumina
   # path anno_probe_features_get() returns the whole annotation table, with NA in
-  # the column of the class asked for — for K450, GENE_TSS1500 carries 84,808
+  # the column of the class asked for: for K450, GENE_TSS1500 carries 84,808
   # annotated probes against 401,394 NA. This block used to select the
   # coordinates without dropping them, which is precisely what the producer did
   # wrong: the expected value it computed was the burden of the WHOLE sample, and
@@ -372,8 +372,8 @@ test_that("a retired column stops the analysis instead of testing nothing", {
 
   # AI-308: this used to name a region class the run had not produced and expect
   # the run to stop rather than write a CSV that tested nothing. The request can
-  # no longer name a class at all — the classes are the (AREA, SUBAREA) pairs
-  # declared with areas/subareas — so the surviving guarantee is the one on the
+  # no longer name a class at all: the classes are the (AREA, SUBAREA) pairs
+  # declared with areas/subareas, so the surviving guarantee is the one on the
   # column itself: `scopes` is retired, and a request still carrying it is told
   # so by name instead of being read as a typo for something else.
   inference_details <- data.frame(

@@ -36,9 +36,9 @@
 #' downstream.
 #'
 #' AI-308: it runs **after** [assoc_validate_scope()], and needs to. Which
-#' aggregations a marker admits depends on the scope — the two peaks of a
+#' aggregations a marker admits depends on the scope: the two peaks of a
 #' bimodal density need one big group, so they exist at `SCOPE = SAMPLE` and
-#' nowhere else — so a request whose scope has not been validated yet cannot be
+#' nowhere else, so a request whose scope has not been validated yet cannot be
 #' judged here. `inference_details$scope` is therefore a precondition, not an
 #' optional column.
 #'
@@ -86,14 +86,14 @@ assoc_validate_aggregation <- function(inference_details, keys = NULL) {
            paste(legal, collapse = ", "), ".", call. = FALSE)
 
     # AI-308: the scope of the request reaches the registry. Which aggregations
-    # a marker admits is not a property of the marker alone — MODELOW/MODEHIGH
+    # a marker admits is not a property of the marker alone: MODELOW/MODEHIGH
     # estimate two peaks of a density and need the whole distribution, so they
     # exist at SCOPE = SAMPLE and nowhere else. Without the scope this check
     # could not see that, and a request for them per instance was answered here
     # and refused later, inside io_pivot_build(), with the run already going.
     #
-    # The AREA is deliberately NOT passed. Its restriction — a single-position
-    # block admits only VALUE — is not a refusal but a renaming: the request is
+    # The AREA is deliberately NOT passed. Its restriction, a single-position
+    # block admits only VALUE, is not a refusal but a renaming: the request is
     # honoured and the artefact takes the name that says nothing was reduced
     # (see .assoc_aggregation_get()). Refusing it here would reject a legal
     # request on the grounds that one of the run's classes needs it spelled

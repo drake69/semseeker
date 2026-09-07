@@ -7,7 +7,7 @@
 - **`association_analysis()` runs one aggregation per request, and it has to be
   named.** `SCOPE` has two values: `SAMPLE` reduces the positions of a region
   class to one number per sample, `INSTANCE` reduces them to one number per
-  instance of that class — one row per gene, per island, per probe. Until now
+  instance of that class: one row per gene, per island, per probe. Until now
   every request produced **both** and wrote them into the same file, so each
   result was the union of two different questions, with no way to have asked for
   only one.
@@ -27,9 +27,9 @@
 
   **Migration.** A request that wants both branches writes two rows, one per
   scope; both still land in the same result file, told apart by the `SCOPE`
-  column. `limma_`/`voom_` families are refused at `scope = "SAMPLE"` — they
+  column. `limma_`/`voom_` families are refused at `scope = "SAMPLE"`: they
   estimate a prior variance across instances, and a collapsed artefact holds one
-  row — where before the collapsed keys were skipped and the run continued on
+  row, whereas before the collapsed keys were skipped and the run continued on
   the per-instance ones.
 
 - **`inference_details$scopes` is removed.** It named the region classes a
@@ -220,8 +220,8 @@
   sample.** At `SCOPE = SAMPLE` the mask that selects the positions of a class
   was built from the full probe annotation table, including the probes with no
   annotation for that class. On a 450k run the mask covered all 485,512
-  positions whatever the class was — against 365,860 for `GENE_WHOLE`, 84,342
-  for `GENE_TSS1500` and 62,870 for `ISLAND_N_SHORE` — so every restricted
+  positions whatever the class was, against 365,860 for `GENE_WHOLE`, 84,342
+  for `GENE_TSS1500` and 62,870 for `ISLAND_N_SHORE`, so every restricted
   burden equalled the burden of the whole sample, and all classes returned the
   same number. Per-instance results were never affected, and neither were
   WGBS/long-read runs, where the annotation is resolved by coordinate overlap

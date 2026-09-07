@@ -241,7 +241,7 @@ test_that("association_analysis at scope SAMPLE runs without error and writes in
 }
 
 # ---------------------------------------------------------------------------
-# T1 — scope INSTANCE + spearman: exercises pivot parquet read / chunk / merge
+# T1, scope INSTANCE + spearman: exercises pivot parquet read / chunk / merge
 #      path, one row per instance of every region class of the run
 # ---------------------------------------------------------------------------
 
@@ -288,7 +288,7 @@ test_that("association_analysis at scope INSTANCE reads area pivots and writes i
   #
   # The property it wanted is now sayable: the request asked for the
   # per-instance branch, so every row must carry SCOPE = INSTANCE, and a region
-  # class must span many instances — which is exactly what a collapsed row
+  # class must span many instances, which is exactly what a collapsed row
   # cannot do.
   result_csv <- csv_files[!grepl("(?i)assoc_covariates_model", csv_files)][1]
   if (!is.na(result_csv) && file.exists(result_csv) && file.info(result_csv)$size > 10) {

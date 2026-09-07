@@ -100,8 +100,8 @@ assoc_validate_family_test <- function(family_test){
 
 #' Refuse a request whose family test cannot be run
 #'
-#' AI-309. `assoc_validate_family_test()` answers a question — is this string a
-#' family this package knows how to fit — and answers it for one value. This is
+#' AI-309. `assoc_validate_family_test()` answers a question: is this string a
+#' family this package knows how to fit, and answers it for one value. This is
 #' the *consequence* of that answer at the door of `association_analysis()`,
 #' alongside [assoc_validate_scope()] and [assoc_validate_aggregation()].
 #'
@@ -110,7 +110,7 @@ assoc_validate_family_test <- function(family_test){
 #' log gained a line, and the run carried on to write an inference CSV that
 #' looks exactly like one where every requested test had been fitted. A reader
 #' of that file cannot tell a model that found nothing from a model that was
-#' never run — and the whole point of naming the six coordinates in the output
+#' never run, and the whole point of naming the six coordinates in the output
 #' is to make that distinction impossible to lose.
 #'
 #' Skipping is right for an *environmental* condition, where the request was
@@ -135,7 +135,7 @@ assoc_validate_family <- function(inference_details) {
 
     if (length(family_test) == 0)
       stop("inference_details row ", z, ": 'family_test' is required. Name the ",
-           "model to fit — a group test, a GLM family, a correlation, a ",
+           "model to fit: a group test, a GLM family, a correlation, a ",
            "quantile regression. The row used to be dropped with a line in the ",
            "log, which left a result file that could not be told apart from ",
            "one where the test had run and found nothing.", call. = FALSE)

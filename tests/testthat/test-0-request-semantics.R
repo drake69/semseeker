@@ -1,4 +1,4 @@
-## AI-310 — the semantics of a request, and of the identity of what it produces.
+## AI-310: the semantics of a request, and of the identity of what it produces.
 ##
 ## These are conceptual invariants rather than behaviours of one function. Each
 ## of them has already been violated at least once, silently, and in every case
@@ -12,7 +12,7 @@
 test_that("every column the documentation names is a column the package accepts", {
   # association_analysis() documented a `marker` column of inference_details for
   # a long time. It was never in the vocabulary, so a request written from the
-  # documentation was refused as carrying an unknown column — the documentation
+  # documentation was refused as carrying an unknown column: the documentation
   # described a package that did not exist. Nothing could have noticed: the two
   # lists live in different files and neither reads the other.
   rd <- system.file("../man/association_analysis.Rd", package = "SEMseeker")
@@ -40,7 +40,7 @@ test_that("every column the documentation names is a column the package accepts"
 
   # The other direction is a documentation gap, not a lie: these columns work,
   # they are simply not described in the argument block. Pinned so it can only
-  # shrink — a new accepted column that nobody documents will fail here.
+  # shrink: a new accepted column that nobody documents will fail here.
   known_gap <- c("covariates", "covariates_dummy", "covariates_pca",
                  "collinearity_check", "transformation_x", "filter_p_value",
                  "samples_sql_condition", "areas_sql_condition",
@@ -73,7 +73,7 @@ test_that("distinct coordinate tuples never compose the same artefact key", {
   #
   # The risk is not hypothetical: the key is a flat underscore join and two
   # vocabularies carry an underscore inside their values (N_SHORE, S_SHELF), so
-  # nothing about the format prevents a collision — only the vocabularies do.
+  # nothing about the format prevents a collision, only the vocabularies do.
   # That is exactly the kind of guarantee that has to be measured.
   tempFolder <- tempFolders[20]
   on.exit({ try(SEMseeker:::core_close_env(), silent = TRUE)
@@ -139,8 +139,8 @@ test_that("every coordinate is load-bearing: dropping one changes the key", {
 test_that("the taxonomy forbids the one case where aggregations would coincide", {
   # A block holding a single position has no reduction to speak of: its sum, its
   # mean and its median are the block itself. Rather than let three names return
-  # one number — which would invite the reader to believe three things were
-  # computed — the taxonomy admits exactly one name there, VALUE.
+  # one number, which would invite the reader to believe three things were
+  # computed: the taxonomy admits exactly one name there, VALUE.
   #
   # So the constraint "two combinations never give the same answer" is kept at
   # the level where it can be kept: the combinations that would collide are not
@@ -154,8 +154,8 @@ test_that("the taxonomy forbids the one case where aggregations would coincide",
                               "admits more than one aggregation"))
   }
 
-  # At SCOPE = SAMPLE the same area is the whole sample — thousands of positions
-  # — so the reduction is real and the names are not interchangeable.
+  # At SCOPE = SAMPLE the same area is the whole sample, thousands of positions,
+  # so the reduction is real and the names are not interchangeable.
   at_sample <- SEMseeker:::util_aggregations_allowed(
     "MUTATIONS", "HYPER", discrete = TRUE, default = FALSE,
     scope = "SAMPLE", area = "PROBE")
@@ -236,7 +236,7 @@ test_that("the enrichment input invariant is declared once, not five times", {
   # It used to be two literals written out by hand in every backend, so nothing
   # stated the invariant and nothing enforced it: a sixth backend asking for
   # ISLAND would have been served, because assoc_results_get() accepts any
-  # region class — the cross-study overlaps iterate over all of them.
+  # region class: the cross-study overlaps iterate over all of them.
   want <- SEMseeker:::enrich_input_invariant()
   expect_equal(want$scope, "INSTANCE")
   expect_equal(want$area,  "GENE")

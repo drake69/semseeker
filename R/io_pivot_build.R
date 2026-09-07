@@ -208,12 +208,12 @@ key_col_value <- function(aggregation) {
     #
     # AI-308: `drop_nulls("AREA")` first, and it is not decoration. On the
     # Illumina path anno_probe_features_get() returns the WHOLE annotation table
-    # — every probe of the array — with NA in the column of the class asked for:
+    # (every probe of the array) with NA in the column of the class asked for:
     # for K450, GENE_TSS1500 carries 84,808 annotated probes against 401,394 NA.
     # Selecting the coordinates without dropping those rows built the mask on
     # all 485,512 positions whatever the class, so the inner join below excluded
     # nothing and every "restricted" burden came out equal to the burden of the
-    # whole sample — identical for GENE_TSS1500, ISLAND_N_SHORE and GENE_WHOLE
+    # whole sample: identical for GENE_TSS1500, ISLAND_N_SHORE and GENE_WHOLE
     # alike. Silent, because a number was produced for each class.
     #
     # The INSTANCE branch below never had the defect: it drops the same nulls

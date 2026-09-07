@@ -4,7 +4,7 @@
 #' filter this package applies for convenience, it is what the analysis is: a
 #' pathway is a set of genes, so a CpG island is not a member of one and a
 #' collapsed per-sample burden is not a gene. The two coordinates are therefore
-#' invariants of the enrichment layer — `SCOPE = INSTANCE`, because a gene list
+#' invariants of the enrichment layer: `SCOPE = INSTANCE`, because a gene list
 #' needs one row per gene, and `AREA = GENE`.
 #'
 #' Regions that are not genes are not excluded from enrichment in general: they
@@ -13,7 +13,7 @@
 #' statements). Once mapped, what reaches this layer is `AREA = GENE` again.
 #'
 #' It exists as a function, and not as two literals, because it used to be two
-#' literals — written out by hand in all five backends. Nothing declared the
+#' literals, written out by hand in all five backends. Nothing declared the
 #' invariant and nothing enforced it: a sixth backend asking for `ISLAND` would
 #' have been served, because [assoc_results_get()] accepts any region class (the
 #' cross-study overlaps iterate over all of them legitimately).
@@ -39,9 +39,9 @@ enrich_input_invariant <- function() list(scope = "INSTANCE", area = "GENE")
 #'
 #' So the check moves to the door and names the remedy. Two failure modes:
 #' \itemize{
-#'   \item the run has no `GENE` region class at all — nothing a pathway
+#'   \item the run has no `GENE` region class at all: nothing a pathway
 #'     analysis could be about;
-#'   \item it has one, but no inference result carries a per-instance gene row —
+#'   \item it has one, but no inference result carries a per-instance gene row:
 #'     the association was run, on something else.
 #' }
 #' A result file written before `SCOPE` existed as a column cannot be judged and
@@ -64,8 +64,8 @@ enrich_input_assert <- function(inference_details, ssEnv = NULL) {
   if (!(want$area %in% areas))
     stop("this run declares no ", want$area, " region class, so there is ",
          "nothing a pathway analysis could be about: a pathway is a set of ",
-         "genes. Declare it on the analysis — ",
-         "association_analysis(areas = \"GENE\", scope = \"INSTANCE\", ...) — ",
+         "genes. Declare it on the analysis: ",
+         "association_analysis(areas = \"GENE\", scope = \"INSTANCE\", ...), ",
          "and run the enrichment on the result.", call. = FALSE)
 
   markers <- unique(as.character(ssEnv$keys_markers_figures$MARKER))
@@ -104,7 +104,7 @@ enrich_input_assert <- function(inference_details, ssEnv = NULL) {
   stop("no inference result of this folder carries a gene row: the enrichment ",
        "reads SCOPE = ", want$scope, " and AREA = ", want$area,
        ", and every result here was produced on something else. This is not a ",
-       "negative result — the input was never computed. Produce it with ",
+       "negative result: the input was never computed. Produce it with ",
        "association_analysis(scope = \"INSTANCE\", areas = \"GENE\", ...); a ",
        "run at scope = \"SAMPLE\" answers a different question and cannot feed ",
        "a pathway analysis.", call. = FALSE)

@@ -23,7 +23,7 @@
 #'     \item{scope}{Required. Which of the two aggregations to run, over the
 #'       region classes of the call (\code{areas}, \code{subareas}).
 #'       \code{"SAMPLE"} reduces the positions of each class to one number per
-#'       sample — the burden, or its density, or a descriptor of the signal.
+#'       sample: the burden, or its density, or a descriptor of the signal.
 #'       \code{"INSTANCE"} reduces them to one number per instance of the class:
 #'       one row per gene, per island, per cytoband, per probe.
 #'
@@ -65,9 +65,9 @@
 #'   previous run foresaw costs one scan of the position pivot rather than a
 #'   rerun.
 #'
-#'   Result rows carry the coordinates as columns — \code{MARKER},
+#'   Result rows carry the coordinates as columns: \code{MARKER},
 #'   \code{FIGURE}, \code{SCOPE}, \code{AREA}, \code{SUBAREA},
-#'   \code{AGGREGATION} — never a class name squashed into one of them.
+#'   \code{AGGREGATION}, never a class name squashed into one of them.
 #' @param result_folder character. Path to the SEMseeker result folder.
 #' @param maxResources numeric. Maximum percentage of CPU cores to use
 #'   (default 90).
@@ -128,7 +128,7 @@ association_analysis <- function(inference_details, result_folder, maxResources 
 
   inference_details <- assoc_validate_inference_schema(unique(inference_details))
   # AI-248: shape first, then meaning. Refuse a request that cannot be honoured
-  # before any result is written — checking it inside the per-marker loop would
+  # before any result is written: checking it inside the per-marker loop would
   # surface the mistake after part of the output exists.
   #
   # AI-308: the scope goes first, because which aggregations are admissible
@@ -177,7 +177,7 @@ association_analysis <- function(inference_details, result_folder, maxResources 
                                              collapse = ", "),
                 ", which the sample sheet does not carry: joining the per-sample ",
                 "features as well.")
-      # AI-308: the request no longer names region classes — they are the
+      # AI-308: the request no longer names region classes: they are the
       # (AREA, SUBAREA) pairs of the run. A covariate the sheet does not carry
       # can name any of them, plus "SAMPLE" for the unrestricted feature, so the
       # join offers the whole registry rather than a list the request no longer

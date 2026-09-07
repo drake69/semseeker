@@ -372,7 +372,7 @@ assoc_run_marker <- function(prep, marker, family_test, fileNameResults,
 #' AI-255 unified the two consumers into one. `sem_run_depth1_marker()` read
 #' columns out of the joined per-sample table, `assoc_run_marker()` read a pivot,
 #' and `depth_analysis` chose between them; the two existed because the two
-#' artefacts had different *shapes* — a table with samples down the rows, a pivot
+#' artefacts had different *shapes*: a table with samples down the rows, a pivot
 #' with areas down the rows. They have the same shape now: a key column and one
 #' column per sample. A `SCOPE = SAMPLE` artefact is one row tall, so transposing
 #' it yields exactly one feature column, which is what the fitting code already
@@ -384,14 +384,14 @@ assoc_run_marker <- function(prep, marker, family_test, fileNameResults,
 #' two aggregations, and nothing inherited that job: this function built both
 #' tables and stacked them, so every request produced the per-sample burden **and**
 #' the per-instance rows, summed into one result file. That was a leftover, not a
-#' design — the aggregation branches themselves have always been separate, and
+#' design: the aggregation branches themselves have always been separate, and
 #' [io_pivot_build()] is where they part company.
 #'
 #' So the request now names its branch, and this returns one of the two:
 #' \itemize{
-#'   \item `SCOPE = INSTANCE` — the region classes of the run crossed with the
+#'   \item `SCOPE = INSTANCE`: the region classes of the run crossed with the
 #'     figures of the marker, one row per instance of each class;
-#'   \item `SCOPE = SAMPLE` — the same region classes, each collapsed to one
+#'   \item `SCOPE = SAMPLE`: the same region classes, each collapsed to one
 #'     number per sample.
 #' }
 #' Both range over `ssEnv$keys_areas_subareas`, the registry built from
@@ -402,7 +402,7 @@ assoc_run_marker <- function(prep, marker, family_test, fileNameResults,
 #' `PROBE_WHOLE` and `POSITION_WHOLE` are one class under two names, and
 #' collapsed they are the same number: the whole sample, no mask. The caller
 #' skips whichever of the two the technology does not speak (AI-098), and
-#' `util_keys_create()` always forces `POSITION` into the registry — so an
+#' `util_keys_create()` always forces `POSITION` into the registry, so an
 #' Illumina run that did not declare `PROBE` would have its whole-sample burden
 #' built on `POSITION_WHOLE` and then skipped, losing a row without an error.
 #' The collapsed branch therefore rewrites the single-position class to the
@@ -439,7 +439,7 @@ assoc_run_marker <- function(prep, marker, family_test, fileNameResults,
   }
 
   # SCOPE = SAMPLE: the region classes of the run, each collapsed to one number
-  # per sample. The classes come from the registry, not from the request — they
+  # per sample. The classes come from the registry, not from the request: they
   # are declared once, with areas=/subareas=, and built at runtime.
   regions <- ssEnv$keys_areas_subareas
   mf <- ssEnv$keys_markers_figures
