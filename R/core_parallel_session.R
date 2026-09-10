@@ -44,6 +44,21 @@ core_parallel_session <- function()
     ssEnv$parallel_strategy <- parallel_strategy
   }
 
+  # multicore requires fork(), which Windows does not provide. future does not
+  # refuse the request: plan(multicore) is accepted and then degrades to a
+  # single worker, so a caller who asked for parallelism gets none and is never
+  # told. Convert to multisession, which every platform supports, and say so.
+  # Measured on CI: the same suite took 285 minutes on Windows against 134 on
+  # Linux, and the ratio was the number of workers, not the speed of the
+  # platform.
+  if (parallel_strategy == "multicore" && !parallelly::supportsMulticore()) {
+    core_log_event("WARNING: ", format(Sys.time(), "%a %b %d %X %Y"),
+              " multicore requires fork(), which this platform does not",
+              " provide. Switching to multisession.")
+    parallel_strategy <- "multisession"
+    ssEnv$parallel_strategy <- parallel_strategy
+  }
+
   if(parallelly::supportsMulticore())
     options(parallelly.fork.enable= TRUE)
   else
