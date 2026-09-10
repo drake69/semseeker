@@ -182,6 +182,19 @@
 
 ### Bug fixes
 
+- **A request for `multicore` on a platform without `fork()` was granted with a
+  single worker.** `future::plan(multicore)` does not refuse such a platform: it
+  accepts the request and degrades to one worker. Windows has no `fork()`, so a
+  run taking the default `parallel_strategy = "multicore"` executed the whole
+  pipeline in series while believing it was parallel, and nothing in the log
+  said so. macOS already had an explicit conversion, for an unrelated reason
+  (fork is unsafe there alongside Polars); a platform that simply lacks `fork()`
+  had none. `core_parallel_session()` now converts `multicore` to `multisession`
+  wherever `parallelly::supportsMulticore()` is false, and logs the substitution
+  the way the macOS path does. Measured on CI, same commit and same suite: 285
+  minutes on Windows against 134 on Linux. The ratio was the number of workers,
+  not the speed of the platform.
+
 - **A consumer wrote over the file it was consuming.**
   `assoc_data_extractor()` read the canonical inference CSV, applied three
   filters — the figures of the marker, the `areas_sql_condition` of the request,
